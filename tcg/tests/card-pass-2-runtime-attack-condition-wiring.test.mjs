@@ -72,7 +72,10 @@ test('attack audit records structured condition ownership separately', () => {
 test('the condition owner is deliberately narrow and fail-closed', () => {
   assert.ok(conditionSource.includes('if (String(step.op || "") !== "APPLY_CONDITION") return null;'));
   assert.ok(conditionSource.includes('["op", "target", "condition", "mode"]'));
-  assert.ok(conditionSource.includes('applyRuntimeCondition(target, step.condition, turn, step.mode)'));
+  assert.ok(conditionSource.includes('applyRuntimeConditionWithContext('));
+  assert.ok(conditionSource.includes('"$bound_attack_target"'));
+  assert.ok(conditionSource.includes('target_controller_seat: target.controller_seat'));
+  assert.ok(matchSource.includes('source_action_id:attackActionId'));
   assert.ok(conditionSource.includes('Mixed programs deliberately return null'));
 });
 

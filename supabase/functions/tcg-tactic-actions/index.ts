@@ -25,7 +25,8 @@ import {
   type RuntimeV02PredicateLeaf,
 } from "../_shared/tcg-match-predicate-tree-v0-2.ts";
 import { evaluateRuntimeV02EventOccurredRequirement } from "../_shared/tcg-match-event-history-query-v0-2.ts";
-import { addRuntimeShield, applyRuntimeCondition, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions, type ApplyConditionMode } from "./runtime-v0-2-core.ts";
+import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions, type ApplyConditionMode } from "./runtime-v0-2-core.ts";
+import { applyRuntimeConditionWithContext } from "../_shared/tcg-match-condition-engine-v0-2.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.4";
 const EFFECT_SCHEMA = "sb-tcg-effects-v0.1";
@@ -1339,7 +1340,30 @@ function executeUntilChoice(state: any) {
       if (!["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"].includes(rawMode)) {
         throw new Error("tcg_v0_2_tactic_condition_mode_unsupported");
       }
-      applyRuntimeCondition(found.cr, condition, Number(state.turn_seq || 0), rawMode as ApplyConditionMode);
+      const turn = Number(state.turn_seq);
+      if (!Number.isInteger(turn) || turn < 0) throw new Error("tcg_v0_2_tactic_condition_turn_invalid");
+      const activeSeat = Number(state.active_seat);
+      if (activeSeat !== 1 && activeSeat !== 2) throw new Error("tcg_v0_2_tactic_condition_active_seat_invalid");
+      const sourceSeat = Number(effect.owner_seat);
+      if (sourceSeat !== 1 && sourceSeat !== 2) throw new Error("tcg_v0_2_tactic_condition_source_seat_invalid");
+      const targetSeat = Number(found.seat);
+      if (targetSeat !== 1 && targetSeat !== 2) throw new Error("tcg_v0_2_tactic_condition_target_seat_invalid");
+      const sourceActionId = String(effect.id || "").trim();
+      if (!sourceActionId) throw new Error("tcg_v0_2_tactic_condition_action_required");
+      applyRuntimeConditionWithContext(
+        found.cr,
+        condition,
+        turn,
+        rawMode as ApplyConditionMode,
+        {
+          turn_seq: turn,
+          active_seat: activeSeat as 1 | 2,
+          source_controller_seat: sourceSeat as 1 | 2,
+          target_controller_seat: targetSeat as 1 | 2,
+          card_effect: true,
+          source_action_id: sourceActionId,
+        },
+      );
       effect.cursor++;
       continue;
     }

@@ -6,6 +6,10 @@ import {
   structuredRuntimeAfterDamageOverchargeDiscardCondition,
 } from "../_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts";
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
+import {
+  runtimeV02ConditionProtectionCount,
+  runtimeV02InstallConditionProtection,
+} from "../_shared/tcg-match-condition-protection-v0-2.ts";
 
 function assertEquals(actual: unknown, expected: unknown, message = "values differ") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
@@ -427,4 +431,52 @@ Deno.test("malformed near-family programs fail closed while unrelated and legacy
     structuredRuntimeAfterDamageOverchargeDiscardCondition(legacy, { card_id: "test-overcharge-creature" }, 2),
     null,
   );
+});
+
+
+Deno.test("overcharge discard remains committed while matching opponent-card condition protection blocks Stunned", () => {
+  const state = stateWith(4);
+  const target = (state.players as any)["2"].vanguard;
+  runtimeV02InstallConditionProtection(target, {
+    protection_id: "overcharge-condition-protection",
+    source_action_id: "protection-source",
+    source_uid: "protection-source-uid",
+    source_card_id: "protection-source-card",
+    source_controller_seat: 2,
+    target_controller_seat: 2,
+    installed_turn_seq: 9,
+    condition_names: [],
+    condition_slot: "control",
+    source_controller: "opponent",
+    card_effect_only: true,
+    max_uses: 1,
+    expires_on: "start_of_controller_next_turn",
+  });
+  const descriptor = structuredRuntimeAfterDamageOverchargeDiscardCondition(
+    state,
+    { card_id: "test-overcharge-creature" },
+    2,
+  )!;
+  const pending = runtimeV02CreateAttackOverchargeDiscardChoice(
+    state,
+    1,
+    descriptor,
+    card("source-1", "test-overcharge-creature"),
+    targetBinding(state),
+    attackIfContext(state, 1, true),
+    "choice-protected",
+  )!;
+  const resolved = runtimeV02ResolveAttackOverchargeDiscardChoice(
+    pending,
+    1,
+    pending.id,
+    ["essence:ess-1"],
+    state,
+  );
+  assertEquals(resolved.condition_applied, false);
+  assertEquals(resolved.condition_prevented, true);
+  assertEquals(resolved.condition_reason, "condition_protection");
+  assertEquals(target.conditions.control, null);
+  assertEquals((state.players as any)["1"].discard.map((item: any) => item.uid), ["ess-1"]);
+  assertEquals(runtimeV02ConditionProtectionCount(target), 0);
 });

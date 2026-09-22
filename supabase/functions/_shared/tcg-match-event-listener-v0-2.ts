@@ -22,7 +22,7 @@ import {
   type RuntimeV02FrozenEssenceAttachedWorkItem,
 } from "./tcg-match-essence-attachment-work-v0-2.ts";
 import {
-  applyRuntimeCondition,
+  applyRuntimeConditionWithContext,
   clearRuntimeCondition,
   hasRuntimeCondition,
   runtimeConditions,
@@ -2059,7 +2059,25 @@ function executeStep(
     if (!["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"].includes(rawMode)) {
       throw new Error("tcg_v0_2_event_listener_condition_mode_unsupported");
     }
-    applyRuntimeCondition(target.cr, condition, currentTurn(state), rawMode as ApplyConditionMode);
+    const turn = currentTurn(state);
+    const activeSeat = normalizedSeat(
+      state.active_seat,
+      "tcg_v0_2_event_listener_condition_active_seat_invalid",
+    );
+    applyRuntimeConditionWithContext(
+      target.cr,
+      condition,
+      turn,
+      rawMode as ApplyConditionMode,
+      {
+        turn_seq: turn,
+        active_seat: activeSeat,
+        source_controller_seat: candidate.seat,
+        target_controller_seat: target.seat,
+        card_effect: true,
+        source_action_id: `event-listener:${event.event_id}:${listenerId(candidate)}:${continuation.step_cursor}`,
+      },
+    );
     continuation.step_cursor++;
     return "continue";
   }

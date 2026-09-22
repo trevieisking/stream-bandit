@@ -1,12 +1,12 @@
 import {
   addRuntimeShield,
-  applyRuntimeCondition,
   healRuntimeDamage,
   placeRuntimeDamage,
   type ApplyConditionMode,
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import { applyRuntimeConditionWithContext } from "./tcg-match-condition-engine-v0-2.ts";
 import { runtimeV02EvaluateAttackIf } from "./tcg-match-attack-if-v0-2.ts";
 import {
   recordRuntimeV02AttackHealEachPackets,
@@ -17,7 +17,16 @@ import {
 export type RuntimeV02AttackConditionTarget =
   | "$source_creature"
   | "$attack_target"
+  | "$bound_attack_target"
   | "$current_opponent_vanguard";
+
+export type RuntimeV02AttackConditionApplicationContext = {
+  source_controller_seat: 1 | 2;
+  attack_target_controller_seat: 1 | 2;
+  current_opponent_vanguard_controller_seat: 1 | 2;
+  active_seat: 1 | 2;
+  source_action_id: string;
+};
 
 export type RuntimeV02AttackConditionEffectResult = {
   target: RuntimeV02AttackConditionTarget;
@@ -72,6 +81,7 @@ function targetToken(value: unknown, attackId: string, index: number): RuntimeV0
   if (
     target !== "$source_creature" &&
     target !== "$attack_target" &&
+    target !== "$bound_attack_target" &&
     target !== "$current_opponent_vanguard"
   ) {
     throw new Error(`tcg_v0_2_attack_condition_target_unsupported:${attackId}:${index}:${String(value)}`);
@@ -84,11 +94,14 @@ function resolveTarget(
   sourceCreature: RuntimeCreature,
   attackTarget: RuntimeCreature,
   currentOpponentVanguard: RuntimeCreature | null | undefined,
-): RuntimeCreature {
-  if (target === "$source_creature") return sourceCreature;
-  if (target === "$attack_target") return attackTarget;
+  context: RuntimeV02AttackConditionApplicationContext,
+): { creature: RuntimeCreature; controller_seat: 1 | 2 } {
+  if (target === "$source_creature") return { creature: sourceCreature, controller_seat: context.source_controller_seat };
+  if (target === "$attack_target" || target === "$bound_attack_target") {
+    return { creature: attackTarget, controller_seat: context.attack_target_controller_seat };
+  }
   if (!currentOpponentVanguard) throw new Error("tcg_v0_2_attack_condition_opponent_vanguard_missing");
-  return currentOpponentVanguard;
+  return { creature: currentOpponentVanguard, controller_seat: context.current_opponent_vanguard_controller_seat };
 }
 
 /**
@@ -106,6 +119,7 @@ export function structuredRuntimeAfterDamageConditionEffects(
   sourceCreature: RuntimeCreature,
   attackTarget: RuntimeCreature,
   currentOpponentVanguard: RuntimeCreature | null | undefined,
+  applicationContext: RuntimeV02AttackConditionApplicationContext,
 ): RuntimeV02AttackConditionPhaseResult | null {
   const definition = runtimeV02Definition(state, instanceOrId);
   if (!definition) return null;
@@ -153,8 +167,21 @@ export function structuredRuntimeAfterDamageConditionEffects(
   const turn = currentTurn(state);
   const effects = normalized.map((raw) => {
     const step = raw!;
-    const target = resolveTarget(step.target, sourceCreature, attackTarget, currentOpponentVanguard);
-    const result = applyRuntimeCondition(target, step.condition, turn, step.mode);
+    const target = resolveTarget(step.target, sourceCreature, attackTarget, currentOpponentVanguard, applicationContext);
+    const result = applyRuntimeConditionWithContext(
+      target.creature,
+      step.condition,
+      turn,
+      step.mode,
+      {
+        turn_seq: turn,
+        active_seat: applicationContext.active_seat,
+        source_controller_seat: applicationContext.source_controller_seat,
+        target_controller_seat: target.controller_seat,
+        card_effect: true,
+        source_action_id: applicationContext.source_action_id,
+      },
+    );
     return {
       target: step.target,
       condition: step.condition,

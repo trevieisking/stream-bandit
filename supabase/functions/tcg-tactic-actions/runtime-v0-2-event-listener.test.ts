@@ -7,6 +7,10 @@ import {
 } from "../_shared/tcg-match-event-listener-v0-2.ts";
 import { runtimeV02PrivateRewardInspectionView } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
 import { runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
+import {
+  runtimeV02ConditionProtectionCount,
+  runtimeV02InstallConditionProtection,
+} from "../_shared/tcg-match-condition-protection-v0-2.ts";
 
 function assert(
   condition: unknown,
@@ -813,4 +817,42 @@ Deno.test("unmarked legacy matches preserve raw play behavior", () => {
     (state.players as any)["1"].vanguard.flags.lifecycle_withdrawal_cost,
     undefined,
   );
+});
+
+
+Deno.test("triggered APPLY_CONDITION uses source-aware Condition protection", () => {
+  const source = creatureDefinition(
+    "test-condition-trigger",
+    "Condition Trigger",
+    "Shade",
+    ability("condition-trigger", {
+      all: [{ predicate: "event_subject_is_source" }],
+    }, [{
+      op: "APPLY_CONDITION",
+      target: "$current_opponent_vanguard",
+      condition: "Dazed",
+      mode: "apply_if_empty",
+    }]),
+  );
+  const state = baseState(source);
+  const target = (state.players as any)["2"].vanguard;
+  runtimeV02InstallConditionProtection(target, {
+    protection_id: "event-condition-protection",
+    source_action_id: "protection-source",
+    source_uid: "protection-source-uid",
+    source_card_id: "protection-source-card",
+    source_controller_seat: 2,
+    target_controller_seat: 2,
+    installed_turn_seq: 7,
+    condition_names: [],
+    condition_slot: "control",
+    source_controller: "opponent",
+    card_effect_only: true,
+    max_uses: 1,
+    expires_on: "start_of_controller_next_turn",
+  });
+  const complete = begin(state);
+  equal(complete.status, "complete");
+  equal(target.conditions.control, null);
+  equal(runtimeV02ConditionProtectionCount(target), 0);
 });

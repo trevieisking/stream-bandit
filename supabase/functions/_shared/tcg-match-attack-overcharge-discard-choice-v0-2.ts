@@ -1,8 +1,8 @@
 import {
-  applyRuntimeCondition,
   type ApplyConditionMode,
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { applyRuntimeConditionWithContext } from "./tcg-match-condition-engine-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 import { runtimeV02EvaluateAttackIf, type RuntimeV02AttackIfContext } from "./tcg-match-attack-if-v0-2.ts";
 import {
@@ -513,7 +513,20 @@ export function runtimeV02ResolveAttackOverchargeDiscardChoice(
   let conditionPrevented = false;
   let conditionReason: string | null = null;
   if (choice.target_remained_after_damage) {
-    const result = applyRuntimeCondition(target, choice.condition, choice.turn_seq, choice.condition_mode);
+    const result = applyRuntimeConditionWithContext(
+      target,
+      choice.condition,
+      choice.turn_seq,
+      choice.condition_mode,
+      {
+        turn_seq: choice.turn_seq,
+        active_seat: seat,
+        source_controller_seat: seat,
+        target_controller_seat: choice.target_seat,
+        card_effect: true,
+        source_action_id: `attack:${choice.turn_seq}:${seat}:${choice.attack_id}:${choice.source_uid}`,
+      },
+    );
     conditionApplied = result.applied;
     conditionPrevented = result.prevented;
     conditionReason = result.reason || null;
