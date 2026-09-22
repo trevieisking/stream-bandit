@@ -974,7 +974,7 @@
 - [x] Card Pass **#1513 SUCCESS** on final exact head `2b09549535ab7df9dd25a57e5e139400fd8dd48f`.
 - [x] Preserve canonical owner-family count **40**; no owner #41.
 - [x] Leave Supabase production, main and live promotion untouched.
-- [ ] V2.4.96: freeze and reconcile all **19** Release 1 `OPTIONAL` uses through a generic consent/resume contract without absorbing nested-operation ownership.
+- [x] V2.4.96: freeze and reconcile all **19** Release 1 `OPTIONAL` uses through a generic consent/resume contract without absorbing nested-operation ownership.
 
 ## V2.4.96 — OPTIONAL all-surface closeout
 - [x] Freeze Release 1 `OPTIONAL` inventory to exactly **19** uses.
@@ -985,13 +985,30 @@
 - [x] Identify the missing parity as exactly six ordinary Attack OPTIONAL Reserve-switch programs.
 - [x] Confirm current Attack switch specialist parses a different IF-based family and does not claim those six OPTIONAL programs.
 - [x] Confirm the six structured cards can otherwise fall toward legacy text / caller-supplied switch-index handling.
-- [ ] Extend the existing Attack Reserve-switch specialist with the exact frozen OPTIONAL grammar.
-- [ ] Preserve declared Reserve filters generically.
-- [ ] Allow decline without performing Atomic Switch.
-- [ ] On accept, rebind the current source/turn/selected Reserve anchor before Atomic Switch.
-- [ ] Preserve Movement Listener then Heal Listener continuation after accepted switch.
-- [ ] Keep legacy compatibility available only for legacy/unclaimed attacks.
-- [ ] Prove all 19 frozen OPTIONAL consumers through canonical ownership.
-- [ ] Move `OPTIONAL` from missing to implemented only after all 19 are green.
-- [ ] Refresh release-control closures/capability fingerprint as required and pass a fresh exact-head Card Pass.
+- [x] Extend the existing Attack Reserve-switch specialist with the exact frozen OPTIONAL grammar.
+- [x] Preserve declared Reserve filters generically.
+- [x] Allow decline without performing Atomic Switch.
+- [x] On accept, rebind the current source/turn/selected Reserve anchor before Atomic Switch.
+- [x] Preserve Movement Listener then Heal Listener continuation after accepted switch.
+- [x] Keep legacy compatibility available only for legacy/unclaimed attacks.
+- [x] Prove all 19 frozen OPTIONAL consumers through canonical ownership.
+- [x] Move `OPTIONAL` from missing to implemented only after all 19 are green.
+- [x] Refresh release-control closures/capability fingerprint as required and pass a fresh exact-head Card Pass.
+
+### V2.4.96 final acceptance
+- [x] Freeze checkpoint `c2bfe680b86242d8b7a1f67a2da989310e90fece` / Card Pass **#1515 SUCCESS**.
+- [x] Six ordinary Attack OPTIONAL switch programs use server-owned min 0 / max 1 choice state.
+- [x] Aeralith's Gale-only Reserve filter is enforced generically from card data.
+- [x] Decline produces no Atomic Switch or movement events.
+- [x] Accept delegates to Atomic Switch, then Movement Listener, then Heal Listener.
+- [x] Legacy effect-text / caller-index compatibility remains outside structured ownership.
+- [x] Match closure = **109** / `8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6`.
+- [x] Tactic closure = **45** / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`.
+- [x] Card Pass **#1518 SUCCESS** on exact source/runtime + release-control head `f3fc2343ee9c3484045f9c291ee2595e222c91ac`.
+- [x] `OPTIONAL` moved from missing to implemented.
+- [x] Capability blob = `0e3dad5932f8511637d36fcd342c7e645944d506`.
+- [x] Card Pass **#1520 SUCCESS** on final exact capability/control head `3f247763c86a03eb3c8986f409acd5ecc4d8eb16`.
+- [x] Preserve owner-family count **40**; no owner #41.
+- [x] Leave production/main/live unchanged.
+- [ ] V2.4.97: freeze and reconcile all **13** Release 1 `INSPECT_ZONE` uses through one authoritative inspection contract without absorbing later choice/move ownership.
 

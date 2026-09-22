@@ -2735,3 +2735,70 @@ V2.4.96 must:
 7. remove the six structured cards from dependence on legacy effect-text / caller-supplied switch indexes without deleting legacy compatibility;
 8. add no card-ID/name dispatch and no owner #41.
 
+## V2.4.96 — OPTIONAL all-surface closeout — ACCEPTED
+
+V2.4.96 is complete across all **19** frozen Release 1 `OPTIONAL` uses.
+
+### Accepted surface map
+
+- **9 Event Listener** consumers retain the existing private accept/decline continuation and resume their nested operations through their original semantic owners.
+- **6 ordinary Attack after_damage** consumers now use the canonical server-owned Attack Reserve-switch choice instead of legacy effect-text / caller-supplied switch indexes.
+- **3 Tactic** consumers retain the generic private accept/decline plus nested/else-step interpreter resume.
+- **1 Marevault mixed after_damage_finished** consumer retains its existing 0..1 switch stage after movement/heal boundaries.
+
+For the six ordinary Attack consumers:
+- decline is a legal zero-selection result and performs no Atomic Switch;
+- accept rebinds source turn, source Vanguard identity and selected Reserve anchor;
+- declared Reserve filters are data-driven, including Aeralith's Gale-only filter;
+- accepted mutation remains Atomic Switch;
+- Movement Listener and resulting Heal Listener remain authoritative after the switch;
+- structured ownership disables the legacy switch fallback for those attacks;
+- no card-ID/name dispatch was added.
+
+`OPTIONAL` therefore owns consent + deterministic resume only. Nested semantics remain with their existing owners. Canonical owner-family count remains **40**; no owner #41.
+
+### Exact acceptance evidence
+
+Freeze:
+- `c2bfe680b86242d8b7a1f67a2da989310e90fece`;
+- Card Pass **#1515 SUCCESS**.
+
+Source/runtime repair:
+- `9772e30eed24a1acbb35c1714b3ab569a8586823`;
+- #1516 identified only nullable-test typing + expected release-control drift.
+
+Required-switch test narrowing:
+- `0ed4a7f22e4a9f4ec9e02ad184429796a8a17316`;
+- Card Pass **#1517** deterministic runtime + all type-checks green; structure failure only stale release-control digest.
+
+Source/runtime + release-control acceptance:
+- `f3fc2343ee9c3484045f9c291ee2595e222c91ac`;
+- Match closure **109 files** / `8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6`;
+- Tactic closure unchanged **45 files** / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`;
+- Card Pass **#1518 SUCCESS**.
+
+Capability reconciliation:
+- `6c3151a6cee9f2c4794200898a4b761c41a147ae`;
+- `OPTIONAL` moved from **missing** to **implemented**;
+- capability blob `0e3dad5932f8511637d36fcd342c7e645944d506`;
+- #1519 runtime/type job green; one stale switch-foundation structure assertion still expected OPTIONAL to be missing.
+
+Final exact-head acceptance:
+- `3f247763c86a03eb3c8986f409acd5ecc4d8eb16`;
+- stale foundation guard now requires OPTIONAL implemented while still requiring overall runtime parity false;
+- Card Pass **#1520 SUCCESS**.
+
+No database migration, Supabase Edge deployment, main merge or live promotion occurred. Production remains unchanged; promotion remains HOLD while remaining Release 1 capability debt is closed.
+
+### Next exact runtime target — V2.4.97
+
+`INSPECT_ZONE` all-surface reconciliation.
+
+A fresh frozen 193-card scan after V2.4.96 finds **13** remaining `INSPECT_ZONE` uses, making it the largest currently used missing/partial operation:
+- `INSPECT_ZONE` 13;
+- `CHOOSE_FROM_SET` 10;
+- `DIRECT_DAMAGE` 8;
+- `ATTACH_ESSENCE_FROM_ZONE` 7.
+
+V2.4.97 must begin read-only by freezing all 13 zones, viewers, counts, visibility/ordering semantics, bound variables and downstream consumers. Inspection owns authoritative sampling/view state only; later choose/move/search effects remain with their existing owners.
+

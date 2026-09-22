@@ -954,3 +954,24 @@ The generic Attack OPTIONAL switch route must honor the nested SELECT_CREATURE f
 ## 328 — legacy Attack switch compatibility is not structured authority
 Legacy effect-text / caller-supplied switch-index handling may remain for legacy snapshots, but once a structured OPTIONAL switch program is claimed by the canonical Attack choice owner, that structured attack must not also execute the legacy switch path.
 
+## 329 — OPTIONAL ordinary Attack consent is a server choice, not a request parameter
+The six frozen ordinary Attack OPTIONAL switches now use the same authoritative pending Attack choice transport as other structured Attack choices. Browser-provided legacy switch indexes are compatibility-only and cannot be structured authority.
+
+## 330 — optional Attack switch filters are rebound at choice creation and resolution
+Declared Reserve filters, including element filters, are evaluated from current structured card data. The selected Reserve anchor is rebound before Atomic Switch; no frozen card identity may determine filter behavior.
+
+## 331 — OPTIONAL decline emits no semantic side effect
+A legal zero-selection decline advances the Attack completion path without Atomic Switch, movement events or invented listener packets. Consent itself is the entire semantic outcome of the declined OPTIONAL node.
+
+## 332 — OPTIONAL Release 1 parity is accepted
+All 19 frozen OPTIONAL uses are covered across 9 Event Listener, 6 ordinary Attack, 3 Tactic and 1 mixed Attack consumer. `OPTIONAL` is implemented at capability blob `0e3dad5932f8511637d36fcd342c7e645944d506`. Final exact-head Card Pass #1520 is green at `3f247763c86a03eb3c8986f409acd5ecc4d8eb16`.
+
+## 333 — OPTIONAL release-control state
+Match closure is 109 / `8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6`; Tactic closure remains 45 / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`. Owner-family count remains 40 and production was not changed.
+
+## 334 — INSPECT_ZONE is the next largest remaining used operation gap
+After V2.4.96, the frozen 193-card scan contains exactly 13 `INSPECT_ZONE` uses, ahead of CHOOSE_FROM_SET 10, DIRECT_DAMAGE 8 and ATTACH_ESSENCE_FROM_ZONE 7. V2.4.97 must freeze all inspection shapes before source changes.
+
+## 335 — inspection authority is not downstream choice/move authority
+`INSPECT_ZONE` may own authoritative sample identity, visibility, ordering and private-view state. A following `CHOOSE_FROM_SET`, `MOVE_CARDS`, search, reward or zone mutation remains delegated to its own canonical owner.
+
