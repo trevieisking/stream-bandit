@@ -216,8 +216,9 @@ test('Withdrawal dispatcher cannot regain attached-Essence payment or direct swi
   assert.equal(withdrawalTransaction.includes('discard.push('), false);
 });
 
-test('switch foundation does not falsely claim listener or full runtime parity', () => {
-  assert.ok(capabilities.operations.missing.includes('OPTIONAL'));
+test('switch foundation records OPTIONAL completion without falsely claiming full runtime parity', () => {
+  assert.equal(capabilities.operations.missing.includes('OPTIONAL'), false);
+  assert.ok(capabilities.operations.implemented.includes('OPTIONAL'));
   assert.ok(capabilities.operations.implemented.includes('APPLY_CONDITION'));
   assert.equal(capabilities.completion.runtime_interpreter_parity, false);
   assert.equal(capabilities.completion.zero_card_specific_runtime_branches, false);
