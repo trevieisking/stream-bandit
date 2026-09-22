@@ -1,9 +1,10 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02ApplyCardZonePartitionTransfer, runtimeV02ApplyCardZoneReorder, runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02ShuffleInPlace } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
 import { runtimeV02RandomSampleHiddenZone } from "../_shared/tcg-match-hidden-zone-sample-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
+import { runtimeV02PrivateRewardInspectionView } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
@@ -13,6 +14,7 @@ import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMov
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02NormalizeEffectAttachmentState } from "../_shared/tcg-match-essence-attachment-state-v0-2.ts";
 import { runtimeV02CardSelectionOptions, runtimeV02NormalizeSelectCardsStep, runtimeV02RebindSelectedCards, runtimeV02ResolveSelectCards, type RuntimeV02SelectCardsDescriptor, type RuntimeV02SelectedCardRef } from "../_shared/tcg-match-card-selection-v0-2.ts";
+import { runtimeV02InspectDeckTopEffectOwnedSet, runtimeV02InspectionProvenanceAfterRemoval, runtimeV02NormalizeInspectZoneStep, runtimeV02NormalizeInspectionProvenance, runtimeV02RebindInspectionRemainder, runtimeV02ResolveRewardInspectionChoice, runtimeV02RewardInspectionChoiceOptions, type RuntimeV02InspectZoneDescriptor, type RuntimeV02InspectionProvenance, type RuntimeV02RewardInspectionChoiceOption } from "../_shared/tcg-match-inspection-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import {
   evaluateRuntimeV02LegalCardAvailableRequirement,
@@ -243,6 +245,24 @@ function selectCardsDescriptorMap(vars: Record<string, unknown>) {
   vars.__select_cards_descriptors = created;
   return created;
 }
+function inspectionProvenanceMap(vars: Record<string, unknown>) {
+  const current = vars.__inspection_sources;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, RuntimeV02InspectionProvenance>;
+  }
+  const created: Record<string, RuntimeV02InspectionProvenance> = {};
+  vars.__inspection_sources = created;
+  return created;
+}
+function inspectionParentTokenMap(vars: Record<string, unknown>) {
+  const current = vars.__inspection_parent_tokens;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, string>;
+  }
+  const created: Record<string, string> = {};
+  vars.__inspection_parent_tokens = created;
+  return created;
+}
 function selectedCardRefs(value: unknown): RuntimeV02SelectedCardRef[] {
   if (!Array.isArray(value)) throw new Error("tcg_v0_2_tactic_selected_cards_variable_invalid");
   return value.map((raw, index) => {
@@ -429,6 +449,10 @@ function unsupportedOps(steps: any[]): string[] {
         try { runtimeV02NormalizeSelectCardsStep(step); }
         catch { unsupported.add("SELECT_CARDS_GRAMMAR"); }
       }
+      if (op === "INSPECT_ZONE") {
+        try { runtimeV02NormalizeInspectZoneStep(step); }
+        catch { unsupported.add("INSPECT_ZONE_GRAMMAR"); }
+      }
       if (op === "ATTACH_ESSENCE_FROM_ZONE") {
         if (step.cards != null) {
           if (String(step.zone || "") !== "discard" || step.manual_attachment !== false) {
@@ -456,6 +480,15 @@ function requiredEffectResourcesAvailable(state: any, ownerSeat: number, steps: 
       if (String(step?.op || "") === "SELECT_CARDS") {
         const descriptor = runtimeV02NormalizeSelectCardsStep(step);
         if (runtimeV02CardSelectionOptions(state, ownerSeat, descriptor).length < descriptor.min) ok = false;
+      }
+      if (String(step?.op || "") === "INSPECT_ZONE") {
+        const descriptor = runtimeV02NormalizeInspectZoneStep(step);
+        const zoneSeat = playerSeat(ownerSeat, descriptor.player, {});
+        const zoneOwner = state.players[String(zoneSeat)];
+        const available = descriptor.zone === "rewards"
+          ? Number(zoneOwner?.rewards?.length || 0)
+          : Number(zoneOwner?.deck?.length || 0);
+        if (available < descriptor.min) ok = false;
       }
       if (String(step?.op || "") === "ATTACH_ESSENCE_FROM_ZONE" && step.cards == null && String(step.from || "") === "discard") {
         const seat = playerSeat(ownerSeat, step.player || "self", {});
@@ -525,6 +558,7 @@ function makeView(state: any, viewerSeat: number, revision: number) {
     pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, viewerSeat as 1 | 2),
     pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, viewerSeat as 1 | 2),
     private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, viewerSeat as 1 | 2),
+    private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, viewerSeat as 1 | 2),
     result: state.result || null,
     log: (state.log || []).slice(-20),
     you: {
@@ -987,6 +1021,49 @@ function executeUntilChoice(state: any) {
       effect.cursor++;
       continue;
     }
+    if (op === "INSPECT_ZONE") {
+      const descriptor = runtimeV02NormalizeInspectZoneStep(step);
+      const zoneSeat = playerSeat(ownerSeat, descriptor.player, vars);
+      if (descriptor.zone === "rewards") {
+        const options = runtimeV02RewardInspectionChoiceOptions(
+          state,
+          ownerSeat,
+          zoneSeat,
+          descriptor,
+        );
+        setPending(state, effect, {
+          seat: ownerSeat,
+          kind: "inspect_rewards",
+          prompt: "Choose Reward Card to inspect",
+          min: descriptor.min,
+          max: Math.min(descriptor.max, options.length),
+          mode: "select",
+          options: options.map((option) => ({
+            id: option.id,
+            label: option.label,
+            data: { option },
+          })),
+          context: {
+            apply: "inspect_reward",
+            descriptor: structuredClone(descriptor),
+            zone_owner_seat: zoneSeat,
+          },
+        });
+        return;
+      }
+      const inspected = runtimeV02InspectDeckTopEffectOwnedSet(
+        state,
+        ownerSeat,
+        zoneSeat,
+        descriptor,
+      );
+      vars[descriptor.as] = inspected.cards.map((card) => ({ ...card }));
+      inspectionProvenanceMap(vars)[descriptor.as] = structuredClone(
+        inspected.provenance,
+      );
+      effect.cursor++;
+      continue;
+    }
     if (op === "LOOK_TOP") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
       const player = state.players[String(seat)];
@@ -1041,9 +1118,22 @@ function executeUntilChoice(state: any) {
       return;
     }
     if (op === "CHOOSE_FROM_SET") {
-      const source = (resolveVar(vars, step.source) || []) as Inst[];
+      const sourceToken = typeof step.source === "string" && step.source.startsWith("$")
+        ? step.source.slice(1)
+        : "";
+      const provenance = sourceToken
+        ? inspectionProvenanceMap(vars)[sourceToken]
+        : null;
+      const source = provenance
+        ? runtimeV02RebindInspectionRemainder(state, provenance)
+        : (resolveVar(vars, step.source) || []) as Inst[];
+      if (sourceToken) vars[sourceToken] = source.map((card) => ({ ...card }));
       const options = cardOptions(state, source, step.filters, ownerSeat);
-      const bounds = choiceBounds(step.count, options.length, false);
+      const bounds = choiceBounds(
+        step.count ?? { min: step.min, max: step.max },
+        options.length,
+        false,
+      );
       setPending(state, effect, {
         seat: ownerSeat,
         kind: "choose_cards",
@@ -1052,7 +1142,11 @@ function executeUntilChoice(state: any) {
         max: bounds.max,
         mode: "select",
         options,
-        context: { apply: "set_var_cards", var_name: String(step.as || "chosen") },
+        context: {
+          apply: "set_var_cards",
+          var_name: String(step.as || "chosen"),
+          source_token: sourceToken,
+        },
       });
       return;
     }
@@ -1177,6 +1271,71 @@ function executeUntilChoice(state: any) {
       const token = typeof step.cards === "string" && step.cards.startsWith("$")
         ? step.cards.slice(1)
         : "";
+      const parentToken = token
+        ? inspectionParentTokenMap(vars)[token] || token
+        : "";
+      const inspectionProvenance = parentToken
+        ? inspectionProvenanceMap(vars)[parentToken]
+        : null;
+      if (inspectionProvenance) {
+        if (
+          destinationSeat !== inspectionProvenance.zone_owner_seat ||
+          String(step.to || "") !== "discard"
+        ) {
+          throw new Error("tcg_v0_2_tactic_inspection_move_destination_unsupported");
+        }
+        const rebound = runtimeV02RebindInspectionRemainder(
+          state,
+          inspectionProvenance,
+        );
+        const selected = cards.map((card, index) => {
+          const current = rebound.find((candidate) => candidate.uid === card.uid);
+          if (!current || current.card_id !== card.card_id) {
+            throw new Error(
+              `tcg_v0_2_tactic_inspection_selected_card_changed:${index}`,
+            );
+          }
+          return current;
+        });
+        if (!selected.length) {
+          throw new Error("tcg_v0_2_tactic_inspection_selected_card_required");
+        }
+        const player = state.players[String(destinationSeat)];
+        runtimeV02ApplyCardZonePartitionTransfer(
+          player.deck as Inst[],
+          player.discard as Inst[],
+          {
+            cause: "effect",
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            source: {
+              controller_seat: destinationSeat as 1 | 2,
+              zone: "deck",
+              owner_card_uid: null,
+            },
+            destination: {
+              controller_seat: destinationSeat as 1 | 2,
+              zone: "discard",
+              owner_card_uid: null,
+            },
+            source_window: {
+              position: "top",
+              card_uids: rebound.map((card) => card.uid),
+            },
+            destination_card_uids: selected.map((card) => card.uid),
+            source_remainder_position: "top",
+            destination_position: "bottom",
+          },
+        );
+        const next = runtimeV02InspectionProvenanceAfterRemoval(
+          inspectionProvenance,
+          selected.map((card) => card.uid),
+        );
+        inspectionProvenanceMap(vars)[parentToken] = structuredClone(next);
+        effect.cursor++;
+        continue;
+      }
       const selectDescriptor = token ? selectCardsDescriptorMap(vars)[token] : null;
       if (selectDescriptor) {
         const refs = selectedCardRefs(resolveVar(vars, step.cards));
@@ -1273,11 +1432,54 @@ function executeUntilChoice(state: any) {
     }
     if (op === "PUT_REMAINDER_ON_DECK_BOTTOM" || op === "RETURN_REMAINDER_TO_DECK_TOP" || op === "RETURN_SET_TO_DECK_TOP") {
       const sourceToken = step.source || step.cards;
-      const source = ((resolveVar(vars, sourceToken) || []) as Inst[]).slice();
+      const sourceVar = typeof sourceToken === "string" && sourceToken.startsWith("$")
+        ? sourceToken.slice(1)
+        : "";
+      const provenance = sourceVar
+        ? inspectionProvenanceMap(vars)[sourceVar]
+        : null;
       const except = new Set((((resolveVar(vars, step.except) || []) as Inst[]).map((inst) => inst.uid)));
-      const cards = source.filter((inst) => !except.has(inst.uid));
       const seat = step.player ? playerSeat(ownerSeat, step.player, vars) : ownerSeat;
       const destination = op === "PUT_REMAINDER_ON_DECK_BOTTOM" ? "deck_bottom" : "deck_top";
+      if (provenance) {
+        if (
+          seat !== provenance.zone_owner_seat ||
+          destination !== "deck_top"
+        ) throw new Error("tcg_v0_2_tactic_inspection_remainder_destination_unsupported");
+        const removed = new Set(provenance.removed_uids);
+        if (
+          except.size !== removed.size ||
+          [...except].some((uid) => !removed.has(uid))
+        ) throw new Error("tcg_v0_2_tactic_inspection_remainder_except_changed");
+        const cards = runtimeV02RebindInspectionRemainder(state, provenance);
+        vars[sourceVar] = cards.map((card) => ({ ...card }));
+        if (cards.length <= 1) {
+          effect.cursor++;
+          continue;
+        }
+        if (!String(step.order || "").includes("choice")) {
+          effect.cursor++;
+          continue;
+        }
+        const options = cardOptions(state, cards, null, ownerSeat);
+        setPending(state, effect, {
+          seat: ownerSeat,
+          kind: "order_inspected_deck_top",
+          prompt: "Choose card order",
+          min: options.length,
+          max: options.length,
+          mode: "order",
+          options,
+          context: {
+            apply: "order_inspected_deck_top",
+            zone_seat: seat,
+            provenance_token: sourceVar,
+          },
+        });
+        return;
+      }
+      const source = ((resolveVar(vars, sourceToken) || []) as Inst[]).slice();
+      const cards = source.filter((inst) => !except.has(inst.uid));
       if (cards.length <= 1 || !String(step.order || "").includes("choice")) {
         moveCardsToDestination(state, seat, cards, destination);
         effect.cursor++;
@@ -1794,7 +1996,22 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   let movementFlow: ReturnType<typeof runtimeV02BeginMovementListenerContinuation> | null = null;
   const attachmentHealPacketIds: string[] = [];
 
-  if (apply === "select_cards") {
+  if (apply === "inspect_reward") {
+    const descriptor = context.descriptor as RuntimeV02InspectZoneDescriptor;
+    const option = selected[0]?.data?.option as RuntimeV02RewardInspectionChoiceOption | undefined;
+    if (!option) throw new Error("tcg_v0_2_tactic_reward_inspection_option_required");
+    const view = runtimeV02ResolveRewardInspectionChoice(
+      state,
+      effect.owner_seat,
+      Number(context.zone_owner_seat),
+      descriptor,
+      option,
+    );
+    vars[descriptor.as] = view.cards.map((card) => ({
+      uid: card.uid,
+      card_id: card.card_id,
+    }));
+  } else if (apply === "select_cards") {
     const descriptor = context.descriptor as RuntimeV02SelectCardsDescriptor;
     const refs = selected.map((option) => option.data.ref as RuntimeV02SelectedCardRef);
     const rebound = runtimeV02ResolveSelectCards(
@@ -1834,9 +2051,19 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
     vars[String(context.var_name)] = context.many ? values : (values[0] || null);
   } else if (apply === "set_var_cards") {
     const sourceStep = effect.steps[effect.cursor];
-    const source = (resolveVar(vars, sourceStep.source) || []) as Inst[];
+    const sourceToken = String(context.source_token || "");
+    const provenance = sourceToken
+      ? inspectionProvenanceMap(vars)[sourceToken]
+      : null;
+    const source = provenance
+      ? runtimeV02RebindInspectionRemainder(state, provenance)
+      : (resolveVar(vars, sourceStep.source) || []) as Inst[];
     const selectedIds = new Set(selected.map((option) => String(option.data.uid)));
-    vars[String(context.var_name)] = source.filter((inst) => selectedIds.has(inst.uid));
+    const variable = String(context.var_name);
+    vars[variable] = source.filter((inst) => selectedIds.has(inst.uid));
+    if (provenance) {
+      inspectionParentTokenMap(vars)[variable] = sourceToken;
+    }
   } else if (apply === "set_var_player") {
     vars[String(context.var_name)] = selected[0]?.data?.player || null;
   } else if (apply === "hand_to_discard" || apply === "hand_to_bottom") {
@@ -1938,6 +2165,43 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       }
       runtimeV02CommitCardZoneTransfer(player.discard as Inst[], player.deck as Inst[], preflight);
     }
+  } else if (apply === "order_inspected_deck_top") {
+    const token = String(context.provenance_token || "");
+    const provenance = inspectionProvenanceMap(vars)[token];
+    if (!provenance) throw new Error("tcg_v0_2_tactic_inspection_provenance_missing");
+    const zoneSeat = Number(context.zone_seat);
+    if (zoneSeat !== provenance.zone_owner_seat) {
+      throw new Error("tcg_v0_2_tactic_inspection_reorder_owner_changed");
+    }
+    const current = runtimeV02RebindInspectionRemainder(state, provenance);
+    const ordered = selected.map((option) => ({
+      uid: String(option.data.uid),
+      card_id: String(option.data.card_id),
+    }));
+    if (
+      ordered.length !== current.length ||
+      new Set(ordered.map((card) => card.uid)).size !== current.length ||
+      ordered.some((card) =>
+        !current.some((now) =>
+          now.uid === card.uid && now.card_id === card.card_id
+        )
+      )
+    ) throw new Error("tcg_v0_2_tactic_inspection_reorder_changed");
+    const player = state.players[String(zoneSeat)];
+    runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+      cause: "effect",
+      action_kind: "tactic",
+      source_action_id: effect.id,
+      source_card_uid: effect.source_card.uid,
+      zone: {
+        controller_seat: zoneSeat as 1 | 2,
+        zone: "deck",
+        owner_card_uid: null,
+      },
+      card_uids: ordered.map((card) => card.uid),
+      destination_position: "top",
+    });
+    vars[token] = ordered.map((card) => ({ ...card }));
   } else if (apply === "ordered_move") {
     const ordered: Inst[] = selected.map((option) => ({
       uid: String(option.data.uid),
@@ -2209,6 +2473,7 @@ Deno.serve(async (req) => {
         pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
       });
     }
 
@@ -2246,6 +2511,7 @@ Deno.serve(async (req) => {
           pending_heal_listener_choice: null,
           pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(resolved.pending_choice, seat as 1 | 2),
           private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
         });
       }
       delete state.pending_tactic_movement_resume;
@@ -2269,6 +2535,7 @@ Deno.serve(async (req) => {
         pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
       });
     }
 
@@ -2308,6 +2575,7 @@ Deno.serve(async (req) => {
           pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(resolved.pending_choice, seat as 1 | 2),
           pending_movement_listener_choice: null,
           private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
         });
       }
       if (!resolved.resume_ready || resolved.resume_seat == null || resolved.resume_seat !== effect.owner_seat) {
@@ -2330,6 +2598,7 @@ Deno.serve(async (req) => {
         pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
       });
     }
 
@@ -2362,6 +2631,7 @@ Deno.serve(async (req) => {
       pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
       pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
       private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
     });
   } catch (error) {
     return json({ ok: false, version: VERSION, error: error instanceof Error ? error.message : String(error) }, 500);
