@@ -1010,7 +1010,7 @@
 - [x] Card Pass **#1520 SUCCESS** on final exact capability/control head `3f247763c86a03eb3c8986f409acd5ecc4d8eb16`.
 - [x] Preserve owner-family count **40**; no owner #41.
 - [x] Leave production/main/live unchanged.
-- [ ] V2.4.97: freeze and reconcile all **13** Release 1 `INSPECT_ZONE` uses through one authoritative inspection contract without absorbing later choice/move ownership.
+- [x] V2.4.97: freeze and reconcile all **13** Release 1 `INSPECT_ZONE` uses through one authoritative inspection contract without absorbing later choice/move ownership.
 
 ## V2.4.97 — INSPECT_ZONE all-surface closeout
 - [x] Freeze Release 1 `INSPECT_ZONE` inventory to exactly **13** nodes.
@@ -1022,12 +1022,37 @@
 - [x] Confirm generic Event Listener coverage for Moonbit, Gloamkin, Wispbat, Graveglider and Veil Essence.
 - [x] Prove current Tactic interpreter has no `INSPECT_ZONE` execution branch.
 - [x] Identify the missing parity as exactly Parallax Window + Seer Nyx.
-- [ ] Add one generic Tactic INSPECT_ZONE route under owner #31 semantics.
-- [ ] Delegate Reward inspection identity/ledger to the existing Reward inspection owner.
-- [ ] Bind Seer Nyx's exact opponent top-3 as a private effect-owned set without moving it during inspection.
-- [ ] Revalidate bound inspection provenance before CHOOSE_FROM_SET / Card-Zone mutation.
-- [ ] Preserve player/controller-chosen ordering through existing Card-Zone routes.
-- [ ] Prove all 13 frozen INSPECT_ZONE nodes through canonical ownership.
-- [ ] Move `INSPECT_ZONE` from missing to implemented only after all 13 are green.
-- [ ] Refresh release-control closures/capability fingerprint and pass fresh exact-head Card Pass.
+- [x] Add one generic Tactic INSPECT_ZONE route under owner #31 semantics.
+- [x] Delegate Reward inspection identity/ledger to the existing Reward inspection owner.
+- [x] Bind Seer Nyx's exact opponent top-3 as a private effect-owned set without moving it during inspection.
+- [x] Revalidate bound inspection provenance before CHOOSE_FROM_SET / Card-Zone mutation.
+- [x] Preserve player/controller-chosen ordering through existing Card-Zone routes.
+- [x] Prove all 13 frozen INSPECT_ZONE nodes through canonical ownership.
+- [x] Move `INSPECT_ZONE` from missing to implemented only after all 13 are green.
+- [x] Refresh release-control closures/capability fingerprint and pass fresh exact-head Card Pass.
+
+### V2.4.97 final acceptance
+- [x] Inspection submodule remains under owner #31; no owner #41.
+- [x] Card Pass **#1524 SUCCESS** on isolated owner/test head `3eefcabf4e07c7934f23661a3b8ef4a8d6bdde03`.
+- [x] Parallax delegates same-position Reward inspection to owner #32.
+- [x] Seer inspects top three without moving them; discard and final top order delegate to Card-Zone.
+- [x] Match closure = **109** / `8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6`.
+- [x] Tactic closure = **46** / `5defbc3ccf666ee96191aea62b2f98bfda7800ed56f86c5e4e8e7501f1cef876`.
+- [x] Card Pass **#1526 SUCCESS** on source/runtime + release-control head `aae70b4fa61ce193301e9e4ca7a33e4351c52d69`.
+- [x] `INSPECT_ZONE` moved missing -> implemented; capability blob `b3ed5b6640a8213491479bf7c7fb4fdb63e0d30f`.
+- [x] Card Pass **#1528 SUCCESS** on final exact head `369917d9ccca815a3857f3c38f9a88d932eb97a5`.
+- [x] Production/main/live unchanged; promotion HOLD.
+
+## V2.4.98 — CHOOSE_FROM_SET all-surface closeout
+- [x] Freeze Release 1 inventory to exactly **10** nodes.
+- [x] Freeze surface split to **3 Event Listener / 2 active Ability / 1 Attack / 4 Tactic**.
+- [x] Freeze ordinary `source + min/max` family to **9** nodes.
+- [x] Freeze Scout Zeph `set + selection` filtered family to **1** node.
+- [x] Keep later physical card move/order under Card-Zone #30.
+- [ ] Audit exact current execution ownership for all 10 nodes before source changes.
+- [ ] Preserve every already-working Event Listener / Ability / Attack specialist.
+- [ ] Close only proven CHOOSE_FROM_SET gaps generically.
+- [ ] Prove all 10 nodes with private server choice + current bound-set revalidation.
+- [ ] Move `CHOOSE_FROM_SET` partial -> implemented only after all 10 are green.
+- [ ] Refresh release-control/capability evidence and close V2.4.98.
 

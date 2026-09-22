@@ -2871,3 +2871,41 @@ The Tactic route must:
 8. fail closed on stale deck/reward state before downstream mutation;
 9. add no card-ID/name dispatch.
 
+## V2.4.97 — INSPECT_ZONE all-surface closeout — ACCEPTED
+
+All **13** frozen Release 1 inspection nodes now have canonical execution coverage.
+
+- Parallax Window uses a server-owned Reward-position choice; Reward identity/ledger/private view remains owner #32 and the Reward stays in place.
+- Seer Nyx binds exact opponent deck-top provenance without moving cards during inspection; selection rebinds current top identities; selected discard uses Card-Zone positional partition; final top order uses Card-Zone same-zone reorder.
+- Hidden identities stay controller-private. Stale Reward/deck/order identity fails closed before mutation.
+- Shared inspection code is a submodule of owner #31; no owner #41 and no card-ID/name dispatch.
+
+Exact evidence:
+- inspection owner/test head `3eefcabf4e07c7934f23661a3b8ef4a8d6bdde03` — Card Pass **#1524 SUCCESS**;
+- Tactic source head `b671ed372ed46b2d853770bbc8c9726fb7e39171` — deterministic/runtime/type checks green; only closure drift remained;
+- source/runtime + release-control head `aae70b4fa61ce193301e9e4ca7a33e4351c52d69` — Card Pass **#1526 SUCCESS**;
+- Match closure **109** / `8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6`;
+- Tactic closure **46** / `5defbc3ccf666ee96191aea62b2f98bfda7800ed56f86c5e4e8e7501f1cef876`;
+- capability head `90a3ed4e8a592d379e1e252ed143f871fb6a4a44`; `INSPECT_ZONE` moved missing -> implemented; capability blob `b3ed5b6640a8213491479bf7c7fb4fdb63e0d30f`;
+- final guard head `369917d9ccca815a3857f3c38f9a88d932eb97a5` — Card Pass **#1528 SUCCESS**.
+
+Production/main/live remain unchanged. Release promotion remains **HOLD** while Release 1 capability debt is closed.
+
+## V2.4.98 — CHOOSE_FROM_SET all-surface closeout (freeze)
+
+Frozen Release 1 inventory: exactly **10** nodes.
+
+Surface split:
+- Event Listener **3**: Stardot, Star Essence, Orbit Ring.
+- Active Ability **2**: Celestyr — Dream Cartographer, Noctivane.
+- Attack **1**: Celestyr — Dream Ray.
+- Tactic **4**: Future Draw, Scout Zeph, Seer Nyx, Circuit Scanner.
+
+Grammar families:
+- **9** nodes use a previously bound set via `source` plus top-level `min/max`, with optional filters.
+- **1** node, Scout Zeph, uses `set + selection` with min 0/max 2 and Gale-Creature filtering.
+
+Owner #31 Card Search / Filter / Inspection owns bound-set choice identity, filtering, min/max, private server choice, current-set revalidation and result binding. Owner #33 keeps hidden-information visibility; owner #30 keeps every later physical move/reorder. The preceding LOOK_TOP/INSPECT_ZONE remains with its own inspection route.
+
+V2.4.98 begins with a read-only all-10 coverage audit. Existing Event Listener, Ability and Attack specialists must be preserved. Only proven gaps may be repaired; no card-ID/name dispatch and no owner #41.
+

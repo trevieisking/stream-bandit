@@ -990,3 +990,21 @@ Eleven of the thirteen frozen nodes already execute through bounded Attack, Abil
 ## 340 — Reward and deck-top inspection use different privacy ledgers but one capability
 Reward inspection may reuse the existing Reward inspection ledger/private view. Deck-top inspection uses hidden-information/private inspection state. Capability parity is accepted only when both source-zone families obey the same declared selection/visibility/return-policy contract without leaking identities publicly.
 
+## 341 — INSPECT_ZONE Release 1 parity is accepted
+All 13 frozen inspection nodes are covered. Owner #31 owns inspection identity/set semantics; Reward #32 owns Reward inspection ledger/private Reward view; Hidden Information #33 owns visibility; Card-Zone #30 owns later physical move/order. `INSPECT_ZONE` is implemented at capability blob `b3ed5b6640a8213491479bf7c7fb4fdb63e0d30f`. Final Card Pass #1528 is green at `369917d9ccca815a3857f3c38f9a88d932eb97a5`.
+
+## 342 — effect-owned inspection sets are provenance, not detached card copies
+An effect-owned inspected set records exact current zone owner, ordered identities and removed identities while cards stay authoritative in their zone. Downstream mutation rebinds that provenance and delegates to Card-Zone; it never copies detached card objects into another zone.
+
+## 343 — Reward inspection privacy remains Reward-owner state
+A Tactic may request Reward inspection through owner #31 orchestration, but Reward identity, current-turn ledger and controller-private Reward view remain owner #32 state. Public/opponent views receive no inspected Reward identity.
+
+## 344 — CHOOSE_FROM_SET is the next largest remaining used operation gap
+After V2.4.97, the frozen 193-card inventory contains exactly 10 `CHOOSE_FROM_SET` nodes, ahead of DIRECT_DAMAGE 8 and ATTACH_ESSENCE_FROM_ZONE 7. V2.4.98 must audit all ten before source changes.
+
+## 345 — CHOOSE_FROM_SET selects from an already-bound set
+Owner #31 may validate bound-set identity, filter legal members, enforce min/max and bind the chosen subset. It must not resample hidden information or physically move cards. Visibility remains owner #33 and later move/order remains Card-Zone #30.
+
+## 346 — CHOOSE_FROM_SET has two frozen grammar families
+Nine Release 1 nodes use `source + min/max` with optional filters. Scout Zeph alone uses `set + selection` with Gale-Creature filtering and range 0..2. Runtime parity must be operation-shaped across both grammars rather than card-ID-shaped.
+
