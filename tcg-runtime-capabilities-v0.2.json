@@ -21,6 +21,7 @@
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
       "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
+      "CHOOSE_FROM_SET",
       "CHOOSE_HAND_TO_DECK_BOTTOM",
       "CHOOSE_HAND_TO_DISCARD",
       "CHOOSE_PLAYER",
@@ -66,8 +67,7 @@
       "SWITCH_WITH_VANGUARD"
     ],
     "partial": [
-      "ATTACH_ESSENCE_FROM_ZONE",
-      "CHOOSE_FROM_SET"
+      "ATTACH_ESSENCE_FROM_ZONE"
     ],
     "missing": [
       "ATTACH_ESSENCE_FROM_SELECTION",
@@ -1007,6 +1007,105 @@
           "sha256": "5defbc3ccf666ee96191aea62b2f98bfda7800ed56f86c5e4e8e7501f1cef876"
         }
       }
+    },
+    "release1_choose_from_set_all_surface_v2_4_98": {
+      "accepted_head": "4d3781c12c8b42f953de203eb4acdf14b09ee5e2",
+      "card_pass_run": 1541,
+      "operation": "CHOOSE_FROM_SET",
+      "frozen_consumers": [
+        {
+          "card_id": "astral-stardot",
+          "surface": "Event Listener",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-star-essence",
+          "surface": "Event Listener",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-orbit-ring",
+          "surface": "Event Listener",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-celestyr-dream-cartographer",
+          "surface": "active Ability",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "shade-noctivane",
+          "surface": "active Ability",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-celestyr-dream-ray",
+          "surface": "Attack",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-future-draw",
+          "surface": "Tactic",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "gale-scout-zeph",
+          "surface": "Tactic",
+          "grammar": "set + selection"
+        },
+        {
+          "card_id": "shade-seer-nyx",
+          "surface": "Tactic",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "volt-circuit-scanner",
+          "surface": "Tactic",
+          "grammar": "source + min/max + filters.any"
+        }
+      ],
+      "owners": {
+        "bound_set_choice": "supabase/functions/_shared/tcg-match-bound-set-choice-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "active_deck_reading": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
+        "active_deck_planning": "supabase/functions/_shared/tcg-match-active-ability-deck-planning-v0-2.ts",
+        "attack_top_deck_choice": "supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "hidden_information": "supabase/functions/_shared/tcg-match-hidden-information-v0-2.ts",
+        "card_zone_mutation": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts"
+      },
+      "semantics": {
+        "grammars": [
+          "source_range",
+          "set_selection"
+        ],
+        "filters_any": true,
+        "optional_zero": true,
+        "hidden_choice": "controller-private / server-owned",
+        "stale_rebind": "bound set identity and live deck-top provenance fail closed before mutation",
+        "mutation_owner": "Card-Zone #30",
+        "visibility_owner": "Hidden Information #33",
+        "choice_owner": "Card Search / Filter / Inspection #31",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-bound-set-choice.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-deck-planning.test.ts",
+        "tcg/tests/card-pass-2-tactic-bound-set-choice-runtime.test.mjs",
+        "tcg/tests/card-pass-2-active-ability-deck-planning-runtime.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 111,
+          "sha256": "e1035dbc68dae15d980843b8a7a3d8a11fc076ba9fab72100ccc4f78e7fe09bc"
+        },
+        "tactic_actions": {
+          "file_count": 47,
+          "sha256": "5fe799462c53855691f0901fba11740c79d99d691d40bc2173ee6c1a40ae70ac"
+        }
+      },
+      "note": "All ten frozen Release 1 CHOOSE_FROM_SET nodes are covered across preserved Event Listener / Noctivane / Dream Ray / Seer Nyx specialists plus the repaired Tactic families and generic active deck-planning family. Owner #31 owns choice semantics only; owner #30 owns physical deck mutation. No owner #41."
     }
   }
 }
