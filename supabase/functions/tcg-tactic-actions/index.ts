@@ -14,6 +14,7 @@ import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMov
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02NormalizeEffectAttachmentState } from "../_shared/tcg-match-essence-attachment-state-v0-2.ts";
 import { runtimeV02CardSelectionOptions, runtimeV02NormalizeSelectCardsStep, runtimeV02RebindSelectedCards, runtimeV02ResolveSelectCards, type RuntimeV02SelectCardsDescriptor, type RuntimeV02SelectedCardRef } from "../_shared/tcg-match-card-selection-v0-2.ts";
+import { runtimeV02BindDeckTopSet, runtimeV02BoundDeckSetAfterRemoval, runtimeV02BoundSetChoiceOptions, runtimeV02NormalizeChooseFromSetStep, runtimeV02RebindBoundDeckSet, runtimeV02ResolveBoundSetChoice, type RuntimeV02BoundDeckSetProvenance, type RuntimeV02ChooseFromSetDescriptor } from "../_shared/tcg-match-bound-set-choice-v0-2.ts";
 import { runtimeV02InspectDeckTopEffectOwnedSet, runtimeV02InspectionProvenanceAfterRemoval, runtimeV02NormalizeInspectZoneStep, runtimeV02NormalizeInspectionProvenance, runtimeV02RebindInspectionRemainder, runtimeV02ResolveRewardInspectionChoice, runtimeV02RewardInspectionChoiceOptions, type RuntimeV02InspectZoneDescriptor, type RuntimeV02InspectionProvenance, type RuntimeV02RewardInspectionChoiceOption } from "../_shared/tcg-match-inspection-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import {
@@ -263,6 +264,24 @@ function inspectionParentTokenMap(vars: Record<string, unknown>) {
   vars.__inspection_parent_tokens = created;
   return created;
 }
+function boundDeckSetProvenanceMap(vars: Record<string, unknown>) {
+  const current = vars.__bound_deck_sets;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, RuntimeV02BoundDeckSetProvenance>;
+  }
+  const created: Record<string, RuntimeV02BoundDeckSetProvenance> = {};
+  vars.__bound_deck_sets = created;
+  return created;
+}
+function boundSetParentTokenMap(vars: Record<string, unknown>) {
+  const current = vars.__bound_set_parent_tokens;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, string>;
+  }
+  const created: Record<string, string> = {};
+  vars.__bound_set_parent_tokens = created;
+  return created;
+}
 function selectedCardRefs(value: unknown): RuntimeV02SelectedCardRef[] {
   if (!Array.isArray(value)) throw new Error("tcg_v0_2_tactic_selected_cards_variable_invalid");
   return value.map((raw, index) => {
@@ -448,6 +467,10 @@ function unsupportedOps(steps: any[]): string[] {
       if (op === "SELECT_CARDS") {
         try { runtimeV02NormalizeSelectCardsStep(step); }
         catch { unsupported.add("SELECT_CARDS_GRAMMAR"); }
+      }
+      if (op === "CHOOSE_FROM_SET") {
+        try { runtimeV02NormalizeChooseFromSetStep(step); }
+        catch { unsupported.add("CHOOSE_FROM_SET_GRAMMAR"); }
       }
       if (op === "INSPECT_ZONE") {
         try { runtimeV02NormalizeInspectZoneStep(step); }
@@ -1068,7 +1091,26 @@ function executeUntilChoice(state: any) {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
       const player = state.players[String(seat)];
       const count = Math.min(Math.max(0, Number(step.count || 0)), player.deck.length);
-      vars[String(step.as || "looked")] = player.deck.splice(0, count);
+      const variable = String(step.as || "looked");
+      const nextStep = effect.steps[effect.cursor + 1] || {};
+      if (String(nextStep.op || "") === "CHOOSE_FROM_SET") {
+        const chooseDescriptor = runtimeV02NormalizeChooseFromSetStep(nextStep);
+        if (chooseDescriptor.source_token === variable) {
+          const bound = runtimeV02BindDeckTopSet(
+            state,
+            ownerSeat,
+            seat,
+            count,
+          );
+          vars[variable] = bound.cards.map((card) => ({ ...card }));
+          boundDeckSetProvenanceMap(vars)[variable] = structuredClone(
+            bound.provenance,
+          );
+          effect.cursor++;
+          continue;
+        }
+      }
+      vars[variable] = player.deck.splice(0, count);
       if (count > 0) recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck_top");
       effect.cursor++;
       continue;
@@ -1118,6 +1160,49 @@ function executeUntilChoice(state: any) {
       return;
     }
     if (op === "CHOOSE_FROM_SET") {
+      const descriptor = runtimeV02NormalizeChooseFromSetStep(step);
+      const boundProvenance = boundDeckSetProvenanceMap(vars)[
+        descriptor.source_token
+      ];
+      if (boundProvenance) {
+        const source = runtimeV02RebindBoundDeckSet(state, boundProvenance);
+        vars[descriptor.source_token] = source.map((card) => ({ ...card }));
+        const options = runtimeV02BoundSetChoiceOptions(
+          state,
+          descriptor,
+          source,
+        );
+        if (options.length < descriptor.min) {
+          throw new Error("required_effect_choice_unavailable");
+        }
+        if (!options.length && descriptor.min === 0) {
+          vars[descriptor.as] = [];
+          boundSetParentTokenMap(vars)[descriptor.as] =
+            descriptor.source_token;
+          effect.cursor++;
+          continue;
+        }
+        setPending(state, effect, {
+          seat: ownerSeat,
+          kind: "choose_bound_set",
+          prompt: "Choose card",
+          min: descriptor.min,
+          max: Math.min(descriptor.max, options.length),
+          mode: "select",
+          options: options.map((option) => ({
+            id: option.id,
+            label: option.label,
+            data: { ref: option.ref },
+          })),
+          context: {
+            apply: "bind_bound_set_choice",
+            descriptor: structuredClone(descriptor),
+            source_token: descriptor.source_token,
+          },
+        });
+        return;
+      }
+
       const sourceToken = typeof step.source === "string" && step.source.startsWith("$")
         ? step.source.slice(1)
         : "";
@@ -1274,6 +1359,90 @@ function executeUntilChoice(state: any) {
       const parentToken = token
         ? inspectionParentTokenMap(vars)[token] || token
         : "";
+      const boundParentToken = token
+        ? boundSetParentTokenMap(vars)[token] || ""
+        : "";
+      const boundProvenance = boundParentToken
+        ? boundDeckSetProvenanceMap(vars)[boundParentToken]
+        : null;
+      if (boundProvenance) {
+        if (destinationSeat !== boundProvenance.zone_owner_seat) {
+          throw new Error("tcg_v0_2_tactic_bound_set_move_owner_changed");
+        }
+        const rebound = runtimeV02RebindBoundDeckSet(
+          state,
+          boundProvenance,
+        );
+        const selected = cards.map((card, index) => {
+          const current = rebound.find((candidate) =>
+            candidate.uid === card.uid && candidate.card_id === card.card_id
+          );
+          if (!current) {
+            throw new Error(
+              `tcg_v0_2_tactic_bound_set_selected_card_changed:${index}`,
+            );
+          }
+          return current;
+        });
+        const destination = String(step.to ?? step.destination ?? "hand");
+        if (selected.length > 0) {
+          const player = state.players[String(destinationSeat)];
+          if (destination === "hand") {
+            runtimeV02ApplyCardZonePartitionTransfer(
+              player.deck as Inst[],
+              player.hand as Inst[],
+              {
+                cause: "effect",
+                action_kind: "tactic",
+                source_action_id: effect.id,
+                source_card_uid: effect.source_card.uid,
+                source: {
+                  controller_seat: destinationSeat as 1 | 2,
+                  zone: "deck",
+                  owner_card_uid: null,
+                },
+                destination: {
+                  controller_seat: destinationSeat as 1 | 2,
+                  zone: "hand",
+                  owner_card_uid: null,
+                },
+                source_window: {
+                  position: "top",
+                  card_uids: rebound.map((card) => card.uid),
+                },
+                destination_card_uids: selected.map((card) => card.uid),
+                source_remainder_position: "top",
+                destination_position: "bottom",
+              },
+            );
+          } else if (destination === "deck_bottom") {
+            runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+              cause: "effect",
+              action_kind: "tactic",
+              source_action_id: effect.id,
+              source_card_uid: effect.source_card.uid,
+              zone: {
+                controller_seat: destinationSeat as 1 | 2,
+                zone: "deck",
+                owner_card_uid: null,
+              },
+              card_uids: selected.map((card) => card.uid),
+              destination_position: "bottom",
+            });
+          } else {
+            throw new Error(
+              `tcg_v0_2_tactic_bound_set_move_destination_unsupported:${destination}`,
+            );
+          }
+          boundDeckSetProvenanceMap(vars)[boundParentToken] =
+            runtimeV02BoundDeckSetAfterRemoval(
+              boundProvenance,
+              selected.map((card) => card.uid),
+            );
+        }
+        effect.cursor++;
+        continue;
+      }
       const inspectionProvenance = parentToken
         ? inspectionProvenanceMap(vars)[parentToken]
         : null;
@@ -1431,16 +1600,82 @@ function executeUntilChoice(state: any) {
       continue;
     }
     if (op === "PUT_REMAINDER_ON_DECK_BOTTOM" || op === "RETURN_REMAINDER_TO_DECK_TOP" || op === "RETURN_SET_TO_DECK_TOP") {
-      const sourceToken = step.source || step.cards;
+      const sourceToken = step.source || step.set || step.cards;
       const sourceVar = typeof sourceToken === "string" && sourceToken.startsWith("$")
         ? sourceToken.slice(1)
         : "";
       const provenance = sourceVar
         ? inspectionProvenanceMap(vars)[sourceVar]
         : null;
-      const except = new Set((((resolveVar(vars, step.except) || []) as Inst[]).map((inst) => inst.uid)));
+      const exceptToken = step.except ?? step.exclude;
+      const except = new Set((((resolveVar(vars, exceptToken) || []) as Inst[]).map((inst) => inst.uid)));
       const seat = step.player ? playerSeat(ownerSeat, step.player, vars) : ownerSeat;
       const destination = op === "PUT_REMAINDER_ON_DECK_BOTTOM" ? "deck_bottom" : "deck_top";
+      const boundProvenance = sourceVar
+        ? boundDeckSetProvenanceMap(vars)[sourceVar]
+        : null;
+      if (boundProvenance) {
+        if (seat !== boundProvenance.zone_owner_seat) {
+          throw new Error("tcg_v0_2_tactic_bound_set_remainder_owner_changed");
+        }
+        const removed = new Set(boundProvenance.removed_uids);
+        if (
+          except.size !== removed.size ||
+          [...except].some((uid) => !removed.has(uid))
+        ) {
+          throw new Error("tcg_v0_2_tactic_bound_set_except_changed");
+        }
+        const cards = runtimeV02RebindBoundDeckSet(state, boundProvenance);
+        vars[sourceVar] = cards.map((card) => ({ ...card }));
+        if (!cards.length) {
+          delete boundDeckSetProvenanceMap(vars)[sourceVar];
+          effect.cursor++;
+          continue;
+        }
+        if (String(step.order || "") === "player_choice" && cards.length > 1) {
+          const options = cardOptions(state, cards, null, ownerSeat);
+          setPending(state, effect, {
+            seat: ownerSeat,
+            kind: "order_bound_deck_set",
+            prompt: "Choose card order",
+            min: options.length,
+            max: options.length,
+            mode: "order",
+            options,
+            context: {
+              apply: "order_bound_deck_remainder",
+              zone_seat: seat,
+              provenance_token: sourceVar,
+              destination,
+            },
+          });
+          return;
+        }
+        if (
+          destination === "deck_bottom" ||
+          String(step.order || "") === "player_choice"
+        ) {
+          const player = state.players[String(seat)];
+          runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+            cause: "effect",
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            zone: {
+              controller_seat: seat as 1 | 2,
+              zone: "deck",
+              owner_card_uid: null,
+            },
+            card_uids: cards.map((card) => card.uid),
+            destination_position: destination === "deck_bottom" ? "bottom" : "top",
+          });
+        }
+        if (destination === "deck_bottom") {
+          delete boundDeckSetProvenanceMap(vars)[sourceVar];
+        }
+        effect.cursor++;
+        continue;
+      }
       if (provenance) {
         if (
           seat !== provenance.zone_owner_seat ||
@@ -1996,7 +2231,24 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   let movementFlow: ReturnType<typeof runtimeV02BeginMovementListenerContinuation> | null = null;
   const attachmentHealPacketIds: string[] = [];
 
-  if (apply === "inspect_reward") {
+  if (apply === "bind_bound_set_choice") {
+    const descriptor = context.descriptor as RuntimeV02ChooseFromSetDescriptor;
+    const sourceToken = String(context.source_token || "");
+    const provenance = boundDeckSetProvenanceMap(vars)[sourceToken];
+    if (!provenance) {
+      throw new Error("tcg_v0_2_tactic_bound_set_provenance_missing");
+    }
+    const source = runtimeV02RebindBoundDeckSet(state, provenance);
+    const selectedRefs = selected.map((option) => option.data.ref);
+    const resolved = runtimeV02ResolveBoundSetChoice(
+      state,
+      descriptor,
+      source,
+      selectedRefs,
+    );
+    vars[descriptor.as] = resolved.map((card) => ({ ...card }));
+    boundSetParentTokenMap(vars)[descriptor.as] = sourceToken;
+  } else if (apply === "inspect_reward") {
     const descriptor = context.descriptor as RuntimeV02InspectZoneDescriptor;
     const option = selected[0]?.data?.option as RuntimeV02RewardInspectionChoiceOption | undefined;
     if (!option) throw new Error("tcg_v0_2_tactic_reward_inspection_option_required");
@@ -2164,6 +2416,56 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
         }
       }
       runtimeV02CommitCardZoneTransfer(player.discard as Inst[], player.deck as Inst[], preflight);
+    }
+  } else if (apply === "order_bound_deck_remainder") {
+    const token = String(context.provenance_token || "");
+    const provenance = boundDeckSetProvenanceMap(vars)[token];
+    if (!provenance) {
+      throw new Error("tcg_v0_2_tactic_bound_set_provenance_missing");
+    }
+    const zoneSeat = Number(context.zone_seat);
+    if (zoneSeat !== provenance.zone_owner_seat) {
+      throw new Error("tcg_v0_2_tactic_bound_set_reorder_owner_changed");
+    }
+    const current = runtimeV02RebindBoundDeckSet(state, provenance);
+    const ordered = selected.map((option) => ({
+      uid: String(option.data.uid),
+      card_id: String(option.data.card_id),
+    }));
+    if (
+      ordered.length !== current.length ||
+      new Set(ordered.map((card) => card.uid)).size !== current.length ||
+      ordered.some((card) =>
+        !current.some((now) =>
+          now.uid === card.uid && now.card_id === card.card_id
+        )
+      )
+    ) {
+      throw new Error("tcg_v0_2_tactic_bound_set_reorder_changed");
+    }
+    const destination = String(context.destination || "");
+    if (destination !== "deck_top" && destination !== "deck_bottom") {
+      throw new Error(
+        `tcg_v0_2_tactic_bound_set_reorder_destination_unsupported:${destination}`,
+      );
+    }
+    const player = state.players[String(zoneSeat)];
+    runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+      cause: "effect",
+      action_kind: "tactic",
+      source_action_id: effect.id,
+      source_card_uid: effect.source_card.uid,
+      zone: {
+        controller_seat: zoneSeat as 1 | 2,
+        zone: "deck",
+        owner_card_uid: null,
+      },
+      card_uids: ordered.map((card) => card.uid),
+      destination_position: destination === "deck_bottom" ? "bottom" : "top",
+    });
+    vars[token] = ordered.map((card) => ({ ...card }));
+    if (destination === "deck_bottom") {
+      delete boundDeckSetProvenanceMap(vars)[token];
     }
   } else if (apply === "order_inspected_deck_top") {
     const token = String(context.provenance_token || "");
