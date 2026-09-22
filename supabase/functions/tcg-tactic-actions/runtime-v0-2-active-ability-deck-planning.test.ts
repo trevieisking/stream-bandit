@@ -5,8 +5,14 @@ import {
   structuredRuntimeActiveAbilityDeckPlanning,
 } from "../_shared/tcg-match-active-ability-deck-planning-v0-2.ts";
 import {
+  runtimeV02CurrentTurnActiveAbilityUseCount,
   runtimeV02RecordActiveAbilityUse,
 } from "../_shared/tcg-match-active-ability-choice-v0-2.ts";
+import {
+  runtimeV02CreateActiveAbilityLiveChoice,
+  runtimeV02PendingActiveAbilityLiveChoiceView,
+  runtimeV02ResolveActiveAbilityLiveChoice,
+} from "../_shared/tcg-match-active-ability-live-v0-2.ts";
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, message = "values differ") {
@@ -242,4 +248,49 @@ Deno.test("deck drift between private stages fails closed before reorder mutatio
     "deck_top_changed",
   );
   equal(s.players["1"].deck, before);
+});
+
+
+Deno.test("live active-Ability facade delegates the two-stage deck-planning family", () => {
+  const s = state();
+  const pending = runtimeV02CreateActiveAbilityLiveChoice(
+    s,
+    1,
+    source(),
+    "live-plan-1",
+  );
+  if (!pending || pending.kind !== "plan_own_deck_top") {
+    throw new Error("live deck-planning choice required");
+  }
+  equal(
+    runtimeV02CurrentTurnActiveAbilityUseCount(s, 1, "deck-planner"),
+    1,
+  );
+  equal(runtimeV02PendingActiveAbilityLiveChoiceView(pending, 2), {
+    id: "live-plan-1",
+    seat: 1,
+    kind: "plan_own_deck_top",
+    waiting: true,
+  });
+  const first = runtimeV02ResolveActiveAbilityLiveChoice(
+    pending,
+    1,
+    pending.id,
+    ["card:b"],
+    s,
+  );
+  if (first.kind !== "plan_own_deck_top" || first.stage !== "order_required") {
+    throw new Error("live deck-planning order stage required");
+  }
+  const second = runtimeV02ResolveActiveAbilityLiveChoice(
+    first.pending_choice,
+    1,
+    first.pending_choice.id,
+    ["card:d", "card:a", "card:c"],
+    s,
+  );
+  if (second.kind !== "plan_own_deck_top" || second.stage !== "complete") {
+    throw new Error("live deck-planning completion required");
+  }
+  equal(s.players["1"].deck.map((x:any) => x.uid), ["d", "a", "c", "e", "b"]);
 });

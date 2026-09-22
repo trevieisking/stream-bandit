@@ -15,6 +15,14 @@ import {
   type RuntimeV02PendingActiveAbilityDeckReadingChoice,
 } from "./tcg-match-active-ability-deck-reading-v0-2.ts";
 import {
+  runtimeV02CreateActiveAbilityDeckPlanningChoice,
+  runtimeV02PendingActiveAbilityDeckPlanningChoiceView,
+  runtimeV02ResolveActiveAbilityDeckPlanningChoice,
+  structuredRuntimeActiveAbilityDeckPlanning,
+  type RuntimeV02ActiveAbilityDeckPlanningResolution,
+  type RuntimeV02PendingActiveAbilityDeckPlanningChoice,
+} from "./tcg-match-active-ability-deck-planning-v0-2.ts";
+import {
   runtimeV02CreateActiveAbilityEssenceRedistributionChoice,
   runtimeV02PendingActiveAbilityEssenceRedistributionChoiceView,
   runtimeV02ResolveActiveAbilityEssenceRedistributionChoice,
@@ -73,6 +81,7 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilitySupplyChoice
   | RuntimeV02PendingActiveAbilitySupplyAttachmentChoice
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
+  | RuntimeV02PendingActiveAbilityDeckPlanningChoice
   | RuntimeV02PendingActiveAbilityChoice
   | RuntimeV02PendingActiveAbilitySelectedHealChoice
   | RuntimeV02PendingActiveAbilitySelectedHealEachChoice
@@ -83,6 +92,7 @@ export type RuntimeV02ActiveAbilityLiveResolution =
   | RuntimeV02ActiveAbilitySupplyChoiceResolution
   | RuntimeV02ActiveAbilitySupplyAttachmentResolution
   | RuntimeV02ActiveAbilityDeckReadingResolution
+  | RuntimeV02ActiveAbilityDeckPlanningResolution
   | {
     kind: "inspect_one_reward";
     ability_id: string;
@@ -161,6 +171,26 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
       state,
       controllerSeat,
       supplyAttachmentDescriptor.ability_id,
+    );
+    return pending;
+  }
+
+  const deckPlanningDescriptor = structuredRuntimeActiveAbilityDeckPlanning(
+    state,
+    instance,
+  );
+  if (deckPlanningDescriptor) {
+    const pending = runtimeV02CreateActiveAbilityDeckPlanningChoice(
+      state,
+      controllerSeat,
+      deckPlanningDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      deckPlanningDescriptor.ability_id,
     );
     return pending;
   }
@@ -262,6 +292,12 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   if (choice.kind === "select_discard_essence_then_friendly_target") {
     return runtimeV02PendingActiveAbilitySupplyAttachmentChoiceView(choice, viewerSeat);
   }
+  if (choice.kind === "plan_own_deck_top") {
+    return runtimeV02PendingActiveAbilityDeckPlanningChoiceView(
+      choice,
+      viewerSeat,
+    );
+  }
   if (choice.kind === "inspect_opponent_deck_top_then_optional_bottom") {
     return runtimeV02PendingActiveAbilityDeckReadingChoiceView(choice, viewerSeat);
   }
@@ -315,6 +351,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   }
   if (choice.kind === "select_discard_essence_then_friendly_target") {
     return runtimeV02ResolveActiveAbilitySupplyAttachmentChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
+  if (choice.kind === "plan_own_deck_top") {
+    return runtimeV02ResolveActiveAbilityDeckPlanningChoice(
       choice,
       controllerSeat,
       choiceId,

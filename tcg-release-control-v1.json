@@ -93,8 +93,8 @@
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "c51ba1409390f90c0758d82fe4e3aacc6ac5e9bf",
-        "file_count": 109,
-        "closure_sha256": "8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6",
+        "file_count": 111,
+        "closure_sha256": "5d7a6a2ca83717fad91a872d51e2dd3d4e01ad5fed0d7d75ff73ea1cf5c6fbe8",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -115,6 +115,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-continuation-v0-2.ts",
             "git_blob_sha": "a5f80f5b4e1b2b1a2dea6e8f78a026ffda266422"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-active-ability-deck-planning-v0-2.ts",
+            "git_blob_sha": "258cbc47efbea4682f93f4e2adad9d68f72d0b22"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
@@ -142,7 +146,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
-            "git_blob_sha": "ce93496cfbdc0f9cae1362ee8c03903956cbec90"
+            "git_blob_sha": "a4c963d2049365a9942fdaff81f04730a1e30e9a"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-opponent-creature-choice-v0-2.ts",
@@ -279,6 +283,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-attack-v0-2.ts",
             "git_blob_sha": "8a0250ee68797259e3569fd8e6db282c13c46da1"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-bound-set-choice-v0-2.ts",
+            "git_blob_sha": "103f14e7bc5ccaebe7c6eabfebcdedaab92ff4a0"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-card-cost-choice-v0-2.ts",
