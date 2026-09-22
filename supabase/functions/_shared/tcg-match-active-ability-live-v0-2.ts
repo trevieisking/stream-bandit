@@ -47,6 +47,14 @@ import {
   type RuntimeV02PendingActiveAbilitySupplyAttachmentChoice,
 } from "./tcg-match-active-ability-supply-attachment-v0-2.ts";
 import {
+  runtimeV02CreateActiveAbilityHandAttachmentDamageChoice,
+  runtimeV02PendingActiveAbilityHandAttachmentDamageChoiceView,
+  runtimeV02ResolveActiveAbilityHandAttachmentDamageChoice,
+  structuredRuntimeActiveAbilityHandAttachmentDamage,
+  type RuntimeV02ActiveAbilityHandAttachmentDamageChoiceResolution,
+  type RuntimeV02PendingActiveAbilityHandAttachmentDamageChoice,
+} from "./tcg-match-active-ability-hand-attachment-damage-v0-2.ts";
+import {
   runtimeV02BuildActiveAbilitySelectedHealChoice,
   runtimeV02BuildActiveAbilitySelectedHealEachChoice,
   runtimeV02PendingActiveAbilitySelectedHealChoiceView,
@@ -80,6 +88,7 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilityEssenceRedistributionChoice
   | RuntimeV02PendingActiveAbilitySupplyChoice
   | RuntimeV02PendingActiveAbilitySupplyAttachmentChoice
+  | RuntimeV02PendingActiveAbilityHandAttachmentDamageChoice
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityDeckPlanningChoice
   | RuntimeV02PendingActiveAbilityChoice
@@ -91,6 +100,7 @@ export type RuntimeV02ActiveAbilityLiveResolution =
   | RuntimeV02ActiveAbilityEssenceRedistributionResolution
   | RuntimeV02ActiveAbilitySupplyChoiceResolution
   | RuntimeV02ActiveAbilitySupplyAttachmentResolution
+  | RuntimeV02ActiveAbilityHandAttachmentDamageChoiceResolution
   | RuntimeV02ActiveAbilityDeckReadingResolution
   | RuntimeV02ActiveAbilityDeckPlanningResolution
   | {
@@ -171,6 +181,24 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
       state,
       controllerSeat,
       supplyAttachmentDescriptor.ability_id,
+    );
+    return pending;
+  }
+
+  const handAttachmentDamageDescriptor =
+    structuredRuntimeActiveAbilityHandAttachmentDamage(state, instance);
+  if (handAttachmentDamageDescriptor) {
+    const pending = runtimeV02CreateActiveAbilityHandAttachmentDamageChoice(
+      state,
+      controllerSeat,
+      handAttachmentDamageDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      handAttachmentDamageDescriptor.ability_id,
     );
     return pending;
   }
@@ -292,6 +320,12 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   if (choice.kind === "select_discard_essence_then_friendly_target") {
     return runtimeV02PendingActiveAbilitySupplyAttachmentChoiceView(choice, viewerSeat);
   }
+  if (choice.kind === "select_target_then_hand_essence_direct_damage") {
+    return runtimeV02PendingActiveAbilityHandAttachmentDamageChoiceView(
+      choice,
+      viewerSeat,
+    );
+  }
   if (choice.kind === "plan_own_deck_top") {
     return runtimeV02PendingActiveAbilityDeckPlanningChoiceView(
       choice,
@@ -351,6 +385,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   }
   if (choice.kind === "select_discard_essence_then_friendly_target") {
     return runtimeV02ResolveActiveAbilitySupplyAttachmentChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
+  if (choice.kind === "select_target_then_hand_essence_direct_damage") {
+    return runtimeV02ResolveActiveAbilityHandAttachmentDamageChoice(
       choice,
       controllerSeat,
       choiceId,
