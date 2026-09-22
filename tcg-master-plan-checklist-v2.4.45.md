@@ -876,7 +876,7 @@
 - [x] Move `SET_WITHDRAWAL_MODIFIER` from partial to implemented.
 - [x] Refresh capability fingerprint to `9b33834f794be37a9814b9f6bbb9a6dee37c58d8`.
 - [x] Card Pass **#1481 SUCCESS** on exact capability-reconciled head `45164fad24d17037a58102d305996d755722425a`.
-- [ ] V2.4.93: close `HEAL_EACH` parity across Verdantusk Attack, Elderbloom active Ability, Marevault mixed after-damage-finished Attack and Reef Medic Olan Tactic without duplicating Heal ownership.
+- [x] V2.4.93: close `HEAL_EACH` parity across Verdantusk Attack, Elderbloom active Ability, Marevault mixed after-damage-finished Attack and Reef Medic Olan Tactic without duplicating Heal ownership.
 
 
 ## V2.4.93 — HEAL_EACH all-consumer parity closeout
@@ -905,7 +905,7 @@
 - [x] Refresh capability fingerprint to `2e5596630d16932c7ebfc6dcff0fbc9f370da290`.
 - [x] Card Pass **#1489 SUCCESS** on exact capability-reconciled head `fec2fb546a976ab67003acc4133d7fc3f5fe9a69`.
 - [x] Preserve canonical owner-family count 40 and leave main/live Supabase untouched.
-- [ ] V2.4.94: close `SELECT_CARDS` selection/resume ownership across all seven frozen consumer surfaces without duplicating Card-Zone ownership.
+- [x] V2.4.94: close `SELECT_CARDS` selection/resume ownership across all seven frozen consumer surfaces without duplicating Card-Zone ownership.
 
 ## V2.4.94 — SELECT_CARDS all-surface closeout (in progress)
 - [x] Freeze the Release 1 `SELECT_CARDS` inventory to exactly seven consumers across Event Listener, Attack, active Ability and Tactic surfaces.
@@ -925,10 +925,24 @@
 - [x] Match Edge closure = 108 files / `26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286`.
 - [x] Tactic Edge closure = 44 files / `b2df5e5e605e9cdab570c55af6199e48a785c4ff2af456ecf015f27118b823f9`.
 - [x] Card Pass **#1496 SUCCESS** on exact active-Ability source/runtime + release-control head `d88af8f3a1047c38a8935974709c6a6389f43be4`.
-- [ ] Implement/reuse generic Tactic `SELECT_CARDS` private selection/resume for Forager Nia and Quickcharge Cell.
-- [ ] Preserve Tactic variable binding while delegating later card movement/attachment to canonical downstream owners.
-- [ ] Prove all seven frozen `SELECT_CARDS` consumers execute through their canonical surfaces.
-- [ ] Move `SELECT_CARDS` from missing to implemented only after all seven consumers are green.
-- [ ] Refresh the capability-manifest release-control fingerprint and pass a fresh exact-head Card Pass after capability reconciliation.
-- [ ] Close V2.4.94 and select the next master-plan target.
+- [x] Implement/reuse generic Tactic `SELECT_CARDS` private selection/resume for Forager Nia and Quickcharge Cell.
+- [x] Preserve Tactic variable binding while delegating later card movement/attachment to canonical downstream owners.
+- [x] Prove all seven frozen `SELECT_CARDS` consumers execute through their canonical surfaces.
+- [x] Move `SELECT_CARDS` from missing to implemented only after all seven consumers are green.
+- [x] Refresh the capability-manifest release-control fingerprint and pass a fresh exact-head Card Pass after capability reconciliation.
+- [x] Close V2.4.94 and select the next master-plan target.
+
+### V2.4.94 final acceptance
+- [x] Generic Card Selection owner isolated head `1470dd8ebc79b43749dc58cd827c7a2764ff3cee` / Card Pass **#1499 SUCCESS**.
+- [x] Forager Nia player-chosen multi-card ordering uses a fresh private continuation and canonical Card-Zone movement.
+- [x] Quickcharge Cell consumes its already-selected exact discard Essence and delegates temporary attachment to canonical Essence Attachment ownership.
+- [x] Card Pass **#1501** proves all runtime/type checks green before Tactic closure refresh.
+- [x] Tactic Edge closure = 45 files / `ea17df9e55af4e18d80585113fe73045321d70d60b2d6c6160880a9c18bfb5d6`.
+- [x] Card Pass **#1502 SUCCESS** on exact all-surface source/runtime + release-control head `795a9e94da7e5eadedf41c653fed3cc44be8c8e5`.
+- [x] `SELECT_CARDS` capability moved from missing to implemented.
+- [x] Capability fingerprint refreshed to `092d25f4091326e31d3b78cd0987867fd8125174`.
+- [x] Card Pass **#1503 SUCCESS** on exact capability/control head `ff6af2fde6029158eb63c74df01b4232412f94e3`.
+- [x] Preserve canonical owner-family count **40**; no owner #41.
+- [x] Leave Supabase production, main and live promotion untouched.
+- [ ] V2.4.95: freeze and reconcile all **20** Release 1 `APPLY_CONDITION` uses through Condition owner #19 without card-specific dispatch.
 

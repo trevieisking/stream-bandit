@@ -2468,3 +2468,69 @@ Close the remaining Tactic `SELECT_CARDS` surface generically for:
 
 The next pass must freeze both exact Tactic programs first, then reuse one server-private card-selection/resume transport. Selection may bind a variable for later program steps, but any physical move/attachment stays with the canonical downstream engine. Only after Event Listener + Attack + active Ability + Tactic cover all seven frozen consumers may `SELECT_CARDS` move from missing to implemented.
 
+## V2.4.94 — SELECT_CARDS all-surface closeout — ACCEPTED
+
+V2.4.94 is complete across all seven frozen Release 1 consumers.
+
+### Frozen seven-consumer execution map
+
+- Grove / Capscout — triggered Ability / Event Listener: optional discard Device selection -> Card-Zone deck-bottom move.
+- Grove / Myceliarch — Attack after-damage specialist: optional discard Device selection -> Card-Zone deck-bottom move.
+- Grove / Forager Nia — Tactic: select 0-2 discard Devices -> fresh private order choice when two are chosen -> Card-Zone deck-bottom move -> draw 1.
+- Tide / Surgefin — active Ability: select 0-1 Basic Tide Essence -> fresh Creature-target choice -> canonical Essence Attachment -> conditional Heal.
+- Volt / Tinkit — triggered Ability / Event Listener: optional discard Device selection -> Card-Zone deck-bottom move.
+- Volt / Stormcoil — Living Circuit — active Ability: exact Basic Volt Essence -> fresh field-target choice -> canonical borrowed Essence Attachment.
+- Volt / Quickcharge Cell — Tactic: exact Basic Volt Essence -> field-target choice -> canonical temporary Essence Attachment until controller Aftermath.
+
+### Accepted ownership
+
+`SELECT_CARDS` now owns one generic operation contract:
+- server-private legal option construction;
+- declared min/max enforcement;
+- exact current zone + card identity + filter revalidation;
+- reconnect/stale choice fencing;
+- variable binding only.
+
+It does **not** own later physical mutation:
+- physical card movement/order remains owner #30 Card-Zone;
+- physical Essence attachment remains owner #22 Essence Attachment;
+- condition/heal/event/movement continuations remain with their existing owners.
+
+The shared Card Selection module is a submodule serving existing owner families. It does not create owner #41. Canonical Release 1 owner-family count remains **40**.
+
+### Exact acceptance evidence
+
+Generic Card Selection owner:
+- isolated test-bearing head: `1470dd8ebc79b43749dc58cd827c7a2764ff3cee`;
+- Card Pass **#1499 SUCCESS**.
+
+Complete Tactic source/runtime before release-control refresh:
+- `23c2fa0af3ed423674444102473e0ced6979f299`;
+- Card Pass **#1501** runtime job fully green; the only failing gate was intentionally stale Tactic closure count.
+
+Complete all-surface source/runtime + release-control:
+- `795a9e94da7e5eadedf41c653fed3cc44be8c8e5`;
+- Card Pass **#1502 SUCCESS**;
+- Match closure: **108 files** / `26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286`;
+- Tactic closure: **45 files** / `ea17df9e55af4e18d80585113fe73045321d70d60b2d6c6160880a9c18bfb5d6`.
+
+Capability reconciliation:
+- `SELECT_CARDS` moved from **missing** to **implemented**;
+- capability blob: `092d25f4091326e31d3b78cd0987867fd8125174`;
+- capability/control head: `ff6af2fde6029158eb63c74df01b4232412f94e3`;
+- Card Pass **#1503 SUCCESS**.
+
+No database migration, Supabase Edge deployment, main merge or live promotion was performed. Production remains unchanged and promotion remains HOLD while the master-plan capability closeout loop continues.
+
+### Next exact runtime target — V2.4.95
+
+`APPLY_CONDITION` all-surface Condition-owner reconciliation.
+
+Read-only frozen inventory currently contains exactly **20 Release 1 operation uses**, making it the largest remaining used missing opcode:
+- active/triggered Ability producers;
+- Attack after-damage / conditional Attack producers;
+- triggered Tactic/Event Listener producers;
+- one ordinary Tactic-program conditional producer.
+
+V2.4.95 belongs to existing Condition owner #19. It must begin by freezing all 20 exact shapes, targets, condition names, application modes and timing boundaries. Producers may orchestrate, but condition slot legality, application/replacement/protection/lifecycle mutation stays with the canonical Condition Engine. No owner #41 and no card-ID/name dispatch.
+

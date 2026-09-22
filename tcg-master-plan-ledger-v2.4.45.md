@@ -888,3 +888,21 @@ The V2.4.94 active-Ability sub-slice is accepted on exact head `d88af8f3a1047c38
 ## 306 — Tactic SELECT_CARDS owns selection and binding, not later mutation
 The remaining V2.4.94 Tactic route must own legal option construction, min/max choice validation, current-zone/card revalidation and variable binding. Any following `MOVE_CARDS`, `ATTACH_ESSENCE_FROM_ZONE` or other physical mutation remains delegated to its canonical engine/specialist. Completing selection transport must not create a second Card-Zone or Essence Attachment owner.
 
+## 307 — optional SELECT_CARDS binds an empty set, not a fake card
+When declared minimum is zero and no legal option exists—or the controller legally chooses zero—the selection owner binds an empty server-side set and advances. It must not fabricate an identity, perform a zone mutation or manufacture an attachment.
+
+## 308 — player-chosen card order is a separate private continuation
+A later `MOVE_CARDS ... order: player_choice` over a selected hidden set receives a fresh server choice identity. The order choice validates the exact same selected instances and then delegates physical movement to Card-Zone. Selection ownership must not become ordering/movement ownership.
+
+## 309 — cards-bound Essence attachment consumes the selected ref without a second selection prompt
+When `ATTACH_ESSENCE_FROM_ZONE` references a prior `SELECT_CARDS` variable, the Tactic/Ability orchestrator rebinds that exact current card ref and sends it to canonical Essence Attachment ownership. It must not ask the player to select the same Essence again or move the card itself.
+
+## 310 — SELECT_CARDS closes only as one all-surface operation contract
+V2.4.94 is accepted only because Event Listener, Attack, active Ability and Tactic together cover all seven frozen Release 1 consumers. The shared Card Selection module owns legality/revalidation/binding only and is a submodule of existing owner families; canonical owner-family count remains 40.
+
+## 311 — APPLY_CONDITION is the next Release 1 condition closeout target
+The frozen 193-card inventory contains exactly 20 `APPLY_CONDITION` operation uses, the largest remaining used missing opcode after V2.4.94. V2.4.95 must freeze every exact condition/target/mode/timing shape before source changes, then route application through Condition owner #19. Producers may sequence the operation but must not create a second condition-state owner or owner #41.
+
+## 312 — V2.4.94 exact acceptance
+All-surface source/runtime + release-control accepted at `795a9e94da7e5eadedf41c653fed3cc44be8c8e5` with Card Pass #1502 SUCCESS; capability/control accepted at `ff6af2fde6029158eb63c74df01b4232412f94e3` with Card Pass #1503 SUCCESS. Match closure is 108 / `26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286`; Tactic closure is 45 / `ea17df9e55af4e18d80585113fe73045321d70d60b2d6c6160880a9c18bfb5d6`; `SELECT_CARDS` is implemented; production was not changed.
+
