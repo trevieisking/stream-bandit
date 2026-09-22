@@ -536,9 +536,9 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "51a2947844fd313ef42582316cc8a29d9b9b8490",
-        "file_count": 46,
-        "closure_sha256": "5defbc3ccf666ee96191aea62b2f98bfda7800ed56f86c5e4e8e7501f1cef876",
+        "entrypoint_git_blob_sha": "603ce837fe2c2f4a0a212394b2a434a4977a5892",
+        "file_count": 47,
+        "closure_sha256": "5fe799462c53855691f0901fba11740c79d99d691d40bc2173ee6c1a40ae70ac",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -547,6 +547,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
             "git_blob_sha": "236c36b943a39a09a39f0f76542c396355dbb590"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-bound-set-choice-v0-2.ts",
+            "git_blob_sha": "103f14e7bc5ccaebe7c6eabfebcdedaab92ff4a0"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-card-selection-v0-2.ts",
@@ -718,7 +722,7 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "51a2947844fd313ef42582316cc8a29d9b9b8490"
+            "git_blob_sha": "603ce837fe2c2f4a0a212394b2a434a4977a5892"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
