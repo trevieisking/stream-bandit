@@ -60,7 +60,7 @@ test('the generic listener owns every operation and predicate used by the full f
 test('evolved continuation is card-id-free and reuses canonical rule owners', () => {
   for (const forbidden of [...ids, ...names]) assert.equal(helper.includes(forbidden), false, `card-specific authority leaked into generic listener: ${forbidden}`);
   for (const owner of [
-    'applyRuntimeCondition','dealRuntimeEffectDamage','addRuntimeShield','applyRuntimeV02HealPacket',
+    'applyRuntimeCondition','runtimeV02ApplyDirectDamage','addRuntimeShield','applyRuntimeV02HealPacket',
     'runtimeV02InspectRewardPositions','recordRuntimeV02HiddenInformationView',
     'runtimeV02ApplyEssenceAttachmentTransaction','runtimeV02BuildEssenceAttachedTriggerPlan',
   ]) assert.ok(helper.includes(owner), `canonical owner not reused: ${owner}`);
