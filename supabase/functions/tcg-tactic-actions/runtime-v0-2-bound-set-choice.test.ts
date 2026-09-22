@@ -50,6 +50,7 @@ function def(
 function state() {
   return {
     runtime_registry_v0_2: runtimeV02SnapshotMarker(),
+    turn_seq: 12,
     players: {
       "1": {
         deck: [
