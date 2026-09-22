@@ -115,8 +115,8 @@ function fields(state: Record<string, unknown>, seat: Seat): Field[] {
   const own = player(state, seat);
   const rows: Array<[FieldWhere, number | null, unknown]> = [
     ["vanguard", null, own.vanguard],
-    [0,1,2,3].map(function(index){ return ["reserve", index, (own.reserve as unknown[])[index]] as [FieldWhere, number, unknown]; })
-  ].flat() as Array<[FieldWhere, number | null, unknown]>;
+    ...[0,1,2,3].map(function(index){ return ["reserve", index, (own.reserve as unknown[])[index]] as [FieldWhere, number, unknown]; }),
+  ];
   const out: Field[] = [];
   for (const row of rows) {
     const where = row[0], index = row[1], raw = row[2];
