@@ -30,8 +30,8 @@ import {
 } from "./tcg-match-condition-engine-v0-2.ts";
 import {
   addRuntimeShield,
-  dealRuntimeEffectDamage,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { runtimeV02ApplyDirectDamage } from "./tcg-match-direct-damage-v0-2.ts";
 import {
   evaluateRuntimeV02DamageHistoryCountRequirement,
   normalizeRuntimeV02DamageHistoryCountRequirement,
@@ -104,6 +104,13 @@ export type RuntimeV02EventListenerEvent = {
   target_zone?: "vanguard" | "reserve";
   prevention_kind?: "ability" | "relic" | "shield";
   prevention_amount?: number;
+  packet_id?: string;
+  damage_class?: "attack" | "effect" | "recoil" | "condition";
+  requested_amount?: number;
+  final_packet_amount?: number;
+  shield_prevented?: number;
+  actual_hp_damage?: number;
+  source_card_id?: string;
 };
 
 export type RuntimeV02DamagePreventedEventInput = {
@@ -820,6 +827,15 @@ function targetField(
     candidate.field
   ) return candidate.field;
   if (token === "$event_subject") return eventSubject(state, event);
+  if (token === "$damage_packet_source_creature") {
+    const uid = String(event.source_creature_uid || "").trim();
+    if (!uid) {
+      throw new Error("tcg_v0_2_event_listener_damage_packet_source_creature_required");
+    }
+    const found = fieldByUid(state, uid);
+    if (found) return found;
+    throw new Error("tcg_v0_2_event_listener_damage_packet_source_creature_missing");
+  }
   if (token === "$current_friendly_vanguard") {
     const found = allFields(state).find((field) =>
       field.seat === candidate.seat && field.where === "vanguard"
@@ -998,6 +1014,23 @@ function requirementLeaf(
         throw new Error("tcg_v0_2_event_listener_prevention_amount_invalid");
       }
       const amount = Number(event.prevention_amount);
+      return Number.isFinite(amount) && amount >= minimum;
+    }
+    case "damage_packet_class_is":
+      return String(event.damage_class || "") === String(value.damage_class || "");
+    case "damage_packet_target_is_attached_creature":
+      return !!candidate.field &&
+        candidate.field.top.uid === String(event.target_creature_uid || event.subject_uid || "");
+    case "damage_packet_target_zone_is":
+      return String(event.target_zone || "") === String(value.zone || "");
+    case "damage_packet_source_controller_is_opponent":
+      return event.source_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    case "damage_packet_amount_at_least": {
+      const minimum = Number(value.value);
+      if (!Number.isFinite(minimum) || minimum < 0) {
+        throw new Error("tcg_v0_2_event_listener_damage_packet_amount_invalid");
+      }
+      const amount = Number(event.final_packet_amount);
       return Number.isFinite(amount) && amount >= minimum;
     }
     case "source_counter_at_least": {
@@ -2043,11 +2076,33 @@ function executeStep(
   }
 
   if (op === "DIRECT_DAMAGE") {
-    if (step.damage_class != null && String(step.damage_class) !== "effect") {
-      throw new Error("tcg_v0_2_event_listener_direct_damage_class_unsupported");
-    }
     const target = targetField(state, continuation, candidate, event, step.target);
-    dealRuntimeEffectDamage(target.cr, Math.max(0, numberValue(step.amount, "tcg_v0_2_event_listener_direct_damage_amount_invalid")));
+    const actionId =
+      `event-listener:${event.event_id}:${listenerId(candidate)}:${continuation.step_cursor}`;
+    const packetId = `${actionId}:direct:${target.top.uid}`;
+    const result = runtimeV02ApplyDirectDamage(
+      state,
+      target.cr,
+      step,
+      {
+        packet_id: packetId,
+        damage_class: String(step.damage_class || "") as "effect" | "recoil",
+        source_controller_seat: candidate.seat,
+        source_kind: candidate.kind,
+        source_action_id: actionId,
+        source_card_uid: candidate.source.uid,
+        source_card_id: candidate.source.card_id,
+        source_creature_uid: candidate.field?.top.uid ?? null,
+        target_controller_seat: target.seat,
+        target_creature_uid: target.top.uid,
+        target_zone: target.where,
+        target_index: target.index,
+      },
+      String(step.target || ""),
+      null,
+    );
+    const packetEvent = result.after_damage_event as RuntimeV02EventListenerEvent;
+    continuation.work.push(...eventWorkItems(state, packetEvent));
     continuation.step_cursor++;
     return "continue";
   }
@@ -2325,6 +2380,114 @@ function recordEvent(
   if (!events.some((entry) => entry.event_id === event.event_id)) {
     events.push({ ...event });
   }
+}
+
+export type RuntimeV02ResolvedAttackDamageEventInput = {
+  action_id: string;
+  packet_id: string;
+  attack_id: string;
+  source_controller_seat: 1 | 2;
+  source_creature_uid: string;
+  source_card_uid: string;
+  source_card_id: string;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  requested_amount: number;
+  final_packet_amount: number;
+  shield_prevented: number;
+  actual_hp_damage: number;
+};
+
+export function runtimeV02CreateResolvedAttackDamageEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ResolvedAttackDamageEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const source = fieldByUid(
+    state,
+    requiredString(
+      input.source_creature_uid,
+      "tcg_v0_2_attack_damage_packet_source_required",
+    ),
+  );
+  if (!source || source.seat !== input.source_controller_seat) {
+    throw new Error("tcg_v0_2_attack_damage_packet_source_changed");
+  }
+  const target = fieldByUid(
+    state,
+    requiredString(
+      input.target_creature_uid,
+      "tcg_v0_2_attack_damage_packet_target_required",
+    ),
+  );
+  if (
+    !target ||
+    target.seat !== input.target_controller_seat ||
+    target.where !== input.target_zone ||
+    target.index !== input.target_index
+  ) {
+    throw new Error("tcg_v0_2_attack_damage_packet_target_changed");
+  }
+  const requested = Number(input.requested_amount);
+  const finalAmount = Number(input.final_packet_amount);
+  const shieldPrevented = Number(input.shield_prevented);
+  const actualHpDamage = Number(input.actual_hp_damage);
+  if (
+    !Number.isFinite(requested) || requested < 0 ||
+    !Number.isFinite(finalAmount) || finalAmount < 0 ||
+    !Number.isFinite(shieldPrevented) || shieldPrevented < 0 ||
+    !Number.isFinite(actualHpDamage) || actualHpDamage < 0
+  ) {
+    throw new Error("tcg_v0_2_attack_damage_packet_amount_invalid");
+  }
+  const packetId = requiredString(
+    input.packet_id,
+    "tcg_v0_2_attack_damage_packet_id_required",
+  );
+  const event: RuntimeV02EventListenerEvent = {
+    event_id: `after-damage:${packetId}`,
+    event: "after_damage_packet",
+    subject_uid: target.top.uid,
+    subject_card_id: target.top.card_id,
+    controller_seat: target.seat,
+    source_controller_seat: source.seat,
+    origin_zone: target.where,
+    destination_zone: target.where,
+    destination_index: target.index,
+    phase: "damage_packet",
+    source_action_id: requiredString(
+      input.action_id,
+      "tcg_v0_2_attack_damage_packet_action_required",
+    ),
+    source_card_uid: requiredString(
+      input.source_card_uid,
+      "tcg_v0_2_attack_damage_packet_source_card_uid_required",
+    ),
+    source_card_id: requiredString(
+      input.source_card_id,
+      "tcg_v0_2_attack_damage_packet_source_card_id_required",
+    ),
+    action_kind: "attack",
+    turn_seq: turn,
+    packet_id: packetId,
+    damage_class: "attack",
+    attack_id: requiredString(
+      input.attack_id,
+      "tcg_v0_2_attack_damage_packet_attack_id_required",
+    ),
+    source_creature_uid: source.top.uid,
+    target_creature_uid: target.top.uid,
+    target_controller_seat: target.seat,
+    target_zone: target.where,
+    requested_amount: requested,
+    final_packet_amount: finalAmount,
+    shield_prevented: shieldPrevented,
+    actual_hp_damage: actualHpDamage,
+  };
+  recordEvent(state, event);
+  return { ...event };
 }
 
 export function runtimeV02CreateCreatureEnteredPlayEvent(

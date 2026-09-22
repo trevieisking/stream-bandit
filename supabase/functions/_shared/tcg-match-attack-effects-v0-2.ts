@@ -1,13 +1,13 @@
 import {
   addRuntimeShield,
   healRuntimeDamage,
-  placeRuntimeDamage,
   type ApplyConditionMode,
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 import { applyRuntimeConditionWithContext } from "./tcg-match-condition-engine-v0-2.ts";
 import { runtimeV02EvaluateAttackIf } from "./tcg-match-attack-if-v0-2.ts";
+import { runtimeV02ApplyDirectDamage } from "./tcg-match-direct-damage-v0-2.ts";
 import {
   recordRuntimeV02AttackHealEachPackets,
   recordRuntimeV02AttackSelfHealPackets,
@@ -196,6 +196,14 @@ export function structuredRuntimeAfterDamageConditionEffects(
 }
 
 
+export type RuntimeV02AttackRecoilExecutionContext = {
+  source_controller_seat: 1 | 2;
+  source_action_id: string;
+  source_card_uid: string;
+  source_card_id: string;
+  source_creature_uid: string;
+};
+
 export type RuntimeV02AttackRecoilEffectResult = {
   target: "$source_creature";
   damage_class: "recoil";
@@ -203,6 +211,8 @@ export type RuntimeV02AttackRecoilEffectResult = {
   source_attack_id: string;
   placed: number;
   shield_prevented: 0;
+  packet_id: string;
+  after_damage_event: Record<string, unknown>;
 };
 
 export type RuntimeV02AttackRecoilPhaseResult = {
@@ -215,10 +225,9 @@ export type RuntimeV02AttackRecoilPhaseResult = {
  * Owns only structured v0.2 attack after-damage programs made entirely from
  * attack-owned DIRECT_DAMAGE recoil instructions aimed at the source creature.
  *
- * This intentionally preserves the current recoil placement rule: recoil adds
- * directly to accumulated damage and does not consume Shield. Damage-packet
- * listeners remain a separate later runtime pass; this owner does not pretend
- * those listener lifecycles are complete.
+ * Recoil remains damage placement and therefore does not consume Shield, but
+ * it now delegates through owner #20 DIRECT_DAMAGE so before-packet protection,
+ * packet history and after-packet listener events are canonical.
  *
  * Mixed programs and non-recoil DIRECT_DAMAGE return null so compatibility
  * authority remains whole rather than partially executing a structured list.
@@ -228,6 +237,7 @@ export function structuredRuntimeAfterDamageRecoilEffects(
   instanceOrId: string | { card_id?: unknown } | null | undefined,
   attackSlot: number,
   sourceCreature: RuntimeCreature,
+  execution: RuntimeV02AttackRecoilExecutionContext,
 ): RuntimeV02AttackRecoilPhaseResult | null {
   const definition = runtimeV02Definition(state, instanceOrId);
   if (!definition) return null;
@@ -278,16 +288,49 @@ export function structuredRuntimeAfterDamageRecoilEffects(
 
   if (normalized.some((step) => step == null)) return null;
 
-  const effects = normalized.map((raw) => {
+  const effects = normalized.map((raw, index) => {
     const step = raw!;
-    const placed = placeRuntimeDamage(sourceCreature, step.amount);
+    const packetId = `${execution.source_action_id}:recoil:${index}`;
+    const resolved = runtimeV02ApplyDirectDamage(
+      state,
+      sourceCreature,
+      {
+        op: "DIRECT_DAMAGE",
+        target: "$source_creature",
+        amount: step.amount,
+        damage_class: "recoil",
+        source_attack_id: step.source_attack_id,
+      },
+      {
+        packet_id: packetId,
+        damage_class: "recoil",
+        source_controller_seat: execution.source_controller_seat,
+        source_kind: "attack",
+        source_action_id: execution.source_action_id,
+        source_card_uid: execution.source_card_uid,
+        source_card_id: execution.source_card_id,
+        source_creature_uid: execution.source_creature_uid,
+        target_controller_seat: execution.source_controller_seat,
+        target_creature_uid: execution.source_creature_uid,
+        target_zone: "vanguard",
+        target_index: null,
+      },
+      "$source_creature",
+      attackId,
+    );
+    const receipt = resolved.packet.receipt;
+    if (receipt.kind !== "damage_placement") {
+      throw new Error("tcg_v0_2_attack_recoil_packet_receipt_invalid");
+    }
     return {
       target: "$source_creature" as const,
       damage_class: "recoil" as const,
       amount: step.amount,
       source_attack_id: step.source_attack_id,
-      placed,
+      placed: receipt.actual_damage_placed,
       shield_prevented: 0 as const,
+      packet_id: packetId,
+      after_damage_event: resolved.after_damage_event,
     };
   });
 

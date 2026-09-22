@@ -40,13 +40,15 @@ test('legacy recoil English is gated and the attack audit records structured rec
   );
 });
 
-test('recoil owner is deliberately narrow and preserves placement semantics', () => {
+test('recoil owner is deliberately narrow and delegates packet semantics to owner #20', () => {
   assert.ok(effectSource.includes('if (String(step.op || "") !== "DIRECT_DAMAGE") return null;'));
   assert.ok(effectSource.includes('if (String(step.damage_class || "") !== "recoil") return null;'));
   assert.ok(effectSource.includes('String(step.target || "") !== "$source_creature"'));
   assert.ok(effectSource.includes('sourceAttackId !== attackId'));
-  assert.ok(effectSource.includes('placeRuntimeDamage(sourceCreature, step.amount)'));
-  assert.ok(effectSource.includes('Damage-packet') && effectSource.includes('listeners remain a separate later runtime pass'));
+  assert.ok(effectSource.includes('runtimeV02ApplyDirectDamage('));
+  assert.ok(effectSource.includes('damage_class: "recoil"'));
+  assert.ok(effectSource.includes('target_zone: "vanguard"'));
+  assert.ok(!effectSource.includes('placeRuntimeDamage(sourceCreature, step.amount)'));
 });
 
 test('the frozen Set One has exactly two attack-owned recoil after_damage programs', () => {
@@ -68,4 +70,15 @@ test('the frozen Set One has exactly two attack-owned recoil after_damage progra
     ['meltline-charge', 20],
     ['reckless-rush', 10],
   ]);
+});
+
+
+test('primary attack damage packet listener is resolved before structured after-damage recoil', () => {
+  assertInOrder([
+    'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
+    'const attackDamagePacketEvent=runtimeV02CreateResolvedAttackDamageEvent(',
+    'const attackDamagePacketFlow=runtimeV02BeginEventListenerContinuation(s,[attackDamagePacketEvent])',
+    'const structuredRecoilEffects=structuredRuntimeAfterDamageRecoilEffects(',
+  ], 'attack damage packet event ordering changed');
+  assert.ok(matchSource.includes('recoil_damage_packet_event_listener:recoilDamagePacketAudit'));
 });
