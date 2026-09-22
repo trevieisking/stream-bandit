@@ -929,6 +929,20 @@ export function runtimeV02ResumeActiveAbilityHandAttachmentDamage(
     resume.damage_step.target,
     null,
   );
+  if (
+    resolved.descriptor.damage_class !== "effect" ||
+    !("actual_hp_damage" in resolved.packet.receipt)
+  ) {
+    throw new Error(
+      "tcg_v0_2_active_ability_hand_damage_effect_receipt_required",
+    );
+  }
+  const actualHpDamage = Number(resolved.packet.receipt.actual_hp_damage);
+  if (!Number.isFinite(actualHpDamage) || actualHpDamage < 0) {
+    throw new Error(
+      "tcg_v0_2_active_ability_hand_damage_effect_receipt_invalid",
+    );
+  }
   const next: RuntimeV02ActiveAbilityHandAttachmentDamageResume = {
     kind: "hand_attachment_damage",
     stage: "after_damage_event",
@@ -939,10 +953,10 @@ export function runtimeV02ResumeActiveAbilityHandAttachmentDamage(
     source_card_id: resume.source_card_id,
     target_anchor_uid: target.top.uid,
     target_card_id: target.top.card_id,
-    packet_id,
+    packet_id: packetId,
     requested_amount: resolved.packet.requested_amount,
     final_amount: resolved.packet.final_amount,
-    actual_hp_damage: resolved.packet.receipt.actual_hp_damage,
+    actual_hp_damage: actualHpDamage,
   };
   return {
     kind: "hand_attachment_damage",
@@ -950,8 +964,8 @@ export function runtimeV02ResumeActiveAbilityHandAttachmentDamage(
     ability_id: resume.ability_id,
     requested_amount: resolved.packet.requested_amount,
     final_amount: resolved.packet.final_amount,
-    actual_hp_damage: resolved.packet.receipt.actual_hp_damage,
-    packet_id,
+    actual_hp_damage: actualHpDamage,
+    packet_id: packetId,
     after_damage_event: resolved.after_damage_event,
     resume: next,
   };
