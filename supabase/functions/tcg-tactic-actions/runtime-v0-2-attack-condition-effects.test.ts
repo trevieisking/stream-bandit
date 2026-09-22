@@ -94,7 +94,6 @@ Deno.test("condition-only after_damage applies to the actual attack target", () 
     source,
     target,
     opponentVanguard,
-  ,
     attackContext());
   assertEquals(result?.attack_id, "condition-strike");
   assertEquals(result?.effects[0].applied, true);
@@ -118,7 +117,6 @@ Deno.test("source-creature condition effects are registry-driven", () => {
     source,
     target,
     creature(),
-  ,
     attackContext());
   assertEquals(result?.effects[0].condition, "Scorched");
   assertEquals(source.conditions.scorched, true);
@@ -142,7 +140,6 @@ Deno.test("current-opponent-vanguard target does not alias a Reserve attack targ
     source,
     reserveTarget,
     opponentVanguard,
-  ,
     attackContext());
   assertEquals(result?.effects[0].applied, true);
   assertEquals(opponentVanguard.conditions.modifier, "Silenced");
@@ -165,7 +162,6 @@ Deno.test("apply_if_empty preserves an occupied condition slot", () => {
     creature(),
     target,
     creature(),
-  ,
     attackContext());
   assertEquals(result?.effects[0].applied, false);
   assertEquals(result?.effects[0].reason, "slot_occupied");
@@ -188,7 +184,6 @@ Deno.test("condition immunity prevents the structured attack condition", () => {
     creature(),
     target,
     creature(),
-  ,
     attackContext());
   assertEquals(result?.effects[0].prevented, true);
   assertEquals(result?.effects[0].reason, "condition_immunity");
@@ -208,7 +203,6 @@ Deno.test("mixed after_damage programs remain on compatibility authority and do 
     creature(),
     target,
     creature(),
-  ,
     attackContext());
   assertEquals(result, null);
   assertEquals(target.conditions.modifier, null);
@@ -230,7 +224,6 @@ Deno.test("legacy-only matches remain on compatibility authority", () => {
     creature(),
     target,
     creature(),
-  ,
     attackContext());
   assertEquals(result, null);
   assertEquals(target.conditions.modifier, null);
@@ -252,7 +245,6 @@ Deno.test("malformed owned condition metadata fails closed", () => {
       creature(),
       creature(),
       creature(),
-    ,
     attackContext()),
     "tcg_v0_2_attack_condition_step_field_unsupported",
   );
