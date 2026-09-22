@@ -2909,3 +2909,27 @@ Owner #31 Card Search / Filter / Inspection owns bound-set choice identity, filt
 
 V2.4.98 begins with a read-only all-10 coverage audit. Existing Event Listener, Ability and Attack specialists must be preserved. Only proven gaps may be repaired; no card-ID/name dispatch and no owner #41.
 
+### V2.4.98 ownership audit
+
+Read-only execution audit after the 10-node freeze:
+
+**Preserve unchanged — 6/10 selection nodes already execute through accepted private-choice specialists**
+- Event Listener ×3: Stardot, Star Essence, Orbit Ring use generic private `choose_from_set` state and bound-set membership revalidation.
+- Active Ability ×1: Noctivane uses the bounded deck-reading specialist and Card-Zone reorder.
+- Attack ×1: Celestyr / Dream Ray uses the bounded top-deck choice specialist and Card-Zone partition transfer.
+- Tactic ×1: Seer Nyx now uses the V2.4.97 inspection provenance route and Card-Zone partition/reorder.
+
+**Proven repair target — 4/10**
+- Celestyr — Dream Cartographer active Ability: no live family recognizes `LOOK_TOP 4 -> CHOOSE_FROM_SET 0..1 -> deck-bottom selected -> controller-order remainder top`.
+- Future Draw: Tactic choice grammar is recognized, but the LOOK_TOP family currently detaches cards from Deck and later mutates destination/order inline rather than through Card-Zone.
+- Circuit Scanner: same Tactic ownership debt plus frozen `filters.any` is not recognized by current Tactic card filtering.
+- Scout Zeph: alternate `set + selection` CHOOSE grammar is unsupported; downstream frozen aliases `destination`, `set`, and `exclude` are also not recognized.
+
+Exact repair boundary:
+1. add one shared owner-#31 bound-set choice contract for the two frozen CHOOSE grammars and filters;
+2. use that contract in the three affected Tactics while keeping inspected/bound identities server-private;
+3. keep their inspected/LOOK_TOP deck window authoritative until Card-Zone performs chosen movement/reorder;
+4. add one bounded active-Ability deck-planning family for Celestyr's declared sequence using the same owner-#31 choice semantics and owner-#30 Card-Zone mutation;
+5. do not modify the six accepted routes unless a guard proves ownership drift;
+6. no card-ID/name dispatch and no owner #41.
+

@@ -1049,10 +1049,21 @@
 - [x] Freeze ordinary `source + min/max` family to **9** nodes.
 - [x] Freeze Scout Zeph `set + selection` filtered family to **1** node.
 - [x] Keep later physical card move/order under Card-Zone #30.
-- [ ] Audit exact current execution ownership for all 10 nodes before source changes.
+- [x] Audit exact current execution ownership for all 10 nodes before source changes.
 - [ ] Preserve every already-working Event Listener / Ability / Attack specialist.
 - [ ] Close only proven CHOOSE_FROM_SET gaps generically.
 - [ ] Prove all 10 nodes with private server choice + current bound-set revalidation.
 - [ ] Move `CHOOSE_FROM_SET` partial -> implemented only after all 10 are green.
 - [ ] Refresh release-control/capability evidence and close V2.4.98.
+
+### V2.4.98 audit result
+- [x] Preserve Event Listener ×3 CHOOSE_FROM_SET routes unchanged.
+- [x] Preserve Noctivane active deck-reading specialist unchanged.
+- [x] Preserve Celestyr Dream Ray Attack specialist unchanged.
+- [x] Preserve Seer Nyx Tactic inspection-provenance route unchanged.
+- [ ] Add shared bound-set choice grammar for `source + min/max` and Scout Zeph `set + selection`.
+- [ ] Support frozen `filters.any` without weakening existing filter grammar.
+- [ ] Canonicalize Future Draw / Circuit Scanner / Scout Zeph deck-window movement/order through Card-Zone.
+- [ ] Add bounded Celestyr active deck-planning family with private staged choice and Card-Zone mutation.
+- [ ] Prove the four repaired consumers plus six preserved consumers = all 10.
 

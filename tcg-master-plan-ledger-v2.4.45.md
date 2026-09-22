@@ -1008,3 +1008,15 @@ Owner #31 may validate bound-set identity, filter legal members, enforce min/max
 ## 346 — CHOOSE_FROM_SET has two frozen grammar families
 Nine Release 1 nodes use `source + min/max` with optional filters. Scout Zeph alone uses `set + selection` with Gale-Creature filtering and range 0..2. Runtime parity must be operation-shaped across both grammars rather than card-ID-shaped.
 
+## 347 — V2.4.98 preserves six accepted choice routes
+Stardot, Star Essence and Orbit Ring already use Event Listener private CHOOSE_FROM_SET state; Noctivane uses the active deck-reading specialist; Celestyr Dream Ray uses the Attack top-deck choice specialist; Seer Nyx uses the inspection-provenance Tactic route. V2.4.98 does not replace these accepted routes.
+
+## 348 — V2.4.98 repair target is four consumers
+The proven gaps are Celestyr — Dream Cartographer active Ability plus Tactics Future Draw, Circuit Scanner and Scout Zeph. Celestyr has no live family. Circuit Scanner needs frozen `filters.any`; Scout Zeph needs `set + selection` plus downstream field aliases; all three affected Tactic LOOK_TOP families must hand physical movement/order to Card-Zone before acceptance.
+
+## 349 — bound-set choice ownership is smaller than deck mutation ownership
+Owner #31 validates the already-bound set, filters options, enforces min/max, keeps the choice private, revalidates selected identity and binds the result. Owner #30 alone performs later physical deck/hand movement or reorder. Closing CHOOSE_FROM_SET must not turn owner #31 into a Card-Zone writer.
+
+## 350 — active deck planning is a bounded Ability family, not a generic interpreter
+Celestyr's active `LOOK_TOP -> CHOOSE_FROM_SET -> MOVE_CARDS -> RETURN_REMAINDER_TO_DECK_TOP` sequence may have a dedicated operation-shaped active-Ability route using shared owner-#31 choice semantics and owner-#30 mutation. It must remain card-ID-free and must not absorb unrelated active Abilities.
+
