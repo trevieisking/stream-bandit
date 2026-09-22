@@ -906,3 +906,18 @@ The frozen 193-card inventory contains exactly 20 `APPLY_CONDITION` operation us
 ## 312 — V2.4.94 exact acceptance
 All-surface source/runtime + release-control accepted at `795a9e94da7e5eadedf41c653fed3cc44be8c8e5` with Card Pass #1502 SUCCESS; capability/control accepted at `ff6af2fde6029158eb63c74df01b4232412f94e3` with Card Pass #1503 SUCCESS. Match closure is 108 / `26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286`; Tactic closure is 45 / `ea17df9e55af4e18d80585113fe73045321d70d60b2d6c6160880a9c18bfb5d6`; `SELECT_CARDS` is implemented; production was not changed.
 
+## 313 — APPLY_CONDITION stays inside Condition owner #19
+The frozen Release 1 `APPLY_CONDITION` gap is producer-routing parity, not missing condition-state semantics. Condition owner #19 remains the sole authority for names, slot legality, immunity, temporary protection, application mode and lifecycle state. Event Listener, Attack and Tactic may sequence an application but must not own parallel condition mutation.
+
+## 314 — triggered Ability condition producers are Event Listener consumers
+Cindercrest, Veiljaw, Umbraspider and Sparkmoth use triggered Ability events and therefore execute through the generic Event Listener family. V2.4.95 must not invent an Active Ability route for them.
+
+## 315 — source-aware condition protection is part of structured APPLY_CONDITION
+A structured card-effect condition application with known source/controller/target context must use the context-aware Condition owner so temporary card-effect protection can be consumed correctly. The legacy context-free adapter remains only for compatibility callers whose source context is genuinely unavailable.
+
+## 316 — after_attack_finished condition timing is distinct from after_damage
+Aeralith — Storm Shepherd applies Blinded to the current opposing Vanguard only after the Attack's optional switch sequence is finished. The runtime must preserve this declared phase; ordinary after_damage condition ownership cannot execute it early.
+
+## 317 — after-attack-finished specialists remain disjoint
+The Marevault four-step `after_damage_finished` specialist remains exact to its Essence-move / HEAL_EACH / optional-switch family. Aeralith condition timing requires a separate operation-shaped subroute under Attack owner #14, not a permissive widening of the Marevault parser.
+

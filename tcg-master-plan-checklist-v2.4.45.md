@@ -946,3 +946,20 @@
 - [x] Leave Supabase production, main and live promotion untouched.
 - [ ] V2.4.95: freeze and reconcile all **20** Release 1 `APPLY_CONDITION` uses through Condition owner #19 without card-specific dispatch.
 
+## V2.4.95 — APPLY_CONDITION all-surface closeout
+- [x] Freeze Release 1 `APPLY_CONDITION` inventory to exactly **20** operation uses.
+- [x] Freeze surface split to **6 Event Listener / 12 Attack after_damage / 1 Attack after_attack_finished / 1 Tactic**.
+- [x] Freeze condition inventory to 9 names and exact counts.
+- [x] Freeze application modes to `apply_if_empty` ×19 and `apply_if_empty_or_same` ×1.
+- [x] Confirm Condition owner #19 already owns names, slots, immunity, temporary protection and lifecycle state.
+- [x] Confirm the four Ability consumers are triggered Abilities and therefore Event Listener-owned, not Active Ability-owned.
+- [x] Confirm nested conditional Attack Condition programs already use source-aware Condition application.
+- [ ] Upgrade Event Listener APPLY_CONDITION producer path to source-aware Condition owner context.
+- [ ] Upgrade direct pure-condition Attack owner to source-aware Condition owner context.
+- [ ] Upgrade Tactic APPLY_CONDITION producer path to source-aware Condition owner context.
+- [ ] Add bounded Attack after-attack-finished Condition subroute for Aeralith timing without widening Marevault ownership.
+- [ ] Prove all 20 frozen consumers through their canonical surfaces.
+- [ ] Move `APPLY_CONDITION` from missing to implemented only after all 20 are green.
+- [ ] Refresh capability fingerprint + release-control closures as required.
+- [ ] Pass exact-head Card Pass and synchronize Master Plan / Checklist / Ledger acceptance.
+

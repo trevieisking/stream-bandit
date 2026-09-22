@@ -2534,3 +2534,86 @@ Read-only frozen inventory currently contains exactly **20 Release 1 operation u
 
 V2.4.95 belongs to existing Condition owner #19. It must begin by freezing all 20 exact shapes, targets, condition names, application modes and timing boundaries. Producers may orchestrate, but condition slot legality, application/replacement/protection/lifecycle mutation stays with the canonical Condition Engine. No owner #41 and no card-ID/name dispatch.
 
+## V2.4.95 — APPLY_CONDITION all-surface closeout (freeze)
+
+Read-only inventory is frozen before source changes.
+
+### Frozen Release 1 inventory
+
+Exactly **20** `APPLY_CONDITION` operation uses exist:
+- **6 Event Listener consumers** — four triggered Creature Abilities plus two triggered Tactic/attachment listeners;
+- **12 Attack after_damage consumers** — direct and nested conditional families;
+- **1 Attack after_attack_finished consumer** — Gale / Aeralith — Storm Shepherd;
+- **1 Tactic program consumer** — Volt / Blackout Pulse.
+
+Exactly **9** condition names are used:
+- Scorched ×2;
+- Blinded ×2;
+- Venomed ×2;
+- Rooted ×2;
+- Silenced ×2;
+- Dazed ×4;
+- Crushed ×3;
+- Drenched ×1;
+- Stunned ×2.
+
+Exactly two application modes are used:
+- `apply_if_empty` ×19;
+- `apply_if_empty_or_same` ×1 (Blackout Pulse).
+
+Condition owner #19 already owns:
+- canonical condition names and slot mapping;
+- `apply_if_empty` / `apply_if_empty_or_same` legality;
+- condition immunity;
+- source-aware temporary condition protection;
+- lifecycle state.
+
+### Surface ownership audit
+
+Event Listener surface:
+- Ember / Cindercrest — Ash Mark;
+- Shade / Veiljaw — Frayed Thought;
+- Shade / Umbraspider — Web of Doubt;
+- Volt / Sparkmoth — Flash Dust;
+- Shade / Mirror Fang listener;
+- Stone / Faultstone listener.
+
+These six already execute through Event Listener, but the current APPLY_CONDITION branch calls the legacy context-free condition adapter. V2.4.95 must route structured producer context through the source-aware Condition owner without changing listener discovery, limits or target binding.
+
+Attack after_damage surface:
+- Kilnback;
+- Pinionserpent;
+- Sporeling;
+- Mossram;
+- Elderbloom — First Canopy ×2;
+- Noctivane;
+- Cragroller;
+- Monolithorn;
+- Abyssalume;
+- Stormmane;
+- Stormcoil — Living Circuit.
+
+Nested conditional Attack programs already use the source-aware Condition owner. The direct pure-condition Attack owner still uses the legacy context-free adapter and must be reconciled without changing its narrow operation-shaped claim.
+
+Attack after_attack_finished surface:
+- Aeralith — Storm Shepherd / Eye of the Storm applies Blinded to the **current opponent Vanguard after the Attack's optional switch has completed**.
+
+This timing is distinct from ordinary after_damage. The existing Marevault after-damage-finished specialist intentionally claims only its four-step Essence-move / HEAL_EACH / optional-switch family and must not be widened accidentally. Aeralith requires a separate generic after-attack-finished Condition subroute under Attack owner #14.
+
+Tactic program surface:
+- Volt / Blackout Pulse.
+
+The Tactic interpreter already executes APPLY_CONDITION but currently uses the legacy context-free adapter. It must pass source/controller/target/action context into Condition owner #19 while preserving Tactic orchestration and later SET_DEVICE_PLAY_LOCK ownership.
+
+### Repair rule
+
+V2.4.95 does **not** create a Condition engine or owner #41.
+
+The repair must:
+1. preserve Condition owner #19 as the only condition-state mutation authority;
+2. upgrade structured Event Listener / direct Attack / Tactic producers to source-aware application;
+3. preserve already-correct conditional Attack ownership;
+4. add one bounded after-attack-finished Condition subroute for Aeralith timing;
+5. keep card IDs/names out of runtime dispatch;
+6. prove all 20 frozen uses before moving APPLY_CONDITION from missing to implemented.
+
