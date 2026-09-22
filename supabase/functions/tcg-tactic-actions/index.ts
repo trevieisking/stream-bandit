@@ -257,11 +257,18 @@ function selectedCardRefs(value: unknown): RuntimeV02SelectedCardRef[] {
     };
   });
 }
-function selectedCardMoveDestination(player: any, destination: string) {
-  if (destination === "hand") return { zone: player.hand as Inst[], zone_name: "hand", position: "bottom" as const };
-  if (destination === "discard") return { zone: player.discard as Inst[], zone_name: "discard", position: "bottom" as const };
-  if (destination === "deck_bottom") return { zone: player.deck as Inst[], zone_name: "deck", position: "bottom" as const };
-  if (destination === "deck_top") return { zone: player.deck as Inst[], zone_name: "deck", position: "top" as const };
+function selectedCardMoveDestination(
+  player: any,
+  destination: string,
+): {
+  zone: Inst[];
+  zone_name: "hand" | "discard" | "deck";
+  position: "top" | "bottom";
+} {
+  if (destination === "hand") return { zone: player.hand as Inst[], zone_name: "hand", position: "bottom" };
+  if (destination === "discard") return { zone: player.discard as Inst[], zone_name: "discard", position: "bottom" };
+  if (destination === "deck_bottom") return { zone: player.deck as Inst[], zone_name: "deck", position: "bottom" };
+  if (destination === "deck_top") return { zone: player.deck as Inst[], zone_name: "deck", position: "top" };
   throw new Error(`unsupported_card_destination:${destination}`);
 }
 function commitSelectedCardMove(
