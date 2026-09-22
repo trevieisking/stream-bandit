@@ -54,6 +54,7 @@
       "SCHEDULE_SOURCE_DISCARD",
       "SEARCH_DECK",
       "SEARCH_DECK_GROUP",
+      "SELECT_CARDS",
       "SELECT_CREATURE",
       "SET_ATTACK_ELIGIBILITY",
       "SET_WITHDRAWAL_MODIFIER",
@@ -79,7 +80,6 @@
       "PERFORM_VOLUNTARY_WITHDRAWAL",
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
-      "SELECT_CARDS",
       "SET_ATTACK_COST_FLOOR",
       "SET_DEVICE_PLAY_LOCK",
       "SET_RESOLVING_CARD_DESTINATION",
@@ -753,6 +753,84 @@
         }
       },
       "note": "Verdantusk Attack, Elderbloom active Ability, Marevault mixed after-damage-finished Attack and Reef Medic Olan Tactic now execute HEAL_EACH through canonical Heal Packet/listener ownership. No second Heal engine and no new owner family."
+    },
+    "release1_select_cards_all_surface_v2_4_94": {
+      "accepted_head": "795a9e94da7e5eadedf41c653fed3cc44be8c8e5",
+      "card_pass_run": 1502,
+      "operation": "SELECT_CARDS",
+      "frozen_consumers": [
+        {
+          "card_id": "grove-capscout",
+          "surface": "triggered Ability / Event Listener",
+          "shape": "discard Device 0-1 -> deck_bottom preserve"
+        },
+        {
+          "card_id": "grove-myceliarch",
+          "surface": "Attack after_damage",
+          "shape": "discard Device 0-1 -> deck_bottom preserve"
+        },
+        {
+          "card_id": "grove-forager-nia",
+          "surface": "Tactic",
+          "shape": "discard Device 0-2 -> player-ordered deck_bottom -> draw 1"
+        },
+        {
+          "card_id": "tide-surgefin",
+          "surface": "active Ability",
+          "shape": "discard Basic Tide Essence 0-1 -> Tide Reserve target -> attachment -> conditional heal"
+        },
+        {
+          "card_id": "volt-tinkit",
+          "surface": "triggered Ability / Event Listener",
+          "shape": "discard Device 0-1 -> deck_bottom preserve"
+        },
+        {
+          "card_id": "volt-stormcoil-living-circuit",
+          "surface": "active Ability",
+          "shape": "discard Basic Volt Essence 1 -> Volt field target -> borrowed attachment"
+        },
+        {
+          "card_id": "volt-quickcharge-cell",
+          "surface": "Tactic",
+          "shape": "discard Basic Volt Essence 1 -> Volt field target -> temporary attachment"
+        }
+      ],
+      "owners": {
+        "card_selection": "supabase/functions/_shared/tcg-match-card-selection-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "attack_discard_recycle": "supabase/functions/_shared/tcg-match-attack-discard-recycle-choice-v0-2.ts",
+        "active_ability": "supabase/functions/_shared/tcg-match-active-ability-supply-attachment-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "card_zone_mutation": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+        "essence_attachment_mutation": "supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts"
+      },
+      "semantics": {
+        "selection_owner": "legal option construction, min/max validation, exact current-zone/card/filter rebind and variable binding",
+        "hidden_identity": "selected hidden-zone card identity remains server-private",
+        "optional_zero": "min=0 selection may bind an empty set without manufacturing a card move",
+        "ordering": "player-chosen deck-bottom order is a fresh private continuation before Card-Zone mutation",
+        "attachment": "cards-bound ATTACH_ESSENCE_FROM_ZONE consumes the already-selected exact ref and delegates physical attachment",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-card-selection.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-supply-attachment.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-discard-recycle-choice.test.ts",
+        "tcg/tests/card-pass-2-tactic-select-cards-runtime.test.mjs",
+        "tcg/tests/card-pass-2-runtime-active-ability-choice-wiring.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 108,
+          "sha256": "26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286"
+        },
+        "tactic_actions": {
+          "file_count": 45,
+          "sha256": "ea17df9e55af4e18d80585113fe73045321d70d60b2d6c6160880a9c18bfb5d6"
+        }
+      },
+      "note": "All seven frozen Release 1 SELECT_CARDS consumers now execute through canonical surface owners with one generic selection contract. Physical card movement and Essence attachment remain delegated to owner families #30 and #22. No owner #41."
     }
   }
 }
