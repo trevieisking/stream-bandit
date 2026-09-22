@@ -157,7 +157,10 @@ test('Tactic APPLY_CONDITION delegates mode and mutation to the shared Condition
   const block=tacticSource.slice(start,end);
   assert.match(block,/resolveVar\(vars, step\.target\)/);
   assert.match(block,/\["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"\]/);
-  assert.match(block,/applyRuntimeCondition\(found\.cr, condition, Number\(state\.turn_seq \|\| 0\), rawMode as ApplyConditionMode\)/);
+  assert.match(block,/applyRuntimeConditionWithContext\(/);
+  assert.match(block,/source_controller_seat: sourceSeat as 1 \| 2/);
+  assert.match(block,/target_controller_seat: targetSeat as 1 \| 2/);
+  assert.match(block,/source_action_id: sourceActionId/);
   assert.doesNotMatch(block,/volt-blackout-pulse/);
 });
 
