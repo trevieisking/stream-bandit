@@ -3086,3 +3086,51 @@ Frozen attachment-state families:
 
 V2.4.100 must begin with a read-only audit of all seven against Essence Attachment owner #22, shared attachment-state normalization, Event/Movement/Heal listener boundaries and current Ability/Tactic routes. Selection remains with its existing owner; physical attachment remains owner #22. No second attachment engine and no owner #41.
 
+## V2.4.100 — audit and repair result
+
+The seven-consumer execution audit found **one** actual all-surface parity gap.
+
+### Preserved canonical routes — 6 / 7
+- Magmagecko keeps the existing active hand-attachment + damage family; selection remains private and physical attachment delegates to Essence Attachment owner #22.
+- Surgefin keeps the accepted supply route and prior optional `SELECT_CARDS` binding.
+- Stormcoil — Living Circuit keeps the accepted supply-attachment route and borrowed attachment state.
+- Arcprowler keeps the triggered Event Listener inline-hand attachment route.
+- Coilclank keeps the triggered Event Listener inline-discard temporary attachment route.
+- Quickcharge Cell keeps the Tactic prior-`SELECT_CARDS` route and temporary attachment state.
+
+None of those six routes was replaced or given card-ID/name dispatch.
+
+### Proven gap and bounded repair — Dynamozer
+Dynamozer's structured paid self-attachment owner already existed and passed isolated tests, but it was not connected to the single live active-Ability router / Match private-choice continuation.
+
+V2.4.100 therefore added only the missing generic live composition:
+`paid activation cost -> fresh eligible discard Essence choice -> Essence Attachment owner #22 -> existing Event / Movement / Heal continuation`.
+
+The new route:
+- is operation-shaped and card-ID-free;
+- delegates Device discard payment to the existing active-Ability Payment/cost gate;
+- revalidates the current source, turn, paid limit receipt and selected Essence before mutation;
+- preserves temporary attachment state through shared normalization;
+- delegates physical attachment to owner #22;
+- reuses the established post-attachment active-Ability continuation instead of creating a second resolver.
+
+Owner-family count remains **40**; no owner #41.
+
+### Source/runtime + release-control acceptance
+- exact head `d0d37294f7cd9e81196691d6e91bf117923862de`;
+- Card Pass **#1576 SUCCESS**;
+- all seven frozen consumers covered;
+- new Dynamozer live-route invariant tests green;
+- Deno deterministic runtime green;
+- Match / Tactic / Private Alpha type-checks green;
+- Match closure **118** / `ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1`;
+- Tactic closure **53** / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`.
+
+### Capability reclassification
+`ATTACH_ESSENCE_FROM_ZONE` is now **implemented** for the frozen Release 1 grammar:
+- source grammars: inline hand 2 / inline discard 2 / prior `SELECT_CARDS` refs 3;
+- attachment states: permanent/default 3 / temporary 3 / borrowed 1;
+- capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`.
+
+Production, main and live remain unchanged. Promotion remains **HOLD** while the synchronized plan/checklist/ledger capability-control head completes fresh exact-head validation and the remaining singleton Release 1 operation debt is closed.
+
