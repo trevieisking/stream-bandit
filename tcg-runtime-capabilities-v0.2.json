@@ -18,6 +18,7 @@
       "ADD_SHIELD",
       "ADD_SHIELD_EACH",
       "APPLY_CONDITION",
+      "ATTACH_ESSENCE_FROM_SELECTION",
       "ATTACH_ESSENCE_FROM_ZONE",
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
@@ -70,7 +71,6 @@
     ],
     "partial": [],
     "missing": [
-      "ATTACH_ESSENCE_FROM_SELECTION",
       "DEAL_EFFECT_DAMAGE",
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
@@ -1308,6 +1308,82 @@
         }
       },
       "note": "All seven frozen Release 1 ATTACH_ESSENCE_FROM_ZONE consumers are covered through existing selection owners and canonical Essence Attachment owner #22. Six routes were already canonical; V2.4.100 added only the missing generic paid self-attachment live route for Dynamozer and reused the existing Event/Movement/Heal continuation. No owner #41."
+    },
+    "release1_attach_essence_from_selection_singleton_v2_4_101": {
+      "accepted_head": "8cadb7ce31e98548c868aa1817fe2ab59f5abcac",
+      "card_pass_run": 1595,
+      "operation": "ATTACH_ESSENCE_FROM_SELECTION",
+      "frozen_use_count": 1,
+      "frozen_consumers": [
+        {
+          "card_id": "prismatic-stream-bandit-prismatic-founder",
+          "surface": "active Ability",
+          "ability_id": "bandits-current",
+          "sequence": [
+            "SEARCH_DECK",
+            "ATTACH_ESSENCE_FROM_SELECTION",
+            "SHUFFLE_DECK"
+          ],
+          "search": {
+            "player": "self",
+            "reveal": "public",
+            "min": 0,
+            "max": 1,
+            "filters": {
+              "card_family": "Essence",
+              "essence_subtype": "Basic",
+              "dynamic_element_exclusion": "attached_essence_elements"
+            },
+            "destination": "effect_owned_selection",
+            "hidden_fail_allowed": true
+          },
+          "attachment": {
+            "target": "$source_creature",
+            "manual_attachment": false,
+            "attachment_state": "normal/permanent",
+            "true_origin_zone": "deck"
+          }
+        }
+      ],
+      "owners": {
+        "card_search_filter_inspection_31_submodule": "supabase/functions/_shared/tcg-match-active-ability-search-attachment-v0-2.ts",
+        "hidden_information": "supabase/functions/_shared/tcg-match-hidden-information-v0-2.ts",
+        "essence_attachment_22": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
+        "essence_attachment_route": "supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "randomization": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
+        "active_ability_facade": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
+        "active_ability_continuation": "supabase/functions/_shared/tcg-match-active-ability-continuation-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "effect_owned_selection_is_logical_provenance": true,
+        "selected_card_remains_in_deck_until_attachment": true,
+        "dynamic_element_eligibility_revalidated_before_mutation": true,
+        "source_turn_and_limit_revalidated": true,
+        "optional_zero_selection_shuffles_without_attachment": true,
+        "attachment_listeners_complete_before_shuffle": true,
+        "physical_attachment_owner": 22,
+        "search_choice_owner": 31,
+        "hidden_information_preserved": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-search-attachment.test.ts",
+        "tcg/tests/card-pass-2-runtime-active-ability-search-attachment-wiring.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 119,
+          "sha256": "96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d"
+        },
+        "tactic_actions": {
+          "file_count": 53,
+          "sha256": "ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e"
+        }
+      },
+      "note": "The sole frozen ATTACH_ESSENCE_FROM_SELECTION consumer now executes through a bounded owner-#31 active-Ability search/private-choice submodule, Hidden Information #33, canonical Essence Attachment owner #22, existing Event/Movement/Heal continuation and the shared Randomization engine. effect_owned_selection remains logical provenance only; the selected card stays physically in deck until owner #22 attaches it from the true deck origin. No owner #41."
     }
   }
 }
