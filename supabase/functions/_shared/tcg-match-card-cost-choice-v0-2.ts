@@ -209,9 +209,11 @@ function handPending(
 ): RuntimeV02PendingCardCostChoice {
   const filters = cost.filters || {};
   const used = new Set(Object.values(selected).flat());
+  const hasFilters = Object.keys(filters).length > 0;
   const options = hand(state, binding.controller_seat)
     .filter((card) => !used.has(card.uid))
     .filter((card) =>
+      !hasFilters ||
       runtimeV02CardMatchesSelectionFilters(
         state,
         card,
