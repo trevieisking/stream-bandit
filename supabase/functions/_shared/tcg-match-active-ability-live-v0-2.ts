@@ -7,6 +7,14 @@ import {
   type RuntimeV02PendingActiveAbilityChoice,
 } from "./tcg-match-active-ability-choice-v0-2.ts";
 import {
+  runtimeV02CreateSearchSelectionAttachmentChoice,
+  runtimeV02PendingSearchSelectionAttachmentChoiceView,
+  runtimeV02ResolveSearchSelectionAttachmentChoice,
+  structuredRuntimeSearchSelectionAttachmentActiveAbility,
+  type RuntimeV02PendingSearchSelectionAttachmentChoice,
+  type RuntimeV02SearchSelectionAttachmentResolution,
+} from "./tcg-match-active-ability-search-attachment-v0-2.ts";
+import {
   runtimeV02CreateActiveAbilityDeckReadingChoice,
   runtimeV02PendingActiveAbilityDeckReadingChoiceView,
   runtimeV02ResolveActiveAbilityDeckReadingChoice,
@@ -94,6 +102,7 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilitySupplyAttachmentChoice
   | RuntimeV02PendingPaidSelfAttachmentChoice
   | RuntimeV02PendingActiveAbilityHandAttachmentDamageChoice
+  | RuntimeV02PendingSearchSelectionAttachmentChoice
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityDeckPlanningChoice
   | RuntimeV02PendingActiveAbilityChoice
@@ -106,6 +115,7 @@ export type RuntimeV02ActiveAbilityLiveResolution =
   | RuntimeV02ActiveAbilitySupplyChoiceResolution
   | RuntimeV02ActiveAbilitySupplyAttachmentResolution
   | RuntimeV02ActiveAbilityHandAttachmentDamageChoiceResolution
+  | RuntimeV02SearchSelectionAttachmentResolution
   | RuntimeV02ActiveAbilityDeckReadingResolution
   | RuntimeV02ActiveAbilityDeckPlanningResolution
   | {
@@ -204,6 +214,24 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
       state,
       controllerSeat,
       handAttachmentDamageDescriptor.ability_id,
+    );
+    return pending;
+  }
+
+  const searchAttachmentDescriptor =
+    structuredRuntimeSearchSelectionAttachmentActiveAbility(state, instance);
+  if (searchAttachmentDescriptor) {
+    const pending = runtimeV02CreateSearchSelectionAttachmentChoice(
+      state,
+      controllerSeat,
+      searchAttachmentDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      searchAttachmentDescriptor.ability_id,
     );
     return pending;
   }
@@ -334,6 +362,12 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
       viewerSeat,
     );
   }
+  if (choice.kind === "search_attach_essence_from_selection") {
+    return runtimeV02PendingSearchSelectionAttachmentChoiceView(
+      choice,
+      viewerSeat,
+    );
+  }
   if (choice.kind === "plan_own_deck_top") {
     return runtimeV02PendingActiveAbilityDeckPlanningChoiceView(
       choice,
@@ -402,6 +436,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   }
   if (choice.kind === "select_target_then_hand_essence_direct_damage") {
     return runtimeV02ResolveActiveAbilityHandAttachmentDamageChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
+  if (choice.kind === "search_attach_essence_from_selection") {
+    return runtimeV02ResolveSearchSelectionAttachmentChoice(
       choice,
       controllerSeat,
       choiceId,
