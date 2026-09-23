@@ -1,4 +1,5 @@
 import type { RuntimeV02CardZoneInstance } from "./tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02CardMatchesSelectionFilters } from "./tcg-match-card-selection-v0-2.ts";
 import type { RuntimeV02DefeatDescribe } from "./tcg-match-defeat-engine-v0-2.ts";
 import type { RuntimeV02CardCostState } from "./tcg-match-payment-cost-v0-2.ts";
 import {
@@ -144,8 +145,11 @@ export function runtimeV02BuildResolvedCardCostOperations<T extends RuntimeV02Ca
       if (cost.player !== "self") {
         throw new Error(`tcg_v0_2_card_cost_route_discard_player_unsupported:${costIndex}`);
       }
-      if (cost.filters && Object.keys(cost.filters).length > 0) {
-        throw new Error(`tcg_v0_2_card_cost_route_discard_filters_unsupported:${costIndex}`);
+      const filters = cost.filters && typeof cost.filters === "object" && !Array.isArray(cost.filters)
+        ? cost.filters as Record<string, unknown>
+        : {};
+      if (cost.filters != null && (typeof cost.filters !== "object" || Array.isArray(cost.filters))) {
+        throw new Error(`tcg_v0_2_card_cost_route_discard_filters_invalid:${costIndex}`);
       }
       const count = positiveInteger(
         cost.count,
@@ -159,6 +163,21 @@ export function runtimeV02BuildResolvedCardCostOperations<T extends RuntimeV02Ca
       );
       if (new Set(cardUids).size !== cardUids.length) {
         throw new Error(`tcg_v0_2_card_cost_route_discard_uid_duplicate:${costIndex}`);
+      }
+      if (Object.keys(filters).length > 0) {
+        const player = state.players?.[String(binding.controller_seat)];
+        if (!player || !Array.isArray(player.hand)) {
+          throw new Error(`tcg_v0_2_card_cost_route_discard_hand_invalid:${costIndex}`);
+        }
+        for (const uid of cardUids) {
+          const matches = player.hand.filter((entry) => entry && entry.uid === uid);
+          if (matches.length !== 1) {
+            throw new Error(`tcg_v0_2_card_cost_route_discard_filter_card_missing:${costIndex}:${uid}`);
+          }
+          if (!runtimeV02CardMatchesSelectionFilters(state, matches[0], filters)) {
+            throw new Error(`tcg_v0_2_card_cost_route_discard_filter_changed:${costIndex}:${uid}`);
+          }
+        }
       }
       return {
         kind: "hand_discard",
