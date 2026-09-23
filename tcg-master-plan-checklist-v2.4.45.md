@@ -1117,7 +1117,7 @@
 - [x] Repair only proven all-surface parity gaps generically.
 - [x] Prove all seven frozen consumers.
 - [x] Move `ATTACH_ESSENCE_FROM_ZONE` partial -> implemented only after all seven are green.
-- [ ] Refresh release-control/capability evidence and exact-head validation.
+- [x] Refresh release-control/capability evidence and exact-head validation.
 
 ### V2.4.100 audit result
 - [x] Six existing routes remain unchanged: Magmagecko / Surgefin / Living Circuit / Arcprowler / Coilclank / Quickcharge Cell.
@@ -1133,5 +1133,14 @@
 - [x] `ATTACH_ESSENCE_FROM_ZONE` moved partial -> implemented; capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`.
 - [x] Preserve owner-family count **40**; no owner #41.
 - [x] Leave Supabase production, main and live promotion untouched.
-- [ ] Final synchronized capability/control exact-head Card Pass is green and recorded.
+- [x] Final synchronized capability/control exact-head Card Pass is green and recorded.
+
+### V2.4.100 final acceptance
+- [x] Card Pass **#1581 SUCCESS** on synchronized capability/control head `6fa819d30ddb952b437b7b77318dfe2d0feb11fe`.
+- [x] Set One structure / effect grammar / release-control checks green.
+- [x] Deterministic runtime and all required type-checks green.
+- [x] `ATTACH_ESSENCE_FROM_ZONE` = implemented at capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`.
+- [x] Seven frozen consumers = 7 / 7.
+- [x] Owner-family count remains 40.
+- [x] Production/main/live unchanged; promotion HOLD pending remaining Release 1 singleton operation debt.
 
