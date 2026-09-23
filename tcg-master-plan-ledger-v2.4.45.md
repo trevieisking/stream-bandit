@@ -1083,3 +1083,12 @@ All seven frozen ATTACH_ESSENCE_FROM_ZONE consumers are covered at source/runtim
 ## 371 — ATTACH_ESSENCE_FROM_ZONE Release 1 parity is accepted
 All seven frozen Release 1 consumers are covered across active Ability, triggered Ability/Event Listener and Tactic surfaces. Selection remains with the established private/card-selection owners; physical attachment remains Essence Attachment owner #22; temporary and borrowed disposition remains shared structured attachment state. The sole execution gap was Dynamozer's missing paid self-attachment live route, repaired generically without card-ID dispatch or a new owner family. `ATTACH_ESSENCE_FROM_ZONE` is implemented at capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`. Synchronized capability/control head `6fa819d30ddb952b437b7b77318dfe2d0feb11fe` passed Card Pass #1581. Production/main/live remain unchanged and promotion stays HOLD while remaining Release 1 singleton operation debt is closed.
 
+## 372 — ATTACH_ESSENCE_FROM_SELECTION is the next used singleton
+After V2.4.100, every remaining currently used missing operation is a one-consumer slice. Capability-order tie-breaking selects `ATTACH_ESSENCE_FROM_SELECTION` first. Its sole Release 1 consumer is Prismatic Founder / Bandit's Current.
+
+## 373 — effect_owned_selection is provenance, not a source zone
+Founder's `SEARCH_DECK` leaves the chosen card physically in deck while binding it into `$founder_new_essence`. `effect_owned_selection` therefore names logical effect-owned provenance only. Essence Attachment owner #22 must receive the selected card's true physical origin (`deck`) and exact UID/card identity; no fake effect-owned zone may be introduced.
+
+## 374 — Founder requires a bounded active-Ability composition
+The current active-Ability router has no `SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK` family. V2.4.101 may add that exact operation-shaped composition, including the dependent active-Ability SEARCH_DECK surface required to reach the missing attachment opcode. Search/hidden-information ownership, attachment owner #22, listener continuation and Randomization ownership remain separate. No generic catch-all Ability interpreter and no card-ID dispatch.
+
