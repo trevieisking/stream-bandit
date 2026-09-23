@@ -1,0 +1,126 @@
+{
+  "id": "stream-bandit-tcg-release-control-v2.4",
+  "version": "2.4",
+  "date": "2026-09-17",
+  "authority": {
+    "desired_behavior": "tcg-master-plan-progress-v2.3.5.md",
+    "execution_checklist": "tcg-master-plan-checklist-v2.3.5.md",
+    "audit_history": "tcg-master-plan-ledger-v2.3.5.md",
+    "battle_interaction": "tcg-battle-client-interaction-v1.json",
+    "card_action_controller": "tcg-v2-card-action-controller-v1.json",
+    "card_visual": "tcg-card-visual-printing-v1.2.json",
+    "mechanic_harvest": "tcg-mechanic-harvest-index-v1.md",
+    "generic_mechanics": "tcg-generic-mechanic-capabilities-v1.json"
+  },
+  "continuity_rule": {
+    "required": true,
+    "statement": "Every material implementation result must update the canonical checklist and ledger with exact repository, PR/branch, reviewed head, merge SHA where applicable, changed files, validation/review evidence, live impact, decision and exact next operation before acceptance is reported.",
+    "resume_source": "github_control_files_not_chat_memory"
+  },
+  "accepted_source": {
+    "repository": "trevieisking/stream-bandit",
+    "main_sha": "24fe6d0feff7c7298ffb474887ae8eef2dc8b44f",
+    "latest_accepted_pr": 571,
+    "latest_reviewed_head": "b7f870bf9cb0a1679f71c762a05e67901b3df0c0",
+    "latest_validation": {
+      "name": "TCG Card Pass 2 Validation",
+      "run_number": 619,
+      "run_id": 35247988250,
+      "conclusion": "success"
+    }
+  },
+  "release_architecture": {
+    "prototype_authority": "in_match_interaction_only",
+    "one_screen_meaning": "active_battle_board_remains_coherent_during_gameplay_choices",
+    "all_in_one_product_page": false,
+    "route_order": [
+      "landing_account",
+      "game_home",
+      "play_mode_select",
+      "ranked",
+      "matchmaking",
+      "opponent_found_paired",
+      "board_only_match",
+      "match_result"
+    ],
+    "outside_active_match": [
+      "collection",
+      "deck_builder",
+      "packs",
+      "learn_card_viewer",
+      "progress_season",
+      "profile",
+      "settings"
+    ]
+  },
+  "backend_reuse": {
+    "required": true,
+    "edge_functions": [
+      "tcg-private-alpha-api",
+      "tcg-match-actions",
+      "tcg-tactic-actions"
+    ],
+    "parallel_backend_for_release_ui": false,
+    "parallel_matchmaking_service": false,
+    "browser_rules_engine": false
+  },
+  "ranked_matchmaking": {
+    "player_journey": [
+      "ranked",
+      "play",
+      "matchmaking",
+      "opponent_found_paired",
+      "board"
+    ],
+    "automatic_pairing": true,
+    "player_facing_join_codes": false,
+    "internal_join_code_compatibility_allowed": true,
+    "direct_code_mode_scope": "future_friends_private_only"
+  },
+  "v2_shell_01a": {
+    "status": "complete_in_source",
+    "pr": 571,
+    "head": "b7f870bf9cb0a1679f71c762a05e67901b3df0c0",
+    "merge_sha": "24fe6d0feff7c7298ffb474887ae8eef2dc8b44f",
+    "validation": {
+      "run_number": 619,
+      "run_id": 35247988250,
+      "conclusion": "success"
+    },
+    "changed_files": 3,
+    "additions": 42,
+    "deletions": 8,
+    "supabase_changed": false,
+    "edge_function_changed": false,
+    "live_deployed": false
+  },
+  "gates": {
+    "v2_shell_01b_release_navigation": "pending",
+    "v2_mm_01_ranked_client_journey": "pending",
+    "v2_attack_01_two_user_proof": "pending",
+    "v2_audio_01": "pending",
+    "supabase_deployment": "hold",
+    "public_live_production": "hold"
+  },
+  "next_operation": [
+    "freeze_main_24fe6d0feff7c7298ffb474887ae8eef2dc8b44f",
+    "inventory_existing_signup_account_creation",
+    "inventory_tcg_menu_navigation_assets",
+    "inventory_automatic_matchmaking_client_contract_and_deck_source",
+    "define_minimum_release_route_file_set",
+    "implement_first_bounded_shell_01b_mm_01_slice_on_non_main_branch",
+    "add_route_auth_matchmaking_contract_tests",
+    "refresh_exact_head_evidence",
+    "sync_plan_checklist_ledger_before_acceptance",
+    "keep_supabase_live_hold_until_separate_promotion"
+  ],
+  "promotion_state": {
+    "pr_571_source_merge": "promoted",
+    "shell_01a_source": "accepted",
+    "shell_01b_branch_work": "promote_bounded_only",
+    "edge_function_mutation": "hold_until_proven_required",
+    "supabase": "hold",
+    "live": "hold",
+    "production": "hold"
+  }
+}

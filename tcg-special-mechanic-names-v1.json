@@ -1,0 +1,52 @@
+{
+  "schema": "stream-bandit-tcg-special-mechanic-names-v1",
+  "recorded_at": "2026-09-17",
+  "purpose": "Original Stream Bandit player-facing working names for special-mechanic families studied from historical/current external TCG patterns. Research labels remain provenance only and must not ship as Stream Bandit player-facing terminology.",
+  "originality_rule": {
+    "external_research_labels_are_player_facing": false,
+    "stream_bandit_names_required": true,
+    "engine_uses_generic_capabilities_not_brand_specific_engines": true,
+    "player_facing_names_may_be_refined_later_without_changing_capability_semantics": true
+  },
+  "bundle_semantics": {
+    "descriptive_traits_are_catalog_capability_ids": false,
+    "descriptive_traits_are_design_shorthand_only": true,
+    "exact_runtime_capability_ids_come_from": "tcg-generic-mechanic-capabilities-v1.json",
+    "exact_catalog_mapping_status": "v2_g1e_pending",
+    "owner_opcode_mapping_required_before_runtime_acceptance": true
+  },
+  "working_names": [
+    {"research_family":"historical EX / current ex style","stream_bandit_name":"Ascendant Creature","descriptive_traits":["special rule class","default 2-Reward risk"]},
+    {"research_family":"GX style","stream_bandit_name":"Sigilborn Creature","descriptive_traits":["special rule class","default 2-Reward risk","Signature Power eligible"]},
+    {"research_family":"generic bonded multi-being identity","stream_bandit_name":"Bonded Creature","descriptive_traits":["multiple beings represented by one Creature identity"]},
+    {"research_family":"TAG TEAM GX style","stream_bandit_name":"Bonded Sigilborn","descriptive_traits":["bonded identity","default 3-Reward risk","Signature Power eligible","optional extra-cost bonus"]},
+    {"research_family":"V style","stream_bandit_name":"Exalted Creature","descriptive_traits":["special rule class","default 2-Reward risk"]},
+    {"research_family":"VMAX style","stream_bandit_name":"Colossus Creature","descriptive_traits":["special evolution parent","default 3-Reward risk","high-stakes form"]},
+    {"research_family":"VSTAR style","stream_bandit_name":"Starforged Creature","descriptive_traits":["special evolution parent","default 2-Reward risk","Signature Power eligible"]},
+    {"research_family":"V-UNION style","stream_bandit_name":"Convergence Creature","descriptive_traits":["multi-card assembly","component recipe","assembled battlefield identity"]},
+    {"research_family":"Radiant style","stream_bandit_name":"Gleam Creature","descriptive_traits":["special rule class","shared one-per-deck group restriction"]},
+    {"research_family":"ACE SPEC style","stream_bandit_name":"Prime Card","descriptive_traits":["shared one-per-deck support-card group restriction"]},
+    {"research_family":"Prism Star style","stream_bandit_name":"Riftmarked Card","descriptive_traits":["singleton or shared-group restriction","optional replacement movement to Void"]},
+    {"research_family":"LV.X style","stream_bandit_name":"Overform","descriptive_traits":["overlay upgrade","inherit configured attacks","inherit configured abilities","retain configured state"]},
+    {"research_family":"BREAK style","stream_bandit_name":"Ascension Form","descriptive_traits":["overlay upgrade","inherit configured lower properties","selective property override"]},
+    {"research_family":"Tera style","stream_bandit_name":"Aspect Creature","descriptive_traits":["alternate form or element","optional position-based protection","rule-tag targeting"]},
+    {"research_family":"current Mega-ex style","stream_bandit_name":"Apex Ascendant","descriptive_traits":["special evolution","default 3-Reward risk","high-stakes form"]},
+    {"research_family":"historical Mega EX evolve-and-end-turn pattern","stream_bandit_name":"Ascension Evolution","descriptive_traits":["special evolution","optional immediate end-turn rule"]}
+  ],
+  "shared_special_action_name": {
+    "stream_bandit_name": "Signature Power",
+    "scope": "controller_match",
+    "machine_action_kinds": ["attack", "ability"],
+    "display_labels": {"attack":"Signature Attack","ability":"Signature Ability"},
+    "default_usage": "one shared use per player per match when a card/family declares this capability",
+    "catalog_capability_id": "signature.once_per_match_power"
+  },
+  "separation_rules": [
+    "player-facing family label is not an engine owner",
+    "descriptive traits are not machine capability IDs",
+    "reward value is independent from rarity",
+    "printing finish is cosmetic and independent from special class",
+    "special evolution timing is independent from reward value",
+    "multiple families may compose the same generic capability owners"
+  ]
+}

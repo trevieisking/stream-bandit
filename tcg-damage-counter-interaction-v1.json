@@ -1,0 +1,109 @@
+{
+  "schema": "stream-bandit-tcg-damage-counter-interaction-v1",
+  "recorded_at": "2026-09-17",
+  "purpose": "Machine-readable planning contract for visual placement, movement and turn-transition use of damage counters in the restored Stream Bandit Battle Client, aligned with canonical vitality/damage and precision-execution semantics.",
+  "counter_model": {
+    "base_unit_damage": 10,
+    "visible_counter_values": "10-point increments constrained by the exact amount mode and remaining legal amount declared by the resolving effect or property",
+    "server_authoritative": true,
+    "browser_may_not_invent_total_or_targets": true,
+    "damage_counter_placement_is_distinct_from_ordinary_attack_damage": true,
+    "damage_counter_movement_is_distinct_from_new_damage": true,
+    "fixed_and_up_to_amounts_are_distinct": true
+  },
+  "amount_precision": {
+    "fixed_amount": "If the effect declares a fixed amount, the full legal amount must be selected/applied; the player may not voluntarily choose less merely to reach a preferred damage total.",
+    "up_to_amount": "If the effect explicitly says up to N, the player may select a smaller legal amount including zero when the underlying operation allows zero/no action.",
+    "allow_partial": "Partial movement/placement is legal only when the structured operation explicitly allows it, such as allow_partial=true or an equivalent up-to amount mode.",
+    "available_source_limit": "MOVE_DAMAGE can never remove more damage than actually exists on the source, even when the declared maximum is larger.",
+    "ui_requirement": "The counter tray must distinguish fixed required total from optional/up-to remaining total."
+  },
+  "place_counters_interaction": {
+    "source_card_lifts_or_hovers": true,
+    "battlefield_remains_visible": true,
+    "legal_targets_highlight": true,
+    "counter_tray_appears": true,
+    "player_drags_counter_values_to_legal_targets": true,
+    "tap_select_equivalent_required": true,
+    "remaining_amount_visible": true,
+    "selected_distribution_visible_before_commit": true,
+    "change_or_cancel_before_server_commit_when_practical": true,
+    "commit_requires_effect_legal_distribution": true,
+    "fixed_amount_requires_exact_total_when_legal": true,
+    "up_to_amount_allows_smaller_total_only_when_explicit": true,
+    "defeat_check_runs_immediately_after_each_committed_placement_operation": true
+  },
+  "grouped_place_counters_interaction": {
+    "opcode": "PLACE_DAMAGE_MULTI",
+    "selection_and_amounts_are_validated_as_one_group": true,
+    "all_validated_target_placements_commit_as_one_atomic_effect_operation": true,
+    "no_listener_or_follow_up_targeting_runs_between_individual_target_placements": true,
+    "immediate_batch_defeat_scan_runs_after_all_grouped_placements_commit": true,
+    "batch_defeat_scan_covers_every_affected_destination": true,
+    "all_creatures_made_lethal_by_the_group_leave_play_before_later_listeners_or_follow_up_effects": true,
+    "reward_and_forced_promotion_consequences_resume_after_the_immediate_batch_defeat_boundary": true,
+    "reason": "Grouped placement must preserve one coherent multi-target effect while preventing later logic from acting on any target that the grouped operation made lethal."
+  },
+  "move_counters_interaction": {
+    "source_card_lifts_or_hovers": true,
+    "movable_existing_damage_is_visualized": true,
+    "legal_destinations_highlight": true,
+    "player_drags_counters_from_source_to_destination": true,
+    "source_damage_decreases_by_exact_moved_amount": true,
+    "destination_damage_increases_by_exact_moved_amount": true,
+    "total_moved_amount_cannot_exceed_effect_or_source_limit": true,
+    "fixed_amount_requires_exact_total_when_source_and_targets_make_it_legal": true,
+    "partial_or_smaller_total_requires_explicit_up_to_or_allow_partial_semantics": true,
+    "server_commits_source_and_destination_atomically": true,
+    "destination_defeat_check_runs_immediately_after_atomic_placement": true,
+    "cannot_target_creature_already_removed_from_play": true
+  },
+  "operation_level_defeat_boundary": {
+    "required": true,
+    "single_target_rule": "Every committed PLACE_DAMAGE or MOVE_DAMAGE operation runs the destination defeat check immediately after the placement/state update and before later listeners, follow-up target selection, or effects are allowed to act on that destination.",
+    "grouped_rule": "PLACE_DAMAGE_MULTI validates and commits its full target set atomically, then immediately performs a batch defeat scan across every affected destination before any later listener, follow-up target selection, or effect resumes.",
+    "reason": "A Creature made lethal by counter placement/movement must leave play before subsequent logic can treat it as a legal in-play target.",
+    "attack_turn_handoff_still_waits_for_full_resolution": true
+  },
+  "attack_resolution_order": [
+    "pay_and_validate_attack",
+    "resolve_printed_attack_effects_and_ordinary_damage_using_their_canonical_operation_boundaries",
+    "resolve_required_damage_counter_placement_or_movement_choice",
+    "commit_single_target_counter_operation_or_full_grouped_placement_operation_atomically",
+    "run_immediate_single_destination_or_grouped_batch_defeat_boundary",
+    "resolve_only_later_listeners_conditions_or_follow_up_effects_that_remain_legal_after_that_defeat_boundary",
+    "resolve_remaining_reward_forced_promotion_and_aftermath_consequences_in_canonical_resume_order",
+    "turn_transition"
+  ],
+  "turn_transition_condition_counters": {
+    "supported": true,
+    "description": "A turn-based Condition may declare damage counters that are added at the canonical turn-switch/checkup checkpoint.",
+    "counter_unit_damage": 10,
+    "amount_is_condition_property": true,
+    "condition_badge_or_source_pulses_before_counters_land": true,
+    "counter_animation_uses_same_visual_counter_system": true,
+    "defeat_check_runs_immediately_after_condition_counter_application": true,
+    "reward_and_promotion_consequences_resolve_before_next_player_normal_actions": true,
+    "not_every_condition_deals_damage": true
+  },
+  "modifier_separation": {
+    "ordinary_attack_damage_modifiers_apply_to_counter_placement_automatically": false,
+    "vulnerability_or_resistance_apply_to_counter_placement_automatically": false,
+    "shield_applies_to_counter_placement_automatically": false,
+    "effect_or_rules_schema_must_explicitly_declare_any_exception": true
+  },
+  "ownership": {
+    "damage_counter_state_and_packets": "existing Damage/effect ownership where applicable",
+    "turn_based_condition_schedule": "Condition/timing ownership",
+    "defeat_after_counter_application": "Defeat/Reward/Promotion canonical owners",
+    "ui_role": "visual input and animation only",
+    "new_owner_required_by_this_contract": false
+  },
+  "acceptance_examples": [
+    "PLACE_DAMAGE fixed 30: legal distribution must total exactly 30 in 10-point increments before commit, then run the immediate defeat boundary.",
+    "PLACE_DAMAGE_MULTI: validate the full selected target group, commit all placements atomically, then immediately remove/process every destination made lethal before later listeners resume.",
+    "MOVE_DAMAGE fixed 50: if 50 can legally be moved, the player must move exactly 50; a smaller amount is not a legal voluntary choice.",
+    "MOVE_DAMAGE up to 50 or allow_partial=true: show legal 10-point choices up to the lower of 50 and available source damage; smaller legal totals are allowed.",
+    "condition says place 10 damage at each turn switch: animate one 10 counter at every canonical turn-transition checkpoint while the Condition remains active, immediately check defeat, then resolve consequences before normal play."
+  ]
+}
