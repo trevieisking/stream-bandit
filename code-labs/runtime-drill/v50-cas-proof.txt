@@ -1,0 +1,6 @@
+Code Labs V50 parent-bound CAS runtime proof
+Repository: trevieisking/stream-bandit
+Branch: test/code-labs-v50-runtime-drill-20260728
+Reviewed parent: d1f5723a97951c28e22651029c0fa7fe02c6d91c
+Purpose: harmless one-file runtime drill
+No production route, migration, merge, deletion, or force update.
