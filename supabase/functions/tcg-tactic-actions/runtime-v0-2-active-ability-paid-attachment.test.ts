@@ -6,6 +6,8 @@ import {
   structuredRuntimePaidSelfAttachmentActiveAbility,
 } from "../_shared/tcg-match-active-ability-paid-attachment-v0-2.ts";
 import { runtimeV02CurrentTurnActiveAbilityUseCount } from "../_shared/tcg-match-active-ability-choice-v0-2.ts";
+import { runtimeV02BeginActiveAbilityLiveRoute } from "../_shared/tcg-match-active-ability-live-route-v0-2.ts";
+import { runtimeV02PendingActiveAbilityLiveChoiceView } from "../_shared/tcg-match-active-ability-live-v0-2.ts";
 import { runtimeV02ResumeActiveAbilitySupplyAttachment } from "../_shared/tcg-match-active-ability-supply-attachment-v0-2.ts";
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
@@ -194,4 +196,23 @@ Deno.test("paid self-attachment rejects stale Essence after cost without replayi
   );
   assertEquals(s.players["1"].hand.map((entry:any)=>entry.uid),["ally-uid"]);
   assertEquals(runtimeV02CurrentTurnActiveAbilityUseCount(s,1,"overcharge-engine"),1);
+});
+
+
+Deno.test("single active Ability live router exposes paid self-attachment through the shared private-choice boundary", () => {
+  const s=state();
+  const routed=runtimeV02BeginActiveAbilityLiveRoute(
+    s,1,source(),describe as never,"router-cost-choice",
+  );
+  if(!routed||routed.kind!=="private_choice")throw new Error("paid private choice route required");
+  assertEquals(routed.choice.kind,"paid_self_attachment");
+  if(routed.choice.kind!=="paid_self_attachment")throw new Error("paid choice required");
+  assertEquals(routed.choice.stage,"activation_cost");
+  assertEquals(runtimeV02CurrentTurnActiveAbilityUseCount(s,1,"overcharge-engine"),0);
+  assertEquals(runtimeV02PendingActiveAbilityLiveChoiceView(routed.choice,2),{
+    id:"router-cost-choice",seat:1,kind:"paid_self_attachment",waiting:true,
+  });
+  assertEquals((runtimeV02PendingActiveAbilityLiveChoiceView(routed.choice,1) as any).options,[
+    {id:"hand:device-uid",label:"device-card"},
+  ]);
 });
