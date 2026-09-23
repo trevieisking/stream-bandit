@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "6ea567eb8eff74991897b757dda86e3678a6579b",
-        "file_count": 118,
-        "closure_sha256": "ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1",
+        "entrypoint_git_blob_sha": "e356d80eadde148e40e73a4bbecea5b8ac972f03",
+        "file_count": 119,
+        "closure_sha256": "96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -114,7 +114,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-continuation-v0-2.ts",
-            "git_blob_sha": "d858ba59d218adccf1bf5da5ae10879090e29c4b"
+            "git_blob_sha": "1b6efc4759cc124af47bc0f426fd587a08c8a560"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-deck-planning-v0-2.ts",
@@ -150,7 +150,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
-            "git_blob_sha": "0516147217fa659d85ded7787d19ef81bab524d5"
+            "git_blob_sha": "ce6457a92b42019daf67faef5282d50c728e2a21"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-opponent-creature-choice-v0-2.ts",
@@ -163,6 +163,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-program-v0-2.ts",
             "git_blob_sha": "5ef07393f8d9e75448d35fe2b6e8f3778a8f0377"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-active-ability-search-attachment-v0-2.ts",
+            "git_blob_sha": "5e6bfe448ae69f4573126ef5281ad9409f67d348"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-selected-heal-v0-2.ts",
@@ -562,7 +566,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "6ea567eb8eff74991897b757dda86e3678a6579b"
+            "git_blob_sha": "e356d80eadde148e40e73a4bbecea5b8ac972f03"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
