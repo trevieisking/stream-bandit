@@ -77,7 +77,7 @@ function definition(
   return def;
 }
 
-function matchesFilters(
+export function runtimeV02CardMatchesSelectionFilters(
   state: Record<string, unknown>,
   card: { uid: string; card_id: string },
   filters: Record<string, unknown>,
@@ -179,7 +179,7 @@ export function runtimeV02CardSelectionOptions(
     "tcg_v0_2_select_cards_controller_invalid",
   );
   return discard(state, controllerSeat)
-    .filter((card) => matchesFilters(state, card, descriptor.filters))
+    .filter((card) => runtimeV02CardMatchesSelectionFilters(state, card, descriptor.filters))
     .map((card) => ({
       id: `card:${card.uid}`,
       label: String(definition(state, card).name || card.card_id),
@@ -252,7 +252,7 @@ export function runtimeV02ResolveSelectCards(
     const current = discard(state, controllerSeat).find((card) =>
       card.uid === ref.uid && card.card_id === ref.card_id
     );
-    if (!current || !matchesFilters(state, current, descriptor.filters)) {
+    if (!current || !runtimeV02CardMatchesSelectionFilters(state, current, descriptor.filters)) {
       throw new Error("tcg_v0_2_select_cards_filter_stale");
     }
   }

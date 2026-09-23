@@ -5,6 +5,7 @@ import {
   type RuntimeV02PlannedCardCost,
   type RuntimeV02PlannedHandDiscardCost,
 } from "./tcg-match-payment-plan-v0-2.ts";
+import { runtimeV02CardMatchesSelectionFilters } from "./tcg-match-card-selection-v0-2.ts";
 
 export type RuntimeV02CardCostChoiceBinding = {
   controller_seat: 1 | 2;
@@ -206,12 +207,17 @@ function handPending(
   selected: Record<string, string[]>,
   cost: RuntimeV02PlannedHandDiscardCost,
 ): RuntimeV02PendingCardCostChoice {
-  if (cost.filters && Object.keys(cost.filters).length > 0) {
-    throw new Error(`tcg_v0_2_card_cost_choice_hand_filters_unsupported:${cost.cost_index}`);
-  }
+  const filters = cost.filters || {};
   const used = new Set(Object.values(selected).flat());
   const options = hand(state, binding.controller_seat)
     .filter((card) => !used.has(card.uid))
+    .filter((card) =>
+      runtimeV02CardMatchesSelectionFilters(
+        state,
+        card,
+        filters,
+      )
+    )
     .map((card) => ({
       id: `hand:${card.uid}`,
       label: card.card_id,
