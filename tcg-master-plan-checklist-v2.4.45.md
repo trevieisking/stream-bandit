@@ -1085,10 +1085,37 @@
 - [x] Freeze Release 1 inventory to exactly **8** DIRECT_DAMAGE nodes.
 - [x] Freeze surface split to 3 Ability/effect / 2 Attack recoil / 1 Tactic program / 2 Tactic listeners.
 - [x] Freeze damage classes to `effect` and `recoil`, amounts to 10/20, and bound Creature targets only.
-- [ ] Audit all eight against canonical Damage Engine / Damage Packet ownership.
-- [ ] Preserve source/action/controller context for protection, history and listeners.
-- [ ] Repair only proven execution gaps; no duplicate damage mutation owner.
-- [ ] Prove all eight frozen consumers.
-- [ ] Move `DIRECT_DAMAGE` from missing to implemented only after all eight are green.
-- [ ] Refresh capability/release-control evidence and exact-head validation.
+- [x] Audit all eight against canonical Damage Engine / Damage Packet ownership.
+- [x] Preserve source/action/controller context for protection, history and listeners.
+- [x] Repair only proven execution gaps; no duplicate damage mutation owner.
+- [x] Prove all eight frozen consumers.
+- [x] Move `DIRECT_DAMAGE` from missing to implemented only after all eight are green.
+- [x] Refresh capability/release-control evidence and exact-head validation.
+
+### V2.4.99 final acceptance
+- [x] Event Listener covers triggered Bristleflare / Volcanic Caldera / Thorn Crown DIRECT_DAMAGE.
+- [x] Attack recoil owner covers Reckless Rush + Meltline Charge.
+- [x] Attack modifier completion rider covers Pyrohorn effect DIRECT_DAMAGE.
+- [x] Active Ability route covers Magmagecko's selected-target effect DIRECT_DAMAGE.
+- [x] Tactic route covers Ashen Gamble packet listeners + canonical Defeat/Reward/promotion queue semantics.
+- [x] All-eight DIRECT_DAMAGE guard passes.
+- [x] Card Pass **#1558 SUCCESS** on exact source/runtime + release-control head `27b3cb2b5a041fae1bc8e7c389d7319cb55ff121`.
+- [x] Match Edge closure = 116 / `383ab7bf0eefafb1a41a767cb5f41374d50e76922f03f4c0432ed786851a0c02`.
+- [x] Tactic Edge closure = 53 / `9698a8aa2aeb63d7d10b3e4aa224a90f0d27bc1d492f949c3bb28aaa6048409f`.
+- [x] `DIRECT_DAMAGE` moved missing -> implemented; capability blob `aa3d9e4d719d4cb2596abd1b811d7b8613453974`.
+- [x] Card Pass **#1559 SUCCESS** on exact capability/control head `f6f9d23cd22f890786e653bb760b68d9e41feeb6`.
+- [x] Preserve owner-family count **40**; no owner #41.
+- [x] Leave Supabase production, main and live promotion untouched.
+
+## V2.4.100 — ATTACH_ESSENCE_FROM_ZONE all-surface closeout
+- [x] Freeze Release 1 inventory to exactly **7** nodes.
+- [x] Freeze surface split to **4 active Ability / 2 triggered Ability / 1 Tactic**.
+- [x] Freeze source grammars to hand selection / discard selection / prior SELECT_CARDS refs.
+- [x] Freeze attachment-state families to permanent/default / temporary / borrowed.
+- [ ] Audit all seven against Essence Attachment owner #22 and current listener/resume boundaries.
+- [ ] Preserve every already-working attachment route unchanged.
+- [ ] Repair only proven all-surface parity gaps generically.
+- [ ] Prove all seven frozen consumers.
+- [ ] Move `ATTACH_ESSENCE_FROM_ZONE` partial -> implemented only after all seven are green.
+- [ ] Refresh release-control/capability evidence and exact-head validation.
 

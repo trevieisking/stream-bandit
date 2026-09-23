@@ -3007,3 +3007,82 @@ Frozen grammar:
 
 V2.4.99 must begin with a read-only execution audit against the existing Damage engine / Damage Packet ownership. Producers may sequence DIRECT_DAMAGE, but damage application, protection/prevention, packet history, defeat interaction and listener emission stay with the canonical Damage owners. No owner #41 and no card-ID/name dispatch.
 
+## V2.4.99 — DIRECT_DAMAGE all-surface closeout — ACCEPTED
+
+All **8** frozen Release 1 DIRECT_DAMAGE consumers are now covered through canonical Damage ownership.
+
+### Accepted surface map
+- Bristleflare — Heat Up: triggered Ability / Event Listener, self 10 effect damage.
+- Magmagecko — Ember Feed: active Ability, selected friendly Ember target 10 effect damage.
+- Pyrohorn — Ash Crown: Attack modifier-consume rider, modifier target 20 effect damage.
+- Bristleflare — Reckless Rush: Attack after_damage, source Creature 10 recoil.
+- Furnacefang — Meltline Charge: Attack after_damage, source Creature 20 recoil.
+- Ashen Gamble: ordinary Tactic, selected friendly Ember target 20 effect damage.
+- Volcanic Caldera: triggered Tactic / Event Listener, moved-to-reserve subject 10 effect damage.
+- Thorn Crown: triggered Tactic / Event Listener, damage-packet source Creature 10 effect damage.
+
+### Canonical ownership
+The shared DIRECT_DAMAGE owner validates the bound target request, amount, damage class and recoil attack identity, then delegates physical mutation/protection/history to the canonical Damage Packet / Damage Engine owners.
+
+Producers retain only orchestration:
+- Event Listener owns triggered listener sequencing;
+- Attack recoil owner owns the two exact recoil shapes;
+- Attack modifier completion owns the Pyrohorn rider timing;
+- bounded active Ability ownership handles Magmagecko;
+- Tactic interpreter handles Ashen Gamble while preserving packet listeners and canonical Defeat #34.
+
+Ashen Gamble now completes the full effect lifecycle:
+`DIRECT_DAMAGE -> after_damage_packet Event Listener -> Defeat scan/queue -> remaining Tactic steps`.
+If Defeat queues Reward taking or forced promotion, the Tactic completes with the match left in `resolution`, not incorrectly returned to ordinary play.
+
+No card-ID/name dispatch and no owner #41 were added. Canonical owner-family count remains **40**.
+
+### Exact acceptance evidence
+All-eight source/runtime before release-control refresh:
+- head `1c97fdce71c85846ff158d5c824410a27ffbfcfd`;
+- Card Pass **#1557** deterministic/runtime/type job **SUCCESS**;
+- all-eight DIRECT_DAMAGE static guard **SUCCESS**;
+- only expected Tactic closure drift remained.
+
+All-eight source/runtime + release-control:
+- head `27b3cb2b5a041fae1bc8e7c389d7319cb55ff121`;
+- Card Pass **#1558 SUCCESS**;
+- Match closure **116** / `383ab7bf0eefafb1a41a767cb5f41374d50e76922f03f4c0432ed786851a0c02`;
+- Tactic closure **53** / `9698a8aa2aeb63d7d10b3e4aa224a90f0d27bc1d492f949c3bb28aaa6048409f`.
+
+Capability/control:
+- head `f6f9d23cd22f890786e653bb760b68d9e41feeb6`;
+- `DIRECT_DAMAGE` moved **missing -> implemented**;
+- capability blob `aa3d9e4d719d4cb2596abd1b811d7b8613453974`;
+- Card Pass **#1559 SUCCESS**.
+
+Production/main/live remain unchanged. Promotion remains HOLD while remaining Release 1 capability debt is closed.
+
+## V2.4.100 — ATTACH_ESSENCE_FROM_ZONE all-surface closeout (freeze)
+
+Fresh frozen inventory contains exactly **7** Release 1 nodes, the largest remaining used partial/missing operation.
+
+Surface split:
+- **4 active Creature Abilities**
+  - Ember / Magmagecko — hand, exact 1 Basic Ember Essence -> selected damaged Ember Creature;
+  - Tide / Surgefin — prior optional discard selection 0..1 Basic Tide -> selected Tide Reserve;
+  - Volt / Dynamozer — discard, exact 1 Basic Volt -> source Creature, temporary until controller Aftermath;
+  - Volt / Stormcoil — Living Circuit — prior exact discard selection -> selected Volt field target, borrowed until controller Aftermath.
+- **2 triggered Creature Abilities / Event Listener**
+  - Volt / Arcprowler — on evolve, optional 0..1 Basic Volt from hand -> source Creature;
+  - Volt / Coilclank — on evolve after Device resolved, optional 0..1 Basic Volt from discard -> source Creature, temporary until controller Aftermath.
+- **1 Tactic**
+  - Volt / Quickcharge Cell — prior exact discard selection -> selected Volt field target, temporary until controller Aftermath.
+
+Frozen source grammars:
+1. inline `selection` from hand;
+2. inline `selection` from discard;
+3. prior `SELECT_CARDS` refs via `cards: "$var"`.
+
+Frozen attachment-state families:
+- permanent/default attachment;
+- temporary until `controller_aftermath`, then discard;
+- borrowed until `controller_aftermath`, then discard.
+
+V2.4.100 must begin with a read-only audit of all seven against Essence Attachment owner #22, shared attachment-state normalization, Event/Movement/Heal listener boundaries and current Ability/Tactic routes. Selection remains with its existing owner; physical attachment remains owner #22. No second attachment engine and no owner #41.
+

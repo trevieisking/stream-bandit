@@ -1044,3 +1044,30 @@ All eight frozen DIRECT_DAMAGE operations receive an already-bound Creature targ
 ## 358 — DIRECT_DAMAGE must not bypass Damage Packet ownership
 Effect/recoil damage must preserve canonical protection/prevention, packet identity/history, after-damage listeners, defeat sequencing and source/action/controller context. Producers may request the damage; canonical Damage owners perform the mutation and packet lifecycle.
 
+## 359 — DIRECT_DAMAGE ownership begins after target binding
+All eight frozen DIRECT_DAMAGE nodes receive an already-bound Creature target. Selection/target discovery remains with the producer's existing owner. The DIRECT_DAMAGE submodule validates damage request/context and delegates mutation to Damage Packet / Damage Engine ownership.
+
+## 360 — ordinary Tactic DIRECT_DAMAGE must preserve packet and defeat lifecycles
+Ashen Gamble proves that Tactic effect damage cannot be accepted as a raw HP mutation. The canonical order is damage packet/protection -> after-damage listener continuation -> Defeat #34 scan/queue -> remaining Tactic steps. Reward taking and forced promotion remain queued canonical resolutions.
+
+## 361 — Tactic completion must not erase pending defeat resolution
+When a completed Tactic has queued Reward/promotion work, its endpoint leaves the match in `resolution`. Returning directly to `play` would bypass canonical Defeat consequences and is prohibited.
+
+## 362 — defeat events cross into Event Listener through the canonical adapter
+Defeat owner #34 emits defeat records in its own schema. Event Listener owner #28 consumes them only after `runtimeV02AdaptDefeatEventsForListener`; producers must not cast or reconstruct the envelope ad hoc.
+
+## 363 — DIRECT_DAMAGE Release 1 parity is accepted
+All eight frozen uses are covered across triggered Event Listener, active Ability, Attack recoil, Attack modifier rider and Tactic surfaces. `DIRECT_DAMAGE` is implemented at capability blob `aa3d9e4d719d4cb2596abd1b811d7b8613453974`. Source/runtime + release-control accepted at `27b3cb2b5a041fae1bc8e7c389d7319cb55ff121` / Card Pass #1558; capability/control accepted at `f6f9d23cd22f890786e653bb760b68d9e41feeb6` / Card Pass #1559.
+
+## 364 — V2.4.99 exact release-control state
+Match closure is 116 / `383ab7bf0eefafb1a41a767cb5f41374d50e76922f03f4c0432ed786851a0c02`; Tactic closure is 53 / `9698a8aa2aeb63d7d10b3e4aa224a90f0d27bc1d492f949c3bb28aaa6048409f`. Owner-family count remains 40; production was not changed.
+
+## 365 — ATTACH_ESSENCE_FROM_ZONE is the next largest used capability gap
+After V2.4.99, the frozen 193-card inventory contains exactly 7 `ATTACH_ESSENCE_FROM_ZONE` nodes. Every other currently used missing opcode is a one-consumer slice. V2.4.100 must therefore close the seven attachment consumers before dropping to singleton mechanics.
+
+## 366 — attachment selection and attachment mutation remain separate ownership
+Inline hand/discard selection or prior SELECT_CARDS refs may identify the Essence instance, but physical attachment remains Essence Attachment owner #22. Card selection, hidden visibility, attachment-state normalization, Event Listener, Movement Listener and Heal Listener keep their existing ownership boundaries.
+
+## 367 — temporary and borrowed attachment disposition is structured state
+Release 1 ATTACH_ESSENCE_FROM_ZONE includes default/permanent, temporary and borrowed states. Temporary/borrowed attachments expire at controller Aftermath to discard as declared. Producer routes must use shared attachment-state normalization rather than invent local flag conventions.
+
