@@ -1071,3 +1071,12 @@ Inline hand/discard selection or prior SELECT_CARDS refs may identify the Essenc
 ## 367 — temporary and borrowed attachment disposition is structured state
 Release 1 ATTACH_ESSENCE_FROM_ZONE includes default/permanent, temporary and borrowed states. Temporary/borrowed attachments expire at controller Aftermath to discard as declared. Producer routes must use shared attachment-state normalization rather than invent local flag conventions.
 
+## 368 — V2.4.100 all-seven attachment audit found one live parity gap
+The frozen seven ATTACH_ESSENCE_FROM_ZONE consumers split 4 active Ability / 2 triggered Ability Event Listener / 1 Tactic. Magmagecko, Surgefin, Living Circuit, Arcprowler, Coilclank and Quickcharge Cell already used canonical selection, attachment-state and owner-#22 mutation paths. Dynamozer alone had an isolated paid self-attachment owner that was not yet reachable through the single live active-Ability router / Match continuation.
+
+## 369 — paid self-attachment is an orchestration family, not a new attachment owner
+Dynamozer's repaired path delegates Device discard payment to the existing active-Ability Payment/cost gate, makes a fresh private eligible-discard Essence choice, then delegates physical attachment to Essence Attachment owner #22. The Match layer reuses the established Event / Movement / Heal post-attachment continuation. The route is operation-shaped and card-ID-free; owner-family count remains 40.
+
+## 370 — V2.4.100 source/runtime and Release 1 capability coverage are accepted
+All seven frozen ATTACH_ESSENCE_FROM_ZONE consumers are covered at source/runtime + release-control head `d0d37294f7cd9e81196691d6e91bf117923862de`, Card Pass #1576 SUCCESS. Match closure is 118 / `ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1`; Tactic closure is 53 / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`. ATTACH_ESSENCE_FROM_ZONE moved partial -> implemented at capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`. Production/main/live were not changed; final synchronized capability/control exact-head validation remains required before V2.4.100 is fully closed.
+
