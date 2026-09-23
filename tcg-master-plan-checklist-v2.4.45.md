@@ -1152,13 +1152,29 @@
 - [x] Confirm current live active-Ability router has no execution family for the frozen sequence.
 - [x] Keep physical attachment with Essence Attachment owner #22.
 - [x] Keep final deck randomization with the existing Randomization engine.
-- [ ] Add only the bounded operation-shaped active-Ability family required by the frozen sequence.
-- [ ] Revalidate source, turn, selected deck card and dynamic element eligibility before mutation.
-- [ ] Preserve legal zero-selection -> shuffle path.
-- [ ] Wait for attachment listener continuation before shuffle when a card is attached.
-- [ ] Prove no Founder/card-ID/name dispatch and no new owner family.
-- [ ] Prove the single frozen consumer end-to-end through the live Match choice path.
-- [ ] Move `ATTACH_ESSENCE_FROM_SELECTION` missing -> implemented only after the consumer is green.
-- [ ] Refresh capability/release-control evidence and exact-head validation.
-- [ ] Leave production/main/live unchanged until Release 1 closeout permits promotion.
+- [x] Add only the bounded operation-shaped active-Ability family required by the frozen sequence.
+- [x] Revalidate source, turn, selected deck card and dynamic element eligibility before mutation.
+- [x] Preserve legal zero-selection -> shuffle path.
+- [x] Wait for attachment listener continuation before shuffle when a card is attached.
+- [x] Prove no Founder/card-ID/name dispatch and no new owner family.
+- [x] Prove the single frozen consumer end-to-end through the live Match choice path.
+- [x] Move `ATTACH_ESSENCE_FROM_SELECTION` missing -> implemented only after the consumer is green.
+- [ ] Refresh capability/release-control evidence and final synchronized exact-head validation.
+- [x] Leave production/main/live unchanged until Release 1 closeout permits promotion.
+
+### V2.4.101 source/runtime acceptance
+- [x] Card Pass **#1595 SUCCESS** on exact source/runtime + release-control head `8cadb7ce31e98548c868aa1817fe2ab59f5abcac`.
+- [x] Match closure = **119** / `96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d`.
+- [x] Tactic closure = **53** / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`.
+- [x] Deterministic runtime + Match/Tactic/API/withdrawal/attack/Surge type-checks green.
+- [x] Private deck search hides option identities from opponent.
+- [x] Dynamic already-attached-element exclusion revalidates before mutation.
+- [x] `effect_owned_selection` remains logical provenance; physical source stays `deck`.
+- [x] Physical attachment remains owner #22.
+- [x] Event / Movement / Heal continuation completes before shuffle.
+- [x] Randomization engine owns the final shuffle.
+- [x] Zero-selection branch shuffles without attachment.
+- [x] No Founder/card-name dispatch and no owner #41.
+- [x] `ATTACH_ESSENCE_FROM_SELECTION` = implemented at capability blob `bca64acae1cb4cb7370e4b8fd2a03bedfa7f8a8f`.
+- [ ] Final synchronized capability/control + plan/checklist/ledger exact-head Card Pass is green and recorded.
 
