@@ -3153,3 +3153,31 @@ The synchronized capability/control checkpoint is green.
 
 V2.4.100 is complete. Production, main and live remain unchanged. Promotion remains **HOLD** because Release 1 still contains unresolved singleton operation debt; the next target must be selected from the remaining frozen missing-operation inventory rather than by card preference.
 
+## V2.4.101 — ATTACH_ESSENCE_FROM_SELECTION singleton closeout (freeze)
+
+Fresh structured Set One inventory contains exactly **1** current Release 1 consumer:
+- Prismatic Founder — active Ability `bandits-current`.
+
+Frozen operation sequence:
+1. `SEARCH_DECK` — self deck, public reveal, optional 0..1 Basic Essence whose element is not already attached to the source Creature; hidden failure allowed; destination is logical `effect_owned_selection` bound as `$founder_new_essence`.
+2. `ATTACH_ESSENCE_FROM_SELECTION` — attach `$founder_new_essence` to `$source_creature`, non-manual, normal/permanent attachment state.
+3. `SHUFFLE_DECK` — self deck.
+
+### Read-only execution audit
+The current single live active-Ability router has no family for this search -> effect-owned selection -> attach -> shuffle sequence. Existing active-Ability modules contain no `SEARCH_DECK`, `effect_owned_selection`, or `ATTACH_ESSENCE_FROM_SELECTION` route.
+
+Essence Attachment owner #22 already owns physical attachment, receipt/event creation and lifecycle state, but deliberately rejects `effect_owned_selection` as a physical source zone. That is correct: the effect-owned selection is a logical bound set, while the selected card remains physically in the deck until owner #22 removes it from the true `deck` origin during attachment.
+
+V2.4.101 therefore requires one bounded, operation-shaped active-Ability composition that:
+- keeps deck search/selection and hidden-information semantics with their existing owners;
+- binds exact selected card identity plus true deck provenance without moving it to a fake zone;
+- revalidates source Creature, current turn, selected card identity and dynamic element eligibility before mutation;
+- delegates physical deck -> Creature attachment to Essence Attachment owner #22;
+- waits for the existing attachment Event / Movement / Heal continuation before the following shuffle step;
+- delegates the final shuffle to the existing Randomization engine;
+- supports the legal zero-selection path by shuffling without attaching;
+- consumes the ordinary once-per-turn active-Ability limit at activation;
+- contains no Founder/card-ID/name dispatch and creates no new owner family.
+
+Because the preceding `SEARCH_DECK` is already classified implemented but lacks this active-Ability surface, V2.4.101 may repair that dependent surface only as required to make the frozen ATTACH_ESSENCE_FROM_SELECTION consumer executable. It must not broaden into a generic catch-all Ability interpreter.
+
