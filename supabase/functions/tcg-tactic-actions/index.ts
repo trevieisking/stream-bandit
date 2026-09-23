@@ -17,6 +17,9 @@ import { runtimeV02CardSelectionOptions, runtimeV02NormalizeSelectCardsStep, run
 import { runtimeV02BindDeckTopSet, runtimeV02BoundDeckSetAfterRemoval, runtimeV02BoundSetChoiceOptions, runtimeV02NormalizeChooseFromSetStep, runtimeV02RebindBoundDeckSet, runtimeV02ResolveBoundSetChoice, type RuntimeV02BoundDeckSetProvenance, type RuntimeV02ChooseFromSetDescriptor } from "../_shared/tcg-match-bound-set-choice-v0-2.ts";
 import { runtimeV02InspectDeckTopEffectOwnedSet, runtimeV02InspectionProvenanceAfterRemoval, runtimeV02NormalizeInspectZoneStep, runtimeV02NormalizeInspectionProvenance, runtimeV02RebindInspectionRemainder, runtimeV02ResolveRewardInspectionChoice, runtimeV02RewardInspectionChoiceOptions, type RuntimeV02InspectZoneDescriptor, type RuntimeV02InspectionProvenance, type RuntimeV02RewardInspectionChoiceOption } from "../_shared/tcg-match-inspection-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
+import { runtimeV02ApplyDirectDamage, runtimeV02NormalizeDirectDamageStep } from "../_shared/tcg-match-direct-damage-v0-2.ts";
+import { runtimeV02BeginEventListenerContinuation } from "../_shared/tcg-match-event-listener-v0-2.ts";
+import { runtimeV02PreflightDefeatScan, runtimeV02ScanAndQueueDefeats } from "../_shared/tcg-match-defeat-engine-v0-2.ts";
 import {
   evaluateRuntimeV02LegalCardAvailableRequirement,
   evaluateRuntimeV02ReserveCountAtLeastRequirement,
@@ -150,6 +153,27 @@ function findCreature(state: any, ref: CreatureRef | null | undefined) {
     }
   }
   return null;
+}
+function tacticDefeatDescribe(state: any) {
+  return (creature: Cr) => {
+    const top = topInst(creature);
+    if (!top) throw new Error("tcg_v0_2_tactic_defeat_top_required");
+    const d = runtimeV02Definition(state, top);
+    if (!d) throw new Error("tcg_v0_2_tactic_defeat_definition_required");
+    const creatureDefinition = d.creature && typeof d.creature === "object" && !Array.isArray(d.creature)
+      ? d.creature as Record<string, unknown>
+      : null;
+    if (!creatureDefinition) throw new Error("tcg_v0_2_tactic_defeat_creature_definition_required");
+    const maxHp = Number(creatureDefinition.hp);
+    const rewardValue = Number(creatureDefinition.reward_value);
+    if (!Number.isFinite(maxHp) || maxHp <= 0) throw new Error("tcg_v0_2_tactic_defeat_hp_invalid");
+    if (!Number.isInteger(rewardValue) || rewardValue < 1) throw new Error("tcg_v0_2_tactic_defeat_reward_invalid");
+    return {
+      max_hp: maxHp,
+      reward_value: rewardValue,
+      label: String(d.name || top.card_id),
+    };
+  };
 }
 function applyTacticHeal(state: any, effect: EffectState, found: NonNullable<ReturnType<typeof findCreature>>, amount: number) {
   if (state.runtime_registry_v0_2 == null) {
@@ -475,6 +499,14 @@ function unsupportedOps(steps: any[]): string[] {
       if (op === "INSPECT_ZONE") {
         try { runtimeV02NormalizeInspectZoneStep(step); }
         catch { unsupported.add("INSPECT_ZONE_GRAMMAR"); }
+      }
+      if (op === "DIRECT_DAMAGE") {
+        try {
+          const descriptor = runtimeV02NormalizeDirectDamageStep(step);
+          if (descriptor.damage_class !== "effect") unsupported.add("DIRECT_DAMAGE_CLASS");
+        } catch {
+          unsupported.add("DIRECT_DAMAGE_GRAMMAR");
+        }
       }
       if (op === "ATTACH_ESSENCE_FROM_ZONE") {
         if (step.cards != null) {
@@ -957,7 +989,13 @@ function finishEffect(state: any, effect: EffectState) {
   log(state, `Seat ${effect.owner_seat} resolved ${effect.source_name}.`);
   delete state.effect_resolution;
   delete state.pending_choice;
-  if (state.phase !== "complete" && state.phase !== "overtime_pending") state.phase = "play";
+  if (state.pending_resolutions != null && !Array.isArray(state.pending_resolutions)) {
+    throw new Error("tcg_v0_2_tactic_resolution_queue_invalid");
+  }
+  const pendingResolution = Array.isArray(state.pending_resolutions) && state.pending_resolutions.length > 0;
+  if (state.phase !== "complete" && state.phase !== "overtime_pending") {
+    state.phase = pendingResolution ? "resolution" : "play";
+  }
   evaluateWinner(state);
 }
 
@@ -1763,6 +1801,93 @@ function executeUntilChoice(state: any) {
       for (const ref of refs as CreatureRef[]) {
         const found = findCreature(state, ref);
         if (found) addRuntimeShield(found.cr, amount);
+      }
+      effect.cursor++;
+      continue;
+    }
+    if (op === "DIRECT_DAMAGE") {
+      const descriptor = runtimeV02NormalizeDirectDamageStep(step);
+      if (descriptor.damage_class !== "effect") {
+        throw new Error("tcg_v0_2_tactic_direct_damage_class_unsupported");
+      }
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (!found) throw new Error("tcg_v0_2_tactic_direct_damage_target_missing");
+      const sourceSeat = Number(effect.owner_seat);
+      const targetSeat = Number(found.seat);
+      if (sourceSeat !== 1 && sourceSeat !== 2) throw new Error("tcg_v0_2_tactic_direct_damage_source_seat_invalid");
+      if (targetSeat !== 1 && targetSeat !== 2) throw new Error("tcg_v0_2_tactic_direct_damage_target_seat_invalid");
+      const target = topInst(found.cr);
+      if (!target) throw new Error("tcg_v0_2_tactic_direct_damage_target_top_required");
+      const describe = tacticDefeatDescribe(state);
+      runtimeV02PreflightDefeatScan(state, describe);
+      const packetId = `${effect.id}:direct:${effect.cursor}:${target.uid}`;
+      const resolved = runtimeV02ApplyDirectDamage(
+        state,
+        found.cr,
+        step,
+        {
+          packet_id: packetId,
+          damage_class: "effect",
+          source_controller_seat: sourceSeat as 1 | 2,
+          source_kind: "tactic",
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_card_id: effect.source_card_id,
+          source_creature_uid: null,
+          target_controller_seat: targetSeat as 1 | 2,
+          target_creature_uid: target.uid,
+          target_zone: found.where,
+          target_index: found.index,
+        },
+        String(step.target || ""),
+        null,
+      );
+      const packetFlow = runtimeV02BeginEventListenerContinuation(
+        state,
+        [resolved.after_damage_event],
+      );
+      if (packetFlow.status === "player_choice_required") {
+        throw new Error("tcg_v0_2_tactic_direct_damage_event_choice_not_yet_supported");
+      }
+      if (
+        packetFlow.emitted_movement_events.length ||
+        packetFlow.emitted_heal_packet_ids.length
+      ) {
+        throw new Error("tcg_v0_2_tactic_direct_damage_nested_listener_output_not_yet_supported");
+      }
+
+      // Defeat events are also routed through Event Listener ownership. Repeat
+      // only when those listeners create a new defeated Creature; each pass
+      // physically removes prior defeats, so the loop is strictly bounded.
+      for (let pass = 0; pass < 10; pass++) {
+        const defeat = runtimeV02ScanAndQueueDefeats(
+          state,
+          describe,
+          {
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_controller_seat: sourceSeat as 1 | 2,
+            source_card_uid: effect.source_card.uid,
+          },
+        );
+        if (!defeat.defeated_count) break;
+        if (defeat.defeat_events.length) {
+          const defeatFlow = runtimeV02BeginEventListenerContinuation(
+            state,
+            defeat.defeat_events,
+          );
+          if (defeatFlow.status === "player_choice_required") {
+            throw new Error("tcg_v0_2_tactic_direct_damage_defeat_event_choice_not_yet_supported");
+          }
+          if (
+            defeatFlow.emitted_movement_events.length ||
+            defeatFlow.emitted_heal_packet_ids.length
+          ) {
+            throw new Error("tcg_v0_2_tactic_direct_damage_defeat_listener_output_not_yet_supported");
+          }
+        }
+        if (pass === 9) throw new Error("tcg_v0_2_tactic_direct_damage_defeat_loop_guard");
       }
       effect.cursor++;
       continue;
