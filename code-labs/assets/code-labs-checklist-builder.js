@@ -2,10 +2,14 @@
 (function(){
 'use strict';
 var KEY='codeLabsChecklistBuilder';
-var VERSION='V2.0-master-checklist-final-view';
+var VERSION='V2.1-master-checklist-projection-consumer';
+var PROJECTION_VERSION='V1-master-checklist-evidence-projection';
+var PROJECTION_EVENT='code-labs-master-checklist-projection';
+var PROJECTION_REQUEST_EVENT='code-labs-master-checklist-projection-request';
 var STATES=['PASS','HOLD','BLOCK','NOT_RUN','USER_CHECK'];
 var REPAIR_CONTEXT_FIELDS=['operation_id','expected_state_version','repository','pull_request','branch','reviewed_head_sha','merge_commit_sha','target_file','source_hash','candidate_hash','plan_id','plan_revision','plan_hash','page','page_role','requested_action','preserved_capabilities','affected_helpers','dependencies','authentication','owner_scope','entitlement','database_boundary','browser_boundary','github_boundary','rollback','replay','fencing_tests','cg_repair_lab_findings','code_god_findings','workflow_run_count','combined_status_count','evidence_source','required','performed','passed','failed','not_run','user_checks'];
 var loadedChecklist=null;
+var projectionListenerInstalled=false;
 
 function q(s,r){return(r||document).querySelector(s)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -164,6 +168,56 @@ function renderCanonical(){
     +'<div class="notice"><p><b>Browser summary: '+esc(result)+'</b> - PASS '+totals.PASS+', HOLD '+totals.HOLD+', BLOCK '+totals.BLOCK+', NOT RUN '+totals.NOT_RUN+', USER CHECK '+totals.USER_CHECK+'. This is not a promotion decision.</p></div>'
     +'<div style="overflow:auto"><table><thead><tr><th>#</th><th>State</th><th>Requirement</th><th>Evidence</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
+function projectionOf(value){
+  var input=value&&typeof value==='object'?value:null;
+  if(input&&input.master_checklist_projection&&typeof input.master_checklist_projection==='object')input=input.master_checklist_projection;
+  return input;
+}
+function trustedProjection(value){
+  var projection=projectionOf(value);
+  return !!(
+    projection&&
+    projection.version===PROJECTION_VERSION&&
+    projection.authority==='read-only-evidence-projection'&&
+    projection.writer_authority===false&&
+    projection.promotion_authority===false&&
+    projection.exact_checklist&&typeof projection.exact_checklist==='object'&&
+    Array.isArray(projection.exact_checklist.items)
+  );
+}
+function hydrateProjection(value){
+  var projection=projectionOf(value);
+  if(!trustedProjection(projection)){
+    setStatus('Read-only checklist projection rejected: authority or shape is invalid','bad');
+    return false;
+  }
+  try{
+    var parsed=parseChecklistText(JSON.stringify(projection));
+    loadedChecklist=parsed;
+    setValue('clCanonicalChecklistJson',JSON.stringify(projection,null,2));
+    syncBinding(loadedChecklist);
+    renderCanonical();
+    var result=overall(loadedChecklist.items||[]);
+    setStatus('Read-only evidence projection loaded: '+result,result==='BLOCK'?'bad':result==='PASS'?'good':'warn');
+    return true;
+  }catch(error){
+    setStatus('Read-only checklist projection rejected: '+String(error&&error.message||error),'bad');
+    return false;
+  }
+}
+function receiveProjection(event){
+  var detail=event&&event.detail;
+  if(detail)hydrateProjection(detail);
+}
+function requestProjection(){
+  if(window.CodeLabsMasterChecklistProjection)hydrateProjection(window.CodeLabsMasterChecklistProjection);
+  if(typeof CustomEvent==='function')document.dispatchEvent(new CustomEvent(PROJECTION_REQUEST_EVENT,{detail:{consumer:'CodeLabsMasterChecklistV2',version:VERSION,projection_version:PROJECTION_VERSION,read_only:true}}));
+}
+function installProjectionListener(){
+  if(projectionListenerInstalled)return;
+  document.addEventListener(PROJECTION_EVENT,receiveProjection);
+  projectionListenerInstalled=true;
+}
 function loadCanonical(){
   try{
     loadedChecklist=parseChecklistText(val('#clCanonicalChecklistJson'));
@@ -206,7 +260,7 @@ function add(){
   panel.id='clChecklistBuilder';
   panel.innerHTML=''
     +'<div><span class="pill">Final verification owner</span><h1>Master Checklist</h1><p>Load the exact owner-scoped checklist, bind it to the selected Master Plan and current GitHub head, then record what is PASS, HOLD, BLOCK, NOT RUN or waiting for USER CHECK.</p><p><span id="clMasterChecklistStatus" class="badge warn">Local verification view ready</span></p><div class="actions"><button class="btn primary" id="clLoadExactChecklist" type="button">Load exact checklist</button><button class="btn ghost" id="clBuildChecklist" type="button">Build report</button><button class="btn ghost" id="clCopyChecklist" type="button">Copy report</button><button class="btn ghost" id="clSaveChecklist" type="button">Save locally</button></div></div>'
-    +'<div class="heroCard"><b>Use this last</b><ol><li>Paste the authoritative checklist JSON.</li><li>Refresh exact repository, PR, head, workflows and statuses.</li><li>Record user checks and unresolved evidence.</li><li>Request a separate promotion decision only when every required gate is proven.</li></ol></div>';
+    +'<div class="heroCard"><b>Use this last</b><ol><li>Load the trusted read-only evidence projection when available, or paste the authoritative checklist JSON as a fallback.</li><li>Refresh exact repository, PR, head, workflows and statuses.</li><li>Record user checks and unresolved evidence separately.</li><li>Request a separate promotion decision only when every required gate is proven.</li></ol></div>';
   var exact=document.createElement('section');
   exact.className='panel';
   exact.innerHTML=''
@@ -216,7 +270,7 @@ function add(){
     +'<div class="grid2"><label>Repository<input id="clChecklistRepository" placeholder="owner/repository"></label><label>Pull request<input id="clChecklistPr" placeholder="Exact PR number"></label></div>'
     +'<label>Reviewed head SHA<input id="clChecklistHead" placeholder="Full 40-character head SHA"></label>'
     +'<div class="grid2"><label>Workflow runs found<input id="clWorkflowRunCount" inputmode="numeric" value="0"></label><label>Combined statuses found<input id="clStatusCount" inputmode="numeric" value="0"></label></div>'
-    +'<label>Authoritative checklist JSON<textarea id="clCanonicalChecklistJson" class="mid" placeholder="Paste an object containing exact_checklist or an items array. Secret values must never be pasted here."></textarea></label>'
+    +'<label>Authoritative checklist JSON<textarea id="clCanonicalChecklistJson" class="mid" placeholder="Trusted read-only projection auto-fills here when supplied. Manual paste remains available. Secret values must never be pasted here."></textarea></label>'
     +'<div id="clCanonicalChecklistView"></div>';
   var form=document.createElement('section');
   form.className='panel';
@@ -230,7 +284,7 @@ function add(){
   out.className='panel';
   out.innerHTML=''
     +'<h2>Master Checklist report</h2><textarea id="clChecklistOutput" class="mid" readonly placeholder="The final verification report appears here"></textarea>'
-    +'<div class="notice"><p><b>Safety boundary:</b> this page only stores a local verification view and builds text. It cannot change authoritative Code Labs records, write GitHub, prepare Writer, merge, deploy, delete or promote production use.</p></div>';
+    +'<div class="notice"><p><b>Safety boundary:</b> this page only stores a local verification view and builds text. It can consume a trusted read-only evidence projection, but it cannot change authoritative Code Labs records, write GitHub, prepare Writer, merge, deploy, delete or promote production use.</p></div>';
   main.appendChild(panel);
   main.appendChild(exact);
   main.appendChild(form);
@@ -243,11 +297,18 @@ function add(){
   window.CodeLabsMasterChecklistV2={
     version:VERSION,
     states:STATES.slice(),
+    projection_version:PROJECTION_VERSION,
+    projection_event:PROJECTION_EVENT,
+    projection_request_event:PROJECTION_REQUEST_EVENT,
     parse:parseChecklistText,
+    trustedProjection:trustedProjection,
+    hydrateProjection:hydrateProjection,
     read:function(){return read()},
     report:report,
     overall:function(){return overall(loadedChecklist&&loadedChecklist.items||[])}
   };
+  installProjectionListener();
+  requestProjection();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',add);else add();
 })();

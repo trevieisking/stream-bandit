@@ -1,4 +1,5 @@
 const HASH_VERSION = "sha256-utf8-v1";
+const CHECKLIST_PROJECTION_VERSION = "V1-master-checklist-evidence-projection";
 
 export const ATOMIC_ACTION_COVERAGE = Object.freeze({
   adapted: Object.freeze([
@@ -19,6 +20,7 @@ export const ATOMIC_ACTION_COVERAGE = Object.freeze({
     "checkpoint.create",
     "workflow.advance",
     "workflow.reset",
+    "checklist.persist_projection",
     "undo.execute",
   ]),
   requires_domain_preparation: Object.freeze([
@@ -238,6 +240,59 @@ function candidateAcceptPayload(args, context, now) {
   };
 }
 
+function checklistProjectionPayload(context) {
+  const plan = row(context.plan, "owner-scoped Master Plan");
+  const projection = row(context.checklist_projection, "master checklist projection");
+  if (
+    projection.version !== CHECKLIST_PROJECTION_VERSION ||
+    projection.authority !== "read-only-evidence-projection" ||
+    projection.writer_authority !== false ||
+    projection.promotion_authority !== false
+  ) {
+    throw new Error("The Master Checklist projection authority is invalid.");
+  }
+  const checklist = row(projection.exact_checklist, "exact checklist projection");
+  if (!Array.isArray(checklist.items)) {
+    throw new Error("The exact checklist projection items are required.");
+  }
+  const planId = identifier(plan.id, "Master Plan id");
+  if (String(plan.filename || "") !== "code-labs/CODE-LABS-V1-PLAN.md") {
+    throw new Error("The exact Code Labs Master Plan file is required.");
+  }
+  const planHash = identifier(plan.current_hash, "Master Plan source hash").toLowerCase();
+  if (!/^[a-f0-9]{64}$/.test(planHash)) {
+    throw new Error("A canonical Master Plan source hash is required.");
+  }
+  if (
+    String(checklist.plan_record_id || "") !== planId ||
+    String(checklist.source_hash || "").toLowerCase() !== planHash
+  ) {
+    throw new Error("The Master Checklist projection is not bound to this Master Plan.");
+  }
+  const metadata = clone(plan.metadata || {});
+  metadata.exact_checklist = clone(checklist);
+
+  return {
+    effects: [
+      {
+        kind: "record_update",
+        key: "record",
+        record_type: "file",
+        record_id: planId,
+        expected_updated_at: timestamp(plan.updated_at, "Master Plan updated_at"),
+        patch: { metadata },
+      },
+      receiptEffect({
+        recordType: "file",
+        recordId: planId,
+        changedFields: ["metadata"],
+        undoAvailable: true,
+      }),
+    ],
+    response: response("checklist.persist_projection"),
+  };
+}
+
 function selectionPayload(action, args) {
   return {
     effects: [
@@ -381,6 +436,7 @@ export async function buildAtomicWorkspacePayload(actionValue, argsValue, contex
     return await candidatePayload(action, args, context, now);
   }
   if (action === "candidate.accept") return candidateAcceptPayload(args, context, now);
+  if (action === "checklist.persist_projection") return checklistProjectionPayload(context);
   if (action === "checkpoint.create") return checkpointPayload(args);
   if (action === "file.intake") return fileIntakePayload(args, context);
   if (action === "undo.execute") return undoPayload(args, context);

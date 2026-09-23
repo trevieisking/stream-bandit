@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import "./checklist-persistence.contract.test.mjs";
 import {
   ATOMIC_ACTION_COVERAGE,
   buildAtomicWorkspacePayload,

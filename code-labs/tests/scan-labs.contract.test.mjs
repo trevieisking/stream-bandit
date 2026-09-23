@@ -74,3 +74,26 @@ test('Buddy Tools exposes Scan Labs without changing canonical workflow navigati
   excludes(buddy, "id:'scan-labs'", 'No private route registry');
   excludes(buddy, 'var ROUTES=', 'No duplicate canonical routes');
 });
+
+test('Master Checklist consumes only the bounded read-only evidence projection and preserves manual fallback', async () => {
+  const checklist = await read('code-labs/assets/code-labs-checklist-builder.js');
+  includes(checklist, "var VERSION='V2.1-master-checklist-projection-consumer'", 'Checklist projection consumer version');
+  includes(checklist, "var PROJECTION_VERSION='V1-master-checklist-evidence-projection'", 'Projection schema version');
+  includes(checklist, "projection.authority==='read-only-evidence-projection'", 'Read-only authority gate');
+  includes(checklist, 'projection.writer_authority===false', 'Writer authority denial');
+  includes(checklist, 'projection.promotion_authority===false', 'Promotion authority denial');
+  includes(checklist, 'Array.isArray(projection.exact_checklist.items)', 'Exact checklist shape gate');
+  includes(checklist, "var PROJECTION_EVENT='code-labs-master-checklist-projection'", 'Projection event');
+  includes(checklist, "var PROJECTION_REQUEST_EVENT='code-labs-master-checklist-projection-request'", 'One-shot projection request event');
+  includes(checklist, 'hydrateProjection:hydrateProjection', 'Bounded hydration API');
+  includes(checklist, "q('#clLoadExactChecklist').onclick=loadCanonical", 'Manual JSON fallback remains');
+  includes(checklist, 'installProjectionListener();', 'Event consumer installation');
+  includes(checklist, 'requestProjection();', 'One bounded projection request');
+  const hydrate = checklist.match(/function hydrateProjection\(value\)\{([\s\S]*?)\n\}/);
+  assert.ok(hydrate, 'Hydration function must remain inspectable.');
+  excludes(hydrate[1], 'save();', 'Projection hydration must not persist browser state automatically');
+  excludes(hydrate[1], '.checked=', 'Projection hydration must not auto-approve manual checkboxes');
+  for (const forbidden of ['fetch(', '.from(', 'functions.invoke(', 'CodeLabsBackendWriteQueue', 'github.writer_prepare', 'setInterval(', 'MutationObserver']) {
+    excludes(checklist, forbidden, 'Checklist browser authority boundary');
+  }
+});
