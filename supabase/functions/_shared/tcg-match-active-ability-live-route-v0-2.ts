@@ -124,6 +124,9 @@ export function runtimeV02BeginActiveAbilityLiveRoute<
     choiceId,
   );
   if (paidAttachment) {
+    if (paidAttachment.status !== "player_choice_required") {
+      throw new Error("tcg_v0_2_paid_attachment_begin_status_invalid");
+    }
     return {
       kind: "private_choice",
       choice: paidAttachment.pending_choice,
