@@ -1112,10 +1112,26 @@
 - [x] Freeze surface split to **4 active Ability / 2 triggered Ability / 1 Tactic**.
 - [x] Freeze source grammars to hand selection / discard selection / prior SELECT_CARDS refs.
 - [x] Freeze attachment-state families to permanent/default / temporary / borrowed.
-- [ ] Audit all seven against Essence Attachment owner #22 and current listener/resume boundaries.
-- [ ] Preserve every already-working attachment route unchanged.
-- [ ] Repair only proven all-surface parity gaps generically.
-- [ ] Prove all seven frozen consumers.
-- [ ] Move `ATTACH_ESSENCE_FROM_ZONE` partial -> implemented only after all seven are green.
+- [x] Audit all seven against Essence Attachment owner #22 and current listener/resume boundaries.
+- [x] Preserve every already-working attachment route unchanged.
+- [x] Repair only proven all-surface parity gaps generically.
+- [x] Prove all seven frozen consumers.
+- [x] Move `ATTACH_ESSENCE_FROM_ZONE` partial -> implemented only after all seven are green.
 - [ ] Refresh release-control/capability evidence and exact-head validation.
+
+### V2.4.100 audit result
+- [x] Six existing routes remain unchanged: Magmagecko / Surgefin / Living Circuit / Arcprowler / Coilclank / Quickcharge Cell.
+- [x] The sole proven parity gap was Dynamozer's paid self-attachment owner missing from the live active-Ability router / Match continuation.
+- [x] Dynamozer now uses the generic paid cost -> discard Essence choice -> owner #22 attachment route.
+- [x] Existing Event / Movement / Heal continuation is reused after attachment.
+- [x] Paid attachment route and Match orchestration contain no Dynamozer/card-name dispatch.
+- [x] Temporary/borrowed attachment-state normalization and controller-Aftermath cleanup remain shared ownership.
+- [x] All-seven invariant coverage is green.
+- [x] Card Pass **#1576 SUCCESS** on exact source/runtime + release-control head `d0d37294f7cd9e81196691d6e91bf117923862de`.
+- [x] Match closure = **118** / `ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1`.
+- [x] Tactic closure = **53** / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`.
+- [x] `ATTACH_ESSENCE_FROM_ZONE` moved partial -> implemented; capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`.
+- [x] Preserve owner-family count **40**; no owner #41.
+- [x] Leave Supabase production, main and live promotion untouched.
+- [ ] Final synchronized capability/control exact-head Card Pass is green and recorded.
 
