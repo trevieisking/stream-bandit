@@ -198,8 +198,9 @@ function sourceTop(
   controllerSeat: Seat,
 ): Inst {
   const creature = sourceCreature(state, controllerSeat);
+  const stack = creature.stack as unknown[];
   return inst(
-    (creature.stack as unknown[])[creature.stack.length - 1],
+    stack[stack.length - 1],
     "tcg_v0_2_search_attachment_source_top_invalid",
   );
 }
