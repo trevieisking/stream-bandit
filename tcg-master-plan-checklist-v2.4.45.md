@@ -1144,3 +1144,21 @@
 - [x] Owner-family count remains 40.
 - [x] Production/main/live unchanged; promotion HOLD pending remaining Release 1 singleton operation debt.
 
+## V2.4.101 — ATTACH_ESSENCE_FROM_SELECTION singleton closeout
+- [x] Freeze current Release 1 inventory to exactly **1** consumer: Prismatic Founder / Bandit's Current.
+- [x] Freeze sequence to `SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK`.
+- [x] Freeze search to optional 0..1 Basic Essence with a new attached element, public reveal, hidden failure allowed.
+- [x] Freeze effect-owned selection as logical bound provenance, not a physical card zone.
+- [x] Confirm current live active-Ability router has no execution family for the frozen sequence.
+- [x] Keep physical attachment with Essence Attachment owner #22.
+- [x] Keep final deck randomization with the existing Randomization engine.
+- [ ] Add only the bounded operation-shaped active-Ability family required by the frozen sequence.
+- [ ] Revalidate source, turn, selected deck card and dynamic element eligibility before mutation.
+- [ ] Preserve legal zero-selection -> shuffle path.
+- [ ] Wait for attachment listener continuation before shuffle when a card is attached.
+- [ ] Prove no Founder/card-ID/name dispatch and no new owner family.
+- [ ] Prove the single frozen consumer end-to-end through the live Match choice path.
+- [ ] Move `ATTACH_ESSENCE_FROM_SELECTION` missing -> implemented only after the consumer is green.
+- [ ] Refresh capability/release-control evidence and exact-head validation.
+- [ ] Leave production/main/live unchanged until Release 1 closeout permits promotion.
+
