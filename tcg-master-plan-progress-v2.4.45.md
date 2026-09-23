@@ -3271,3 +3271,57 @@ V2.4.101 is complete. Production, main and live remain unchanged. Promotion rema
 
 Read-only inventory selects the next used missing operation deterministically: `MOVE_ZONE_POSITION`, with exactly one Release 1 consumer — Astral Celestial Observatory.
 
+## V2.4.102 — MOVE_ZONE_POSITION singleton closeout (freeze)
+
+Fresh Release 1 inventory contains exactly **1** current use of `MOVE_ZONE_POSITION`:
+- Astral / Celestial Observatory — Realm listener `celestial-observatory-topshift`.
+
+Frozen listener:
+- event = `hidden_information_viewed`;
+- `controller_scope = any`;
+- requirement = `event_zone_is(deck_top)`;
+- limit = once per turn, owner `event_controller`;
+- player consent = existing generic Event Listener `OPTIONAL`;
+- acting player = `$event_controller`;
+- accepted operation = move exactly 1 card in that player's `deck` from `top` to `bottom`;
+- visibility = `no_additional_reveal`.
+
+### Upstream trigger audit — shared owner debt exposed by this singleton
+The source/runtime audit proves `MOVE_ZONE_POSITION` is not the only missing seam required to make the frozen consumer live.
+
+There are exactly **5 Astral `hidden_information_viewed` listeners** in the accepted structured set:
+1. Orbitortoise / Forecast Shell — Shield;
+2. Prismowl / Wide Eyes — draw then discard;
+3. Starwhale / Star Current — withdrawal modifier;
+4. Celestial Observatory / Observatory Topshift — optional top-to-bottom deck reorder;
+5. Dreamglass / Foresight Heal — heal after Ability/Attack hidden-information views.
+
+Their nested operations are already owned by existing systems except Observatory's still-missing `MOVE_ZONE_POSITION`. The shared trigger bridge itself is absent: Hidden Information owner #33 records private view metadata, but those views are not emitted into the generic Event Listener runtime.
+
+V2.4.102 therefore includes the minimum generic trigger parity needed by the frozen consumer and the already-declared hidden-information listener family:
+- Hidden Information owner #33 must remain the canonical owner of view occurrence and private metadata;
+- each actual view occurrence must have canonical event identity, controller seat, viewed zone and source action metadata sufficient for Event Listener predicates/history;
+- `event_zone_is` must evaluate the canonical viewed zone;
+- `$event_controller` must resolve only from the current Event Listener event context;
+- existing Event Listener `OPTIONAL` and `event_controller` turn-limit ownership remain unchanged;
+- hidden-view listener execution must preserve the source action's pending private choice/continuation and resolve listener choices first without exposing hidden card identity;
+- Match and Tactic live routes must both project/resume the same Event Listener choice contract;
+- Dreamglass's emitted Heal Packet must still pass through the canonical Heal Listener continuation;
+- no card ID/name dispatch may be introduced.
+
+### MOVE_ZONE_POSITION ownership
+Card-Zone owner #30 already exposes `runtimeV02ApplyCardZoneReorder`, the canonical same-zone exact-instance reorder primitive. V2.4.102 must delegate physical deck mutation to that owner.
+
+The Event Listener interpreter may own only operation validation / event-context binding:
+- player token = `$event_controller`;
+- zone = `deck`;
+- from = `top`;
+- to = `bottom`;
+- count = 1;
+- visibility = `no_additional_reveal`.
+
+At resolution, the exact **current** top card UID must be bound and passed to Card-Zone #30. The operation must not inspect/reveal the card, clone it, move any previously viewed stale UID, or fabricate a new zone.
+
+### Safety boundary
+This is a shared systems repair, not an Observatory special case. No production/main/live promotion occurs in V2.4.102. Owner-family count must remain **40**; no owner #41.
+
