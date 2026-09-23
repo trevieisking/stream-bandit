@@ -234,21 +234,48 @@ async function prepareFileIntakeContext(
   if (!/^[a-f0-9]{40}$/i.test(commitSha)) {
     throw new Error("GitHub did not return immutable source provenance.");
   }
-  const source = await githubRequest(
-    repoPath + "/contents/" + path.split("/").map(encodeURIComponent).join("/") +
-      "?ref=" + encodeURIComponent(commitSha),
-    authority.token,
-  );
-  if (
-    !source || source.type !== "file" || source.encoding !== "base64" ||
-    typeof source.content !== "string"
-  ) {
-    throw new Error("GitHub did not return one readable File Lab source file.");
+  const intakeAction = String(input.action || "change").trim().toLowerCase();
+  const addRequested = intakeAction === "add" || intakeAction === "create";
+  if (!["change", "add", "create"].includes(intakeAction)) {
+    throw new Error("File Lab intake requires a change or add action.");
   }
-  const code = decodeBase64(source.content);
-  const size = new TextEncoder().encode(code).length;
-  if (!code || size > 750000) {
-    throw new Error("The File Lab source must be non-empty and under 750000 bytes.");
+
+  let source: Row | null = null;
+  let sourceAbsent = false;
+  try {
+    source = await githubRequest(
+      repoPath + "/contents/" + path.split("/").map(encodeURIComponent).join("/") +
+        "?ref=" + encodeURIComponent(commitSha),
+      authority.token,
+    );
+  } catch (error) {
+    const message = String((error as Error)?.message || error || "");
+    if (!addRequested || !/404|not found/i.test(message)) throw error;
+    sourceAbsent = true;
+  }
+
+  let code = "";
+  if (sourceAbsent) {
+    code = String(input.content ?? input.current_code ?? "");
+    const size = new TextEncoder().encode(code).length;
+    if (!code.trim() || size > 180000) {
+      throw new Error("File Lab add intake requires one complete file under 180000 bytes.");
+    }
+  } else {
+    if (addRequested) {
+      throw new Error("File Lab add intake requires the target path to be absent at the immutable source commit.");
+    }
+    if (
+      !source || source.type !== "file" || source.encoding !== "base64" ||
+      typeof source.content !== "string"
+    ) {
+      throw new Error("GitHub did not return one readable File Lab source file.");
+    }
+    code = decodeBase64(source.content);
+    const size = new TextEncoder().encode(code).length;
+    if (!code || size > 750000) {
+      throw new Error("The File Lab source must be non-empty and under 750000 bytes.");
+    }
   }
 
   const matches = await rest(
@@ -267,6 +294,9 @@ async function prepareFileIntakeContext(
   }
 
   const existing = matches[0] || null;
+  if (sourceAbsent && existing) {
+    throw new Error("File Lab add intake already has a staged row for this exact path.");
+  }
   const intakeAt = nowIso();
   return {
     ...context,
@@ -285,7 +315,9 @@ async function prepareFileIntakeContext(
         source_repo: repo,
         source_ref: requestedRef,
         source_path: path,
-        source_blob_sha: String(source.sha || ""),
+        source_blob_sha: sourceAbsent ? null : String(source?.sha || ""),
+        source_absent: sourceAbsent,
+        source_action: sourceAbsent ? "add" : "change",
         source_commit_sha: commitSha,
         verified_owner_repository: true,
         intake_at: intakeAt,
