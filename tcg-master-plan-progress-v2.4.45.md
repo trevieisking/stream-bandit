@@ -3248,3 +3248,26 @@ Capability blob:
 
 Production, main and live remain unchanged. Promotion remains **HOLD** while this synchronized capability/control + plan/checklist/ledger head receives fresh exact-head validation and the remaining singleton Release 1 operation debt is closed.
 
+## V2.4.101 — FINAL ACCEPTANCE
+
+The synchronized capability/control + plan/checklist/ledger checkpoint is green.
+
+- synchronized head `220f9875884ff08e169980c8a72ca17950b9c8ef`;
+- Card Pass **#1600 SUCCESS**;
+- Set One structure / starter / effect-grammar / release-control validation **SUCCESS**;
+- deterministic v0.2 runtime **SUCCESS**;
+- Match dispatcher and dependency type-check **SUCCESS**;
+- Tactic interpreter type-check **SUCCESS**;
+- Private Alpha setup API type-check **SUCCESS**;
+- structured withdrawal / attack-damage / Surge type-checks **SUCCESS**;
+- Match closure **119** / `96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d`;
+- Tactic closure **53** / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`;
+- capability blob `bca64acae1cb4cb7370e4b8fd2a03bedfa7f8a8f`;
+- `ATTACH_ESSENCE_FROM_SELECTION` = **implemented**;
+- frozen Release 1 consumer = **1 / 1 covered**;
+- owner-family count = **40**.
+
+V2.4.101 is complete. Production, main and live remain unchanged. Promotion remains **HOLD** because Release 1 still contains unresolved singleton operation debt.
+
+Read-only inventory selects the next used missing operation deterministically: `MOVE_ZONE_POSITION`, with exactly one Release 1 consumer — Astral Celestial Observatory.
+
