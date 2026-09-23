@@ -3134,3 +3134,22 @@ Owner-family count remains **40**; no owner #41.
 
 Production, main and live remain unchanged. Promotion remains **HOLD** while the synchronized plan/checklist/ledger capability-control head completes fresh exact-head validation and the remaining singleton Release 1 operation debt is closed.
 
+## V2.4.100 — FINAL ACCEPTANCE
+
+The synchronized capability/control checkpoint is green.
+
+- synchronized head `6fa819d30ddb952b437b7b77318dfe2d0feb11fe`;
+- Card Pass **#1581 SUCCESS**;
+- Set One structure / starter / effect-grammar / release-control validation **SUCCESS**;
+- deterministic v0.2 runtime **SUCCESS**;
+- Match dispatcher and dependency type-check **SUCCESS**;
+- Tactic interpreter type-check **SUCCESS**;
+- Private Alpha setup API type-check **SUCCESS**;
+- structured withdrawal / attack-damage / Surge type-checks **SUCCESS**;
+- capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`;
+- `ATTACH_ESSENCE_FROM_ZONE` = **implemented**;
+- frozen Release 1 attachment consumers = **7 / 7 covered**;
+- owner-family count = **40**.
+
+V2.4.100 is complete. Production, main and live remain unchanged. Promotion remains **HOLD** because Release 1 still contains unresolved singleton operation debt; the next target must be selected from the remaining frozen missing-operation inventory rather than by card preference.
+
