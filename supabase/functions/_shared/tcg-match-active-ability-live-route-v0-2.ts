@@ -17,6 +17,9 @@ import {
 } from "./tcg-match-active-ability-immediate-live-v0-2.ts";
 import type { RuntimeV02ActiveAbilityProgramSource, RuntimeV02ActiveAbilityProgramState } from "./tcg-match-active-ability-program-v0-2.ts";
 import {
+  runtimeV02BeginPaidSelfAttachmentActiveAbilityLiveRoute,
+} from "./tcg-match-active-ability-paid-attachment-v0-2.ts";
+import {
   runtimeV02BeginTargetedDrainActiveAbilityLiveRoute,
   type RuntimeV02TargetedDrainActiveAbilityLiveBegin,
 } from "./tcg-match-active-ability-targeted-drain-live-v0-2.ts";
@@ -55,8 +58,10 @@ export type RuntimeV02ActiveAbilityLiveRouteResult<
  *    choice merely to fit an older dispatcher contract;
  * 2. the targeted-drain family gets its dedicated already-paid opposing-Creature
  *    choice boundary before the older generic private-choice facade is consulted;
- * 3. unrelated programs fall through to the already-live private-choice facade;
- * 4. completely unsupported families return null without mutation.
+ * 3. paid self-attachment performs effect preflight and canonical activation-cost
+ *    routing before entering the shared private-choice boundary;
+ * 4. unrelated programs fall through to the already-live private-choice facade;
+ * 5. completely unsupported families return null without mutation.
  *
  * A recognized family that is malformed fails inside its own owner rather than
  * falling through to a different family. The router owns no Ability semantics,
@@ -109,6 +114,20 @@ export function runtimeV02BeginActiveAbilityLiveRoute<
   );
   if (targetedDrain) {
     return { kind: "targeted_drain_choice", targeted_drain: targetedDrain };
+  }
+
+  const paidAttachment = runtimeV02BeginPaidSelfAttachmentActiveAbilityLiveRoute(
+    state,
+    controllerSeat,
+    source,
+    defeatDescribe,
+    choiceId,
+  );
+  if (paidAttachment) {
+    return {
+      kind: "private_choice",
+      choice: paidAttachment.pending_choice,
+    };
   }
 
   const choice = runtimeV02CreateActiveAbilityLiveChoice(
