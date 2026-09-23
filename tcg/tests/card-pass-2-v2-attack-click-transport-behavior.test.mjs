@@ -33,6 +33,11 @@ class FakeNode {
     this.dataset = {};
     this.textContent = '';
     this._innerHTML = '';
+    this.listeners = new Map();
+  }
+
+  addEventListener(type, listener) {
+    this.listeners.set(type, listener);
   }
 
   set innerHTML(value) {
@@ -213,8 +218,9 @@ test('rendered V2 card Attack click posts authoritative Attack payload and surfa
   );
 
   const status = harness.nodes.get('battleStatus');
-  assert.equal(status.textContent, 'stale_revision', 'nested authoritative rejection must remain visible to the player');
+  assert.equal(status.textContent, 'That action could not be completed. Try another legal move.', 'nested authoritative rejection must be player-readable');
   assert.equal(status.dataset.kind, 'error');
+  assert.equal(status.dataset.errorCode, 'stale_revision', 'raw rejection must remain available for diagnostics');
 
   const viewRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-private-alpha-api'));
   assert.equal(viewRequests.length, 2, 'failed Attack must re-sync authoritative match state once after the initial load');

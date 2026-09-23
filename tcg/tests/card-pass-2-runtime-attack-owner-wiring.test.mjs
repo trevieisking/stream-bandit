@@ -60,7 +60,7 @@ after(() => {
 
 const reservePermission = { controller: "opponent", zone: "reserve", card_family: "Creature", selection: "one" };
 
-function fixture({ structured = true, control = null, permissions = [], cardId = "test-creature" } = {}) {
+function fixture({ structured = true, control = null, permissions = [], cardId = "test-creature", legacyAttack = true, structuredEffect = false } = {}) {
   const creature = (uid) => ({
     stack: [{ uid, card_id: cardId }], essence: [], relic: null, damage: 0, shield: 0,
     conditions: { scorched: false, venomed: 0, control: null, modifier: null }, flags: {},
@@ -94,6 +94,12 @@ function fixture({ structured = true, control = null, permissions = [], cardId =
       },
     },
   };
+  if (!legacyAttack) delete state.card_index[cardId].definition.attack_1;
+  if (structuredEffect) {
+    state.card_index[cardId].definition_v0_2.creature.attacks[0].after_damage = [
+      { op: "APPLY_CONDITION", target: "$current_opponent_vanguard", condition: "Silenced" },
+    ];
+  }
   if (structured) state.runtime_registry_v0_2 = runtimeV02SnapshotMarker();
   state.players[1].vanguard.conditions.control = control;
   return state;
@@ -207,6 +213,21 @@ for (const structured of [true, false]) {
     assert.equal(result.commits.length, 0);
   });
 }
+
+test("structured: vanilla attack executes from registry with no legacy printed-English attack", async () => {
+  const result = await attack(fixture({ legacyAttack: false }));
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  assert.equal(result.commits[0].p_new_state.players[2].vanguard.damage, 20);
+  assert.equal(result.commits[0].p_event_type, "attack");
+});
+
+test("structured: effect-bearing attack still fails closed when legacy compatibility is absent", async () => {
+  const result = await attack(fixture({ legacyAttack: false, structuredEffect: true }));
+  assert.notEqual(result.status, 200);
+  assert.equal(result.body.error, "tcg_v0_2_attack_legacy_compatibility_required:test-strike");
+  assert.equal(result.commits.length, 0);
+});
 
 test("structured: a new card uses registry Reserve permissions without a card-name dispatcher", async () => {
   const result = await attack(fixture({ cardId: "future-series-test", permissions: [reservePermission] }), { target_reserve_index: 0 });

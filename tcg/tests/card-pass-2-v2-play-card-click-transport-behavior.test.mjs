@@ -48,9 +48,11 @@ class FakeNode {
     this.src = '';
     this.alt = '';
     this.className = '';
+    this.attributes = new Map();
   }
   addEventListener(type, listener) { this.listeners.set(type, listener); }
-  removeAttribute(name) { if (name === 'src') this.src = ''; }
+  setAttribute(name, value) { this.attributes.set(name, String(value)); }
+  removeAttribute(name) { if (name === 'src') this.src = ''; else this.attributes.delete(name); }
   async click() {
     const listener = this.listeners.get('click');
     assert.equal(typeof listener, 'function', this.id + ' must bind click');
@@ -137,11 +139,13 @@ function makeHarness() {
       if (selector === '[data-play-where]') {
         return [...nodes.values()].filter((node) => node.dataset && node.dataset.playWhere);
       }
+      if (selector === '[data-quit-confirm]') return [document.getElementById('quitConfirmAction')];
       return [];
     }
   };
 
   let domReady = null;
+  const windowListeners = new Map();
   const requests = [];
   const session = { access_token: 'test-token' };
   const client = {
@@ -162,6 +166,7 @@ function makeHarness() {
       createClient() { return client; }
     },
     addEventListener(type, listener) {
+      windowListeners.set(type, listener);
       if (type === 'DOMContentLoaded') domReady = listener;
     }
   };
@@ -181,6 +186,13 @@ function makeHarness() {
     }
 
     if (String(url).endsWith('/functions/v1/tcg-match-actions')) {
+      if (payload.action === 'concede') {
+        return {
+          ok: true,
+          status: 200,
+          async json() { return { ok: true, result: { ok: true, revision: 18 } }; }
+        };
+      }
       return {
         ok: true,
         status: 200,
@@ -218,6 +230,8 @@ function makeHarness() {
     document,
     nodes,
     requests,
+    window,
+    windowListeners,
     async boot() { await domReady(); }
   };
 }
@@ -252,9 +266,46 @@ test('play-phase Essence click then Vanguard click submits authoritative attach_
   );
 
   const status = harness.nodes.get('battleStatus');
-  assert.equal(status.textContent, 'stale_revision', 'authoritative rejection must remain visible after the attempted play');
+  assert.equal(status.textContent, 'That action could not be completed. Try another legal move.', 'server rejection should be player-readable');
   assert.equal(status.dataset.kind, 'error');
+  assert.equal(status.dataset.errorCode, 'stale_revision', 'raw server code must remain available for diagnostics');
 
   const viewRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-private-alpha-api'));
   assert.equal(viewRequests.length, 2, 'failed hand play must re-sync the authoritative match view');
+});
+
+
+test('confirmed Battle menu Quit sends one concede while ordinary load/unload never forfeits', async () => {
+  const harness = makeHarness();
+  await harness.boot();
+
+  const matchBeforeQuit = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-match-actions'));
+  assert.equal(matchBeforeQuit.length, 0, 'loading a battle must never concede');
+  assert.equal(harness.windowListeners.has('beforeunload'), false, 'Battle controller must not bind automatic forfeit to beforeunload');
+
+  const menuButton = harness.nodes.get('battleMenuButton');
+  const quitButton = harness.nodes.get('quitMatchButton');
+  const confirm = harness.nodes.get('quitMatchConfirm');
+  const confirmAction = harness.nodes.get('quitConfirmAction');
+
+  await menuButton.click();
+  assert.equal(harness.nodes.get('battleMenu').hidden, false, 'cog must open Battle menu');
+  await quitButton.click();
+  assert.equal(confirm.hidden, false, 'Quit Match must require explicit confirmation');
+  await confirmAction.click();
+
+  const concedeRequests = harness.requests.filter(
+    (entry) => entry.url.endsWith('/functions/v1/tcg-match-actions') && entry.payload.action === 'concede'
+  );
+  assert.equal(concedeRequests.length, 1, 'confirmed Quit must submit exactly one concede command');
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(concedeRequests[0].payload)),
+    {
+      action: 'concede',
+      match_id: 'match-play-bind-proof',
+      client_nonce: 'nonce-1',
+      expected_revision: 17
+    }
+  );
+  assert.equal(harness.window.location.href, 'tcg-play.html', 'successful concede must return quitter to Play/matchmaking');
 });
