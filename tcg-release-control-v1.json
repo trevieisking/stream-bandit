@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "687d5170f555e0ae7542faece69ee0f5d95c455a",
-        "file_count": 117,
-        "closure_sha256": "2619d14397ca69b0f39875e5e0a923c53f71eeed6e432e2e46ef9237c403c100",
+        "entrypoint_git_blob_sha": "6ea567eb8eff74991897b757dda86e3678a6579b",
+        "file_count": 118,
+        "closure_sha256": "ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -146,15 +146,19 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-route-v0-2.ts",
-            "git_blob_sha": "9a9accf5d9c3be27c7a97046e7651ac5217da14d"
+            "git_blob_sha": "d55550edb11d123db6f3204bbd661507de3074cd"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
-            "git_blob_sha": "fa28f756f5ef0c30555b179c790d40e0d275cfca"
+            "git_blob_sha": "0516147217fa659d85ded7787d19ef81bab524d5"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-opponent-creature-choice-v0-2.ts",
             "git_blob_sha": "41d4dfd8217255357c0e1f6605cbb4e88c54def6"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-active-ability-paid-attachment-v0-2.ts",
+            "git_blob_sha": "6dd8d6fc6c6410fbf0ba714abaa593a102ea9c19"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-program-v0-2.ts",
@@ -558,7 +562,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "687d5170f555e0ae7542faece69ee0f5d95c455a"
+            "git_blob_sha": "6ea567eb8eff74991897b757dda86e3678a6579b"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
