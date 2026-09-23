@@ -3181,3 +3181,70 @@ V2.4.101 therefore requires one bounded, operation-shaped active-Ability composi
 
 Because the preceding `SEARCH_DECK` is already classified implemented but lacks this active-Ability surface, V2.4.101 may repair that dependent surface only as required to make the frozen ATTACH_ESSENCE_FROM_SELECTION consumer executable. It must not broaden into a generic catch-all Ability interpreter.
 
+## V2.4.101 — IMPLEMENTATION ACCEPTANCE
+
+The frozen Prismatic Founder singleton is now executable through the live active-Ability path without adding card-specific authority.
+
+### Bounded owner-#31 active-Ability composition
+The new `tcg-match-active-ability-search-attachment-v0-2.ts` module is a **submodule of existing owner #31 — Card Search / Filter / Inspection**, not a new owner family.
+
+It owns only the frozen search/private-choice composition:
+`SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK`.
+
+The route:
+- recognizes the exact operation shape rather than Founder/card IDs or names;
+- requires the source to remain the current friendly Vanguard;
+- consumes the ordinary once-per-turn active-Ability receipt;
+- records the private deck view through Hidden Information owner #33;
+- projects only eligible Basic Essence choices to the controller;
+- excludes elements already attached to the source Creature;
+- revalidates turn, active seat, source identity, definition, receipt, chosen deck-card identity and dynamic element eligibility before mutation;
+- treats `effect_owned_selection` as logical selection provenance only;
+- leaves the selected card physically in deck until canonical attachment;
+- supports the legal zero-selection branch and still shuffles;
+- contains no card-ID/name dispatch.
+
+### Canonical downstream ownership
+Physical deck -> Creature attachment remains **Essence Attachment owner #22** through `runtimeV02BeginExternalEssenceAttachmentRoute(..., "deck", ...)`.
+
+Post-attachment Event / Movement / Heal processing remains the existing active-Ability continuation pipeline. The search family installs `search_selection_attachment_after_attachment`; only after those listeners finish does the shared Randomization engine shuffle the remaining deck.
+
+No fake `effect_owned_selection` physical zone was introduced. No owner #41 was created. Owner-family count remains **40**.
+
+### Runtime / wiring proof
+New deterministic runtime coverage proves:
+- private controller search view / opponent waiting view;
+- dynamic exclusion of already-attached Essence elements;
+- true deck provenance before attachment;
+- owner #22 physical attachment;
+- zero-selection -> shuffle without attachment;
+- stale dynamic eligibility rejection before mutation;
+- post-attachment shuffle continuation.
+
+Static wiring proof freezes:
+- exactly one Release 1 consumer — Prismatic Founder / `bandits-current`;
+- exact `SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK` shape;
+- no Founder/card-name authority in owner, live facade, continuation or Match;
+- shared Match attachment-listener continuation;
+- count-shaped public activation receipts with no searched-card identity leakage.
+
+### Source/runtime + release-control acceptance
+- exact source/runtime head: `8cadb7ce31e98548c868aa1817fe2ab59f5abcac`;
+- Card Pass **#1595 SUCCESS**;
+- Set One structure / starter / effect-grammar validation **SUCCESS**;
+- deterministic v0.2 runtime **SUCCESS**;
+- Match dispatcher/dependency type-check **SUCCESS**;
+- Tactic interpreter type-check **SUCCESS**;
+- Private Alpha setup API type-check **SUCCESS**;
+- structured withdrawal / attack-damage / Surge type-checks **SUCCESS**;
+- Match closure **119** / `96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d`;
+- Tactic closure **53** / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`.
+
+### Capability reclassification
+`ATTACH_ESSENCE_FROM_SELECTION` is now **implemented** for the frozen Release 1 grammar.
+
+Capability blob:
+`bca64acae1cb4cb7370e4b8fd2a03bedfa7f8a8f`.
+
+Production, main and live remain unchanged. Promotion remains **HOLD** while this synchronized capability/control + plan/checklist/ledger head receives fresh exact-head validation and the remaining singleton Release 1 operation debt is closed.
+
