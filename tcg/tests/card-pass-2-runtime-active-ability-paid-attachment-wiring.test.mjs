@@ -91,7 +91,7 @@ test('paid attachment activation receipt stays selection-shaped and does not exp
   const playCreature = match.indexOf('if(action==="play_creature")', useStart);
   assert.ok(useStart >= 0 && playCreature > useStart, 'use_ability block missing');
   const block = match.slice(useStart, playCreature);
-  assert.ok(block.includes('pending.kind==="plan_own_deck_top"||pending.kind==="paid_self_attachment"'));
+  assert.ok(block.includes('pending.kind==="paid_self_attachment"?{card_selection_min:pending.min,card_selection_max:pending.max}'));
   assert.ok(block.includes('card_selection_min:pending.min'));
   assert.ok(block.includes('card_selection_max:pending.max'));
   for (const secret of ['pending.options', 'pending.source_uid', 'pending.source_card_id', 'pending.cost_filters', 'pending.essence_filters']) {
