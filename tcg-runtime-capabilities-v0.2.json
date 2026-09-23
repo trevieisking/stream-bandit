@@ -27,6 +27,7 @@
       "CHOOSE_PLAYER",
       "CLEAR_CONDITION",
       "CLEAR_CONDITION_IF_PRESENT",
+      "DIRECT_DAMAGE",
       "DISCARD_ATTACHED_ESSENCE",
       "DISCARD_DECK_TOP",
       "DISCARD_HAND",
@@ -74,7 +75,6 @@
       "DEAL_EFFECT_DAMAGE",
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
-      "DIRECT_DAMAGE",
       "MOVE_DAMAGE",
       "MOVE_ZONE_POSITION",
       "PERFORM_VOLUNTARY_WITHDRAWAL",
@@ -1106,6 +1106,106 @@
         }
       },
       "note": "All ten frozen Release 1 CHOOSE_FROM_SET nodes are covered across preserved Event Listener / Noctivane / Dream Ray / Seer Nyx specialists plus the repaired Tactic families and generic active deck-planning family. Owner #31 owns choice semantics only; owner #30 owns physical deck mutation. No owner #41."
+    },
+    "release1_direct_damage_all_surface_v2_4_99": {
+      "accepted_head": "27b3cb2b5a041fae1bc8e7c389d7319cb55ff121",
+      "card_pass_run": 1558,
+      "operation": "DIRECT_DAMAGE",
+      "frozen_consumers": [
+        {
+          "card_id": "ember-bristleflare",
+          "surface": "triggered Ability / Event Listener",
+          "shape": "self 10 effect"
+        },
+        {
+          "card_id": "ember-magmagedcko",
+          "surface": "active Ability",
+          "shape": "selected friendly Ember Creature 10 effect"
+        },
+        {
+          "card_id": "ember-pyrohorn-ash-crown",
+          "surface": "Attack modifier-consume rider",
+          "shape": "modifier target 20 effect"
+        },
+        {
+          "card_id": "ember-bristleflare",
+          "surface": "Attack after_damage",
+          "attack_id": "reckless-rush",
+          "shape": "source Creature 10 recoil"
+        },
+        {
+          "card_id": "ember-furnacefang",
+          "surface": "Attack after_damage",
+          "attack_id": "meltline-charge",
+          "shape": "source Creature 20 recoil"
+        },
+        {
+          "card_id": "ember-ashen-gamble",
+          "surface": "Tactic",
+          "shape": "selected friendly Ember Creature 20 effect"
+        },
+        {
+          "card_id": "ember-volcanic-caldera",
+          "surface": "triggered Tactic / Event Listener",
+          "shape": "moved-to-reserve subject 10 effect"
+        },
+        {
+          "card_id": "grove-thorn-crown",
+          "surface": "triggered Tactic / Event Listener",
+          "shape": "damage-packet source Creature 10 effect"
+        }
+      ],
+      "owners": {
+        "direct_damage": "supabase/functions/_shared/tcg-match-direct-damage-v0-2.ts",
+        "damage_packet": "supabase/functions/_shared/tcg-match-damage-packet-v0-2.ts",
+        "damage_engine": "supabase/functions/_shared/tcg-match-damage-engine-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "attack_recoil": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
+        "attack_modifier_rider": "supabase/functions/tcg-match-actions/index.ts",
+        "active_ability": "supabase/functions/_shared/tcg-match-active-ability-hand-attachment-damage-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "defeat": "supabase/functions/_shared/tcg-match-defeat-engine-v0-2.ts"
+      },
+      "semantics": {
+        "damage_classes": [
+          "effect",
+          "recoil"
+        ],
+        "amounts": [
+          10,
+          20
+        ],
+        "packet_protection": true,
+        "before_damage_packet_listener": true,
+        "after_damage_packet_listener": true,
+        "recoil_source_attack_binding": true,
+        "tactic_defeat_scan": true,
+        "tactic_reward_promotion_queue": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-direct-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener-direct-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-recoil-effects.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-hand-attachment-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-hand-attachment-damage-live.test.ts",
+        "tcg/tests/card-pass-2-active-ability-direct-damage.test.mjs",
+        "tcg/tests/card-pass-2-runtime-attack-recoil-wiring.test.mjs",
+        "tcg/tests/card-pass-2-runtime-attack-modifier-live-wiring.test.mjs",
+        "tcg/tests/card-pass-2-tactic-direct-damage-runtime.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 116,
+          "sha256": "383ab7bf0eefafb1a41a767cb5f41374d50e76922f03f4c0432ed786851a0c02"
+        },
+        "tactic_actions": {
+          "file_count": 53,
+          "sha256": "9698a8aa2aeb63d7d10b3e4aa224a90f0d27bc1d492f949c3bb28aaa6048409f"
+        }
+      },
+      "note": "All eight frozen Release 1 DIRECT_DAMAGE consumers now execute through canonical packet/protection/listener ownership. Tactic effect damage additionally routes canonical Defeat #34, Reward/promotion queue semantics, and returns to resolution when required. No owner #41."
     }
   }
 }

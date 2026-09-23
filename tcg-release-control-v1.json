@@ -39,7 +39,7 @@
   "source_fingerprints": {
     "capability_manifest": {
       "path": "tcg-runtime-capabilities-v0.2.json",
-      "git_blob_sha": "f6d4ba6118a60dc44d7b63794724295423f1b77e"
+      "git_blob_sha": "aa3d9e4d719d4cb2596abd1b811d7b8613453974"
     },
     "element_packages": {
       "path": "tcg-element-packages-v0.2.json",
