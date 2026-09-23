@@ -1092,3 +1092,15 @@ Founder's `SEARCH_DECK` leaves the chosen card physically in deck while binding 
 ## 374 — Founder requires a bounded active-Ability composition
 The current active-Ability router has no `SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK` family. V2.4.101 may add that exact operation-shaped composition, including the dependent active-Ability SEARCH_DECK surface required to reach the missing attachment opcode. Search/hidden-information ownership, attachment owner #22, listener continuation and Randomization ownership remain separate. No generic catch-all Ability interpreter and no card-ID dispatch.
 
+## 375 — V2.4.101 implements the Founder search-selection attachment family
+The sole frozen `ATTACH_ESSENCE_FROM_SELECTION` consumer is Prismatic Founder / Bandit's Current. A bounded active-Ability submodule of existing owner #31 now owns only the declared `SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK` composition. It is operation-shaped and contains no Founder/card-ID/name dispatch.
+
+## 376 — effect_owned_selection remains logical provenance
+Founder's selected Essence remains physically in the deck while the server binds the private selected identity. Before mutation the route revalidates current turn, active seat, source Vanguard identity, once-per-turn receipt, exact selected deck card and the dynamic rule that its element is not already attached. The selected card is then passed to Essence Attachment owner #22 with true physical origin `deck`; no fake effect-owned zone exists.
+
+## 377 — attachment listeners finish before Founder shuffles
+After owner #22 attaches the chosen Essence, the existing Event / Movement / Heal active-Ability continuation remains authoritative. Only after that nested listener pipeline completes does the shared Randomization engine shuffle the remaining deck. The legal zero-selection path skips attachment and shuffles immediately.
+
+## 378 — ATTACH_ESSENCE_FROM_SELECTION Release 1 parity is accepted at source/runtime
+Exact source/runtime + release-control head `8cadb7ce31e98548c868aa1817fe2ab59f5abcac` passed Card Pass #1595. Match closure is 119 / `96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d`; Tactic closure remains 53 / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`. The operation moved missing -> implemented at capability blob `bca64acae1cb4cb7370e4b8fd2a03bedfa7f8a8f`. Owner-family count remains 40. Production/main/live were not changed; final synchronized documentation/control exact-head validation remains required before V2.4.101 is fully closed.
+
