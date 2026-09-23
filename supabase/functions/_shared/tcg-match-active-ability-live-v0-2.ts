@@ -47,6 +47,10 @@ import {
   type RuntimeV02PendingActiveAbilitySupplyAttachmentChoice,
 } from "./tcg-match-active-ability-supply-attachment-v0-2.ts";
 import {
+  runtimeV02PendingPaidSelfAttachmentChoiceView,
+  type RuntimeV02PendingPaidSelfAttachmentChoice,
+} from "./tcg-match-active-ability-paid-attachment-v0-2.ts";
+import {
   runtimeV02CreateActiveAbilityHandAttachmentDamageChoice,
   runtimeV02PendingActiveAbilityHandAttachmentDamageChoiceView,
   runtimeV02ResolveActiveAbilityHandAttachmentDamageChoice,
@@ -88,6 +92,7 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilityEssenceRedistributionChoice
   | RuntimeV02PendingActiveAbilitySupplyChoice
   | RuntimeV02PendingActiveAbilitySupplyAttachmentChoice
+  | RuntimeV02PendingPaidSelfAttachmentChoice
   | RuntimeV02PendingActiveAbilityHandAttachmentDamageChoice
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityDeckPlanningChoice
@@ -319,6 +324,9 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   }
   if (choice.kind === "select_discard_essence_then_friendly_target") {
     return runtimeV02PendingActiveAbilitySupplyAttachmentChoiceView(choice, viewerSeat);
+  }
+  if (choice.kind === "paid_self_attachment") {
+    return runtimeV02PendingPaidSelfAttachmentChoiceView(choice, viewerSeat);
   }
   if (choice.kind === "select_target_then_hand_essence_direct_damage") {
     return runtimeV02PendingActiveAbilityHandAttachmentDamageChoiceView(
