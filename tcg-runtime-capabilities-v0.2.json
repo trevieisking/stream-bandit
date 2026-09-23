@@ -18,6 +18,7 @@
       "ADD_SHIELD",
       "ADD_SHIELD_EACH",
       "APPLY_CONDITION",
+      "ATTACH_ESSENCE_FROM_ZONE",
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
       "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
@@ -67,9 +68,7 @@
       "SHUFFLE_ZONE_INTO_DECK",
       "SWITCH_WITH_VANGUARD"
     ],
-    "partial": [
-      "ATTACH_ESSENCE_FROM_ZONE"
-    ],
+    "partial": [],
     "missing": [
       "ATTACH_ESSENCE_FROM_SELECTION",
       "DEAL_EFFECT_DAMAGE",
@@ -204,8 +203,7 @@
     ]
   },
   "known_legacy_equivalents": {
-    "SET_WITHDRAWAL_MODIFIER": "tcg-tactic-actions currently implements legacy SET_WITHDRAWAL_COST lifecycle storage; v0.2 parameter/semantic normalization remains",
-    "ATTACH_ESSENCE_FROM_ZONE": "existing runner is constrained to older source/parameter assumptions and does not yet accept every v0.2 selection variant"
+    "SET_WITHDRAWAL_MODIFIER": "tcg-tactic-actions currently implements legacy SET_WITHDRAWAL_COST lifecycle storage; v0.2 parameter/semantic normalization remains"
   },
   "known_legacy_predicate_equivalents": {},
   "attack_runtime_debt": {
@@ -1206,6 +1204,110 @@
         }
       },
       "note": "All eight frozen Release 1 DIRECT_DAMAGE consumers now execute through canonical packet/protection/listener ownership. Tactic effect damage additionally routes canonical Defeat #34, Reward/promotion queue semantics, and returns to resolution when required. No owner #41."
+    },
+    "release1_attach_essence_from_zone_all_surface_v2_4_100": {
+      "accepted_head": "d0d37294f7cd9e81196691d6e91bf117923862de",
+      "card_pass_run": 1576,
+      "operation": "ATTACH_ESSENCE_FROM_ZONE",
+      "frozen_use_count": 7,
+      "surface_counts": {
+        "active_ability": 4,
+        "triggered_ability_event_listener": 2,
+        "tactic_program": 1
+      },
+      "source_grammars": {
+        "inline_hand_selection": 2,
+        "inline_discard_selection": 2,
+        "prior_select_cards_ref": 3
+      },
+      "attachment_state_counts": {
+        "permanent_default": 3,
+        "temporary": 3,
+        "borrowed": 1
+      },
+      "frozen_consumers": [
+        {
+          "card_id": "ember-magmagecko",
+          "surface": "active Ability",
+          "source": "hand inline selection",
+          "attachment_state": "permanent/default"
+        },
+        {
+          "card_id": "tide-surgefin",
+          "surface": "active Ability",
+          "source": "discard prior SELECT_CARDS ref",
+          "attachment_state": "permanent/default"
+        },
+        {
+          "card_id": "volt-dynamozer",
+          "surface": "active Ability",
+          "source": "discard inline selection after Device discard cost",
+          "attachment_state": "temporary"
+        },
+        {
+          "card_id": "volt-stormcoil-living-circuit",
+          "surface": "active Ability",
+          "source": "discard prior SELECT_CARDS ref",
+          "attachment_state": "borrowed"
+        },
+        {
+          "card_id": "volt-arcprowler",
+          "surface": "triggered Ability / Event Listener",
+          "source": "hand inline selection",
+          "attachment_state": "permanent/default"
+        },
+        {
+          "card_id": "volt-coilclank",
+          "surface": "triggered Ability / Event Listener",
+          "source": "discard inline selection",
+          "attachment_state": "temporary"
+        },
+        {
+          "card_id": "volt-quickcharge-cell",
+          "surface": "Tactic",
+          "source": "discard prior SELECT_CARDS ref",
+          "attachment_state": "temporary"
+        }
+      ],
+      "owners": {
+        "essence_attachment": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
+        "attachment_route": "supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts",
+        "attachment_state": "supabase/functions/_shared/tcg-match-essence-attachment-state-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "active_ability_paid_attachment": "supabase/functions/_shared/tcg-match-active-ability-paid-attachment-v0-2.ts",
+        "active_ability_supply_attachment": "supabase/functions/_shared/tcg-match-active-ability-supply-attachment-v0-2.ts",
+        "active_ability_hand_attachment_damage": "supabase/functions/_shared/tcg-match-active-ability-hand-attachment-damage-v0-2.ts",
+        "active_ability_router": "supabase/functions/_shared/tcg-match-active-ability-live-route-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts"
+      },
+      "semantics": {
+        "physical_attachment_owner": 22,
+        "selection_ownership_preserved": true,
+        "event_movement_heal_continuations_preserved": true,
+        "temporary_borrowed_aftermath_cleanup_preserved": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-hand-attachment-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-supply-attachment.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-paid-attachment.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener-evolved.test.ts",
+        "tcg/tests/card-pass-2-tactic-select-cards-runtime.test.mjs",
+        "tcg/tests/card-pass-2-runtime-active-ability-paid-attachment-wiring.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 118,
+          "sha256": "ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1"
+        },
+        "tactic_actions": {
+          "file_count": 53,
+          "sha256": "ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e"
+        }
+      },
+      "note": "All seven frozen Release 1 ATTACH_ESSENCE_FROM_ZONE consumers are covered through existing selection owners and canonical Essence Attachment owner #22. Six routes were already canonical; V2.4.100 added only the missing generic paid self-attachment live route for Dynamozer and reused the existing Event/Movement/Heal continuation. No owner #41."
     }
   }
 }
