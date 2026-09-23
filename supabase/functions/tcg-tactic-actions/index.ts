@@ -19,6 +19,7 @@ import { runtimeV02InspectDeckTopEffectOwnedSet, runtimeV02InspectionProvenanceA
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import { runtimeV02ApplyDirectDamage, runtimeV02NormalizeDirectDamageStep } from "../_shared/tcg-match-direct-damage-v0-2.ts";
 import { runtimeV02BeginEventListenerContinuation } from "../_shared/tcg-match-event-listener-v0-2.ts";
+import { runtimeV02AdaptDefeatEventsForListener } from "../_shared/tcg-match-event-listener-defeat-event-v0-2.ts";
 import { runtimeV02PreflightDefeatScan, runtimeV02ScanAndQueueDefeats } from "../_shared/tcg-match-defeat-engine-v0-2.ts";
 import {
   evaluateRuntimeV02LegalCardAvailableRequirement,
@@ -155,8 +156,10 @@ function findCreature(state: any, ref: CreatureRef | null | undefined) {
   return null;
 }
 function tacticDefeatDescribe(state: any) {
-  return (creature: Cr) => {
-    const top = topInst(creature);
+  return (creature: { stack: Inst[] }) => {
+    const top = Array.isArray(creature.stack) && creature.stack.length
+      ? creature.stack[creature.stack.length - 1]
+      : null;
     if (!top) throw new Error("tcg_v0_2_tactic_defeat_top_required");
     const d = runtimeV02Definition(state, top);
     if (!d) throw new Error("tcg_v0_2_tactic_defeat_definition_required");
@@ -1875,7 +1878,10 @@ function executeUntilChoice(state: any) {
         if (defeat.defeat_events.length) {
           const defeatFlow = runtimeV02BeginEventListenerContinuation(
             state,
-            defeat.defeat_events,
+            runtimeV02AdaptDefeatEventsForListener(
+              state,
+              defeat.defeat_events,
+            ),
           );
           if (defeatFlow.status === "player_choice_required") {
             throw new Error("tcg_v0_2_tactic_direct_damage_defeat_event_choice_not_yet_supported");

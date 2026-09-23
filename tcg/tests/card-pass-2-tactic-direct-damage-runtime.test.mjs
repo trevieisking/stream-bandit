@@ -63,6 +63,7 @@ for (const marker of [
   'runtimeV02NormalizeDirectDamageStep(step)',
   'runtimeV02ApplyDirectDamage(',
   'runtimeV02BeginEventListenerContinuation(',
+  'runtimeV02AdaptDefeatEventsForListener(',
   'runtimeV02PreflightDefeatScan(state, describe)',
   'runtimeV02ScanAndQueueDefeats(',
   'state.phase = pendingResolution ? "resolution" : "play"',
