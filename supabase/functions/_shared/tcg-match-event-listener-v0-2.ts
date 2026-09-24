@@ -1031,6 +1031,17 @@ function requirementLeaf(
       return event.controller_seat === (candidate.seat === 1 ? 2 : 1);
     case "source_controller_is_self":
       return event.source_controller_seat === candidate.seat;
+    case "source_element_is": {
+      const sourceUid = String(event.source_creature_uid || "").trim();
+      if (!sourceUid) return false;
+      const source = fieldByUid(state, sourceUid);
+      if (!source) return false;
+      const element = requiredString(
+        value.element,
+        "tcg_v0_2_event_listener_source_element_required",
+      );
+      return String(source.def.element || "") === element;
+    }
     case "prevention_target_is_attached_creature":
       return !!candidate.field &&
         candidate.field.top.uid === event.subject_uid;

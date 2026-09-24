@@ -994,3 +994,93 @@ Deno.test("Event Listener subject filters resolve the current event subject defi
   equal(rejected.status, "complete");
   equal(rejected.processed_listener_keys.length, 0);
 });
+
+Deno.test("Orbit Ring source_element_is follows the attack source Creature element", () => {
+  const reserveDummy = creatureDefinition(
+    "astral-orbit-source-dummy",
+    "Orbit Source Dummy",
+    "Astral",
+    null,
+  );
+  const orbitRing = {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id: "astral-orbit-ring",
+    name: "Orbit Ring",
+    card_family: "Tactic",
+    element: "Astral",
+    creature: null,
+    essence: null,
+    tactic: {
+      subtype: "Relic",
+      program: { steps: [] },
+      continuous: [],
+      listeners: [{
+        id: "orbit-ring-after-attack",
+        event: "attack_finished",
+        requirements: {
+          all: [
+            { predicate: "source_is_attached_creature" },
+            { predicate: "source_controller_is_self" },
+            { predicate: "source_element_is", element: "Astral" },
+          ],
+        },
+        limit: null,
+        steps: [{
+          op: "SET_WITHDRAWAL_MODIFIER",
+          target: "$attached_creature",
+          mode: "delta",
+          amount: -1,
+          minimum: 0,
+          duration: { expires_on: ["end_of_turn"], max_uses: 1 },
+        }],
+      }],
+    },
+  };
+  const attackFinished = {
+    event_id: "attack-finished:7:1:orbit-proof",
+    event: "attack_finished",
+    subject_uid: "own-vanguard-uid",
+    controller_seat: 1 as const,
+    source_controller_seat: 1 as const,
+    origin_zone: "vanguard",
+    destination_zone: "vanguard",
+    destination_index: null,
+    phase: "attack_finished",
+    source_action_id: "orbit-proof-attack",
+    source_card_uid: "own-vanguard-uid",
+    action_kind: "attack",
+    turn_seq: 7,
+    attack_id: "orbit-proof-attack",
+    source_creature_uid: "own-vanguard-uid",
+  };
+
+  const matching = baseState(reserveDummy);
+  (matching.players as any)["1"].vanguard.relic =
+    instance("orbit-ring-uid", "astral-orbit-ring");
+  (matching.card_index as any)["astral-orbit-ring"] = {
+    definition_v0_2: orbitRing,
+  };
+  const matched = runtimeV02BeginEventListenerContinuation(
+    matching,
+    [attackFinished],
+  );
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+
+  const rejecting = baseState(reserveDummy);
+  (rejecting.players as any)["1"].vanguard.relic =
+    instance("orbit-ring-uid", "astral-orbit-ring");
+  (rejecting.card_index as any)["astral-orbit-ring"] = {
+    definition_v0_2: orbitRing,
+  };
+  (rejecting.card_index as any)["test-own-vanguard"].definition_v0_2.element =
+    "Gale";
+  const rejected = runtimeV02BeginEventListenerContinuation(
+    rejecting,
+    [attackFinished],
+  );
+  equal(rejected.status, "complete");
+  equal(rejected.processed_listener_keys.length, 0);
+});
+
