@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "561c033bc69af7cb8e39f8e3c03bd33e15c0fb57",
-        "file_count": 120,
-        "closure_sha256": "54ff3c4f6c51992dab5d4a0f94e0ad2489f05cc3030917325c1e6f5f841bd486",
+        "entrypoint_git_blob_sha": "a036a452a667e21bcb44513560f7fee3d651a3ca",
+        "file_count": 121,
+        "closure_sha256": "cac88f3fccbcb2d9c2632ee428180bc813125c641f511c2bc8bfa7d8414b77ba",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -150,7 +150,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
-            "git_blob_sha": "ce6457a92b42019daf67faef5282d50c728e2a21"
+            "git_blob_sha": "2d1b6af86fb169096e134f88de549bbb67f4db3f"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-opponent-creature-choice-v0-2.ts",
@@ -175,6 +175,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-selected-modifier-v0-2.ts",
             "git_blob_sha": "0fa31191d16eabf1efde4cc74907457d6cf7a485"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-active-ability-shield-transfer-v0-2.ts",
+            "git_blob_sha": "8d3a1238b5f191354a955c2dc39bd2ec68149572"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-supply-attachment-v0-2.ts",
@@ -570,7 +574,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "561c033bc69af7cb8e39f8e3c03bd33e15c0fb57"
+            "git_blob_sha": "a036a452a667e21bcb44513560f7fee3d651a3ca"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",

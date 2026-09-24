@@ -87,6 +87,14 @@ import {
   type RuntimeV02ActiveAbilitySelectedModifierResolution,
   type RuntimeV02PendingActiveAbilitySelectedModifierChoice,
 } from "./tcg-match-active-ability-selected-modifier-v0-2.ts";
+import {
+  runtimeV02CreateActiveAbilityShieldTransferChoice,
+  runtimeV02PendingActiveAbilityShieldTransferChoiceView,
+  runtimeV02ResolveActiveAbilityShieldTransferChoice,
+  structuredRuntimeActiveAbilityShieldTransfer,
+  type RuntimeV02ActiveAbilityShieldTransferResolution,
+  type RuntimeV02PendingActiveAbilityShieldTransferChoice,
+} from "./tcg-match-active-ability-shield-transfer-v0-2.ts";
 
 type RuntimeFieldWhere = "vanguard" | "reserve";
 
@@ -108,7 +116,8 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilityChoice
   | RuntimeV02PendingActiveAbilitySelectedHealChoice
   | RuntimeV02PendingActiveAbilitySelectedHealEachChoice
-  | RuntimeV02PendingActiveAbilitySelectedModifierChoice;
+  | RuntimeV02PendingActiveAbilitySelectedModifierChoice
+  | RuntimeV02PendingActiveAbilityShieldTransferChoice;
 
 export type RuntimeV02ActiveAbilityLiveResolution =
   | RuntimeV02ActiveAbilityEssenceRedistributionResolution
@@ -132,7 +141,8 @@ export type RuntimeV02ActiveAbilityLiveResolution =
     emitted_packet_ids: string[];
   }
   | RuntimeV02ActiveAbilitySelectedHealEachResolution
-  | RuntimeV02ActiveAbilitySelectedModifierResolution;
+  | RuntimeV02ActiveAbilitySelectedModifierResolution
+  | RuntimeV02ActiveAbilityShieldTransferResolution;
 
 /**
  * Creates one live active-Ability choice by delegating to exact family
@@ -321,6 +331,26 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
     return pending;
   }
 
+  const shieldTransferDescriptor = structuredRuntimeActiveAbilityShieldTransfer(
+    state,
+    instance,
+  );
+  if (shieldTransferDescriptor) {
+    const pending = runtimeV02CreateActiveAbilityShieldTransferChoice(
+      state,
+      controllerSeat,
+      shieldTransferDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      shieldTransferDescriptor.ability_id,
+    );
+    return pending;
+  }
+
   const selectedModifierDescriptor = structuredRuntimeActiveAbilitySelectedModifier(state, instance);
   if (!selectedModifierDescriptor) return null;
   const pending = runtimeV02BuildActiveAbilitySelectedModifierChoice(
@@ -391,6 +421,12 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   }
   if (choice.kind === "modify_one_friendly_creature") {
     return runtimeV02PendingActiveAbilitySelectedModifierChoiceView(choice, viewerSeat);
+  }
+  if (choice.kind === "transfer_shield_between_friendly_creatures") {
+    return runtimeV02PendingActiveAbilityShieldTransferChoiceView(
+      choice,
+      viewerSeat,
+    );
   }
   throw new Error("tcg_v0_2_active_ability_live_choice_kind_unsupported");
 }
@@ -512,6 +548,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   }
   if (choice.kind === "modify_one_friendly_creature") {
     return runtimeV02ResolveActiveAbilitySelectedModifierChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
+  if (choice.kind === "transfer_shield_between_friendly_creatures") {
+    return runtimeV02ResolveActiveAbilityShieldTransferChoice(
       choice,
       controllerSeat,
       choiceId,
