@@ -150,6 +150,7 @@
       "source_controller_is_self",
       "source_counter_at_least",
       "source_damaged",
+      "source_element_is",
       "source_has_relic",
       "source_has_shield_at_least",
       "source_is_attached_creature",
@@ -188,7 +189,6 @@
       "shield_actual_gain_at_least",
       "shield_source_is_card_effect",
       "shield_target_is_self",
-      "source_element_is",
       "source_has_condition",
       "source_in_play",
       "target_became_vanguard_this_turn",
@@ -1740,6 +1740,32 @@
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts",
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-source-state-requirements.test.ts"
       ]
+    },
+    "release1_source_element_is_v2_4_115": {
+      "accepted_runtime_head": "4d141b15f3393cd07048727457b2616fba0340f6",
+      "card_pass_run": 1678,
+      "predicate": "source_element_is",
+      "frozen_consumers": [
+        {
+          "card_id": "astral-orbit-ring",
+          "listener_id": "orbit-ring-after-attack",
+          "event": "attack_finished"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+      "semantics": {
+        "source_identity": "event.source_creature_uid resolves the current battlefield source Creature",
+        "source_element": "structured source Creature definition element",
+        "required_element": "Astral",
+        "missing_source_fails_closed": true,
+        "positive_and_negative_proof": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts"
+      ],
+      "note": "V2.4.115 closes the sole Release 1 source_element_is consumer. Orbit Ring remains on the generic attack_finished Event Listener route; source_is_attached_creature and source_controller_is_self remain existing generic predicates."
     }
   }
 }
