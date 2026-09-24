@@ -3325,3 +3325,28 @@ At resolution, the exact **current** top card UID must be bound and passed to Ca
 ### Safety boundary
 This is a shared systems repair, not an Observatory special case. No production/main/live promotion occurs in V2.4.102. Owner-family count must remain **40**; no owner #41.
 
+
+## V2.4.102 — freeze addendum: complete hidden-view trigger grammar
+
+Exact-head audit at `1e3a1254740830eb9ca5192f6b679715b7d4f08d` adds one required shared predicate seam to the V2.4.102 freeze.
+
+The accepted effect grammar explicitly declares all of:
+- predicate `event_zone_is`;
+- predicate `source_is_attached_creature`;
+- context variable `$event_controller`;
+- operation `MOVE_ZONE_POSITION(player, zone, from, to, count[, visibility])`.
+
+The current Event Listener runtime implements none of `event_zone_is`, `source_is_attached_creature` or `$event_controller`, and it has no `MOVE_ZONE_POSITION` branch. Hidden Information owner #33 records only de-duplicated turn metadata and does not currently emit actual per-occurrence listener events.
+
+This means V2.4.102 must preserve two distinct concepts:
+1. **history metadata** — the existing de-duplicated current-turn ledger used by current-turn checks; and
+2. **trigger occurrences** — one canonical event per actual hidden-information view, carrying no hidden card identity but carrying exact controller, viewed zone, action kind, source controller, source action, source card and source Creature context where applicable.
+
+The per-occurrence trigger record must not be de-duplicated merely because the history ledger already contains the same controller/zone pair. Listener limits and Event Listener receipts decide whether a later occurrence has gameplay effect.
+
+Dreamglass proves why source metadata is required: its accepted listener matches `source_is_attached_creature`, `source_controller_is_self`, and action kind Ability/Attack. For a hidden-view event, `source_is_attached_creature` therefore binds the event's source Creature UID to the Creature carrying the Relic. Tactic-only views have no source Creature and cannot satisfy that predicate.
+
+Card identities, inspected/search results, deck ordering and private choice options remain forbidden from the trigger event. The existing private-view owners remain authoritative for those values.
+
+Freeze checkpoint: Card Pass **#1604 SUCCESS** on `1e3a1254740830eb9ca5192f6b679715b7d4f08d`; both validation jobs green; combined commit status contains no external statuses. No production/main/live change.
+
