@@ -10,6 +10,7 @@ import {
 import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import {
   recordRuntimeV02HiddenInformationView,
+  runtimeV02TakeHiddenInformationOccurrences,
   type RuntimeV02HiddenInformationOccurrence,
 } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02RandomSampleHiddenZone } from "./tcg-match-hidden-zone-sample-v0-2.ts";
@@ -2497,6 +2498,23 @@ function continueFlow(
     continuation.processed_listener_keys.push(
       receiptKey(candidate, work.event),
     );
+    const hiddenOccurrences =
+      runtimeV02TakeHiddenInformationOccurrences(state);
+    if (hiddenOccurrences.length) {
+      const hiddenEvents =
+        runtimeV02AdaptHiddenInformationOccurrencesForListener(
+          state,
+          hiddenOccurrences,
+        );
+      const hiddenWork = hiddenEvents.flatMap((event) =>
+        eventWorkItems(state, event)
+      );
+      continuation.work.splice(
+        continuation.work_index + 1,
+        0,
+        ...hiddenWork,
+      );
+    }
     continuation.work_index++;
     continuation.program_loaded = false;
     continuation.program = [];
