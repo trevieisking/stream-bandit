@@ -41,6 +41,7 @@ import {
 } from "./tcg-match-requirement-evaluator-v0-2.ts";
 import {
   runtimeV02ApplyCardZoneReorder,
+  runtimeV02ApplyCardZoneTransfer,
   type RuntimeV02CardZoneInstance,
 } from "./tcg-match-card-zone-engine-v0-2.ts";
 import type {
@@ -282,6 +283,7 @@ export type RuntimeV02PendingEventListenerChoice = {
     | "choose_from_set"
     | "select_creature"
     | "select_cards"
+    | "discard_from_hand"
     | "inspect_rewards"
     | "clear_condition"
     | "order_cards"
@@ -2009,6 +2011,46 @@ function executeStep(
     return "continue";
   }
 
+  if (op === "CHOOSE_HAND_TO_DISCARD") {
+    const seat = playerForToken(candidate, step.player, event);
+    const count = Number(step.count);
+    if (!Number.isInteger(count) || count < 0) {
+      throw new Error("tcg_v0_2_event_listener_hand_discard_count_invalid");
+    }
+    const owner = player(state, seat);
+    const hand = owner.hand as Inst[];
+    if (hand.length < count) {
+      throw new Error("tcg_v0_2_event_listener_hand_discard_unavailable");
+    }
+    if (count === 0) {
+      continuation.step_cursor++;
+      return "continue";
+    }
+    const options = hand.map((card) => ({
+      id: `card:${card.uid}`,
+      label: cardName(state, card),
+      data: {
+        ref: {
+          uid: card.uid,
+          card_id: card.card_id,
+          zone_owner_seat: seat,
+          zone: "hand",
+        } satisfies CardRef,
+      },
+    }));
+    installChoice(state, continuation, candidate, event, {
+      seat,
+      kind: "discard_from_hand",
+      prompt: "Choose card to discard",
+      min: count,
+      max: count,
+      mode: "select",
+      options,
+      context: { zone_owner_seat: seat },
+    });
+    return "choice";
+  }
+
   if (op === "MOVE_ZONE_POSITION") {
     const seat = playerForToken(candidate, step.player, event);
     if (
@@ -2911,6 +2953,51 @@ export function runtimeV02ResolveEventListenerChoice(
       }
     }
     continuation.vars[String(pending.context.as || "selected_cards")] = refs;
+    continuation.step_cursor++;
+  } else if (pending.kind === "discard_from_hand") {
+    const seat = normalizedSeat(
+      pending.context.zone_owner_seat,
+      "tcg_v0_2_event_listener_hand_discard_owner_invalid",
+    );
+    const refs = selected.map((option) => option.data.ref as CardRef);
+    if (
+      refs.some((ref) =>
+        ref.zone_owner_seat !== seat ||
+        ref.zone !== "hand"
+      )
+    ) {
+      throw new Error("tcg_v0_2_event_listener_hand_discard_ref_invalid");
+    }
+    const owner = player(state, seat);
+    const hand = owner.hand as Inst[];
+    const discard = owner.discard as Inst[];
+    for (const ref of refs) {
+      if (!hand.some((card) =>
+        card.uid === ref.uid && card.card_id === ref.card_id
+      )) {
+        throw new Error("tcg_v0_2_event_listener_hand_discard_stale");
+      }
+    }
+    if (refs.length > 0) {
+      runtimeV02ApplyCardZoneTransfer(hand, discard, {
+        cause: "effect",
+        action_kind: "event_listener",
+        source_action_id: `listener:${listenerId(candidate)}`,
+        source_card_uid: candidate.source.uid,
+        source: {
+          controller_seat: seat,
+          zone: "hand",
+          owner_card_uid: null,
+        },
+        destination: {
+          controller_seat: seat,
+          zone: "discard",
+          owner_card_uid: null,
+        },
+        card_uids: refs.map((ref) => ref.uid),
+        destination_position: "bottom",
+      });
+    }
     continuation.step_cursor++;
   } else if (pending.kind === "order_cards") {
     const refs = selected.map((option) => option.data.ref as CardRef);
