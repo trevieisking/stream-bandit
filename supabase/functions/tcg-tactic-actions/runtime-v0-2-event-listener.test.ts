@@ -910,6 +910,35 @@ Deno.test("Event Listener active-seat controller predicate matches only the auth
   equal(inactiveCost.cost, 2);
 });
 
+Deno.test("Event Listener schema-valid any_turn timing remains eligible when the source controller is not the active seat", () => {
+  const source = creatureDefinition(
+    "stone-any-turn-proof",
+    "Any Turn Proof",
+    "Stone",
+    ability("any-turn-proof", {
+      all: [{ predicate: "event_subject_is_source" }],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+  (source as any).creature.ability.timing = "any_turn";
+
+  const state = baseState(source);
+  (state as any).active_seat = 2;
+  const matched = begin(state);
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+});
+
 Deno.test("Event Listener subject filters resolve the current event subject definition", () => {
   const matchingSource = creatureDefinition(
     "gale-subject-filter-proof",

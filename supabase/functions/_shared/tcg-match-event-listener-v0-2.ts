@@ -1168,7 +1168,7 @@ function matches(
     return false;
   }
   if (timing === "build" && event.phase !== "build") return false;
-  if (!["own_turn", "build", "any", "passive"].includes(timing)) {
+  if (!["own_turn", "any_turn", "build", "any", "passive"].includes(timing)) {
     throw new Error(
       `tcg_v0_2_event_listener_timing_unsupported:${timing}`,
     );
