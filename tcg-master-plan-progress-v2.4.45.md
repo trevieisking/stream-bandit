@@ -3639,3 +3639,30 @@ If the exact freeze head remains green:
 
 Owner-family count remains **40**. No gameplay-runtime source, Edge closure, main merge, deployment or live promotion is authorized by this slice.
 
+
+## V2.4.105 — implementation acceptance
+
+**Freeze head:** `395a88b63cc4f61ef75245878feb2c62919b9958` — Card Pass #1646 **SUCCESS**.  
+**Accepted capability head:** `ebece9cef2872d205bfa2e4dfc080e4ff2e02071` — Card Pass #1647 **SUCCESS**.
+
+V2.4.105 closed as a pure capability/release-control reconciliation with **no gameplay-runtime or test change**.
+
+The existing canonical Heal Listener dispatcher and deterministic tests already prove all accepted Release 1 semantics across:
+- Symbiote Essence;
+- Shellip / Tidepool Shell;
+- Moonlit Reef.
+
+Exactly eight predicates moved missing -> implemented:
+- `heal_packet_source_is_attached_creature`;
+- `heal_packet_target_controller_is_self`;
+- `heal_packet_target_is_not_source`;
+- `heal_packet_target_is_self`;
+- `heal_actual_amount_at_least`;
+- `heal_source_is_card_effect`;
+- `heal_controller_is_active_seat`;
+- `heal_target_element_is`;
+
+Release Control now points to capability blob `c7d8c34be26d54c804e6bc70f9f243be838cbc8d`. Edge runtime source and dependency closures did not change.
+
+Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
+

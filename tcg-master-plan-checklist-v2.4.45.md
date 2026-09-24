@@ -1267,10 +1267,12 @@
 - [x] Confirm direct deterministic dispatcher proof covers all three accepted listener shapes.
 - [x] Confirm limit reset, packet idempotency, nested-packet non-recursion and fail-closed behavior.
 - [x] Confirm no card-ID/name dispatch and no new owner is needed.
-- [ ] Pass exact-head Card Pass on the V2.4.105 freeze head.
-- [ ] Move exactly eight frozen Heal predicates missing -> implemented.
-- [ ] Update Release Control capability-manifest fingerprint atomically.
-- [ ] Pass exact-head Card Pass after capability reconciliation.
-- [ ] Append V2.4.105 acceptance across plan/checklist/ledger.
+- [x] Pass exact-head Card Pass on the V2.4.105 freeze head.
+- [x] Move exactly eight frozen Heal predicates missing -> implemented.
+- [x] Update Release Control capability-manifest fingerprint atomically.
+- [x] Pass exact-head Card Pass after capability reconciliation.
+- [x] Append V2.4.105 acceptance across plan/checklist/ledger.
 - [x] Preserve 40 owner families; no main/live promotion in this slice.
 
+
+**Acceptance:** freeze `395a88b63cc4f61ef75245878feb2c62919b9958` / Card Pass #1646 SUCCESS; capability head `ebece9cef2872d205bfa2e4dfc080e4ff2e02071` / #1647 SUCCESS; no runtime/test/main/live change.

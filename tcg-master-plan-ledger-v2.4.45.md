@@ -1180,3 +1180,7 @@ The exact structured consumers are Symbiote Essence, Shellip and Moonlit Reef. T
 ## 401 — canonical Heal Listener ownership and proof already exist
 `tcg-match-heal-listener-dispatch-v0-2.ts` implements all eight generically from persisted Heal Packet/source/attachment context. The deterministic dispatcher test resolves Symbiote and Shellip while deferring Moonlit, thereby exercising all eight accepted predicates in the real listener dispatch path. Companion tests prove limits, turn reset, packet idempotency, nested non-recursion and fail-closed behavior. No gameplay implementation change is justified.
 
+
+## 402 — V2.4.105 Heal capability reconciliation accepted
+Freeze head `395a88b63cc4f61ef75245878feb2c62919b9958` passed Card Pass #1646. Accepted capability head `ebece9cef2872d205bfa2e4dfc080e4ff2e02071` passed Card Pass #1647. Exactly eight Heal predicates moved missing -> implemented: `heal_packet_source_is_attached_creature`, `heal_packet_target_controller_is_self`, `heal_packet_target_is_not_source`, `heal_packet_target_is_self`, `heal_actual_amount_at_least`, `heal_source_is_card_effect`, `heal_controller_is_active_seat`, and `heal_target_element_is`. Release Control is synchronized to capability blob `c7d8c34be26d54c804e6bc70f9f243be838cbc8d`. No gameplay runtime, tests or Edge closures changed.
+
