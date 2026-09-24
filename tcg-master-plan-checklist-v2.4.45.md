@@ -1537,3 +1537,23 @@
 - [x] Pass capability head `9ede8792b2f03b3a996c0018586eba624acfd7d1` / Card Pass #1689 SUCCESS.
 
 **Acceptance:** capability blob `f6bbb7ff69357da5a284db77ecf806cc079d9915`; sole frozen Skyrend consumer covered; 40 owner families preserved.
+
+### V2.4.119 — generic Device play-lock lifecycle
+- [x] Sweep frozen Release 1 sources for `SET_DEVICE_PLAY_LOCK`.
+- [x] Confirm exactly one consumer: Volt Blackout Pulse.
+- [x] Keep ownership inside the existing Tactic Runtime family.
+- [x] Add strict `SET_DEVICE_PLAY_LOCK` grammar normalization.
+- [x] Require the frozen end-of-turn duration contract.
+- [x] Store the lock as a controller-scoped current-turn receipt.
+- [x] Gate only Tactic subtype `Device`.
+- [x] Preserve Ally, Relic and Realm playability.
+- [x] Reuse canonical Match Flow `turn_seq` for automatic end-of-turn expiry.
+- [x] Support explicit same-turn unlock without affecting the other seat.
+- [x] Fail closed on malformed current-turn lock receipts.
+- [x] Confirm no Blackout/card-name dispatch and no new owner family.
+- [x] Synchronize Tactic Edge dependency closure to 54 files.
+- [x] Pass runtime head `49480b1612b014bbceee8cacebc108e4a85e4c97` / Card Pass #1691 SUCCESS.
+- [x] Move exactly `SET_DEVICE_PLAY_LOCK` missing -> implemented.
+- [x] Pass capability head `0fb50bc4830d540c8c7656a487219b19c5dcbf28` / Card Pass #1692 SUCCESS.
+
+**Acceptance:** capability blob `32d7a738e3b82751a7010acce867d2b5b5ff1fd4`; sole frozen Blackout Pulse consumer covered; 40 owner families preserved.

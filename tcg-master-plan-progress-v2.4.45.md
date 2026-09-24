@@ -4143,3 +4143,41 @@ Capability head `9ede8792b2f03b3a996c0018586eba624acfd7d1` passed Card Pass #168
 Exactly `event_attack_id_is`, `event_attack_target_zone_is`, and `event_attack_target_controller_is_opponent` moved missing -> implemented. Capability blob is `f6bbb7ff69357da5a284db77ecf806cc079d9915`.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.119 — generic Device play-lock lifecycle
+
+**Baseline authority head:** `3aca7fae26e6d0bfe73c4829d1e0c5d39072c199` — Card Pass #1690 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **one** `SET_DEVICE_PLAY_LOCK` consumer:
+- Volt Blackout Pulse — after its normal Device effect, lock the controller from playing another Device until end of turn.
+
+No other Release 1 card uses this operation.
+
+### Generic Tactic lifecycle ownership
+V2.4.119 adds a bounded Device play-lock submodule under the existing Tactic Runtime owner:
+- strict `SET_DEVICE_PLAY_LOCK` grammar normalization;
+- controller-scoped turn receipt stored in existing `turn_flags`;
+- `tacticPlayability` blocks only subtype `Device`;
+- Ally, Relic and Realm playability remains unchanged;
+- `locked:false` can explicitly clear the same-turn receipt;
+- malformed current-turn receipts fail closed.
+
+Expiry uses canonical Match Flow `turn_seq`. Match Flow already increments `turn_seq` when the turn advances, so an end-of-turn Device lock becomes stale automatically without a second cleanup owner.
+
+### Deterministic proof
+Runtime head `49480b1612b014bbceee8cacebc108e4a85e4c97` passed Card Pass #1691 **SUCCESS**:
+- frozen Blackout grammar accepted;
+- invalid player/expiry/extra fields rejected;
+- controller's later Device play is blocked;
+- opponent Device and controller Ally/Relic/Realm are unaffected;
+- next `turn_seq` automatically restores Device play;
+- explicit same-turn unlock and malformed-receipt fail-closed behavior are covered;
+- Tactic Edge dependency closure expanded from 53 to 54 files and validated.
+
+### Capability acceptance
+Capability head `0fb50bc4830d540c8c7656a487219b19c5dcbf28` passed Card Pass #1692 **SUCCESS**.
+
+Exactly `SET_DEVICE_PLAY_LOCK` moved missing -> implemented. Capability blob is `32d7a738e3b82751a7010acce867d2b5b5ff1fd4`.
+
+Owner-family count remains **40** because the new module is a submodule of the existing Tactic Runtime owner, not a new owner family. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

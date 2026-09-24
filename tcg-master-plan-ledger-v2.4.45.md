@@ -1336,3 +1336,15 @@ Runtime commit `0f4e1e68f22d945f2796c52951610a9741dde288` had green deterministi
 
 ## 452 — V2.4.118 Skyrend metadata predicates accepted
 Capability head `9ede8792b2f03b3a996c0018586eba624acfd7d1` passed Card Pass #1689. Exactly `event_attack_id_is`, `event_attack_target_zone_is`, and `event_attack_target_controller_is_opponent` moved missing -> implemented. Capability blob is `f6bbb7ff69357da5a284db77ecf806cc079d9915`. Owner-family count remains 40; production remains unchanged.
+
+## 453 — V2.4.119 SET_DEVICE_PLAY_LOCK has one frozen Release 1 consumer
+The frozen structured-card sweep finds one use only: Volt Blackout Pulse. The operation applies after that Device resolves and prevents its controller from playing another Device until end of turn.
+
+## 454 — Device play lock belongs to existing Tactic Runtime ownership
+The Tactic Runtime now owns strict Device-lock grammar, a controller-scoped turn receipt, and the playability gate. Only subtype Device is blocked; Ally, Relic and Realm remain unaffected. End-of-turn expiry is derived from canonical Match Flow `turn_seq`, so no duplicate cleanup owner is introduced.
+
+## 455 — V2.4.119 runtime proof passed
+Head `49480b1612b014bbceee8cacebc108e4a85e4c97` passed Card Pass #1691. Deterministic proof covers exact grammar, controller isolation, non-Device preservation, next-turn expiry, explicit unlock and malformed-receipt failure. Tactic Edge closure expanded from 53 to 54 files and passed release-control validation.
+
+## 456 — V2.4.119 SET_DEVICE_PLAY_LOCK accepted
+Capability head `0fb50bc4830d540c8c7656a487219b19c5dcbf28` passed Card Pass #1692. Exactly `SET_DEVICE_PLAY_LOCK` moved missing -> implemented. Capability blob is `32d7a738e3b82751a7010acce867d2b5b5ff1fd4`. Owner-family count remains 40; production remains unchanged.
