@@ -1515,3 +1515,25 @@
 - [x] Preserve 40 owner families; no database/Edge/main/live promotion.
 
 **Acceptance:** capability blob `1890db166b4dceb38a3ea6a02e28596f7307941f`; sole frozen consumer covered.
+
+### V2.4.118 — Skyrend attack-declared metadata parity
+- [x] Sweep frozen Release 1 sources for `event_attack_id_is`.
+- [x] Sweep frozen Release 1 sources for `event_attack_target_zone_is`.
+- [x] Sweep frozen Release 1 sources for `event_attack_target_controller_is_opponent`.
+- [x] Confirm exactly one consumer of each: Gale Skyrend / Open Sky Hunter.
+- [x] Confirm the listener reuses implemented `event_attack_source_is_self`.
+- [x] Confirm the listener reuses implemented `MODIFY_CURRENT_ATTACK_DAMAGE`.
+- [x] Add generic exact attack-id matching to the existing attack-declared listener owner.
+- [x] Add generic target-zone matching to the existing attack-declared listener owner.
+- [x] Add generic opponent-controller matching to the existing attack-declared listener owner.
+- [x] Reject undeclared predicate fields and invalid target zones.
+- [x] Prove Sky Rend -> opponent Reserve changes 110 to 90.
+- [x] Prove wrong attack id, Vanguard target, and self-controlled target remain 110.
+- [x] Confirm no card-ID/name dispatch and no new owner family.
+- [x] Record #1687 as a release-control fingerprint failure only; runtime/type-check jobs were green.
+- [x] Synchronize both Match and Tactic shared Event Listener closure fingerprints.
+- [x] Pass synchronized runtime head `10936bfb16c8e4dff5f2490ea94b4e8b0b9f761f` / Card Pass #1688 SUCCESS.
+- [x] Move exactly the three Skyrend metadata predicates missing -> implemented.
+- [x] Pass capability head `9ede8792b2f03b3a996c0018586eba624acfd7d1` / Card Pass #1689 SUCCESS.
+
+**Acceptance:** capability blob `f6bbb7ff69357da5a284db77ecf806cc079d9915`; sole frozen Skyrend consumer covered; 40 owner families preserved.

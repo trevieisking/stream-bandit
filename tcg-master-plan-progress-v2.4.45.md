@@ -4105,3 +4105,41 @@ Capability head `9a07306ae6fd312b00ce0ef511228a277a440794` passed Card Pass #168
 Exactly `target_became_vanguard_this_turn` moved missing -> implemented. Capability blob is `1890db166b4dceb38a3ea6a02e28596f7307941f`.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.118 — Skyrend attack-declared metadata parity
+
+**Baseline authority head:** `befce93659c63b9238148b8f461e26e157d06d7a` — Card Pass #1686 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **one** consumer for each of the following predicates, all on Gale Skyrend / Open Sky Hunter:
+- `event_attack_id_is` -> `sky-rend`;
+- `event_attack_target_zone_is` -> `reserve`;
+- `event_attack_target_controller_is_opponent`.
+
+The same listener already uses implemented `event_attack_source_is_self`, and its only step is implemented `MODIFY_CURRENT_ATTACK_DAMAGE`.
+
+### Generic repair
+The existing synchronous `attack_declared` Event Listener owner now evaluates the three metadata predicates directly from the authoritative attack input:
+- exact attack id;
+- exact bound target zone;
+- target controller relative to the listener source controller.
+
+Every predicate validates only its declared grammar fields and fails closed on unsupported shapes. No Skyrend/card-name dispatch, helper owner or new owner family is introduced.
+
+### Deterministic proof and closure correction
+Runtime commit `0f4e1e68f22d945f2796c52951610a9741dde288` added the generic predicates and deterministic Skyrend proof. Card Pass #1687 reported **FAIL** only in the structure/release-control gate because the shared Event Listener file also belongs to the Tactic Edge closure; the deterministic runtime core and all type-check jobs were green.
+
+Head `10936bfb16c8e4dff5f2490ea94b4e8b0b9f761f` synchronized the Tactic closure fingerprint and passed Card Pass #1688 **SUCCESS** end-to-end.
+
+The regression proves:
+- Sky Rend -> opponent Reserve: 110 becomes 90;
+- wrong attack id: remains 110;
+- opponent Vanguard target: remains 110;
+- self-controlled Reserve target: remains 110.
+
+### Capability acceptance
+Capability head `9ede8792b2f03b3a996c0018586eba624acfd7d1` passed Card Pass #1689 **SUCCESS**.
+
+Exactly `event_attack_id_is`, `event_attack_target_zone_is`, and `event_attack_target_controller_is_opponent` moved missing -> implemented. Capability blob is `f6bbb7ff69357da5a284db77ecf806cc079d9915`.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

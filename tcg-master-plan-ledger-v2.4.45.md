@@ -1324,3 +1324,15 @@ The existing Atomic Switch / forced-promotion owner writes `became_vanguard_turn
 
 ## 448 — V2.4.117 target_became_vanguard_this_turn accepted
 Capability head `9a07306ae6fd312b00ce0ef511228a277a440794` passed Card Pass #1685. Exactly `target_became_vanguard_this_turn` moved missing -> implemented. Capability blob is `1890db166b4dceb38a3ea6a02e28596f7307941f`. Owner-family count remains 40; production remains unchanged.
+
+## 449 — V2.4.118 Skyrend owns three one-consumer metadata predicates
+The frozen Release 1 sweep finds exactly one consumer each for `event_attack_id_is`, `event_attack_target_zone_is`, and `event_attack_target_controller_is_opponent`: Gale Skyrend / Open Sky Hunter on `attack_declared`.
+
+## 450 — Attack-declared Event Listener evaluates Skyrend metadata generically
+The existing Event Listener owner reads exact attack id, target zone and target controller from the authoritative attack input. It reuses existing `event_attack_source_is_self` and `MODIFY_CURRENT_ATTACK_DAMAGE` ownership and adds no card-specific dispatch or owner family.
+
+## 451 — V2.4.118 closure correction was evidence-driven
+Runtime commit `0f4e1e68f22d945f2796c52951610a9741dde288` had green deterministic runtime/type checks, while Card Pass #1687 failed the structure gate because the changed shared Event Listener file also invalidated the Tactic Edge closure fingerprint. Head `10936bfb16c8e4dff5f2490ea94b4e8b0b9f761f` synchronized that closure and passed Card Pass #1688.
+
+## 452 — V2.4.118 Skyrend metadata predicates accepted
+Capability head `9ede8792b2f03b3a996c0018586eba624acfd7d1` passed Card Pass #1689. Exactly `event_attack_id_is`, `event_attack_target_zone_is`, and `event_attack_target_controller_is_opponent` moved missing -> implemented. Capability blob is `f6bbb7ff69357da5a284db77ecf806cc079d9915`. Owner-family count remains 40; production remains unchanged.
