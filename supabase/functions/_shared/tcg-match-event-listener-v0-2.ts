@@ -1825,6 +1825,7 @@ function executeStep(
       continuation.vars[String(step.as || "inspected")] = inspectDeckTop(
         state,
         candidate,
+        event,
         owner,
         wanted.max,
         wanted.min,
