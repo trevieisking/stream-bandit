@@ -3570,3 +3570,72 @@ Release Control now points to capability blob `73d94115359b28379301c50a38fee4556
 
 Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
 
+
+## V2.4.105 — Heal predicate capability reconciliation (freeze)
+
+**Freeze head:** `2d3b17186a3df64b32531bfef31aa864c4782554`  
+**Inherited gate:** V2.4.104 documentation head Card Pass #1645 **SUCCESS**.
+
+### Exact Release 1 consumers
+
+The structured-card audit finds exactly three identities in this family:
+
+**Grove — Symbiote Essence**
+- `heal_packet_source_is_attached_creature`;
+- `heal_packet_target_controller_is_self`;
+- `heal_packet_target_is_not_source`.
+
+**Tide — Shellip / Tidepool Shell**
+- `heal_packet_target_is_self`;
+- `heal_source_is_card_effect`;
+- `heal_actual_amount_at_least(1)`.
+
+**Tide — Moonlit Reef**
+- `heal_actual_amount_at_least(1)`;
+- `heal_target_element_is(Tide)`;
+- `heal_controller_is_active_seat`;
+- `heal_source_is_card_effect`.
+
+No other Release 1 structured identity uses any of the eight frozen predicates.
+
+### Existing canonical ownership
+
+`supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts` already evaluates all eight generically from the canonical persisted Heal Packet and current listener attachment/source context. It owns:
+- exact source/target Creature identity;
+- target controller;
+- active-seat comparison;
+- actual healed amount;
+- card-effect source flag;
+- target element;
+- source-vs-target distinction.
+
+No card ID/name dispatch participates.
+
+### Existing deterministic proof
+
+`runtime-v0-2-heal-listener-dispatch.test.ts` already builds all three accepted listener shapes together.
+
+The test **"after-heal dispatcher resolves Shellip and Symbiote while deferring Moonlit"** proves:
+- Symbiote matches its three packet/source predicates and emits the reciprocal Heal Packet;
+- Shellip matches target-self + card-effect + actual-heal threshold and gains Shield;
+- Moonlit matches actual-heal + Tide target + active-seat + card-effect and is correctly deferred as an optional choice for the event controller.
+
+Companion tests prove:
+- per-source/attachment turn limits;
+- next-turn reset;
+- persisted packet idempotency;
+- nested Symbiote packet non-recursion;
+- malformed listener metadata fails closed.
+
+### Bounded V2.4.105 action
+
+This is a **metadata reconciliation only** unless validation contradicts the existing proof.
+
+If the exact freeze head remains green:
+1. move exactly the eight frozen Heal predicates missing -> implemented;
+2. update Release Control's capability-manifest fingerprint atomically;
+3. pass exact-head Card Pass;
+4. close master plan/checklist/ledger.
+
+Owner-family count remains **40**. No gameplay-runtime source, Edge closure, main merge, deployment or live promotion is authorized by this slice.
+

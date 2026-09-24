@@ -1173,3 +1173,10 @@ Proof head `5b68a60ff79a4eea0829da0deb596d63f5b6852a` passed Card Pass #1643. Ru
 ## 399 — eight core Event Listener predicates are capability-complete for Release 1
 Accepted head `445759beccccde2c60afaf93905c0f074ce093cc` passed Card Pass #1644. Exactly eight predicates moved missing -> implemented: `event_subject_is_source`, `event_origin_zone_is`, `event_controller_is_active_seat`, `event_destination_zone_is`, `source_is_self`, `event_phase_is`, `event_subject_matches`, and `event_subject_is_attached_creature`. Release Control is synchronized to capability blob `73d94115359b28379301c50a38fee4556f4a8ac4`. No Edge runtime source or closure changed.
 
+
+## 400 — V2.4.105 freezes the Release 1 Heal predicate family
+The exact structured consumers are Symbiote Essence, Shellip and Moonlit Reef. Their union uses eight predicates currently misclassified as missing: `heal_packet_source_is_attached_creature`, `heal_packet_target_controller_is_self`, `heal_packet_target_is_not_source`, `heal_packet_target_is_self`, `heal_actual_amount_at_least`, `heal_source_is_card_effect`, `heal_controller_is_active_seat`, and `heal_target_element_is`.
+
+## 401 — canonical Heal Listener ownership and proof already exist
+`tcg-match-heal-listener-dispatch-v0-2.ts` implements all eight generically from persisted Heal Packet/source/attachment context. The deterministic dispatcher test resolves Symbiote and Shellip while deferring Moonlit, thereby exercising all eight accepted predicates in the real listener dispatch path. Companion tests prove limits, turn reset, packet idempotency, nested non-recursion and fail-closed behavior. No gameplay implementation change is justified.
+

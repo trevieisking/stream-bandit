@@ -1258,3 +1258,19 @@
 
 
 **Acceptance:** proof `5b68a60ff79a4eea0829da0deb596d63f5b6852a` / Card Pass #1643 SUCCESS; capability head `445759beccccde2c60afaf93905c0f074ce093cc` / #1644 SUCCESS; owner families 40; no gameplay-runtime/main/live change.
+
+### V2.4.105 — Heal predicate capability reconciliation
+- [x] Freeze exact consumers: Symbiote Essence, Shellip, Moonlit Reef.
+- [x] Confirm exactly eight missing capability predicates in the accepted family.
+- [x] Confirm Heal Listener dispatcher already implements all eight generically.
+- [x] Confirm accepted predicates are evaluated from canonical Heal Packet/source/attachment context.
+- [x] Confirm direct deterministic dispatcher proof covers all three accepted listener shapes.
+- [x] Confirm limit reset, packet idempotency, nested-packet non-recursion and fail-closed behavior.
+- [x] Confirm no card-ID/name dispatch and no new owner is needed.
+- [ ] Pass exact-head Card Pass on the V2.4.105 freeze head.
+- [ ] Move exactly eight frozen Heal predicates missing -> implemented.
+- [ ] Update Release Control capability-manifest fingerprint atomically.
+- [ ] Pass exact-head Card Pass after capability reconciliation.
+- [ ] Append V2.4.105 acceptance across plan/checklist/ledger.
+- [x] Preserve 40 owner families; no main/live promotion in this slice.
+
