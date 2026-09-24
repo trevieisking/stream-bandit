@@ -95,6 +95,14 @@ import {
   type RuntimeV02ActiveAbilityShieldTransferResolution,
   type RuntimeV02PendingActiveAbilityShieldTransferChoice,
 } from "./tcg-match-active-ability-shield-transfer-v0-2.ts";
+import {
+  runtimeV02CreateActiveAbilitySwitchChoice,
+  runtimeV02PendingActiveAbilitySwitchChoiceView,
+  runtimeV02ResolveActiveAbilitySwitchChoice,
+  structuredRuntimeActiveAbilitySwitch,
+  type RuntimeV02ActiveAbilitySwitchResolution,
+  type RuntimeV02PendingActiveAbilitySwitchChoice,
+} from "./tcg-match-active-ability-switch-v0-2.ts";
 
 type RuntimeFieldWhere = "vanguard" | "reserve";
 
@@ -117,7 +125,8 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilitySelectedHealChoice
   | RuntimeV02PendingActiveAbilitySelectedHealEachChoice
   | RuntimeV02PendingActiveAbilitySelectedModifierChoice
-  | RuntimeV02PendingActiveAbilityShieldTransferChoice;
+  | RuntimeV02PendingActiveAbilityShieldTransferChoice
+  | RuntimeV02PendingActiveAbilitySwitchChoice;
 
 export type RuntimeV02ActiveAbilityLiveResolution =
   | RuntimeV02ActiveAbilityEssenceRedistributionResolution
@@ -142,7 +151,8 @@ export type RuntimeV02ActiveAbilityLiveResolution =
   }
   | RuntimeV02ActiveAbilitySelectedHealEachResolution
   | RuntimeV02ActiveAbilitySelectedModifierResolution
-  | RuntimeV02ActiveAbilityShieldTransferResolution;
+  | RuntimeV02ActiveAbilityShieldTransferResolution
+  | RuntimeV02ActiveAbilitySwitchResolution;
 
 /**
  * Creates one live active-Ability choice by delegating to exact family
@@ -331,6 +341,23 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
     return pending;
   }
 
+  const switchDescriptor = structuredRuntimeActiveAbilitySwitch(state, instance);
+  if (switchDescriptor) {
+    const pending = runtimeV02CreateActiveAbilitySwitchChoice(
+      state,
+      controllerSeat,
+      switchDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      switchDescriptor.ability_id,
+    );
+    return pending;
+  }
+
   const shieldTransferDescriptor = structuredRuntimeActiveAbilityShieldTransfer(
     state,
     instance,
@@ -427,6 +454,9 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
       choice,
       viewerSeat,
     );
+  }
+  if (choice.kind === "switch_with_vanguard") {
+    return runtimeV02PendingActiveAbilitySwitchChoiceView(choice, viewerSeat);
   }
   throw new Error("tcg_v0_2_active_ability_live_choice_kind_unsupported");
 }
@@ -557,6 +587,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   }
   if (choice.kind === "transfer_shield_between_friendly_creatures") {
     return runtimeV02ResolveActiveAbilityShieldTransferChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
+  if (choice.kind === "switch_with_vanguard") {
+    return runtimeV02ResolveActiveAbilitySwitchChoice(
       choice,
       controllerSeat,
       choiceId,

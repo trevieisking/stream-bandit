@@ -13,6 +13,15 @@ export type RuntimeV02SourceDamagedRequirementEvaluation = {
   actual_damage: number;
 };
 
+export type RuntimeV02SourceInPlayRequirement = {
+  predicate: "source_in_play";
+};
+
+export type RuntimeV02SourceInPlayRequirementEvaluation = {
+  predicate: "source_in_play";
+  matched: boolean;
+};
+
 export type RuntimeV02SourceHasShieldAtLeastRequirement = {
   predicate: "source_has_shield_at_least";
   value: number;
@@ -288,6 +297,42 @@ export function evaluateRuntimeV02SourceDamagedRequirement(
     predicate: "source_damaged",
     matched: damage > 0,
     actual_damage: damage,
+  };
+}
+
+export function normalizeRuntimeV02SourceInPlayRequirement(
+  raw: unknown,
+): RuntimeV02SourceInPlayRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_source_in_play_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate"],
+    "tcg_v0_2_requirement_source_in_play_field_unsupported",
+  );
+  if (value.predicate !== "source_in_play") {
+    throw new Error("tcg_v0_2_requirement_source_in_play_predicate_invalid");
+  }
+  return { predicate: "source_in_play" };
+}
+
+export function evaluateRuntimeV02SourceInPlayRequirement(
+  sourceCreature: unknown,
+  rawRequirement: RuntimeV02SourceInPlayRequirement,
+): RuntimeV02SourceInPlayRequirementEvaluation {
+  normalizeRuntimeV02SourceInPlayRequirement(rawRequirement);
+  if (sourceCreature == null) {
+    return { predicate: "source_in_play", matched: false };
+  }
+  const source = objectRecord(
+    sourceCreature,
+    "tcg_v0_2_requirement_source_in_play_source_invalid",
+  );
+  if (!Array.isArray(source.stack)) {
+    throw new Error("tcg_v0_2_requirement_source_in_play_stack_invalid");
+  }
+  return {
+    predicate: "source_in_play",
+    matched: source.stack.length > 0,
   };
 }
 
