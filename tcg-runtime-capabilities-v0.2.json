@@ -144,6 +144,7 @@
       "prevention_target_is_attached_creature",
       "reserve_count_at_least",
       "selected_count_at_least",
+      "source_became_vanguard_this_turn",
       "source_controller_is_self",
       "source_counter_at_least",
       "source_damaged",
@@ -183,7 +184,6 @@
       "shield_actual_gain_at_least",
       "shield_source_is_card_effect",
       "shield_target_is_self",
-      "source_became_vanguard_this_turn",
       "source_element_is",
       "source_has_condition",
       "source_in_play",
@@ -1422,6 +1422,39 @@
         "owner_family_count": 40
       },
       "note": "No gameplay runtime or test change is required; existing generic owners and deterministic positive/negative proof cover all frozen Release 1 source_has_relic consumers."
+    },
+    "release1_source_became_vanguard_this_turn_v2_4_108": {
+      "freeze_head": "84d7b824fde3a6e2f4e5e6922b88cc2d4311dbad",
+      "card_pass_run": 1653,
+      "predicate": "source_became_vanguard_this_turn",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-gustfox",
+          "attack_id": "tailwind-strike",
+          "surface": "Attack conditional_add"
+        },
+        {
+          "card_id": "gale-zephyrhare",
+          "attack_id": "zephyr-kick",
+          "surface": "Attack conditional_add"
+        }
+      ],
+      "owners": {
+        "switch_lifecycle": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+        "conditional_add": "supabase/functions/_shared/tcg-match-attack-conditional-add-evaluator-v0-2.ts",
+        "attack_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-evaluation.test.ts"
+      ],
+      "semantics": {
+        "marker": "Atomic Switch writes incoming.became_vanguard_turn = turn_seq",
+        "declaration_context": "Match evaluates current Vanguard became_vanguard_turn against current turn_seq",
+        "positive_and_negative": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "note": "No runtime or test change is required; both frozen Gale formulas share one generic declaration-time predicate and canonical Atomic Switch lifecycle marker."
     }
   }
 }
