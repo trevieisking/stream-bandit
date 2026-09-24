@@ -182,6 +182,15 @@ const quartzram = continuousCreature("stone-quartzram", "prismatic-bulwark", [{
   filters: { attack_id: "prism-ram" },
 }]);
 
+const kilnback = continuousCreature("ember-kilnback", "furnace-hide", [{
+  id: "furnace-hide-reduction",
+  kind: "incoming_attack_damage",
+  target: "$source_creature",
+  when: { predicate: "source_has_condition", condition: "Scorched" },
+  amount: -10,
+  filters: { source_controller: "opponent" },
+}]);
+
 Deno.test("legacy-only match keeps attack-damage resolver on legacy fallback", () => {
   const state = {
     card_index: {
@@ -251,6 +260,38 @@ Deno.test("structured outgoing and incoming layers preserve Crushed timing betwe
   assertEquals(outgoing, 90);
   const afterCrushed = Number(outgoing) + 20;
   assertEquals(structuredRuntimeIncomingAttackDamage(state, attacker, target, afterCrushed, opponentVanguardConditioned), 100);
+});
+
+Deno.test("Kilnback incoming Attack damage uses canonical source_has_condition semantics", () => {
+  const state = {
+    ...markedState({ "ember-kilnback": kilnback }),
+    turn_seq: 4,
+  } as Record<string, unknown>;
+  const attacker = { essence: [], damage: 0, shield: 0 };
+  const makeTarget = (scorched: boolean) => ({
+    stack: [{ uid: "kilnback", card_id: "ember-kilnback" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+    conditions: { scorched, venomed: 0, control: null, modifier: null },
+  });
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, makeTarget(true), 80, context),
+    70,
+    "Furnace Hide should prevent 10 while Kilnback is Scorched",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, makeTarget(false), 80, context),
+    80,
+    "Furnace Hide must not prevent damage while Kilnback is not Scorched",
+  );
 });
 
 Deno.test("attached Relic outgoing Attack damage resolves Cinder Charm generically", () => {

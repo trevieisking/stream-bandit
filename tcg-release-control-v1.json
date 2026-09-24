@@ -94,7 +94,7 @@
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "561c033bc69af7cb8e39f8e3c03bd33e15c0fb57",
         "file_count": 120,
-        "closure_sha256": "2834a1e3de4e45bbdc51a424712c3fcec3076a5ae6889a97ab12cf44e461c557",
+        "closure_sha256": "1a6e2fe996a00c4253547971952c578750fdd6ad8728f935b9c29a5833ef2826",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -230,7 +230,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts",
-            "git_blob_sha": "417b2e36b9eeff60a69ba5b66e3687f141c7f326"
+            "git_blob_sha": "774b33d3e71a54d2f068d36591530513f124b653"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",

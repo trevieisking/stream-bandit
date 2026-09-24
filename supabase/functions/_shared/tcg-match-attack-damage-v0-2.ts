@@ -5,6 +5,10 @@ import {
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02ApplyDamageProtections } from "./tcg-match-damage-protection-v0-2.ts";
 import {
+  hasRuntimeCondition,
+  type RuntimeV02ConditionCreature,
+} from "./tcg-match-condition-engine-v0-2.ts";
+import {
   evaluateRuntimeV02SourceDamagedRequirement,
   evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
   evaluateRuntimeV02TargetPrintedHpAtLeastRequirement,
@@ -37,6 +41,8 @@ export type RuntimeAttackDamageCreature = {
   relic?: RuntimeCardInstance | null;
   damage?: number;
   shield?: number;
+  conditions?: RuntimeV02ConditionCreature["conditions"];
+  condition?: string | null;
   flags?: Record<string, unknown>;
 };
 
@@ -355,7 +361,13 @@ function selfAbilityWhenMatches(
   if (when == null) return true;
   const predicate = objectRecord(when);
   if (!predicate) return false;
-  if (String(predicate.predicate || "") === "source_has_relic") return Boolean(target.relic);
+  const kind = String(predicate.predicate || "");
+  if (kind === "source_has_relic") return Boolean(target.relic);
+  if (kind === "source_has_condition") {
+    const condition = typeof predicate.condition === "string" ? predicate.condition.trim() : "";
+    if (!condition) return false;
+    return hasRuntimeCondition(target as RuntimeV02ConditionCreature, condition);
+  }
   return false;
 }
 
