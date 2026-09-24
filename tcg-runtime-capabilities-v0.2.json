@@ -157,6 +157,7 @@
       "source_is_attached_creature",
       "source_is_current_friendly_vanguard",
       "source_is_self",
+      "target_became_vanguard_this_turn",
       "target_damaged",
       "target_element_is",
       "target_has_any_condition",
@@ -191,7 +192,6 @@
       "shield_source_is_card_effect",
       "shield_target_is_self",
       "source_in_play",
-      "target_became_vanguard_this_turn",
       "target_damage_at_least",
       "target_damage_at_most",
       "target_damage_equals",
@@ -1800,6 +1800,35 @@
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-evaluation.test.ts",
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-direct-authority-evaluation.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts"
+      ]
+    },
+    "release1_target_became_vanguard_this_turn_v2_4_117": {
+      "accepted_runtime_head": "ca6bc8967064788178ba55ed8538c7b7d7f783af",
+      "card_pass_run": 1684,
+      "predicate": "target_became_vanguard_this_turn",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-wingclip-charm",
+          "effect_id": "wingclip-vanguard-pressure",
+          "surface": "outgoing_attached_relic_attack_damage"
+        }
+      ],
+      "owners": {
+        "switch_marker": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+        "attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts"
+      },
+      "semantics": {
+        "target": "$attached_creature",
+        "current_turn_marker": "attached_creature.became_vanguard_turn === state.turn_seq",
+        "target_element_filter_scope": "attached_creature",
+        "positive_current_turn_gale": true,
+        "negative_previous_turn_gale": true,
+        "negative_current_turn_non_gale": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts"
       ]
     }
