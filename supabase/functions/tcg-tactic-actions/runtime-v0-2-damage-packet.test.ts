@@ -213,3 +213,73 @@ Deno.test("Damage #20 generic packet owner also satisfies existing Heatguard rec
   const result = runtimeV02ResolveBeforeDamagePacket(state, 15, context, lookup);
   equal(result.final_amount, 5);
 });
+
+
+Deno.test("Damage #20 Heatguard condition branch matches Scorched, respects limit, and rejects other conditions", () => {
+  const heatguard = {
+    id: "heatguard-first-risk-reduction",
+    event: "before_damage_packet",
+    requirements: {
+      all: [
+        { predicate: "damage_packet_target_is_attached_creature" },
+        {
+          any: [
+            { predicate: "damage_packet_class_is", damage_class: "recoil" },
+            {
+              all: [
+                { predicate: "damage_packet_class_is", damage_class: "condition" },
+                { predicate: "damage_packet_condition_is", condition: "Scorched" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    limit: { scope: "turn", count: 1, owner: "attachment" },
+    steps: [{ op: "MODIFY_CURRENT_DAMAGE_PACKET", delta: -10, minimum: 0 }],
+  };
+
+  const scorchedFixture = fixture(heatguard, 7);
+  const scorchedContext: RuntimeV02DamagePacketContext = {
+    ...effectContext("scorched-packet", 1),
+    damage_class: "condition",
+    condition: "Scorched",
+    source_kind: "condition",
+    source_action_id: "aftermath:Scorched",
+  };
+  const first = runtimeV02ResolveBeforeDamagePacket(
+    scorchedFixture.state,
+    20,
+    scorchedContext,
+    scorchedFixture.lookup,
+  );
+  equal(first.final_amount, 10);
+  equal(first.modifications.length, 1);
+
+  const second = runtimeV02ResolveBeforeDamagePacket(
+    scorchedFixture.state,
+    20,
+    { ...scorchedContext, packet_id: "scorched-packet-2" },
+    scorchedFixture.lookup,
+  );
+  equal(second.final_amount, 20);
+  equal(second.modifications.length, 0);
+  equal(second.limited.length, 1);
+
+  const venomedFixture = fixture(heatguard, 8);
+  const venomed = runtimeV02ResolveBeforeDamagePacket(
+    venomedFixture.state,
+    20,
+    {
+      ...effectContext("venomed-packet", 1),
+      damage_class: "condition",
+      condition: "Venomed",
+      source_kind: "condition",
+      source_action_id: "aftermath:Venomed",
+    },
+    venomedFixture.lookup,
+  );
+  equal(venomed.final_amount, 20);
+  equal(venomed.modifications.length, 0);
+  equal(venomed.limited.length, 0);
+});
