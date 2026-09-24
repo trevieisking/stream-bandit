@@ -1348,3 +1348,15 @@ Head `49480b1612b014bbceee8cacebc108e4a85e4c97` passed Card Pass #1691. Determin
 
 ## 456 — V2.4.119 SET_DEVICE_PLAY_LOCK accepted
 Capability head `0fb50bc4830d540c8c7656a487219b19c5dcbf28` passed Card Pass #1692. Exactly `SET_DEVICE_PLAY_LOCK` moved missing -> implemented. Capability blob is `32d7a738e3b82751a7010acce867d2b5b5ff1fd4`. Owner-family count remains 40; production remains unchanged.
+
+## 457 — V2.4.120 TRANSFER_SHIELD has one frozen Release 1 consumer
+The frozen structured-card sweep finds one use only: Tide Abyssalume / Lantern Shelter. The Ability selects one other friendly Tide Creature and transfers a player-selected amount from 0 through 20 Shield.
+
+## 458 — Active Ability owns Shield-transfer choice; Damage/Shield owns mutation
+The new family stays inside Active Ability owner #15 for structured recognition, reconnect-stable target/amount choice and once-per-turn receipt orchestration. Physical Shield movement delegates exactly once to existing Damage/Shield owner #20 `runtimeV02TransferShield`. No second Shield mutation path or owner family is introduced.
+
+## 459 — V2.4.120 runtime proof passed
+Head `cbd17b462928d9c33e87b4048df4632a146caf9d` passed Card Pass #1694. Deterministic proof covers target selection, 0..20 amount selection, source/capacity clamping, canonical mutation receipt, receipt-safe preflight and stale amount failure. Match Edge closure expanded from 120 to 121 files and passed.
+
+## 460 — V2.4.120 TRANSFER_SHIELD accepted; TIMEFOLD remains parked
+Capability head `e814e547cfe60256f7068a8ff2a4783986c42857` passed Card Pass #1695. Exactly `TRANSFER_SHIELD` moved missing -> implemented; capability blob is `97467a79747bd144902671c8dbd217af9d50e49d`. TIMEFOLD remains unimplemented because correct support requires a same-seat Match Flow transition, canonical turn-history write, selective Condition-Aftermath skip and correctly scoped anti-chain state. Owner-family count remains 40; production is unchanged.

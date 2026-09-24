@@ -4181,3 +4181,59 @@ Capability head `0fb50bc4830d540c8c7656a487219b19c5dcbf28` passed Card Pass #169
 Exactly `SET_DEVICE_PLAY_LOCK` moved missing -> implemented. Capability blob is `32d7a738e3b82751a7010acce867d2b5b5ff1fd4`.
 
 Owner-family count remains **40** because the new module is a submodule of the existing Tactic Runtime owner, not a new owner family. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.120 — Lantern Shelter / generic active-Ability Shield transfer
+
+**Baseline authority head:** `ee59bc2a2537406b64b3527cf466f3ee21c532ec` — Card Pass #1693 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **one** `TRANSFER_SHIELD` consumer:
+- Tide Abyssalume — Lantern Shelter.
+
+The Ability requires:
+- the source Creature to have at least 1 Shield;
+- one other friendly Tide Creature on the field;
+- a controller once-per-turn active-Ability receipt;
+- a player-selected transfer amount from 0 through 20.
+
+Both prerequisite predicates (`source_has_shield_at_least` and `legal_card_available`) were already implemented before this slice.
+
+### Owner-safe implementation
+V2.4.120 adds a bounded Shield-transfer submodule under existing Active Ability owner #15:
+- card-id-free recognition of the structured SELECT_CREATURE -> TRANSFER_SHIELD family;
+- reconnect-stable source and target anchors;
+- two-stage private choice: select target, then select amount;
+- amount options are bounded by the structured 0..20 range, current source Shield and the canonical destination Shield cap;
+- the existing once-per-turn active-Ability receipt owner is reused;
+- stale source, target, amount or turn state fails closed.
+
+Physical Shield mutation is **not** reimplemented. The Ability submodule delegates exactly once to canonical Damage/Shield owner #20 `runtimeV02TransferShield`.
+
+### Deterministic proof
+Runtime head `cbd17b462928d9c33e87b4048df4632a146caf9d` passed Card Pass #1694 **SUCCESS**:
+- Lantern Shelter target choice is projected privately;
+- the Ability receipt is consumed once through the existing owner;
+- a 20-Shield transfer moves 20 from source to target;
+- amount choices clamp to both source Shield and destination capacity;
+- source-without-Shield and no-target preflight failures consume no Ability receipt;
+- changed target capacity makes a previously offered amount stale and fails closed;
+- Match dispatcher and all dependent type checks passed;
+- Match Edge dependency closure expanded from 120 to 121 files and validated.
+
+### Capability acceptance
+Capability head `e814e547cfe60256f7068a8ff2a4783986c42857` passed Card Pass #1695 **SUCCESS**.
+
+Exactly `TRANSFER_SHIELD` moved missing -> implemented. Capability blob is `97467a79747bd144902671c8dbd217af9d50e49d`.
+
+Owner-family count remains **40** because the new module is an Active Ability #15 submodule and delegates mutation to existing Damage/Shield #20.
+
+### TIMEFOLD audit correction
+The preceding candidate audit proved TIMEFOLD is **not** a small opcode bridge. The branch has an anti-chain check but no reusable same-seat extra-turn transition. Correct TIMEFOLD work must later add a Match Flow extra-turn owner that:
+- survives Defeat/Reward resolution and terminal checks;
+- records the same-seat new turn through canonical turn-owner history;
+- skips only the frozen Condition damage/recovery transition while preserving other end-of-turn cleanup;
+- scopes anti-chain state without disabling unrelated Starbound Mythics.
+
+No TIMEFOLD code was written in V2.4.120.
+
+Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

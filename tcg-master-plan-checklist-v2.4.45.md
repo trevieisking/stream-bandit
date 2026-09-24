@@ -1557,3 +1557,26 @@
 - [x] Pass capability head `0fb50bc4830d540c8c7656a487219b19c5dcbf28` / Card Pass #1692 SUCCESS.
 
 **Acceptance:** capability blob `32d7a738e3b82751a7010acce867d2b5b5ff1fd4`; sole frozen Blackout Pulse consumer covered; 40 owner families preserved.
+
+### V2.4.120 — Lantern Shelter / generic active-Ability Shield transfer
+- [x] Sweep frozen Release 1 sources for `TRANSFER_SHIELD`.
+- [x] Confirm exactly one consumer: Tide Abyssalume / Lantern Shelter.
+- [x] Confirm `source_has_shield_at_least` is already implemented.
+- [x] Confirm `legal_card_available` is already implemented.
+- [x] Keep selection/orchestration under Active Ability owner #15.
+- [x] Reuse Damage/Shield owner #20 for physical Shield transfer.
+- [x] Add card-id-free SELECT_CREATURE -> TRANSFER_SHIELD recognition.
+- [x] Add reconnect-stable target choice.
+- [x] Add a second private amount choice rather than encoding target x amount combinations.
+- [x] Bound amount choice to structured 0..20, source Shield and destination Shield capacity.
+- [x] Preserve the existing controller once-per-turn Ability receipt owner.
+- [x] Fail closed on stale source, target, amount, turn or missing receipt.
+- [x] Prove failed preflight consumes no Ability receipt.
+- [x] Confirm no Abyssalume/card-name dispatch and no new owner family.
+- [x] Synchronize Match Edge dependency closure from 120 to 121 files.
+- [x] Pass runtime head `cbd17b462928d9c33e87b4048df4632a146caf9d` / Card Pass #1694 SUCCESS.
+- [x] Move exactly `TRANSFER_SHIELD` missing -> implemented.
+- [x] Pass capability head `e814e547cfe60256f7068a8ff2a4783986c42857` / Card Pass #1695 SUCCESS.
+- [x] Park TIMEFOLD until the full same-seat Match Flow / Condition-skip / anti-chain contract can be implemented without card-specific lifecycle logic.
+
+**Acceptance:** capability blob `97467a79747bd144902671c8dbd217af9d50e49d`; sole frozen Lantern Shelter consumer covered; 40 owner families preserved.
