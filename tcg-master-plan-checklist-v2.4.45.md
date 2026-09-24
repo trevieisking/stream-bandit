@@ -1219,3 +1219,21 @@
 
 **V2.4.102 acceptance evidence:** implementation head `d91e1ec293a29991f03519bba3092599758333e1`; Card Pass #1636 SUCCESS with both workflow jobs green; capability/release-control synchronized; owner-family count 40; production/main/live unchanged.
 
+
+### V2.4.103 — Damage-Packet predicate family reconciliation
+- [x] Freeze exact consumers: Heatguard Bracer before-packet + Thorn Crown after-packet.
+- [x] Confirm all six predicates are declared by accepted structured card data.
+- [x] Confirm Before-Damage Packet owner already implements all six generically.
+- [x] Confirm canonical Damage Packet context already carries condition provenance.
+- [x] Confirm Event Listener already implements Thorn Crown's five after-packet predicates.
+- [x] Confirm existing deterministic proof for Heatguard recoil and Thorn-style reflect/rejection.
+- [x] Confirm no Release 1 consumer requires after-packet `damage_packet_condition_is`.
+- [x] Freeze scope as capability reconciliation; no gameplay runtime code change.
+- [ ] Add deterministic Heatguard Scorched-condition match + non-match proof.
+- [ ] Pass exact-head Card Pass after proof-only test change.
+- [ ] Move exactly six frozen Damage-Packet predicates missing -> implemented.
+- [ ] Update Release Control capability-manifest fingerprint atomically.
+- [ ] Pass exact-head Card Pass after capability/release-control reconciliation.
+- [ ] Append V2.4.103 acceptance to master plan/checklist/ledger.
+- [x] Preserve owner-family count 40; no main/live promotion in this slice.
+

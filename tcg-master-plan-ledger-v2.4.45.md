@@ -1142,3 +1142,13 @@ Event Listener supports only the accepted bounded deck top -> bottom / count 1 /
 ## 390 — capability and release-control reconciliation complete
 `tcg-runtime-capabilities-v0.2.json` now classifies `MOVE_ZONE_POSITION`, `event_controller_is_self`, `event_zone_is` and `source_is_attached_creature` as implemented. Release Control v1 now fingerprints the exact accepted Edge closures: Match 119 files / `dd577d4492b6753a8f7ac5563ce3d133867e12499fb1cf4bd4551ff3ed457263`; Tactic 53 files / `09067b17567483869def6e55204e45b25ee77d0a8161fb1dfd41367a13920461`; Private Alpha unchanged at 8 files. Production/main/live remain unchanged.
 
+
+## 391 — V2.4.103 freezes the shared Damage-Packet predicate capability family
+The Release 1 structured audit finds exactly two consumers: Ember Heatguard Bracer before `before_damage_packet` and Grove Thorn Crown after `after_damage_packet`. Their union uses six capability predicates: `damage_packet_target_is_attached_creature`, `damage_packet_class_is`, `damage_packet_condition_is`, `damage_packet_source_controller_is_opponent`, `damage_packet_target_zone_is`, and `damage_packet_amount_at_least`.
+
+## 392 — current owners already implement the accepted semantics
+Before-Damage Packet owner `tcg-match-damage-packet-listener-v0-2.ts` evaluates all six against normalized packet context, including condition identity. `tcg-match-damage-packet-context-v0-2.ts` already carries optional normalized condition provenance. Event Listener already evaluates the five after-packet predicates used by Thorn Crown. No gameplay engine repair is justified.
+
+## 393 — only missing evidence is the Heatguard Scorched branch
+Existing tests prove Heatguard recoil and Thorn-style after-packet reflect/rejection. V2.4.103 requires one additional deterministic proof that a condition-class Scorched packet matches Heatguard's accepted predicate branch, a different condition does not match, and normal attachment-limit behavior is preserved. Capability status remains unchanged until that proof and exact-head validation pass.
+

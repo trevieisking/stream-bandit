@@ -3373,3 +3373,82 @@ V2.4.102 is accepted as the shared Hidden Information -> Event Listener parity s
 
 The documentation synchronization that follows this accepted implementation head is record-only and does not alter runtime behavior.
 
+
+## V2.4.103 — Damage-Packet predicate family reconciliation (freeze)
+
+**Freeze head:** `6c0e95ae025d1babd09cf63413e1ed1afee8ff95`  
+**Inherited exact-head gate:** Card Pass #1637 **SUCCESS**; both validation jobs green; no external combined statuses.
+
+### Exact Release 1 consumers
+
+The structured-card audit finds exactly two Release 1 identities in this capability family.
+
+**Ember — Heatguard Bracer / `heatguard-first-risk-reduction`**
+- event: `before_damage_packet`;
+- `damage_packet_target_is_attached_creature`;
+- `damage_packet_class_is(recoil)` OR `damage_packet_class_is(condition)` + `damage_packet_condition_is(Scorched)`;
+- limit: once per turn per attachment;
+- operation: `MODIFY_CURRENT_DAMAGE_PACKET(delta -10, minimum 0)`.
+
+**Grove — Thorn Crown / `thorn-crown-reflect`**
+- event: `after_damage_packet`;
+- `damage_packet_class_is(attack)`;
+- `damage_packet_target_is_attached_creature`;
+- `damage_packet_target_zone_is(vanguard)`;
+- `damage_packet_source_controller_is_opponent`;
+- `damage_packet_amount_at_least(1)`;
+- operation: `DIRECT_DAMAGE($damage_packet_source_creature, 10, effect)`.
+
+No other Release 1 structured consumer was found for:
+`damage_packet_condition_is`,
+`damage_packet_amount_at_least`,
+`damage_packet_source_controller_is_opponent`,
+or `damage_packet_target_zone_is`.
+The shared `damage_packet_class_is` and `damage_packet_target_is_attached_creature` predicates are used by both identities.
+
+### Existing generic ownership
+
+This slice is a capability-reconciliation pass, not a new engine.
+
+**Before-Damage Packet owner**
+`supabase/functions/_shared/tcg-match-damage-packet-listener-v0-2.ts`
+already evaluates all six frozen predicates generically against canonical `RuntimeV02DamagePacketContext`, including `damage_packet_condition_is`.
+
+**Damage Packet context**
+`supabase/functions/_shared/tcg-match-damage-packet-context-v0-2.ts`
+already carries normalized optional `condition` provenance alongside packet class, source, target and packet identity.
+
+**After-Damage Event Listener owner**
+`supabase/functions/_shared/tcg-match-event-listener-v0-2.ts`
+already evaluates the five predicates used by Thorn Crown:
+class, attached target, target zone, opponent source controller and final packet amount.
+
+The accepted current shapes therefore require **no gameplay runtime code change**.
+
+### Existing proof and one missing proof
+
+Already deterministic:
+- generic before-packet modifier ordering / attachment limit;
+- Heatguard recoil branch;
+- Thorn-style after-packet reflect through canonical `DIRECT_DAMAGE`;
+- Thorn non-attack / non-Vanguard rejection.
+
+One proof gap remains before capability promotion:
+- direct Heatguard **condition + Scorched** packet test proving `damage_packet_condition_is` matches Scorched, rejects a different condition, and preserves the existing attachment limit semantics.
+
+### Bounded V2.4.103 action
+
+1. Add only the missing deterministic Scorched-condition proof to the existing Damage #20 packet test file.
+2. Run exact-head Card Pass.
+3. If green, reclassify exactly these six predicates from missing -> implemented:
+   - `damage_packet_target_is_attached_creature`
+   - `damage_packet_class_is`
+   - `damage_packet_condition_is`
+   - `damage_packet_source_controller_is_opponent`
+   - `damage_packet_target_zone_is`
+   - `damage_packet_amount_at_least`
+4. Synchronize Release Control's capability-manifest fingerprint atomically with the capability change.
+5. Re-run exact-head Card Pass and then close master plan/checklist/ledger.
+
+Owner-family count remains **40**. No card-ID/name dispatch, helper owner, main merge, deployment or live promotion is authorized by this slice.
+
