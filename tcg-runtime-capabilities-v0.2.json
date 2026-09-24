@@ -109,6 +109,7 @@
       "event_action_kind_is",
       "event_active_seat_is_controller",
       "event_attachment_kind_is",
+      "event_attachment_target_is_source",
       "event_attack_source_attached_essence_count_at_least",
       "event_attack_source_has_attached_essence_kind",
       "event_attack_source_is_self",
@@ -171,7 +172,6 @@
       "essence_discarded_attachment_kind_is",
       "essence_discarded_by_own_card_effect",
       "essence_discarded_source_controller_is_self",
-      "event_attachment_target_is_source",
       "event_attack_id_is",
       "event_attack_target_controller_is_opponent",
       "event_attack_target_zone_is",
@@ -1518,6 +1518,56 @@
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-paid-attachment.test.ts"
       ],
       "note": "V2.4.110 adds only direct negative proof. Existing generic card-cost choice already evaluates the hand_contains requirement semantically by constructing the exact filtered mandatory hand-discard choice from the live private hand."
+    },
+    "release1_event_attachment_target_is_source_v2_4_111": {
+      "accepted_runtime_head": "42e871cb63ca34c43207ef4bceee8c2dcbbf4553",
+      "card_pass_run": 1664,
+      "predicate": "event_attachment_target_is_source",
+      "frozen_consumers": [
+        {
+          "card_id": "stone-gravibble",
+          "ability_id": "pebble-guard",
+          "event": "essence_attached"
+        },
+        {
+          "card_id": "stone-flintkin",
+          "ability_id": "layered-hide",
+          "event": "relic_attached"
+        },
+        {
+          "card_id": "tide-puddlepip",
+          "ability_id": "freshwater-coat",
+          "event": "essence_attached"
+        },
+        {
+          "card_id": "volt-railhorn",
+          "ability_id": "power-rail",
+          "event": "essence_attached"
+        }
+      ],
+      "owners": {
+        "essence_snapshot": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+        "relic_attachment_route": "supabase/functions/_shared/tcg-match-relic-attachment-route-v0-2.ts",
+        "generic_event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "match_orchestrator": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "essence_attachment_target_identity": "immutable snapshot attachment_target_uid equals source Creature uid",
+        "relic_attachment_target_identity": "event attachment_target_uid equals candidate source Creature uid",
+        "schema_valid_any_turn_supported": true,
+        "marked_runtime_flintkin_card_id_dispatch_removed": true,
+        "legacy_unmarked_flintkin_compatibility_preserved": true,
+        "no_new_owner_family": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-work.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-relic-attachment-route.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-runtime-relic-ownership.test.mjs"
+      ],
+      "note": "V2.4.111 closes all four Release 1 consumers. Essence-attached consumers were already trigger-time snapshot-owned; Flintkin now uses the generic Relic Attachment -> Event Listener -> Heal Packet path. The generic listener also accepts schema-valid any_turn timing. Legacy unmarked raw-heal compatibility remains isolated."
     }
   }
 }
