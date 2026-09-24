@@ -69,7 +69,8 @@
       "SET_WITHDRAWAL_MODIFIER",
       "SHUFFLE_DECK",
       "SHUFFLE_ZONE_INTO_DECK",
-      "SWITCH_WITH_VANGUARD"
+      "SWITCH_WITH_VANGUARD",
+      "TRANSFER_SHIELD"
     ],
     "partial": [],
     "missing": [
@@ -83,8 +84,7 @@
       "SET_ATTACK_COST_FLOOR",
       "SET_RESOLVING_CARD_DESTINATION",
       "SUPPRESS_ABILITY",
-      "TIMEFOLD",
-      "TRANSFER_SHIELD"
+      "TIMEFOLD"
     ]
   },
   "predicates": {
@@ -1890,6 +1890,40 @@
       },
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-device-play-lock.test.ts"
+      ]
+    },
+    "release1_transfer_shield_v2_4_120": {
+      "accepted_runtime_head": "cbd17b462928d9c33e87b4048df4632a146caf9d",
+      "card_pass_run": 1694,
+      "operation": "TRANSFER_SHIELD",
+      "frozen_consumers": [
+        {
+          "card_id": "tide-abyssalume",
+          "ability_id": "lantern-shelter",
+          "surface": "active_ability"
+        }
+      ],
+      "active_ability_owner": "supabase/functions/_shared/tcg-match-active-ability-shield-transfer-v0-2.ts",
+      "mutation_owner": "supabase/functions/_shared/tcg-match-damage-engine-v0-2.ts",
+      "live_route": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
+      "semantics": {
+        "target_choice": "one friendly same-element Creature excluding source",
+        "amount_choice": {
+          "min": 0,
+          "max": 20
+        },
+        "amount_clamped_by": [
+          "source_shield",
+          "destination_capacity_60"
+        ],
+        "controller_turn_limit_owner_reused": true,
+        "reconnect_stable_anchors": true,
+        "stale_target_or_amount_fails_closed": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-shield-transfer.test.ts"
       ]
     }
   }
