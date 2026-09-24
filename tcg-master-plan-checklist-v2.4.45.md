@@ -1580,3 +1580,29 @@
 - [x] Park TIMEFOLD until the full same-seat Match Flow / Condition-skip / anti-chain contract can be implemented without card-specific lifecycle logic.
 
 **Acceptance:** capability blob `97467a79747bd144902671c8dbd217af9d50e49d`; sole frozen Lantern Shelter consumer covered; 40 owner families preserved.
+
+### V2.4.121 — Storm Shepherd / shared source-in-play + active-Ability switch route
+- [x] Sweep frozen Release 1 sources for `source_in_play`.
+- [x] Confirm exactly one consumer: Gale Aeralith / Storm Shepherd.
+- [x] Confirm `legal_card_available` is already implemented.
+- [x] Confirm `SWITCH_WITH_VANGUARD` is already implemented.
+- [x] Reject a predicate-only false close because Active Ability lacked the live switch orchestration family.
+- [x] Add strict shared `source_in_play` normalization to the Requirement evaluator.
+- [x] Make missing source evaluate false and malformed in-play source state fail closed.
+- [x] Reject undeclared `source_in_play` fields.
+- [x] Add card-id-free Active Ability SELECT_CREATURE Reserve -> SWITCH_WITH_VANGUARD recognition.
+- [x] Preserve the existing controller once-per-turn Ability receipt owner.
+- [x] Use reconnect-stable source and Reserve target anchors.
+- [x] Allow a Reserve source to select itself because frozen grammar does not exclude source.
+- [x] Delegate the physical swap to canonical Atomic Switch ownership.
+- [x] Feed canonical `moved_to_reserve` / `became_vanguard` events into existing Movement Listener ownership.
+- [x] Reuse existing nested Heal Listener and Active Ability continuation choreography.
+- [x] Fail closed on stale source, target, turn, active seat or missing receipt.
+- [x] Prove failed target preflight consumes no Ability receipt.
+- [x] Record Card Pass #1697 as release-control Tactic-closure failure only; deterministic runtime and all type-checks were green.
+- [x] Synchronize the Tactic shared Requirement-evaluator closure fingerprint to exact digest `324d7a11c3d889f6227da104dc081bb718dfd0ab06a3e7d8548e7cd9ca5729bd`.
+- [x] Pass corrected runtime head `316dc56b2fa2c12a385b341bbc726a56e9b96f84` / Card Pass #1698 SUCCESS.
+- [x] Move exactly `source_in_play` missing -> implemented while leaving `SWITCH_WITH_VANGUARD` unchanged.
+- [x] Pass capability head `e59857271b18438281dbeade3ac6e03abc11d89e` / Card Pass #1699 SUCCESS.
+
+**Acceptance:** capability blob `89ac252c8a800eff1b91e2a671cd9e3cc928c325`; sole frozen `source_in_play` consumer is runnable end-to-end through canonical switch/listener owners; 40 owner families preserved.

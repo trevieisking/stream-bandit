@@ -4237,3 +4237,63 @@ The preceding candidate audit proved TIMEFOLD is **not** a small opcode bridge. 
 No TIMEFOLD code was written in V2.4.120.
 
 Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.121 — Storm Shepherd / shared source-in-play + active-Ability switch route
+
+**Baseline authority head:** `664a9680382408fd9a27dbac30cb955ef6f7b892` — Card Pass #1696 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **one** `source_in_play` consumer:
+- Gale Aeralith — Storm Shepherd.
+
+Storm Shepherd also depends on already-implemented:
+- `legal_card_available` for a friendly Gale Reserve Creature;
+- `SWITCH_WITH_VANGUARD` with `action_kind:"effect_switch"`.
+
+A predicate-only implementation would have been a false close because Active Ability owner #15 did not yet have a live SELECT_CREATURE Reserve -> SWITCH_WITH_VANGUARD orchestration family.
+
+### Shared predicate ownership
+The shared Requirement evaluator now owns strict `source_in_play` semantics:
+- exact grammar is only `{"predicate":"source_in_play"}`;
+- a missing source is false;
+- a source object must expose an in-play Creature stack;
+- undeclared fields fail closed.
+
+### Generic Active Ability switch route
+Active Ability owner #15 now recognizes the card-id-free family:
+1. source is in play;
+2. a friendly same-element Reserve Creature exists;
+3. choose exactly one legal Reserve Creature;
+4. delegate the physical swap to canonical Atomic Switch ownership;
+5. route emitted `moved_to_reserve` and `became_vanguard` events through the existing Movement Listener;
+6. route any emitted healing through the existing Heal Listener;
+7. resume through the standard Active Ability continuation owner.
+
+The source may be Vanguard or Reserve. Because the frozen grammar does not exclude the source, a Reserve source may select itself and become Vanguard. Choice transport is reconnect-stable and bound to source/target anchors. The existing controller once-per-turn Ability receipt owner is reused.
+
+No new switch engine, movement engine, healing engine or owner family is introduced.
+
+### Validation and closure correction
+Runtime implementation head `620578a0f064093f04698f1a46df6a1f2a779ffa` ran Card Pass #1697:
+- deterministic runtime suite **SUCCESS**;
+- Match dispatcher type-check **SUCCESS**;
+- Tactic interpreter type-check **SUCCESS**;
+- Private Alpha, Withdrawal, Attack-Damage and Surge type-checks **SUCCESS**;
+- overall workflow **FAIL** only because shared Requirement evaluator also belongs to the Tactic Edge dependency closure and that closure fingerprint was stale.
+
+The failure reported exact Tactic closure digest drift:
+- manifest: `600ce673ba7295eb22d74096401634a6249b1df3e52b4f4d91712c38179b8938`;
+- actual: `324d7a11c3d889f6227da104dc081bb718dfd0ab06a3e7d8548e7cd9ca5729bd`.
+
+Release-control-only head `316dc56b2fa2c12a385b341bbc726a56e9b96f84` updated the Tactic closure row for the shared Requirement evaluator and independently recomputed the exact same digest. Card Pass #1698 then passed **SUCCESS** end-to-end.
+
+Match Edge dependency closure is now **122 files**. Tactic Edge remains **54 files** with its refreshed shared Requirement evaluator fingerprint.
+
+### Capability acceptance
+Capability head `e59857271b18438281dbeade3ac6e03abc11d89e` passed Card Pass #1699 **SUCCESS**.
+
+Exactly `source_in_play` moved missing -> implemented. `SWITCH_WITH_VANGUARD` stayed implemented and was not reclassified. Capability blob is `89ac252c8a800eff1b91e2a671cd9e3cc928c325`.
+
+Capability catalogue is now **61/72 operations + 81/108 predicates = 142/180 (78.9%)** implemented. The frozen Release 1 used-missing surface falls from **22 to 21** capabilities.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

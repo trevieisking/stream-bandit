@@ -1360,3 +1360,15 @@ Head `cbd17b462928d9c33e87b4048df4632a146caf9d` passed Card Pass #1694. Determin
 
 ## 460 — V2.4.120 TRANSFER_SHIELD accepted; TIMEFOLD remains parked
 Capability head `e814e547cfe60256f7068a8ff2a4783986c42857` passed Card Pass #1695. Exactly `TRANSFER_SHIELD` moved missing -> implemented; capability blob is `97467a79747bd144902671c8dbd217af9d50e49d`. TIMEFOLD remains unimplemented because correct support requires a same-seat Match Flow transition, canonical turn-history write, selective Condition-Aftermath skip and correctly scoped anti-chain state. Owner-family count remains 40; production is unchanged.
+
+## 461 — V2.4.121 source_in_play has one frozen Release 1 consumer
+The frozen structured-card sweep finds exactly one `source_in_play` use: Gale Aeralith / Storm Shepherd. Its other requirements and switch operation were already implemented, but Active Ability lacked the live Reserve-selection switch route, so predicate-only reconciliation was forbidden.
+
+## 462 — Storm Shepherd reuses shared Requirement and Atomic Switch ownership
+The shared Requirement evaluator owns strict `source_in_play` state semantics. Active Ability #15 owns the reconnect-stable Reserve choice and once-per-turn receipt. Physical switching remains with canonical Atomic Switch ownership, whose `moved_to_reserve` and `became_vanguard` events continue through Movement Listener and nested Heal Listener owners. No card-ID branch or new owner family is introduced.
+
+## 463 — V2.4.121 #1697 failure was release-control evidence only
+Runtime head `620578a0f064093f04698f1a46df6a1f2a779ffa` passed deterministic runtime tests and every type-check, but Card Pass #1697 failed because the shared Requirement evaluator also belongs to the Tactic Edge closure. The manifest digest `600ce673ba7295eb22d74096401634a6249b1df3e52b4f4d91712c38179b8938` was stale; CI measured `324d7a11c3d889f6227da104dc081bb718dfd0ab06a3e7d8548e7cd9ca5729bd`. Release-control-only head `316dc56b2fa2c12a385b341bbc726a56e9b96f84` synchronized that exact closure and passed Card Pass #1698.
+
+## 464 — V2.4.121 source_in_play accepted
+Capability head `e59857271b18438281dbeade3ac6e03abc11d89e` passed Card Pass #1699. Exactly `source_in_play` moved missing -> implemented; `SWITCH_WITH_VANGUARD` remained implemented. Capability blob is `89ac252c8a800eff1b91e2a671cd9e3cc928c325`. Capability coverage is 142/180 (78.9%), frozen used-missing falls to 21, owner-family count remains 40 and production remains unchanged.
