@@ -352,7 +352,14 @@ export function runtimeV02CreateActiveAbilityDeckReadingChoice(
     throw new Error("tcg_v0_2_active_ability_deck_reading_deck_top_unavailable");
   }
   const top = inst(deck[0], "tcg_v0_2_active_ability_deck_reading_top_invalid");
-  recordRuntimeV02HiddenInformationView(state, controllerSeat, "deck_top");
+  recordRuntimeV02HiddenInformationView(state, controllerSeat, "deck_top", {
+    action_kind: "ability",
+    source_controller_seat: controllerSeat,
+    source_action_id: descriptor.ability_id,
+    source_card_uid: sourceInstance.uid,
+    source_creature_uid: sourceInstance.uid,
+    phase: String(state.phase || "play"),
+  });
 
   return {
     id: requiredString(
