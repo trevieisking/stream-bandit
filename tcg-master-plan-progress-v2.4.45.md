@@ -3478,3 +3478,61 @@ V2.4.103 closed as a stale-capability reconciliation with no gameplay-runtime mo
 
 Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
 
+
+## V2.4.104 — core Event Listener predicate reconciliation (freeze)
+
+**Freeze head:** `282602754bede1a54e01068792d5e52c3d36150b`  
+**Inherited gate:** V2.4.103 documentation head Card Pass #1641 **SUCCESS**.
+
+### Exact capability family
+
+The current capability manifest still marks eight predicates missing even though `tcg-match-event-listener-v0-2.ts` already owns generic executable cases for each:
+
+- `event_subject_is_source` — 33 Release 1 card identities;
+- `event_origin_zone_is` — 32;
+- `event_controller_is_active_seat` — 22;
+- `event_destination_zone_is` — 17;
+- `source_is_self` — 17;
+- `event_phase_is` — 9;
+- `event_subject_matches` — 4 identities / 5 predicate occurrences;
+- `event_subject_is_attached_creature` — 3 identities.
+
+The structured audit finds these uses only inside triggered Creature Ability, Essence-listener or Tactic-listener requirement trees currently owned by the generic Event Listener engine. No Attack-program or Tactic-program interpreter requires a second semantic implementation for these accepted shapes.
+
+### Existing generic semantics
+
+The shared requirement evaluator already implements:
+
+- source identity against current candidate/event controller;
+- exact event origin and destination zone comparison;
+- exact event phase comparison;
+- event-controller vs current active-seat comparison;
+- event subject top-instance identity against the listener source;
+- attached Creature identity against the listener candidate's field;
+- subject-definition filtering through canonical `filtersMatch`;
+- source/self controller relation.
+
+No card ID/name dispatch or per-card branch participates.
+
+### Existing proof
+
+Broad deterministic Event Listener suites already exercise:
+- `event_subject_is_source`;
+- `event_origin_zone_is`;
+- `event_destination_zone_is`;
+- `event_phase_is`;
+- `source_is_self`;
+
+across creature-entered, evolved and frozen essence-attachment listener paths.
+
+Three direct proof gaps remain before capability promotion:
+1. `event_controller_is_active_seat` must match the current active seat and reject the inactive controller;
+2. `event_subject_matches` must evaluate the current event subject definition and reject a mismatching filter;
+3. `event_subject_is_attached_creature` must match a Relic/Essence carrier and reject another Creature's event.
+
+### Bounded action
+
+V2.4.104 adds **proof only** for those three semantics. If exact-head Card Pass is green, exactly the eight frozen predicates may move missing -> implemented and Release Control's capability-manifest fingerprint may be updated atomically.
+
+Owner-family count remains **40**. No gameplay-runtime source, main merge, deployment or live promotion is authorized by this slice.
+

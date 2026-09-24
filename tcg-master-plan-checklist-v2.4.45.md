@@ -1239,3 +1239,20 @@
 
 
 **Acceptance:** `6d37f636b806a6701eab45ef7b0c2e92ba38b9ae` / Card Pass #1640 SUCCESS; proof head `cfb91e4c866df8cdebed684441e8c274eab80fba` / #1639 SUCCESS; no gameplay-runtime or live change.
+
+### V2.4.104 — core Event Listener predicate reconciliation
+- [x] Freeze exactly eight missing-but-executable core Event Listener predicates.
+- [x] Audit Release 1 consumer counts and confirm all accepted uses are Event Listener requirement trees.
+- [x] Confirm generic Event Listener cases already exist for all eight.
+- [x] Confirm broad deterministic proof for subject source, origin, destination, phase and source/self.
+- [x] Confirm no card-ID/name dispatch or second interpreter is required.
+- [ ] Add direct active-seat controller match/non-match proof.
+- [ ] Add direct subject-definition filter match/non-match proof.
+- [ ] Add direct attached-creature subject match/non-match proof.
+- [ ] Pass exact-head Card Pass after proof-only tests.
+- [ ] Move exactly eight frozen predicates missing -> implemented.
+- [ ] Update Release Control capability-manifest fingerprint atomically.
+- [ ] Pass exact-head Card Pass after capability reconciliation.
+- [ ] Append V2.4.104 acceptance across plan/checklist/ledger.
+- [x] Preserve 40 owner families; no main/live promotion in this slice.
+

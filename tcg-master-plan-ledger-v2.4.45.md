@@ -1159,3 +1159,10 @@ Proof head `cfb91e4c866df8cdebed684441e8c274eab80fba` passed Card Pass #1639. Th
 ## 395 — six Damage-Packet predicates are capability-complete for Release 1
 Accepted head `6d37f636b806a6701eab45ef7b0c2e92ba38b9ae` passed Card Pass #1640. Exactly six predicates moved missing -> implemented: `damage_packet_target_is_attached_creature`, `damage_packet_class_is`, `damage_packet_condition_is`, `damage_packet_source_controller_is_opponent`, `damage_packet_target_zone_is`, and `damage_packet_amount_at_least`. Release Control is synchronized to capability blob `6c01e3298efb9c21e5d040b8db3940eb76147187`. No gameplay-runtime source or Edge closure changed in the reconciliation commit.
 
+
+## 396 — V2.4.104 freezes eight stale core Event Listener predicates
+The Release 1 audit identifies eight capability entries that remain marked missing despite generic Event Listener cases: `event_subject_is_source`, `event_origin_zone_is`, `event_controller_is_active_seat`, `event_destination_zone_is`, `source_is_self`, `event_phase_is`, `event_subject_matches`, and `event_subject_is_attached_creature`. Their accepted consumers are triggered Ability/Essence/Tactic listener requirement trees only.
+
+## 397 — five predicates already have broad runtime proof; three need direct assertions
+Existing deterministic Event Listener tests exercise source identity, origin/destination zones, phase and source/self across multiple listener families. Direct proof is still required for active-seat controller comparison, event-subject definition filters and attached-Creature subject identity before capability promotion. V2.4.104 is therefore proof-only unless those tests expose a real runtime defect.
+
