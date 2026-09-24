@@ -1,4 +1,7 @@
-import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
+import {
+  recordRuntimeV02HiddenInformationView,
+  type RuntimeV02HiddenInformationSourceContext,
+} from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
 type Seat = 1 | 2;
@@ -250,6 +253,7 @@ export function runtimeV02BindDeckTopSet(
   controllerSeatRaw: number,
   zoneOwnerSeatRaw: number,
   countRaw: number,
+  sourceContext?: RuntimeV02HiddenInformationSourceContext,
 ): {
   cards: RuntimeV02BoundSetCardRef[];
   provenance: RuntimeV02BoundDeckSetProvenance;
@@ -274,7 +278,12 @@ export function runtimeV02BindDeckTopSet(
     throw new Error("tcg_v0_2_bound_set_uid_duplicate");
   }
   if (cards.length > 0) {
-    recordRuntimeV02HiddenInformationView(state, controllerSeat, "deck_top");
+    recordRuntimeV02HiddenInformationView(
+      state,
+      controllerSeat,
+      "deck_top",
+      sourceContext,
+    );
   }
   return {
     cards: cards.map((card) => ({ ...card })),
