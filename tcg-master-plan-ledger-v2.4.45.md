@@ -1270,3 +1270,21 @@ Draft Essence also uses `voluntary_withdrawal_legal_with_incoming` and `PERFORM_
 ## 430 — V2.4.113 target_zone_is accepted
 Capability head `a632fa67be0024e5ca64b98d8965fa00399f5f67` passed Card Pass #1672. Exactly `target_zone_is` moved missing -> implemented. Capability blob is `f1361fca48abfebdbdc5525d768a88f48fec51c7`. Runtime source, production Edge functions and owner-family count remain unchanged.
 
+## 431 — V2.4.114 target_element_is spans four owner surfaces
+Release 1 has 13 structured card consumers across Essence Attachment snapshot, Heal Listener, Withdrawal continuous and outgoing Relic Attack Damage. Shared predicate acceptance therefore requires all four surfaces; an Essence-only proof would be insufficient.
+
+## 432 — Cinder Charm exposed outgoing Relic Attack Damage parity
+Cinder Charm is an attached Relic continuous `attack_damage` producer gated by `target_element_is` and a printed-HP amount case. Damage/Shield owner #20 previously handled outgoing Essence continuous and Creature continuous Ability modifiers, but not outgoing Relic modifiers. V2.4.114 adds that generic Relic surface without card identity or owner-family expansion.
+
+## 433 — target_printed_hp_at_least numeric comparison is shared Requirement ownership
+Cinder's 200+ printed-HP case and the existing Tactic IF predicate now use one shared Requirement evaluator. Tactic and Attack Damage provide target binding; the numeric predicate meaning is no longer duplicated.
+
+## 434 — V2.4.114 first runtime head failed closed
+Head `da93fa4684ba8b09e9c39c7001487ee3615a8a70` / #1674 passed the new Cinder proof but failed five pre-existing prevention tests, with 985 runtime tests passing. The cause was broadening the structured-runtime probe to Relic identity, which made legacy-compatible attached-Relic test states return `null`.
+
+## 435 — probe compatibility restored without removing Cinder parity
+Head `821362b42b853e70067bafd0ef204ac555936cd3` restores the prior probe boundary and keeps generic outgoing Relic Attack Damage. Card Pass #1675 succeeded, proving both the new Cinder route and prior prevention authority.
+
+## 436 — V2.4.114 target_element_is accepted
+Capability head `21237c037b1e1668d3fba16ad7b47c112855b1b3` passed Card Pass #1676. Exactly `target_element_is` moved missing -> implemented. Capability blob `195391418a8490a16e7e0b61b141e5f262522e29`. Owner-family count remains 40; production remains unchanged.
+

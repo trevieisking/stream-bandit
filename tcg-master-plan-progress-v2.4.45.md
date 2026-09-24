@@ -3967,3 +3967,40 @@ Draft Essence must reuse that complete ownership chain, including player-selecte
 
 Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred.
 
+## V2.4.114 — `target_element_is` multi-owner parity + Cinder Charm outgoing Relic Attack Damage
+
+**Baseline authority head:** `4d782a56357a654d3fdbca6a3a9c4b3d727dff34` — Card Pass #1673 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured registry has **13 card consumers** of `target_element_is` across four runtime owner surfaces:
+- Essence Attachment snapshot: Hearth Essence, Smolder Essence, Draft Essence, Bloom Essence, Veil Essence, Fault Essence, Calm Essence, Flow Essence, Brine Essence, Surge Essence;
+- Heal Listener: Symbiote Essence;
+- Withdrawal continuous: Granite Essence;
+- outgoing Relic Attack Damage: Cinder Charm.
+
+The first three owner families already evaluated the predicate generically. The exact audit found one real parity gap: Cinder Charm is a Relic with a continuous outgoing `attack_damage` effect, while Attack Damage previously collected outgoing Essence continuous effects and Creature continuous Abilities but not outgoing Relics.
+
+### Generic repair
+V2.4.114 extends existing Damage/Shield owner #20 rather than creating another owner family:
+- attached Relic continuous effects with `kind: attack_damage` and `target: $attached_creature` enter outgoing Attack Damage generically;
+- Cinder's `target_element_is` reads the attached Creature's structured definition element;
+- Cinder's `value.default / value.cases` formula resolves without card identity;
+- its case predicate `target_printed_hp_at_least` delegates to the shared Requirement evaluator rather than duplicating numeric comparison semantics;
+- the existing Tactic IF `target_printed_hp_at_least` branch now delegates to that same Requirement owner.
+
+Cross-owner proof also adds explicit negative `target_element_is` checks for Essence Attachment and Heal Listener; existing Withdrawal tests already prove Granite works for Stone and rejects non-Stone.
+
+### Fail-closed correction history
+Initial runtime head `da93fa4684ba8b09e9c39c7001487ee3615a8a70` passed the new Cinder test but failed Card Pass #1674 with **985 runtime tests passing / 5 failing**. All five failures were existing damage-prevention-authority tests.
+
+Cause: the structured-runtime probe was unnecessarily widened to inspect attached Relic identity. Legacy-compatible prevention test states intentionally had an attached Relic outside structured `card_index`, so the damage resolver returned `null` instead of entering the already-marked structured Creature authority.
+
+Repair head `821362b42b853e70067bafd0ef204ac555936cd3` restores the prior structured probe boundary while retaining generic outgoing Relic execution. Card Pass #1675 **SUCCESS**.
+
+### Capability acceptance
+Capability head `21237c037b1e1668d3fba16ad7b47c112855b1b3` passed Card Pass #1676 **SUCCESS**.
+
+Exactly `target_element_is` moved missing -> implemented. Capability blob is `195391418a8490a16e7e0b61b141e5f262522e29`.
+
+Release Control is synchronized to the repaired Match/Tactic closures and capability manifest. Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred.
+

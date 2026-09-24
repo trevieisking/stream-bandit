@@ -1429,3 +1429,28 @@
 
 **Acceptance:** capability blob `f1361fca48abfebdbdc5525d768a88f48fec51c7`; `target_zone_is` only.
 
+### V2.4.114 — target_element_is multi-owner parity
+- [x] Inventory all frozen structured card consumers: 13 cards across four owner surfaces.
+- [x] Confirm Essence Attachment snapshot generic target-element semantics.
+- [x] Confirm Heal Listener generic target-element semantics for Symbiote.
+- [x] Confirm Withdrawal continuous generic target-element semantics for Granite, including non-Stone rejection.
+- [x] Identify Cinder Charm outgoing Relic Attack Damage as the remaining parity gap.
+- [x] Add generic attached-Relic outgoing `attack_damage` execution inside existing Damage/Shield owner #20.
+- [x] Keep Cinder dispatch card-ID/name free.
+- [x] Resolve Cinder `value.default / value.cases` generically.
+- [x] Centralize `target_printed_hp_at_least` numeric comparison in shared Requirement ownership.
+- [x] Make Tactic IF delegate its existing target-printed-HP branch to the same Requirement owner.
+- [x] Add Cinder proofs: Ember <200 => +10; Ember >=200 => +20; non-Ember => +0.
+- [x] Add Essence Attachment target-element negative regression.
+- [x] Add Heal Listener target-element negative regression.
+- [x] Record `da93fa4684ba8b09e9c39c7001487ee3615a8a70` / #1674 FAILURE; 985 passed / 5 failed.
+- [x] Diagnose #1674 as an over-broad structured-runtime probe, not Cinder execution.
+- [x] Restore prior structured probe boundary without removing generic outgoing Relic execution.
+- [x] Pass repaired runtime head `821362b42b853e70067bafd0ef204ac555936cd3` / Card Pass #1675 SUCCESS.
+- [x] Move exactly `target_element_is` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint.
+- [x] Pass capability head `21237c037b1e1668d3fba16ad7b47c112855b1b3` / Card Pass #1676 SUCCESS.
+- [x] Preserve 40 owner families; no database/Edge/main/live promotion.
+
+**Acceptance:** capability blob `195391418a8490a16e7e0b61b141e5f262522e29`; all four owner surfaces covered.
+
