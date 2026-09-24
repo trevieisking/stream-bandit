@@ -157,6 +157,7 @@
       "source_has_condition",
       "source_has_relic",
       "source_has_shield_at_least",
+      "source_in_play",
       "source_is_attached_creature",
       "source_is_current_friendly_vanguard",
       "source_is_self",
@@ -191,7 +192,6 @@
       "shield_actual_gain_at_least",
       "shield_source_is_card_effect",
       "shield_target_is_self",
-      "source_in_play",
       "target_damage_at_least",
       "target_damage_at_most",
       "target_damage_equals",
@@ -1924,6 +1924,46 @@
       },
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-shield-transfer.test.ts"
+      ]
+    },
+    "release1_source_in_play_storm_shepherd_v2_4_121": {
+      "accepted_runtime_head": "316dc56b2fa2c12a385b341bbc726a56e9b96f84",
+      "card_pass_run": 1698,
+      "predicate": "source_in_play",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-aeralith-storm-shepherd",
+          "ability_id": "storm-shepherd",
+          "surface": "active_ability"
+        }
+      ],
+      "shared_predicate_owner": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
+      "active_ability_owner": "supabase/functions/_shared/tcg-match-active-ability-switch-v0-2.ts",
+      "switch_owner": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+      "semantics": {
+        "source_must_exist_on_field": true,
+        "source_may_be_vanguard_or_reserve": true,
+        "legal_target": "friendly same-element Reserve Creature",
+        "source_may_select_self_when_source_is_reserve": true,
+        "once_per_turn_controller_receipt_reused": true,
+        "movement_listener_events": [
+          "moved_to_reserve",
+          "became_vanguard"
+        ],
+        "movement_and_heal_continuation_reused": true,
+        "stale_source_or_target_fails_closed": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": {
+        "initial_runtime_head": "620578a0f064093f04698f1a46df6a1f2a779ffa",
+        "initial_card_pass": 1697,
+        "initial_result": "failure_release_control_tactic_closure_only",
+        "corrected_runtime_head": "316dc56b2fa2c12a385b341bbc726a56e9b96f84",
+        "corrected_card_pass": 1698
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-switch.test.ts"
       ]
     }
   }
