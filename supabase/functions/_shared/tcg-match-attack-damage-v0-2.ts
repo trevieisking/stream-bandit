@@ -43,6 +43,7 @@ export type RuntimeAttackDamageCreature = {
   shield?: number;
   conditions?: RuntimeV02ConditionCreature["conditions"];
   condition?: string | null;
+  became_vanguard_turn?: number;
   flags?: Record<string, unknown>;
 };
 
@@ -475,18 +476,28 @@ function outgoingRelicWhenMatches(
   if (when == null) return true;
   const predicate = objectRecord(when);
   if (!predicate) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_when_invalid");
-  const allowed = new Set(["predicate", "target", "element"]);
-  const extra = Object.keys(predicate).find((field) => !allowed.has(field));
-  if (extra) throw new Error(`tcg_v0_2_attack_damage_outgoing_relic_when_field_unsupported:${extra}`);
-  if (String(predicate.predicate || "") !== "target_element_is") {
-    throw new Error("tcg_v0_2_attack_damage_outgoing_relic_when_unsupported");
+  const kind = String(predicate.predicate || "");
+  if (kind === "target_element_is") {
+    const allowed = new Set(["predicate", "target", "element"]);
+    const extra = Object.keys(predicate).find((field) => !allowed.has(field));
+    if (extra) throw new Error(`tcg_v0_2_attack_damage_outgoing_relic_when_field_unsupported:${extra}`);
+    if (String(predicate.target || "") !== "$attached_creature") {
+      throw new Error("tcg_v0_2_attack_damage_outgoing_relic_element_target_unsupported");
+    }
+    const element = String(predicate.element || "").trim();
+    if (!element) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_element_required");
+    return String(attachedCreatureDefinition(state, source).element || "") === element;
   }
-  if (String(predicate.target || "") !== "$attached_creature") {
-    throw new Error("tcg_v0_2_attack_damage_outgoing_relic_element_target_unsupported");
+  if (kind === "target_became_vanguard_this_turn") {
+    const allowed = new Set(["predicate", "target"]);
+    const extra = Object.keys(predicate).find((field) => !allowed.has(field));
+    if (extra) throw new Error(`tcg_v0_2_attack_damage_outgoing_relic_when_field_unsupported:${extra}`);
+    if (String(predicate.target || "") !== "$attached_creature") {
+      throw new Error("tcg_v0_2_attack_damage_outgoing_relic_vanguard_target_unsupported");
+    }
+    return Number(source.became_vanguard_turn ?? -1) === currentTurn(state);
   }
-  const element = String(predicate.element || "").trim();
-  if (!element) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_element_required");
-  return String(attachedCreatureDefinition(state, source).element || "") === element;
+  throw new Error("tcg_v0_2_attack_damage_outgoing_relic_when_unsupported");
 }
 
 function outgoingRelicCaseMatches(
@@ -537,6 +548,19 @@ function outgoingRelicAmount(
   return fallback;
 }
 
+function outgoingRelicFiltersMatch(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+  filters: Record<string, unknown> | undefined,
+  context: RuntimeAttackDamageContext,
+): boolean {
+  const attachedDefinition = attachedCreatureDefinition(state, source);
+  return continuousFiltersMatch(filters, {
+    ...context,
+    target_element: String(attachedDefinition.element || ""),
+  });
+}
+
 function applyOutgoingRelicDamage(
   state: Record<string, unknown>,
   source: RuntimeAttackDamageCreature,
@@ -549,7 +573,7 @@ function applyOutgoingRelicDamage(
       throw new Error("tcg_v0_2_attack_damage_outgoing_relic_limit_unsupported");
     }
     if (!outgoingRelicWhenMatches(state, source, effect.when)) continue;
-    if (!continuousFiltersMatch(effect.filters, context)) continue;
+    if (!outgoingRelicFiltersMatch(state, source, effect.filters, context)) continue;
     const mode = effect.mode == null ? "delta" : String(effect.mode);
     if (mode !== "delta") throw new Error("tcg_v0_2_attack_damage_outgoing_relic_mode_unsupported");
     value += outgoingRelicAmount(state, source, effect);

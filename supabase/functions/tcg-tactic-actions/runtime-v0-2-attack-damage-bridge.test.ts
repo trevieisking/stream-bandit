@@ -191,6 +191,25 @@ const kilnback = continuousCreature("ember-kilnback", "furnace-hide", [{
   filters: { source_controller: "opponent" },
 }]);
 
+const wingclipCharm = structuredEntry("gale-wingclip-charm", {
+  card_family: "Tactic",
+  element: "Gale",
+  tactic: {
+    subtype: "Relic",
+    play_requirements: [],
+    program: { schema: "sb-tcg-effects-v0.2", discard_after_resolve: false, steps: [] },
+    listeners: [],
+    continuous: [{
+      id: "wingclip-vanguard-pressure",
+      kind: "attack_damage",
+      target: "$attached_creature",
+      when: { predicate: "target_became_vanguard_this_turn", target: "$attached_creature" },
+      amount: 20,
+      filters: { target_element: "Gale" },
+    }],
+  },
+});
+
 Deno.test("legacy-only match keeps attack-damage resolver on legacy fallback", () => {
   const state = {
     card_index: {
@@ -260,6 +279,55 @@ Deno.test("structured outgoing and incoming layers preserve Crushed timing betwe
   assertEquals(outgoing, 90);
   const afterCrushed = Number(outgoing) + 20;
   assertEquals(structuredRuntimeIncomingAttackDamage(state, attacker, target, afterCrushed, opponentVanguardConditioned), 100);
+});
+
+Deno.test("Wingclip outgoing Relic damage binds Vanguard timing and target_element to the attached Creature", () => {
+  const state = {
+    ...markedState({
+      "gale-wingclip-charm": wingclipCharm,
+      "gale-large": galeLarge,
+      "ember-large": emberLarge,
+      "stone-test-target": targetEntry,
+    }),
+    turn_seq: 7,
+  } as Record<string, unknown>;
+  const target = {
+    stack: [{ uid: "target", card_id: "stone-test-target" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+    target_element: "Stone",
+  };
+  const makeAttacker = (cardId: string, becameTurn: number) => ({
+    stack: [{ uid: "attacker", card_id: cardId }],
+    essence: [],
+    relic: { uid: "wingclip", card_id: "gale-wingclip-charm" },
+    damage: 0,
+    shield: 0,
+    became_vanguard_turn: becameTurn,
+  });
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("gale-large", 7), target, 50, context),
+    70,
+    "Wingclip should add 20 to an attached Gale Creature that became Vanguard this turn",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("gale-large", 6), target, 50, context),
+    50,
+    "Wingclip must not add damage when the attached Creature became Vanguard on an earlier turn",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("ember-large", 7), target, 50, context),
+    50,
+    "Wingclip target_element filter must reject a non-Gale attached Creature even when the attacked target is unrelated",
+  );
 });
 
 Deno.test("Kilnback incoming Attack damage uses canonical source_has_condition semantics", () => {
