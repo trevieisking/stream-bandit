@@ -3815,3 +3815,32 @@ Exactly `source_became_vanguard_this_turn` moved missing -> implemented. Release
 
 This was a pure capability/release-control reconciliation. Runtime source, tests, Edge closures, database, main and live are unchanged. Owner-family count remains **40**; PR #591 remains draft/unmerged.
 
+## V2.4.109 — `source_is_current_friendly_vanguard` predicate reconciliation
+
+**Baseline authority head:** `7f415b3137c35d1e8fd62cfb74c72a73143ecd21` — Card Pass #1655 **SUCCESS**.
+
+### Exact Release 1 consumer
+Exactly one structured consumer uses this predicate:
+- **Prismatic Founder / Bandit's Current** active Ability.
+
+The frozen Ability is the already-accepted owner-#31 search/private-choice sequence:
+`SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK`.
+
+### Canonical ownership and proof
+`tcg-match-active-ability-search-attachment-v0-2.ts` requires the exact `source_is_current_friendly_vanguard` descriptor shape. Before creating any private search choice it:
+- requires `source.where === "vanguard"`;
+- requires `source.index === null`;
+- rebinds the supplied source identity to the live current Vanguard;
+- only then records the active-Ability use receipt through the shared live facade.
+
+V2.4.109 added one bounded negative regression proving that a Reserve source is rejected with `tcg_v0_2_search_attachment_source_must_be_vanguard` and that the turn-limit receipt remains unconsumed.
+
+**Proof head:** `1364263b1fe85828d84d2072416a927a43dfa5a0` — Card Pass #1656 **SUCCESS**.
+
+### Implementation acceptance
+**Accepted capability head:** `e2c48ab21b0dfa351c4dc282050c38215dcbbfb6` — Card Pass #1657 **SUCCESS**.
+
+Exactly `source_is_current_friendly_vanguard` moved missing -> implemented. Release Control now points to capability blob `ae2a92997fca04a47f25b77283a45f330794a805`.
+
+No gameplay runtime source changed. The only proof change is the negative active-Ability regression. No database, Edge deployment, main merge or live promotion occurred. Owner-family count remains **40**; PR #591 remains draft/unmerged.
+

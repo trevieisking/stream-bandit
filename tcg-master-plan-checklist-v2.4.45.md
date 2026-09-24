@@ -1330,3 +1330,20 @@
 
 **Acceptance:** capability blob `9661f21edda0bb8dfc7d710cdf94ae54fc6496db`; no runtime/test/main/live change.
 
+### V2.4.109 — source_is_current_friendly_vanguard predicate reconciliation
+- [x] Freeze exact consumer: Prismatic Founder / Bandit's Current.
+- [x] Confirm owner #31 search/private-choice descriptor requires exactly `source_is_current_friendly_vanguard`.
+- [x] Confirm activation accepts only `where: vanguard`, `index: null`.
+- [x] Confirm live current-Vanguard identity is rebound before choice creation.
+- [x] Add direct negative proof for a Reserve source.
+- [x] Confirm rejected non-Vanguard activation does not consume the turn-limit receipt.
+- [x] Confirm no Founder/card-ID/name runtime dispatch and no new owner.
+- [x] Pass proof head `1364263b1fe85828d84d2072416a927a43dfa5a0` / Card Pass #1656 SUCCESS.
+- [x] Move exactly `source_is_current_friendly_vanguard` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint atomically.
+- [x] Pass capability head `e2c48ab21b0dfa351c4dc282050c38215dcbbfb6` / Card Pass #1657 SUCCESS.
+- [x] Append plan/checklist/ledger acceptance.
+- [x] Preserve 40 owner families; no main/live promotion.
+
+**Acceptance:** capability blob `ae2a92997fca04a47f25b77283a45f330794a805`; runtime source unchanged; one negative proof test added.
+

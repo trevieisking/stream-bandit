@@ -1213,3 +1213,12 @@ The exact structured consumers are Gale Gustfox / Tailwind Strike and Gale Zephy
 ## 411 — V2.4.108 predicate reconciliation accepted
 Freeze head `84d7b824fde3a6e2f4e5e6922b88cc2d4311dbad` passed Card Pass #1653. Accepted capability head `d99ce641ba85a1eeb922337af67eafc5e34237eb` passed Card Pass #1654. Exactly `source_became_vanguard_this_turn` moved missing -> implemented. Release Control is synchronized to capability blob `9661f21edda0bb8dfc7d710cdf94ae54fc6496db`. No runtime, tests or Edge closures changed; owner-family count remains 40.
 
+## 412 — V2.4.109 freezes the current-friendly-Vanguard requirement
+The sole Release 1 consumer of `source_is_current_friendly_vanguard` is Prismatic Founder / Bandit's Current. It is part of the already-accepted owner-#31 active-Ability search/private-choice composition.
+
+## 413 — active-Ability ownership already enforces the requirement
+The search-selection attachment owner requires the exact predicate in the descriptor, rejects every source location except current Vanguard, and rebinds source identity to the live Vanguard before any private choice or use receipt. V2.4.109 adds explicit negative proof that a Reserve source fails before the once-per-turn receipt is consumed. No gameplay-runtime implementation change is required.
+
+## 414 — V2.4.109 current-Vanguard predicate reconciliation accepted
+Proof head `1364263b1fe85828d84d2072416a927a43dfa5a0` passed Card Pass #1656. Accepted capability head `e2c48ab21b0dfa351c4dc282050c38215dcbbfb6` passed Card Pass #1657. Exactly `source_is_current_friendly_vanguard` moved missing -> implemented. Release Control is synchronized to capability blob `ae2a92997fca04a47f25b77283a45f330794a805`. Runtime source and Edge closures are unchanged; owner-family count remains 40.
+
