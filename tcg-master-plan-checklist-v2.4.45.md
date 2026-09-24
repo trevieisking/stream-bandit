@@ -1473,3 +1473,23 @@
 - [x] Preserve 40 owner families; no database/Edge/main/live promotion.
 
 **Acceptance:** capability blob `230f0eb0b01333b4885c5134e39bfed1dda515cd`; sole frozen consumer covered.
+
+### V2.4.116 — source_has_condition cross-surface parity
+- [x] Sweep frozen Release 1 structured sources for `source_has_condition`.
+- [x] Confirm exactly two frozen consumers: Ember Cinderburrow / Burrow Burst and Ember Kilnback / Furnace Hide.
+- [x] Confirm Cinderburrow already uses generic Attack conditional-add metadata/evaluation.
+- [x] Confirm Match Attack authority supplies current source conditions at legal declaration.
+- [x] Identify Kilnback incoming self-Ability condition matching as the only remaining execution seam.
+- [x] Reuse canonical Condition Engine `hasRuntimeCondition` in the existing Damage/Shield owner.
+- [x] Preserve existing `source_has_relic` incoming self-Ability behaviour.
+- [x] Prove Scorched Kilnback prevents exactly 10 incoming Attack damage.
+- [x] Prove non-Scorched Kilnback prevents zero.
+- [x] Confirm no card-ID/name dispatch, duplicate condition logic or new owner family.
+- [x] Synchronize Match Edge closure fingerprint.
+- [x] Pass runtime head `ff88bf0a4b05414d051d5eae45ee4e476175fa60` / Card Pass #1681 SUCCESS.
+- [x] Move exactly `source_has_condition` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint.
+- [x] Pass capability head `0001fdca5b9f7d063f2496fff8b5e5f88128f5b9` / Card Pass #1682 SUCCESS.
+- [x] Preserve 40 owner families; no database/Edge/main/live promotion.
+
+**Acceptance:** capability blob `6993a45b193e482d29be63cd05c7cbd83031a6ae`; both frozen consumers covered.

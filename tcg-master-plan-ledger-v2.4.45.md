@@ -1300,3 +1300,15 @@ Head `4d141b15f3393cd07048727457b2616fba0340f6` passed Card Pass #1678. The dete
 
 ## 440 — V2.4.115 source_element_is accepted
 Capability head `39eb324e1ca57f372693a263589240998659f5e5` passed Card Pass #1679. Exactly `source_element_is` moved missing -> implemented. Capability blob is `230f0eb0b01333b4885c5134e39bfed1dda515cd`. Owner-family count remains 40; production remains unchanged.
+
+## 441 — V2.4.116 source_has_condition has two frozen Release 1 consumers
+The frozen structured-card sweep finds exactly two uses: Ember Cinderburrow / Burrow Burst conditional-add and Ember Kilnback / Furnace Hide incoming Attack-damage reduction.
+
+## 442 — Cinderburrow was already generic; Kilnback exposed the missing seam
+Attack conditional-add already evaluates `source_has_condition` from current source-condition state. The remaining gap was the incoming self-Ability matcher in the existing Damage/Shield owner.
+
+## 443 — V2.4.116 delegates to canonical Condition ownership
+Kilnback incoming Attack-damage matching now calls canonical Condition Engine `hasRuntimeCondition`. Head `ff88bf0a4b05414d051d5eae45ee4e476175fa60` passed Card Pass #1681, proving Scorched 80 -> 70 and non-Scorched 80 -> 80 with no card-specific dispatch or owner expansion.
+
+## 444 — V2.4.116 source_has_condition accepted
+Capability head `0001fdca5b9f7d063f2496fff8b5e5f88128f5b9` passed Card Pass #1682. Exactly `source_has_condition` moved missing -> implemented. Capability blob is `6993a45b193e482d29be63cd05c7cbd83031a6ae`. Owner-family count remains 40; production remains unchanged.

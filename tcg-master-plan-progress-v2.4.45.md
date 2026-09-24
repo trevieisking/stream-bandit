@@ -4038,3 +4038,34 @@ Capability head `39eb324e1ca57f372693a263589240998659f5e5` passed Card Pass #167
 Exactly `source_element_is` moved missing -> implemented. Capability blob is `230f0eb0b01333b4885c5134e39bfed1dda515cd`.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.116 — `source_has_condition` cross-surface parity
+
+**Baseline authority head:** `36c09307c9934a16d98c76cba0ab6794b2775d7a` — Card Pass #1680 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **two** `source_has_condition` consumers, both Ember:
+- Cinderburrow / Burrow Burst — Attack `conditional_add`, source must be Scorched.
+- Kilnback / Furnace Hide — continuous `incoming_attack_damage`, source Creature must be Scorched.
+
+### Ownership audit
+Cinderburrow was already generic:
+- Attack formula metadata includes `source_has_condition`;
+- conditional-add evaluator matches against normalized `source_conditions`;
+- Match Attack authority supplies current source conditions at legal declaration.
+
+Kilnback exposed the missing execution seam. The existing Damage/Shield owner now delegates that incoming self-Ability predicate to canonical Condition Engine `hasRuntimeCondition`. No duplicated condition-slot logic, card-ID/name dispatch, helper owner or owner-family expansion was introduced.
+
+### Deterministic proof
+Runtime head `ff88bf0a4b05414d051d5eae45ee4e476175fa60` passed Card Pass #1681 **SUCCESS**:
+- Kilnback while Scorched: 80 incoming Attack damage -> 70.
+- Kilnback while not Scorched: remains 80.
+- existing Cinderburrow direct-state positive/negative conditional-add proofs remain green.
+- release-control Match Edge closure updated and validated.
+
+### Capability acceptance
+Capability head `0001fdca5b9f7d063f2496fff8b5e5f88128f5b9` passed Card Pass #1682 **SUCCESS**.
+
+Exactly `source_has_condition` moved missing -> implemented. Capability blob is `6993a45b193e482d29be63cd05c7cbd83031a6ae`.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
