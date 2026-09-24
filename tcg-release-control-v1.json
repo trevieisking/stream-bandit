@@ -94,7 +94,7 @@
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "561c033bc69af7cb8e39f8e3c03bd33e15c0fb57",
         "file_count": 120,
-        "closure_sha256": "c8b596d4f1df8c3f58df150d83a5d00f7ca137b35e25446ee18e534a19a16a5e",
+        "closure_sha256": "e833afa49908a5418771e21ba8b347241c3f0012bd0e08d1eff9e918cb29ff75",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -230,7 +230,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts",
-            "git_blob_sha": "c1010e1d039f33e518861acce8a5df4cb731eb96"
+            "git_blob_sha": "404ef19428e7fa1b286242b8c5b95e60751c92fd"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",
@@ -530,7 +530,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
-            "git_blob_sha": "36efb1bdf777ea3b63546e033055cf16addb17e7"
+            "git_blob_sha": "51bb44e1211afe096bb892a328c88532256c3a14"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
@@ -580,9 +580,9 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "284b282eb196e014a7d2dcbe532fe6edc82ebe75",
+        "entrypoint_git_blob_sha": "89e543c3950ba0801e0b1efc776c5c08df6ada9e",
         "file_count": 53,
-        "closure_sha256": "3ac2ebbfe922bd3db8da8dc6d823719e41280f92e7a573d844bd6a96dd0fe120",
+        "closure_sha256": "6bcd93b60faece46c3e2002e7e34a09097226f56a4928a58838a740a9d83fa5d",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -754,7 +754,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
-            "git_blob_sha": "36efb1bdf777ea3b63546e033055cf16addb17e7"
+            "git_blob_sha": "51bb44e1211afe096bb892a328c88532256c3a14"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
@@ -790,7 +790,7 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "284b282eb196e014a7d2dcbe532fe6edc82ebe75"
+            "git_blob_sha": "89e543c3950ba0801e0b1efc776c5c08df6ada9e"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",

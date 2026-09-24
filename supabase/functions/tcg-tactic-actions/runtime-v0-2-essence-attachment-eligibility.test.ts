@@ -77,6 +77,14 @@ Deno.test('essence_attached snapshot covers every frozen attachment predicate an
   yes({ predicate: 'event_attachment_target_is_source' });
   yes({ predicate: 'event_attachment_kind_is', kind: 'temporary' });
   yes({ predicate: 'target_element_is', target: '$attached_creature', element: 'Gale' });
+  assert.equal(
+    runtimeV02EssenceAttachedSnapshotPredicate(
+      snapshot,
+      { predicate: 'target_element_is', target: '$attached_creature', element: 'Stone' },
+      context,
+    ),
+    false,
+  );
   yes({ predicate: 'target_zone_is', target: '$attached_creature', zone: 'reserve' });
   assert.equal(
     runtimeV02EssenceAttachedSnapshotPredicate(

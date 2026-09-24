@@ -7,6 +7,8 @@ import { runtimeV02ApplyDamageProtections } from "./tcg-match-damage-protection-
 import {
   evaluateRuntimeV02SourceDamagedRequirement,
   evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
+  evaluateRuntimeV02TargetPrintedHpAtLeastRequirement,
+  normalizeRuntimeV02TargetPrintedHpAtLeastRequirement,
 } from "./tcg-match-requirement-evaluator-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
@@ -82,7 +84,9 @@ function structuredRuntimeProbe(
 ): Record<string, unknown> | null {
   const attachments = [
     ...(Array.isArray(attacker.essence) ? attacker.essence : []),
+    ...(attacker.relic ? [attacker.relic] : []),
     ...(Array.isArray(target.essence) ? target.essence : []),
+    ...(target.relic ? [target.relic] : []),
   ];
   const probe = attachments[0];
   if (probe) return runtimeV02Definition(state, probe);
@@ -421,6 +425,133 @@ function applyIncomingSelfAbilityDamage(
   return { value, prevented };
 }
 
+function outgoingRelicContinuousEffects(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+): Array<{ source: RuntimeCardInstance; effect: RuntimeContinuousEffect }> {
+  const relic = source.relic;
+  if (!relic) return [];
+  const definition = runtimeV02Definition(state, relic);
+  const tactic = objectRecord(definition?.tactic);
+  if (!tactic || String(tactic.subtype || "") !== "Relic") return [];
+  const continuous = Array.isArray(tactic.continuous) ? tactic.continuous : [];
+  return continuous
+    .map((value) => objectRecord(value) as RuntimeContinuousEffect | null)
+    .filter((value): value is RuntimeContinuousEffect => Boolean(value))
+    .filter((effect) =>
+      String(effect.kind || "") === "attack_damage" &&
+      String(effect.target || "") === "$attached_creature"
+    )
+    .map((effect) => ({ source: relic, effect }));
+}
+
+function attachedCreatureDefinition(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+): Record<string, unknown> {
+  const stack = Array.isArray(source.stack) ? source.stack : [];
+  const top = stack[stack.length - 1];
+  if (!top) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_source_required");
+  const definition = runtimeV02Definition(state, top);
+  if (!definition) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_source_definition_missing");
+  return definition;
+}
+
+function outgoingRelicWhenMatches(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+  when: unknown,
+): boolean {
+  if (when == null) return true;
+  const predicate = objectRecord(when);
+  if (!predicate) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_when_invalid");
+  const allowed = new Set(["predicate", "target", "element"]);
+  const extra = Object.keys(predicate).find((field) => !allowed.has(field));
+  if (extra) throw new Error(`tcg_v0_2_attack_damage_outgoing_relic_when_field_unsupported:${extra}`);
+  if (String(predicate.predicate || "") !== "target_element_is") {
+    throw new Error("tcg_v0_2_attack_damage_outgoing_relic_when_unsupported");
+  }
+  if (String(predicate.target || "") !== "$attached_creature") {
+    throw new Error("tcg_v0_2_attack_damage_outgoing_relic_element_target_unsupported");
+  }
+  const element = String(predicate.element || "").trim();
+  if (!element) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_element_required");
+  return String(attachedCreatureDefinition(state, source).element || "") === element;
+}
+
+function outgoingRelicCaseMatches(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+  when: unknown,
+): boolean {
+  const requirement = normalizeRuntimeV02TargetPrintedHpAtLeastRequirement(when);
+  if (requirement.target !== "$attached_creature") {
+    throw new Error("tcg_v0_2_attack_damage_outgoing_relic_hp_target_unsupported");
+  }
+  const definition = attachedCreatureDefinition(state, source);
+  const creature = objectRecord(definition.creature);
+  const hp = Number(creature?.hp ?? definition.hp ?? 0);
+  return evaluateRuntimeV02TargetPrintedHpAtLeastRequirement(hp, requirement).matched;
+}
+
+function outgoingRelicAmount(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+  effect: RuntimeContinuousEffect,
+): number {
+  if (effect.value != null && effect.amount != null) {
+    throw new Error("tcg_v0_2_attack_damage_outgoing_relic_amount_ambiguous");
+  }
+  if (effect.value == null) {
+    const amount = Number(effect.amount);
+    if (!Number.isFinite(amount)) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_amount_invalid");
+    return amount;
+  }
+  const formula = objectRecord(effect.value);
+  if (!formula) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_value_invalid");
+  const unsupported = Object.keys(formula).find((field) => !["default", "cases"].includes(field));
+  if (unsupported) throw new Error(`tcg_v0_2_attack_damage_outgoing_relic_value_field_unsupported:${unsupported}`);
+  const fallback = Number(formula.default);
+  if (!Number.isFinite(fallback)) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_default_invalid");
+  if (!Array.isArray(formula.cases)) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_cases_invalid");
+  for (const rawCase of formula.cases) {
+    const item = objectRecord(rawCase);
+    if (!item) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_case_invalid");
+    const extra = Object.keys(item).find((field) => !["when", "amount"].includes(field));
+    if (extra) throw new Error(`tcg_v0_2_attack_damage_outgoing_relic_case_field_unsupported:${extra}`);
+    if (!outgoingRelicCaseMatches(state, source, item.when)) continue;
+    const amount = Number(item.amount);
+    if (!Number.isFinite(amount)) throw new Error("tcg_v0_2_attack_damage_outgoing_relic_case_amount_invalid");
+    return amount;
+  }
+  return fallback;
+}
+
+function applyOutgoingRelicDamage(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+  baseValue: number,
+  context: RuntimeAttackDamageContext,
+): number {
+  let value = Math.max(0, Number(baseValue || 0));
+  for (const { effect } of outgoingRelicContinuousEffects(state, source)) {
+    if (effect.limit != null || effect.consume_when != null) {
+      throw new Error("tcg_v0_2_attack_damage_outgoing_relic_limit_unsupported");
+    }
+    if (!outgoingRelicWhenMatches(state, source, effect.when)) continue;
+    if (!continuousFiltersMatch(effect.filters, context)) continue;
+    const mode = effect.mode == null ? "delta" : String(effect.mode);
+    if (mode !== "delta") throw new Error("tcg_v0_2_attack_damage_outgoing_relic_mode_unsupported");
+    value += outgoingRelicAmount(state, source, effect);
+    const minimum = Number(effect.minimum);
+    if (Number.isFinite(minimum)) value = Math.max(value, minimum);
+    const maximum = Number(effect.maximum);
+    if (Number.isFinite(maximum)) value = Math.min(value, maximum);
+    value = Math.max(0, value);
+  }
+  return value;
+}
+
 const RELIC_CONTINUOUS_USAGE_KEY = "runtime_v0_2_relic_continuous_uses";
 
 function relicContinuousEffects(
@@ -577,6 +708,7 @@ export function structuredRuntimeOutgoingAttackDamage(
     },
     0,
   );
+  value = applyOutgoingRelicDamage(state, attacker, value, context);
   value = applyOutgoingSelfAbilityDamage(state, attacker, value, context);
   return value;
 }

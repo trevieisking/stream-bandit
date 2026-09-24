@@ -3,9 +3,11 @@ import {
   evaluateRuntimeV02ReserveCountAtLeastRequirement,
   evaluateRuntimeV02SourceDamagedRequirement,
   evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
+  evaluateRuntimeV02TargetPrintedHpAtLeastRequirement,
   normalizeRuntimeV02LegalCardAvailableRequirement,
   normalizeRuntimeV02ReserveCountAtLeastRequirement,
   normalizeRuntimeV02SourceHasShieldAtLeastRequirement,
+  normalizeRuntimeV02TargetPrintedHpAtLeastRequirement,
 } from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, message = "values differ") {
@@ -60,6 +62,28 @@ Deno.test("source Shield threshold normalization fails closed on malformed shape
   );
 });
 
+
+Deno.test("shared target printed HP threshold owns the numeric comparison", () => {
+  const requirement = normalizeRuntimeV02TargetPrintedHpAtLeastRequirement({
+    predicate: "target_printed_hp_at_least",
+    target: "$attached_creature",
+    value: 200,
+  });
+  equal(evaluateRuntimeV02TargetPrintedHpAtLeastRequirement(199, requirement).matched, false);
+  const exact = evaluateRuntimeV02TargetPrintedHpAtLeastRequirement(200, requirement);
+  equal(exact.matched, true);
+  equal(exact.target, "$attached_creature");
+  equal(exact.required_hp, 200);
+  equal(exact.actual_hp, 200);
+  throws(
+    () => normalizeRuntimeV02TargetPrintedHpAtLeastRequirement({
+      predicate: "target_printed_hp_at_least",
+      target: "$attached_creature",
+      value: 0,
+    }),
+    "tcg_v0_2_requirement_target_printed_hp_threshold_invalid",
+  );
+});
 
 Deno.test("shared reserve-count predicate counts only occupied Reserve slots", () => {
   const requirement = normalizeRuntimeV02ReserveCountAtLeastRequirement({

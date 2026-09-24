@@ -50,6 +50,20 @@ function essence(cardId: string, continuous: Record<string, unknown>[]) {
   });
 }
 
+function relic(cardId: string, continuous: Record<string, unknown>[]) {
+  return structuredEntry(cardId, {
+    card_family: "Tactic",
+    element: "Ember",
+    tactic: {
+      subtype: "Relic",
+      play_requirements: [],
+      program: { schema: "sb-tcg-effects-v0.2", discard_after_resolve: false, steps: [] },
+      listeners: [],
+      continuous,
+    },
+  });
+}
+
 function continuousCreature(
   cardId: string,
   abilityId: string,
@@ -127,6 +141,37 @@ const murkmite = continuousCreature("shade-murkmite", "murk-sense", [{
   amount: 10,
   filters: { attack_id: "murk-nip" },
 }]);
+
+const cinderCharm = relic("ember-cinder-charm", [{
+  id: "cinder-charm-pressure",
+  kind: "attack_damage",
+  target: "$attached_creature",
+  when: { predicate: "target_element_is", target: "$attached_creature", element: "Ember" },
+  value: {
+    default: 10,
+    cases: [{
+      when: { predicate: "target_printed_hp_at_least", target: "$attached_creature", value: 200 },
+      amount: 20,
+    }],
+  },
+  filters: {},
+}]);
+
+const emberSmall = structuredEntry("ember-small", {
+  card_family: "Creature",
+  element: "Ember",
+  creature: { hp: 190, withdrawal: 1 },
+});
+const emberLarge = structuredEntry("ember-large", {
+  card_family: "Creature",
+  element: "Ember",
+  creature: { hp: 220, withdrawal: 1 },
+});
+const galeLarge = structuredEntry("gale-large", {
+  card_family: "Creature",
+  element: "Gale",
+  creature: { hp: 220, withdrawal: 1 },
+});
 
 const quartzram = continuousCreature("stone-quartzram", "prismatic-bulwark", [{
   id: "prismatic-bulwark-prism-ram",
@@ -206,6 +251,45 @@ Deno.test("structured outgoing and incoming layers preserve Crushed timing betwe
   assertEquals(outgoing, 90);
   const afterCrushed = Number(outgoing) + 20;
   assertEquals(structuredRuntimeIncomingAttackDamage(state, attacker, target, afterCrushed, opponentVanguardConditioned), 100);
+});
+
+Deno.test("attached Relic outgoing Attack damage resolves Cinder Charm generically", () => {
+  const target = { essence: [] };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+  const makeAttacker = (cardId: string) => ({
+    stack: [{ uid: "attacker", card_id: cardId }],
+    essence: [],
+    relic: { uid: "cinder", card_id: "ember-cinder-charm" },
+    damage: 0,
+    shield: 0,
+  });
+  const state = markedState({
+    "ember-cinder-charm": cinderCharm,
+    "ember-small": emberSmall,
+    "ember-large": emberLarge,
+    "gale-large": galeLarge,
+  });
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("ember-small"), target, 50, context),
+    60,
+    "Cinder default should add 10 to an Ember Creature below 200 printed HP",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("ember-large"), target, 50, context),
+    70,
+    "Cinder 200+ printed-HP case should add 20",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("gale-large"), target, 50, context),
+    50,
+    "Cinder target_element_is must reject a non-Ember attached Creature",
+  );
 });
 
 Deno.test("marked mixed structured and legacy card indexes fail closed instead of mixing attack engines", () => {

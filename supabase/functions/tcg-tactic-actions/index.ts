@@ -34,8 +34,10 @@ import { runtimeV02PreflightDefeatScan, runtimeV02ScanAndQueueDefeats } from "..
 import {
   evaluateRuntimeV02LegalCardAvailableRequirement,
   evaluateRuntimeV02ReserveCountAtLeastRequirement,
+  evaluateRuntimeV02TargetPrintedHpAtLeastRequirement,
   normalizeRuntimeV02LegalCardAvailableRequirement,
   normalizeRuntimeV02ReserveCountAtLeastRequirement,
+  normalizeRuntimeV02TargetPrintedHpAtLeastRequirement,
 } from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
 import {
   runtimeV02EvaluatePredicateTree,
@@ -897,14 +899,12 @@ function tacticPredicateLeaf(
   }
 
   if (predicate === "target_printed_hp_at_least") {
-    const target = tacticCreatureTarget(state, ownerSeat, vars, leaf.target);
+    const requirement = normalizeRuntimeV02TargetPrintedHpAtLeastRequirement(leaf);
+    const target = tacticCreatureTarget(state, ownerSeat, vars, requirement.target);
     if (!target) return false;
     const def = topDef(target.cr, state) || {};
     const hp = Number(def.creature?.hp ?? def.hp ?? 0);
-    const threshold = Number(leaf.value);
-    if (!Number.isFinite(hp) || hp < 0) throw new Error("tcg_v0_2_tactic_if_target_hp_invalid");
-    if (!Number.isFinite(threshold) || threshold <= 0) throw new Error("tcg_v0_2_tactic_if_target_hp_threshold_invalid");
-    return hp >= threshold;
+    return evaluateRuntimeV02TargetPrintedHpAtLeastRequirement(hp, requirement).matched;
   }
 
   if (predicate === "target_has_condition") {

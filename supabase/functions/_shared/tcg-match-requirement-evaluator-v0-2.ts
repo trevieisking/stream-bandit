@@ -25,6 +25,20 @@ export type RuntimeV02SourceHasShieldAtLeastRequirementEvaluation = {
   actual_shield: number;
 };
 
+export type RuntimeV02TargetPrintedHpAtLeastRequirement = {
+  predicate: "target_printed_hp_at_least";
+  target: string;
+  value: number;
+};
+
+export type RuntimeV02TargetPrintedHpAtLeastRequirementEvaluation = {
+  predicate: "target_printed_hp_at_least";
+  matched: boolean;
+  target: string;
+  required_hp: number;
+  actual_hp: number;
+};
+
 export type RuntimeV02LegalCardAvailableRequirement = {
   predicate: "legal_card_available";
   controller: string;
@@ -314,6 +328,47 @@ export function evaluateRuntimeV02SourceHasShieldAtLeastRequirement(
     matched: shield >= requirement.value,
     required_shield: requirement.value,
     actual_shield: shield,
+  };
+}
+
+export function normalizeRuntimeV02TargetPrintedHpAtLeastRequirement(
+  raw: unknown,
+): RuntimeV02TargetPrintedHpAtLeastRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_target_printed_hp_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "target", "value"],
+    "tcg_v0_2_requirement_target_printed_hp_field_unsupported",
+  );
+  if (value.predicate !== "target_printed_hp_at_least") {
+    throw new Error("tcg_v0_2_requirement_target_printed_hp_predicate_invalid");
+  }
+  const target = requiredString(
+    value.target,
+    "tcg_v0_2_requirement_target_printed_hp_target_required",
+  );
+  const threshold = Number(value.value);
+  if (!Number.isFinite(threshold) || threshold <= 0) {
+    throw new Error("tcg_v0_2_requirement_target_printed_hp_threshold_invalid");
+  }
+  return { predicate: "target_printed_hp_at_least", target, value: threshold };
+}
+
+export function evaluateRuntimeV02TargetPrintedHpAtLeastRequirement(
+  printedHp: unknown,
+  rawRequirement: RuntimeV02TargetPrintedHpAtLeastRequirement,
+): RuntimeV02TargetPrintedHpAtLeastRequirementEvaluation {
+  const requirement = normalizeRuntimeV02TargetPrintedHpAtLeastRequirement(rawRequirement);
+  const hp = Number(printedHp);
+  if (!Number.isFinite(hp) || hp < 0) {
+    throw new Error("tcg_v0_2_requirement_target_printed_hp_value_invalid");
+  }
+  return {
+    predicate: "target_printed_hp_at_least",
+    matched: hp >= requirement.value,
+    target: requirement.target,
+    required_hp: requirement.value,
+    actual_hp: hp,
   };
 }
 
