@@ -65,6 +65,7 @@
       "SELECT_CARDS",
       "SELECT_CREATURE",
       "SET_ATTACK_ELIGIBILITY",
+      "SET_DEVICE_PLAY_LOCK",
       "SET_WITHDRAWAL_MODIFIER",
       "SHUFFLE_DECK",
       "SHUFFLE_ZONE_INTO_DECK",
@@ -80,7 +81,6 @@
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
       "SET_ATTACK_COST_FLOOR",
-      "SET_DEVICE_PLAY_LOCK",
       "SET_RESOLVING_CARD_DESTINATION",
       "SUPPRESS_ABILITY",
       "TIMEFOLD",
@@ -1862,6 +1862,34 @@
       },
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-declared-damage-listener.test.ts"
+      ]
+    },
+    "release1_set_device_play_lock_v2_4_119": {
+      "accepted_runtime_head": "49480b1612b014bbceee8cacebc108e4a85e4c97",
+      "card_pass_run": 1691,
+      "operation": "SET_DEVICE_PLAY_LOCK",
+      "frozen_consumers": [
+        {
+          "card_id": "volt-blackout-pulse",
+          "surface": "tactic_program",
+          "subtype": "Device"
+        }
+      ],
+      "owner": "supabase/functions/tcg-tactic-actions/runtime-v0-2-device-play-lock.ts",
+      "live_route": "supabase/functions/tcg-tactic-actions/index.ts",
+      "semantics": {
+        "controller_scoped": true,
+        "only_device_subtype_blocked": true,
+        "ally_relic_realm_unaffected": true,
+        "expires_on": "end_of_turn",
+        "expiry_authority": "state.turn_seq",
+        "explicit_unlock_supported": true,
+        "malformed_receipt_fails_closed": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-device-play-lock.test.ts"
       ]
     }
   }
