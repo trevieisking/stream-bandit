@@ -392,6 +392,14 @@ export function runtimeV02CreateActiveAbilityDeckPlanningChoice(
     controllerSeat,
     controllerSeat,
     descriptor.look.count,
+    {
+      action_kind: "ability",
+      source_controller_seat: controllerSeat,
+      source_action_id: descriptor.ability_id,
+      source_card_uid: sourceInstance.uid,
+      source_creature_uid: sourceInstance.uid,
+      phase: String(state.phase || "play"),
+    },
   );
   const options = runtimeV02BoundSetChoiceOptions(
     state,
