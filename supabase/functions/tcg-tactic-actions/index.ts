@@ -3,7 +3,10 @@ import { runtimeV02ApplyCardZonePartitionTransfer, runtimeV02ApplyCardZoneReorde
 import { runtimeV02ShuffleInPlace } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
 import { runtimeV02RandomSampleHiddenZone } from "../_shared/tcg-match-hidden-zone-sample-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
-import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
+import {
+  recordRuntimeV02HiddenInformationView,
+  runtimeV02TakeHiddenInformationOccurrences,
+} from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02PrivateRewardInspectionView } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
@@ -18,7 +21,14 @@ import { runtimeV02BindDeckTopSet, runtimeV02BoundDeckSetAfterRemoval, runtimeV0
 import { runtimeV02InspectDeckTopEffectOwnedSet, runtimeV02InspectionProvenanceAfterRemoval, runtimeV02NormalizeInspectZoneStep, runtimeV02NormalizeInspectionProvenance, runtimeV02RebindInspectionRemainder, runtimeV02ResolveRewardInspectionChoice, runtimeV02RewardInspectionChoiceOptions, type RuntimeV02InspectZoneDescriptor, type RuntimeV02InspectionProvenance, type RuntimeV02RewardInspectionChoiceOption } from "../_shared/tcg-match-inspection-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import { runtimeV02ApplyDirectDamage, runtimeV02NormalizeDirectDamageStep } from "../_shared/tcg-match-direct-damage-v0-2.ts";
-import { runtimeV02BeginEventListenerContinuation } from "../_shared/tcg-match-event-listener-v0-2.ts";
+import {
+  runtimeV02AdaptHiddenInformationOccurrencesForListener,
+  runtimeV02BeginEventListenerContinuation,
+  runtimeV02PendingEventListenerChoiceView,
+  runtimeV02PrivateEventInspectionView,
+  runtimeV02ResolveEventListenerChoice,
+  type RuntimeV02PendingEventListenerChoice,
+} from "../_shared/tcg-match-event-listener-v0-2.ts";
 import { runtimeV02AdaptDefeatEventsForListener } from "../_shared/tcg-match-event-listener-defeat-event-v0-2.ts";
 import { runtimeV02PreflightDefeatScan, runtimeV02ScanAndQueueDefeats } from "../_shared/tcg-match-defeat-engine-v0-2.ts";
 import {
@@ -614,7 +624,9 @@ function makeView(state: any, viewerSeat: number, revision: number) {
     } : null,
     pending_choice: choiceView(state.pending_choice || null, viewerSeat),
     pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, viewerSeat as 1 | 2),
+    pending_event_listener_choice: runtimeV02PendingEventListenerChoiceView(state.pending_event_listener_choice || null, viewerSeat as 1 | 2),
     pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, viewerSeat as 1 | 2),
+    private_event_inspection: runtimeV02PrivateEventInspectionView(state, viewerSeat as 1 | 2),
     private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, viewerSeat as 1 | 2),
     private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, viewerSeat as 1 | 2),
     result: state.result || null,
@@ -741,6 +753,56 @@ function readTacticHealResume(state: any, effect: EffectState) {
   if (Number(raw.turn_seq) !== Number(state.turn_seq || 0)) throw new Error("tcg_v0_2_tactic_heal_resume_turn_stale");
   if (Number(raw.cursor) !== effect.cursor) throw new Error("tcg_v0_2_tactic_heal_resume_cursor_changed");
   return raw;
+}
+function setTacticEventResume(state: any, effect: EffectState) {
+  if (state.pending_tactic_event_resume != null) throw new Error("tcg_v0_2_tactic_event_resume_already_pending");
+  state.pending_tactic_event_resume = {
+    effect_id: effect.id,
+    owner_seat: effect.owner_seat,
+    cursor: effect.cursor,
+    turn_seq: Number(state.turn_seq || 0),
+  };
+}
+function readTacticEventResume(state: any, effect: EffectState) {
+  const raw = state.pending_tactic_event_resume;
+  if (!raw || typeof raw !== "object") throw new Error("tcg_v0_2_tactic_event_resume_required");
+  if (String(raw.effect_id || "") !== effect.id) throw new Error("tcg_v0_2_tactic_event_resume_stale_effect");
+  if (Number(raw.owner_seat) !== effect.owner_seat) throw new Error("tcg_v0_2_tactic_event_resume_owner_changed");
+  if (Number(raw.turn_seq) !== Number(state.turn_seq || 0)) throw new Error("tcg_v0_2_tactic_event_resume_turn_stale");
+  if (Number(raw.cursor) !== effect.cursor) throw new Error("tcg_v0_2_tactic_event_resume_cursor_changed");
+  return raw;
+}
+function drainTacticHiddenInformationEvents(state: any, effect: EffectState): boolean {
+  let guard = 0;
+  while (true) {
+    if (++guard > 20) throw new Error("tcg_v0_2_tactic_hidden_event_guard");
+    if (state.pending_event_listener_choice != null) return true;
+    const occurrences = runtimeV02TakeHiddenInformationOccurrences(state);
+    if (!occurrences.length) return false;
+    const events = runtimeV02AdaptHiddenInformationOccurrencesForListener(
+      state,
+      occurrences,
+    );
+    const flow = runtimeV02BeginEventListenerContinuation(state, events);
+    if ((flow.emitted_movement_events || []).length) {
+      throw new Error("tcg_v0_2_tactic_hidden_event_movement_output_not_yet_supported");
+    }
+    if (flow.status === "player_choice_required") {
+      setTacticEventResume(state, effect);
+      return true;
+    }
+    if ((flow.emitted_heal_packet_ids || []).length) {
+      const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+        state,
+        flow.emitted_heal_packet_ids,
+        effect.owner_seat as 1 | 2,
+      );
+      if (healFlow.status === "player_choice_required") {
+        setTacticHealResume(state, effect);
+        return true;
+      }
+    }
+  }
 }
 function tacticCreatureTarget(
   state: any,
@@ -939,7 +1001,7 @@ function tacticPlayability(state: any, seat: number, uidValue: unknown): TacticP
   if (state.phase !== "play" || Number(state.active_seat) !== seat) {
     return { eligible: false, reason: "not_active_player", index: -1, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
   }
-  if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_movement_resume) {
+  if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_event_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_event_resume || state.pending_tactic_movement_resume) {
     return { eligible: false, reason: "effect_resolution_already_pending", index: -1, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
   }
 
@@ -1006,8 +1068,9 @@ function executeUntilChoice(state: any) {
   const effect = state.effect_resolution as EffectState;
   if (!effect) throw new Error("effect_resolution_missing");
   let guard = 0;
-  while (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_movement_listener_choice && effect.cursor < effect.steps.length) {
+  while (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_event_listener_choice && !state.pending_movement_listener_choice && effect.cursor < effect.steps.length) {
     if (++guard > 200) throw new Error("effect_resolution_guard");
+    if (drainTacticHiddenInformationEvents(state, effect)) return;
     const step = effect.steps[effect.cursor] || {};
     const op = String(step.op || "");
     const ownerSeat = effect.owner_seat;
@@ -2391,7 +2454,16 @@ function executeUntilChoice(state: any) {
     throw new Error(`unknown_effect_op:${op}`);
   }
 
-  if (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_movement_listener_choice && effect.cursor >= effect.steps.length) finishEffect(state, effect);
+  if (
+    !state.pending_choice &&
+    !state.pending_heal_listener_choice &&
+    !state.pending_event_listener_choice &&
+    !state.pending_movement_listener_choice &&
+    effect.cursor >= effect.steps.length
+  ) {
+    if (drainTacticHiddenInformationEvents(state, effect)) return;
+    finishEffect(state, effect);
+  }
 }
 
 function applyPendingChoice(state: any, selected: ChoiceOption[]) {
