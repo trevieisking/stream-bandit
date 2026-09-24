@@ -160,7 +160,8 @@
       "target_has_condition",
       "target_printed_hp_at_least",
       "target_remains_in_play_after_damage",
-      "target_stage_in"
+      "target_stage_in",
+      "target_zone_is"
     ],
     "partial": [],
     "missing": [
@@ -198,7 +199,6 @@
       "target_remaining_hp_at_least",
       "target_remaining_hp_at_most",
       "target_remaining_hp_equals",
-      "target_zone_is",
       "voluntary_withdrawal_legal_with_incoming"
     ]
   },
@@ -1606,6 +1606,37 @@
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-heal-listener-dispatch.test.ts"
       ],
       "note": "V2.4.112 closes target_stage_in across both Release 1 owner surfaces. Bloom uses immutable essence_attached snapshot truth; Symbiote uses generic after_heal_packet attachment dispatch. Proof head includes explicit rejecting-stage regressions without changing runtime source."
+    },
+    "release1_target_zone_is_v2_4_113": {
+      "accepted_proof_head": "9ce5d45ecddc6a13d52b4dda053ccc84290c05ee",
+      "card_pass_run": 1671,
+      "predicate": "target_zone_is",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-draft-essence",
+          "listener_id": "draft-attach-withdrawal",
+          "event": "essence_attached",
+          "target": "$attached_creature",
+          "zone": "reserve"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+      "semantics": {
+        "target_zone_source": "immutable essence-attached trigger snapshot",
+        "accepted_zone": "reserve",
+        "explicit_negative_zone": "vanguard",
+        "no_card_id_dispatch": true,
+        "no_runtime_source_change": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts"
+      ],
+      "held_separately": {
+        "predicate": "voluntary_withdrawal_legal_with_incoming",
+        "operation": "PERFORM_VOLUNTARY_WITHDRAWAL",
+        "reason": "Draft Essence withdrawal legality/operation remains unaccepted until effect-driven Withdrawal reuses the complete canonical Withdrawal quote, lifecycle/current-cost modifiers, exact attached-Essence Payment and Atomic Switch ownership."
+      }
     }
   }
 }
