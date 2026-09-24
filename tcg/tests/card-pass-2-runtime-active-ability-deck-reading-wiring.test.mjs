@@ -62,7 +62,12 @@ test('deck-reading owner is card-id-free and delegates IF, hidden-info, Card-Zon
     assert.equal(owner.includes(forbidden),false,'generic deck-reading owner contains card/name authority: '+forbidden);
   }
   assert.match(owner,/runtimeV02EvaluateActiveAbilityIf\(/);
-  assert.match(owner,/recordRuntimeV02HiddenInformationView\(state, controllerSeat, "deck_top"\)/);
+  assert.match(owner,/recordRuntimeV02HiddenInformationView\(state, controllerSeat, "deck_top", \{/);
+  assert.match(owner,/action_kind: "ability"/);
+  assert.match(owner,/source_controller_seat: controllerSeat/);
+  assert.match(owner,/source_action_id: descriptor\.ability_id/);
+  assert.match(owner,/source_card_uid: sourceInstance\.uid/);
+  assert.match(owner,/source_creature_uid: sourceInstance\.uid/);
   assert.match(owner,/runtimeV02ApplyCardZoneReorder\(/);
   assert.match(owner,/runtimeV02ScheduleAction\(/);
   assert.match(cardZone,/export function runtimeV02ApplyCardZoneReorder/);
