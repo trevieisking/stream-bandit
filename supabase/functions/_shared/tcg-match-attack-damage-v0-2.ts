@@ -84,9 +84,7 @@ function structuredRuntimeProbe(
 ): Record<string, unknown> | null {
   const attachments = [
     ...(Array.isArray(attacker.essence) ? attacker.essence : []),
-    ...(attacker.relic ? [attacker.relic] : []),
     ...(Array.isArray(target.essence) ? target.essence : []),
-    ...(target.relic ? [target.relic] : []),
   ];
   const probe = attachments[0];
   if (probe) return runtimeV02Definition(state, probe);
