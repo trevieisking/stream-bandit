@@ -1110,3 +1110,19 @@ Prismatic Founder / Bandit's Current is the sole frozen Release 1 consumer and i
 ## 380 — MOVE_ZONE_POSITION is the next used singleton
 After V2.4.101, the remaining currently used missing operations are six one-consumer slices. Capability-order tie-breaking selects `MOVE_ZONE_POSITION` first. Its sole frozen consumer is Astral Celestial Observatory: on `hidden_information_viewed` for `deck_top`, once per turn per event controller, that controller may optionally move exactly the top card of their deck to the bottom with `no_additional_reveal`. V2.4.102 must audit existing Event Listener OPTIONAL and Card-Zone reorder ownership before any source change.
 
+
+## 381 — V2.4.102 hidden-view family is shared infrastructure debt
+The accepted Astral structured set contains five `hidden_information_viewed` listeners: Orbitortoise / Forecast Shell, Prismowl / Wide Eyes, Starwhale / Star Current, Celestial Observatory / Observatory Topshift, and Dreamglass / Foresight Heal. Their trigger event is not currently emitted into the generic Event Listener engine. This is one shared owner gap, not five card-specific fixes.
+
+## 382 — hidden-view history and trigger occurrence are different records
+Hidden Information owner #33 keeps its current de-duplicated controller/zone/turn history for current-turn checks. V2.4.102 additionally requires one canonical trigger occurrence for every actual view. Repeated same-zone views must not be collapsed before Event Listener receipts/limits evaluate them. Trigger occurrences contain provenance only — controller, viewed zone and action/source context — never hidden card identity or ordering.
+
+## 383 — grammar seams required by the hidden-view listener family
+The accepted grammar declares `event_zone_is`, `source_is_attached_creature`, `$event_controller` and `MOVE_ZONE_POSITION`. Current Event Listener lacks all four semantics. Dreamglass fixes the meaning of `source_is_attached_creature`: the event's source Creature UID must equal the Creature to which the Relic is attached. Celestial Observatory fixes the meaning of `$event_controller`: the affected/viewing controller from the current hidden-view event, not the listener controller.
+
+## 384 — MOVE_ZONE_POSITION remains Card-Zone #30 mutation
+Celestial Observatory's accepted branch is exactly deck top -> deck bottom, count 1, no additional reveal, for the current event controller. Event Listener may validate and bind that operation, but must re-read the exact current top UID at resolution and delegate same-zone mutation to `runtimeV02ApplyCardZoneReorder`. It must not move a stale previously viewed UID, inspect/reveal the card, clone it, or create a new zone. Owner-family count remains 40.
+
+## 385 — V2.4.102 freeze checkpoint is green
+Head `1e3a1254740830eb9ca5192f6b679715b7d4f08d` passed Card Pass #1604 with both Set One/effect-grammar/release-control validation and deterministic runtime/type-check validation green. GitHub combined status returned no external statuses. Production/main/live remain unchanged and promotion remains HOLD while V2.4.102 source parity is implemented and proven.
+
