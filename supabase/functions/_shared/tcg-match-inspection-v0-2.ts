@@ -1,4 +1,7 @@
-import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
+import {
+  recordRuntimeV02HiddenInformationView,
+  type RuntimeV02HiddenInformationSourceContext,
+} from "./tcg-match-hidden-information-v0-2.ts";
 import {
   runtimeV02InspectRewardPositions,
   type RuntimeV02PrivateRewardInspectionView,
@@ -261,6 +264,7 @@ export function runtimeV02InspectDeckTopEffectOwnedSet(
   controllerSeatRaw: number,
   zoneOwnerSeatRaw: number,
   descriptor: RuntimeV02InspectZoneDescriptor,
+  sourceContext?: RuntimeV02HiddenInformationSourceContext,
 ): { cards: Inst[]; provenance: RuntimeV02InspectionProvenance } {
   const controllerSeat = seat(
     controllerSeatRaw,
@@ -288,7 +292,12 @@ export function runtimeV02InspectDeckTopEffectOwnedSet(
   if (new Set(cards.map((card) => card.uid)).size !== cards.length) {
     throw new Error("tcg_v0_2_inspection_deck_top_uid_duplicate");
   }
-  recordRuntimeV02HiddenInformationView(state, controllerSeat, "deck_top");
+  recordRuntimeV02HiddenInformationView(
+    state,
+    controllerSeat,
+    "deck_top",
+    sourceContext,
+  );
   return {
     cards: cards.map((card) => ({ ...card })),
     provenance: {
