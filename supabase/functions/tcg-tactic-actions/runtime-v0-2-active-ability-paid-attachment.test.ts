@@ -136,6 +136,22 @@ Deno.test("paid self-attachment keeps cost private, pays once, then offers a fre
   ]);
 });
 
+Deno.test("paid self-attachment hand_contains requirement fails closed when no matching Device is in hand before consuming the turn limit", () => {
+  const s=state();
+  s.players["1"].hand=[card("ally-uid","ally-card")];
+  assertThrows(
+    ()=>runtimeV02BeginPaidSelfAttachmentActiveAbilityLiveRoute(
+      s,1,source(),describe as never,"blocked-hand",
+    ),
+    Error,
+    "tcg_v0_2_card_cost_choice_hand_insufficient",
+  );
+  assertEquals(
+    runtimeV02CurrentTurnActiveAbilityUseCount(s,1,"overcharge-engine"),
+    0,
+  );
+});
+
 Deno.test("paid self-attachment delegates physical attachment and existing post-attachment continuation", () => {
   const s=state();
   const first=runtimeV02BeginPaidSelfAttachmentActiveAbilityLiveRoute(
