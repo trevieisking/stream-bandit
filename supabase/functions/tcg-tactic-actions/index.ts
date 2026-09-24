@@ -45,6 +45,11 @@ import {
 } from "../_shared/tcg-match-predicate-tree-v0-2.ts";
 import { evaluateRuntimeV02EventOccurredRequirement } from "../_shared/tcg-match-event-history-query-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions, type ApplyConditionMode } from "./runtime-v0-2-core.ts";
+import {
+  runtimeV02ApplyDevicePlayLock,
+  runtimeV02NormalizeDevicePlayLockStep,
+  runtimeV02TacticPlayBlockReason,
+} from "./runtime-v0-2-device-play-lock.ts";
 import { applyRuntimeConditionWithContext } from "../_shared/tcg-match-condition-engine-v0-2.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.4";
@@ -499,6 +504,13 @@ function unsupportedOps(steps: any[]): string[] {
           runtimeV02NormalizeAttackEligibilityRule(step);
         } catch {
           unsupported.add("SET_ATTACK_ELIGIBILITY_GRAMMAR");
+        }
+      }
+      if (op === "SET_DEVICE_PLAY_LOCK") {
+        try {
+          runtimeV02NormalizeDevicePlayLockStep(step);
+        } catch {
+          unsupported.add("SET_DEVICE_PLAY_LOCK_GRAMMAR");
         }
       }
       if (op === "SET_WITHDRAWAL_COST" && !["end_of_turn", "aftermath"].includes(String(step.expires || "end_of_turn"))) unsupported.add("SET_WITHDRAWAL_COST_EXPIRY");
@@ -1026,6 +1038,14 @@ function tacticPlayability(state: any, seat: number, uidValue: unknown): TacticP
   if (String(d.card_family || d.kind || "") !== "Tactic" || engine?.schema !== EFFECT_SCHEMA) {
     return { eligible: false, reason: "structured_tactic_required", index, source, definition: d, engine, subtype, unsupported_ops: [] };
   }
+  const lifecycleBlock = runtimeV02TacticPlayBlockReason(
+    state,
+    seat as 1 | 2,
+    subtype,
+  );
+  if (lifecycleBlock) {
+    return { eligible: false, reason: lifecycleBlock, index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
   if (
     subtype === "Ally" &&
     Number(state.first_player_seat) === seat &&
@@ -1083,6 +1103,18 @@ function executeUntilChoice(state: any) {
     const op = String(step.op || "");
     const ownerSeat = effect.owner_seat;
     const vars = effect.vars;
+
+    if (op === "SET_DEVICE_PLAY_LOCK") {
+      const descriptor = runtimeV02NormalizeDevicePlayLockStep(step);
+      const lockSeat = playerSeat(ownerSeat, descriptor.player, vars);
+      runtimeV02ApplyDevicePlayLock(
+        state,
+        lockSeat as 1 | 2,
+        descriptor.locked,
+      );
+      effect.cursor++;
+      continue;
+    }
 
     if (op === "DRAW" || op === "DRAW_FIXED") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);

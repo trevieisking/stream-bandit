@@ -580,9 +580,9 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "89e543c3950ba0801e0b1efc776c5c08df6ada9e",
-        "file_count": 53,
-        "closure_sha256": "18c6082f3b75d94f3fae65a5481dc9b78722724af0d0b692bac0c38ded0afc5a",
+        "entrypoint_git_blob_sha": "5898af6ddbc6fba4be1e9c53579160820b6e32b6",
+        "file_count": 54,
+        "closure_sha256": "600ce673ba7295eb22d74096401634a6249b1df3e52b4f4d91712c38179b8938",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -790,11 +790,15 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "89e543c3950ba0801e0b1efc776c5c08df6ada9e"
+            "git_blob_sha": "5898af6ddbc6fba4be1e9c53579160820b6e32b6"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
             "git_blob_sha": "d35bc0408375b6fc7bb3852b9a2251a000fd98ee"
+          },
+          {
+            "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-device-play-lock.ts",
+            "git_blob_sha": "7ac4b39041f8ea2d58348e12ce10df0b37f76370"
           }
         ]
       }
