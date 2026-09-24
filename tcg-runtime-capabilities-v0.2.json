@@ -159,7 +159,8 @@
       "target_has_any_condition",
       "target_has_condition",
       "target_printed_hp_at_least",
-      "target_remains_in_play_after_damage"
+      "target_remains_in_play_after_damage",
+      "target_stage_in"
     ],
     "partial": [],
     "missing": [
@@ -197,7 +198,6 @@
       "target_remaining_hp_at_least",
       "target_remaining_hp_at_most",
       "target_remaining_hp_equals",
-      "target_stage_in",
       "target_zone_is",
       "voluntary_withdrawal_legal_with_incoming"
     ]
@@ -1568,6 +1568,44 @@
         "tcg/tests/card-pass-2-runtime-relic-ownership.test.mjs"
       ],
       "note": "V2.4.111 closes all four Release 1 consumers. Essence-attached consumers were already trigger-time snapshot-owned; Flintkin now uses the generic Relic Attachment -> Event Listener -> Heal Packet path. The generic listener also accepts schema-valid any_turn timing. Legacy unmarked raw-heal compatibility remains isolated."
+    },
+    "release1_target_stage_in_v2_4_112": {
+      "accepted_proof_head": "64cb430b1aa6067d97d18f5c7e2d11dd1d744a16",
+      "card_pass_run": 1668,
+      "predicate": "target_stage_in",
+      "frozen_consumers": [
+        {
+          "card_id": "grove-bloom-essence",
+          "listener_id": "bloom-attach-heal",
+          "event": "essence_attached"
+        },
+        {
+          "card_id": "grove-symbiote-essence",
+          "listener_id": "symbiote-reciprocal-heal",
+          "event": "after_heal_packet"
+        }
+      ],
+      "owners": {
+        "essence_attachment_snapshot": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+        "heal_listener_dispatch": "supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts"
+      },
+      "semantics": {
+        "essence_attachment_stage_source": "printed target Creature stage frozen at trigger time",
+        "heal_listener_stage_source": "current attached Creature definition stage at heal-listener dispatch",
+        "allowed_stages": [
+          "Teen",
+          "Adult"
+        ],
+        "positive_and_negative_proof_on_both_owner_surfaces": true,
+        "no_card_id_dispatch": true,
+        "no_runtime_source_change": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-heal-listener-dispatch.test.ts"
+      ],
+      "note": "V2.4.112 closes target_stage_in across both Release 1 owner surfaces. Bloom uses immutable essence_attached snapshot truth; Symbiote uses generic after_heal_packet attachment dispatch. Proof head includes explicit rejecting-stage regressions without changing runtime source."
     }
   }
 }
