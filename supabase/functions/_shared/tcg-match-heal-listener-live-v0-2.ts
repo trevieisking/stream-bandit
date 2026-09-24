@@ -25,6 +25,7 @@ export type RuntimeV02MovementHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02ResolutionMovementHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02TacticHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02ActiveAbilityEffectHealListenerFlow = RuntimeV02HealListenerFlow;
+export type RuntimeV02HiddenInformationHealListenerFlow = RuntimeV02HealListenerFlow;
 
 export type RuntimeV02AttackHealListenerChoiceResolution =
   RuntimeV02HealListenerChoiceResolution & {
@@ -62,6 +63,12 @@ export type RuntimeV02ActiveAbilityEffectHealListenerChoiceResolution =
     resume_seat: 1 | 2 | null;
   };
 
+export type RuntimeV02HiddenInformationHealListenerChoiceResolution =
+  RuntimeV02HealListenerChoiceResolution & {
+    resume_ready: boolean;
+    resume_seat: 1 | 2 | null;
+  };
+
 type RuntimeV02HealListenerResumeKind =
   | "scan_defeats_then_aftermath"
   | "scan_defeats_then_play"
@@ -69,7 +76,8 @@ type RuntimeV02HealListenerResumeKind =
   | "return_to_play"
   | "resume_tactic_effect"
   | "resume_active_ability_effect"
-  | "resume_attack_program";
+  | "resume_attack_program"
+  | "resume_hidden_information_event";
 
 type RuntimeV02HealListenerResume = {
   kind: RuntimeV02HealListenerResumeKind;
@@ -325,6 +333,24 @@ export function runtimeV02BeginTacticHealListenerContinuation(
 }
 
 /**
+ * Starts canonical after-heal listener continuation for Heal Packets emitted by
+ * a hidden-information Event Listener. Match orchestration preserves the exact
+ * source phase/choice separately; this facade owns only the shared heal queue.
+ */
+export function runtimeV02BeginHiddenInformationHealListenerContinuation(
+  state: Record<string, unknown>,
+  packetIds: string[],
+  resumeSeat: 1 | 2,
+): RuntimeV02HiddenInformationHealListenerFlow {
+  return beginHealListenerContinuation(
+    state,
+    packetIds,
+    resumeSeat,
+    "resume_hidden_information_event",
+  );
+}
+
+/**
  * Resolves one private after-heal listener choice. If the choice owner resumes
  * into another deferred listener, the attack resume receipt is preserved. Only
  * when the entire canonical packet queue is clear is the receipt released back
@@ -454,5 +480,20 @@ export function runtimeV02ResolveTacticHealListenerChoice(
     choiceId,
     choiceIds,
     "resume_tactic_effect",
+  );
+}
+
+export function runtimeV02ResolveHiddenInformationHealListenerChoice(
+  state: Record<string, unknown>,
+  actorSeat: 1 | 2,
+  choiceId: string,
+  choiceIds: string[],
+): RuntimeV02HiddenInformationHealListenerChoiceResolution {
+  return resolveHealListenerChoiceWithResume(
+    state,
+    actorSeat,
+    choiceId,
+    choiceIds,
+    "resume_hidden_information_event",
   );
 }
