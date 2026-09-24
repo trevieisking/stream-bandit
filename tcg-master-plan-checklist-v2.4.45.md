@@ -1493,3 +1493,25 @@
 - [x] Preserve 40 owner families; no database/Edge/main/live promotion.
 
 **Acceptance:** capability blob `6993a45b193e482d29be63cd05c7cbd83031a6ae`; both frozen consumers covered.
+
+### V2.4.117 — target_became_vanguard_this_turn attached-Relic parity
+- [x] Sweep frozen Release 1 structured sources for `target_became_vanguard_this_turn`.
+- [x] Confirm exactly one frozen consumer: Gale Wingclip Charm / `wingclip-vanguard-pressure`.
+- [x] Confirm Wingclip's continuous target is `$attached_creature`.
+- [x] Resolve `filters.target_element` scope to the attached Creature rather than the attacked opponent.
+- [x] Reuse canonical Atomic Switch / forced-promotion `became_vanguard_turn` state.
+- [x] Add generic outgoing Relic `target_became_vanguard_this_turn` evaluation.
+- [x] Preserve existing outgoing Relic `target_element_is` behaviour.
+- [x] Prove current-turn Gale attached Creature receives +20.
+- [x] Prove prior-turn Gale attached Creature receives +0.
+- [x] Prove current-turn non-Gale attached Creature receives +0.
+- [x] Prove a Stone attacked target does not block the attached-Gale filter.
+- [x] Confirm no card-ID/name dispatch and no new owner family.
+- [x] Synchronize Match Edge closure fingerprint.
+- [x] Pass runtime head `ca6bc8967064788178ba55ed8538c7b7d7f783af` / Card Pass #1684 SUCCESS.
+- [x] Move exactly `target_became_vanguard_this_turn` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint.
+- [x] Pass capability head `9a07306ae6fd312b00ce0ef511228a277a440794` / Card Pass #1685 SUCCESS.
+- [x] Preserve 40 owner families; no database/Edge/main/live promotion.
+
+**Acceptance:** capability blob `1890db166b4dceb38a3ea6a02e28596f7307941f`; sole frozen consumer covered.

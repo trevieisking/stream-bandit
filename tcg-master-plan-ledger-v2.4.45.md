@@ -1312,3 +1312,15 @@ Kilnback incoming Attack-damage matching now calls canonical Condition Engine `h
 
 ## 444 — V2.4.116 source_has_condition accepted
 Capability head `0001fdca5b9f7d063f2496fff8b5e5f88128f5b9` passed Card Pass #1682. Exactly `source_has_condition` moved missing -> implemented. Capability blob is `6993a45b193e482d29be63cd05c7cbd83031a6ae`. Owner-family count remains 40; production remains unchanged.
+
+## 445 — V2.4.117 target_became_vanguard_this_turn has one frozen Release 1 consumer
+The exact frozen structured-card sweep finds one use only: Gale Wingclip Charm / `wingclip-vanguard-pressure`, an outgoing attached-Relic Attack-damage modifier.
+
+## 446 — Wingclip target filters bind to the attached Creature
+Wingclip's continuous target is `$attached_creature`. Therefore its `filters.target_element = "Gale"` describes the attached Creature, not the opposing Attack target. V2.4.117 corrects the generic outgoing Relic filter context accordingly.
+
+## 447 — V2.4.117 reuses canonical Vanguard transition state
+The existing Atomic Switch / forced-promotion owner writes `became_vanguard_turn`. Head `ca6bc8967064788178ba55ed8538c7b7d7f783af` passed Card Pass #1684, proving current-turn Gale +20, prior-turn Gale +0, and current-turn non-Gale +0 while attacking a Stone target.
+
+## 448 — V2.4.117 target_became_vanguard_this_turn accepted
+Capability head `9a07306ae6fd312b00ce0ef511228a277a440794` passed Card Pass #1685. Exactly `target_became_vanguard_this_turn` moved missing -> implemented. Capability blob is `1890db166b4dceb38a3ea6a02e28596f7307941f`. Owner-family count remains 40; production remains unchanged.

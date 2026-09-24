@@ -4069,3 +4069,39 @@ Capability head `0001fdca5b9f7d063f2496fff8b5e5f88128f5b9` passed Card Pass #168
 Exactly `source_has_condition` moved missing -> implemented. Capability blob is `6993a45b193e482d29be63cd05c7cbd83031a6ae`.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.117 — `target_became_vanguard_this_turn` attached-Relic parity
+
+**Baseline authority head:** `0eaaa29eb4230dbfca7186afe2065c138d6ff6b4` — Card Pass #1683 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **one** `target_became_vanguard_this_turn` consumer:
+- Gale Wingclip Charm / `wingclip-vanguard-pressure` — outgoing `attack_damage` on `$attached_creature`.
+
+### Semantic audit
+Wingclip also declares `filters.target_element = "Gale"`. The schema target is `$attached_creature`, so the target-element filter belongs to the attached Creature, not to the opposing Creature being attacked. The prior outgoing Relic bridge supplied attacked-target element through the shared Attack context; V2.4.117 corrects that binding generically for outgoing attached-Relic effects.
+
+The canonical Atomic Switch / forced-promotion owner already writes `incoming.became_vanguard_turn = turn_seq`. No new movement flag or duplicate switch state is introduced.
+
+### Generic repair
+The existing outgoing Relic Attack-Damage owner now:
+- accepts `target_became_vanguard_this_turn` only for `$attached_creature`;
+- compares the attached Creature's canonical `became_vanguard_turn` marker with the current `turn_seq`;
+- binds outgoing Relic `target_element` filters to the attached Creature definition;
+- preserves the existing `target_element_is` Relic predicate.
+
+No Wingclip/card-name dispatch, helper owner or new owner family is introduced.
+
+### Deterministic proof
+Runtime head `ca6bc8967064788178ba55ed8538c7b7d7f783af` passed Card Pass #1684 **SUCCESS**:
+- current-turn Gale attached Creature: +20;
+- prior-turn Gale attached Creature: +0;
+- current-turn non-Gale attached Creature: +0;
+- the attacked Creature in the positive case is Stone, proving the filter is not accidentally bound to the opponent target.
+
+### Capability acceptance
+Capability head `9a07306ae6fd312b00ce0ef511228a277a440794` passed Card Pass #1685 **SUCCESS**.
+
+Exactly `target_became_vanguard_this_turn` moved missing -> implemented. Capability blob is `1890db166b4dceb38a3ea6a02e28596f7307941f`.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
