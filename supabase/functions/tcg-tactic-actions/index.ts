@@ -3018,6 +3018,7 @@ Deno.serve(async (req) => {
         card_id: source.card_id,
         subtype,
         pending_choice: !!state.pending_choice,
+        pending_event_listener_choice: !!state.pending_event_listener_choice,
         pending_heal_listener_choice: !!state.pending_heal_listener_choice,
         pending_movement_listener_choice: !!state.pending_movement_listener_choice,
       });
@@ -3026,8 +3027,10 @@ Deno.serve(async (req) => {
         version: VERSION,
         result,
         pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_event_listener_choice: runtimeV02PendingEventListenerChoiceView(state.pending_event_listener_choice || null, seat as 1 | 2),
         pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
+        private_event_inspection: runtimeV02PrivateEventInspectionView(state, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
         private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
       });
@@ -3197,7 +3200,10 @@ Deno.serve(async (req) => {
         const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, resolved.emitted_heal_packet_ids, effect.owner_seat as 1 | 2);
         if (healFlow.status === "player_choice_required") setTacticHealResume(state, effect);
       }
-      executeUntilChoice(state);
+      const movementHiddenPending = state.pending_heal_listener_choice
+        ? true
+        : drainTacticHiddenInformationEvents(state, effect);
+      if (!movementHiddenPending) executeUntilChoice(state);
       const result = await commit("resolve_tactic_movement_listener_choice", {
         seat,
         pending_choice: !!state.pending_choice,
@@ -3260,7 +3266,8 @@ Deno.serve(async (req) => {
         throw new Error("tcg_v0_2_tactic_heal_resume_not_ready");
       }
       delete state.pending_tactic_heal_resume;
-      executeUntilChoice(state);
+      const healHiddenPending = drainTacticHiddenInformationEvents(state, effect);
+      if (!healHiddenPending) executeUntilChoice(state);
       const result = await commit("resolve_tactic_heal_listener_choice", {
         seat,
         pending_choice: !!state.pending_choice,
@@ -3298,6 +3305,7 @@ Deno.serve(async (req) => {
       kind: pending.kind,
       selected_count: selected.length,
       pending_choice: !!state.pending_choice,
+      pending_event_listener_choice: !!state.pending_event_listener_choice,
       pending_heal_listener_choice: !!state.pending_heal_listener_choice,
       pending_movement_listener_choice: !!state.pending_movement_listener_choice,
     });
