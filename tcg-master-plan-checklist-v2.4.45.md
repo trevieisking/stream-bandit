@@ -1313,3 +1313,20 @@
 
 **Acceptance:** freeze `146cf553704447e79a7979d638074de32f6ddfda` / Card Pass #1651 SUCCESS; capability head `830ac7dbec6614500b9135f0b2f800bcd3ae77ec` / #1652 SUCCESS; capability blob `e6763c176e840b757d3886cde050b4c2ed30ae77`; no runtime/test/main/live change.
 
+### V2.4.108 — source_became_vanguard_this_turn predicate reconciliation
+- [x] Freeze exact consumers: Gustfox / Tailwind Strike and Zephyrhare / Zephyr Kick.
+- [x] Confirm both consumers use the same Attack conditional_add predicate shape.
+- [x] Confirm Atomic Switch canonically writes `became_vanguard_turn` on Vanguard entry.
+- [x] Confirm Match derives the declaration predicate from current Vanguard marker vs current `turn_seq`.
+- [x] Confirm generic conditional_add evaluator owns the predicate.
+- [x] Confirm deterministic positive and negative predicate proof.
+- [x] Confirm no card-ID/name dispatch and no new owner.
+- [x] Pass freeze-head Card Pass: `84d7b824fde3a6e2f4e5e6922b88cc2d4311dbad` / #1653 SUCCESS.
+- [x] Move exactly `source_became_vanguard_this_turn` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint atomically.
+- [x] Pass accepted capability head: `d99ce641ba85a1eeb922337af67eafc5e34237eb` / #1654 SUCCESS.
+- [x] Append plan/checklist/ledger acceptance.
+- [x] Preserve 40 owner families; no runtime/main/live promotion.
+
+**Acceptance:** capability blob `9661f21edda0bb8dfc7d710cdf94ae54fc6496db`; no runtime/test/main/live change.
+

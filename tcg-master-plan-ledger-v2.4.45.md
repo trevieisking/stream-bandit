@@ -1204,3 +1204,12 @@ The exact consumers are Stone Rampartusk twice (Rampart Plating continuous incom
 ## 408 — V2.4.107 source_has_relic capability reconciliation accepted
 Freeze head `146cf553704447e79a7979d638074de32f6ddfda` passed Card Pass #1651. Accepted capability head `830ac7dbec6614500b9135f0b2f800bcd3ae77ec` passed Card Pass #1652. Exactly `source_has_relic` moved missing -> implemented. Release Control is synchronized to capability blob `e6763c176e840b757d3886cde050b4c2ed30ae77`. No gameplay runtime, tests or Edge closures changed. Owner-family count remains 40.
 
+## 409 — V2.4.108 freezes the Release 1 became-Vanguard predicate family
+The exact structured consumers are Gale Gustfox / Tailwind Strike and Gale Zephyrhare / Zephyr Kick. Both are Attack conditional_add formulas using `source_became_vanguard_this_turn`; there are no other Release 1 structured consumers.
+
+## 410 — Atomic Switch already owns the lifecycle marker
+`tcg-match-switch-context-v0-2.ts` writes `incoming.became_vanguard_turn = turn_seq` when a Creature becomes Vanguard, including the forced post-defeat Reserve promotion path. Match converts that canonical lifecycle marker into a declaration-time boolean and the generic conditional_add evaluator owns true/false evaluation. Existing deterministic tests prove both branches. No new state or identity dispatch is justified.
+
+## 411 — V2.4.108 predicate reconciliation accepted
+Freeze head `84d7b824fde3a6e2f4e5e6922b88cc2d4311dbad` passed Card Pass #1653. Accepted capability head `d99ce641ba85a1eeb922337af67eafc5e34237eb` passed Card Pass #1654. Exactly `source_became_vanguard_this_turn` moved missing -> implemented. Release Control is synchronized to capability blob `9661f21edda0bb8dfc7d710cdf94ae54fc6496db`. No runtime, tests or Edge closures changed; owner-family count remains 40.
+

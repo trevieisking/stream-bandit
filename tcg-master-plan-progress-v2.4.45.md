@@ -3790,3 +3790,28 @@ Release Control now points to capability blob `e6763c176e840b757d3886cde050b4c2e
 
 Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
 
+## V2.4.108 — `source_became_vanguard_this_turn` predicate reconciliation
+
+**Freeze head:** `84d7b824fde3a6e2f4e5e6922b88cc2d4311dbad` — Card Pass #1653 **SUCCESS**.
+
+### Exact Release 1 consumers
+Exactly two structured consumers use this predicate:
+- **Gale Gustfox / Tailwind Strike** — base 60, +20 when the source became Vanguard this turn.
+- **Gale Zephyrhare / Zephyr Kick** — base 30, +20 when the source became Vanguard this turn.
+
+### Canonical ownership and proof
+- Atomic Switch ownership in `tcg-match-switch-context-v0-2.ts` writes `incoming.became_vanguard_turn = turn_seq` for both ordinary and forced post-defeat Vanguard transitions.
+- Match constructs the declaration-time predicate context by comparing the authoritative current Vanguard `became_vanguard_turn` to the current `turn_seq`.
+- `tcg-match-attack-conditional-add-evaluator-v0-2.ts` owns the direct-state predicate.
+- `runtime-v0-2-attack-conditional-add-evaluation.test.ts` proves both matching and non-matching branches for this exact predicate family.
+
+No card identity dispatch and no duplicate switch state are needed.
+
+## V2.4.108 — implementation acceptance
+
+**Accepted capability head:** `d99ce641ba85a1eeb922337af67eafc5e34237eb` — Card Pass #1654 **SUCCESS**.
+
+Exactly `source_became_vanguard_this_turn` moved missing -> implemented. Release Control now points to capability blob `9661f21edda0bb8dfc7d710cdf94ae54fc6496db`.
+
+This was a pure capability/release-control reconciliation. Runtime source, tests, Edge closures, database, main and live are unchanged. Owner-family count remains **40**; PR #591 remains draft/unmerged.
+
