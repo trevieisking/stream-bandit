@@ -153,3 +153,90 @@ Deno.test("Thorn-style packet requirements ignore non-attack packets and non-van
   equal((s.players as any)["1"].vanguard.damage, 0);
   equal((s.players as any)["1"].vanguard.shield, 5);
 });
+
+
+Deno.test("Event Listener attached-creature subject predicate matches only its carrier Creature", () => {
+  const attachedSubjectRelic = {
+    definition_v0_2: {
+      schema: "sb-tcg-card-v0.2",
+      effect_schema: "sb-tcg-effects-v0.2",
+      id: "test-thorn",
+      name: "Attached Subject Proof",
+      card_family: "Tactic",
+      element: "Grove",
+      creature: null,
+      essence: null,
+      tactic: {
+        subtype: "Relic",
+        program: { steps: [] },
+        continuous: [],
+        listeners: [{
+          id: "attached-subject-proof",
+          event: "after_damage_packet",
+          requirements: {
+            all: [{ predicate: "event_subject_is_attached_creature" }],
+          },
+          limit: null,
+          steps: [{
+            op: "DIRECT_DAMAGE",
+            target: "$damage_packet_source_creature",
+            amount: 10,
+            damage_class: "effect",
+          }],
+        }],
+      },
+    },
+  };
+
+  const matching = state();
+  (matching.card_index as any)["test-thorn"] = attachedSubjectRelic;
+  const matchingEvent = runtimeV02CreateResolvedAttackDamageEvent(matching, {
+    action_id: "attached-subject-match",
+    packet_id: "attached-subject-match",
+    attack_id: "test-attack",
+    source_controller_seat: 1,
+    source_creature_uid: "attacker-uid",
+    source_card_uid: "attacker-uid",
+    source_card_id: "attacker",
+    target_controller_seat: 2,
+    target_creature_uid: "defender-uid",
+    target_zone: "vanguard",
+    target_index: null,
+    requested_amount: 30,
+    final_packet_amount: 30,
+    shield_prevented: 0,
+    actual_hp_damage: 30,
+  });
+  const matched = runtimeV02BeginEventListenerContinuation(matching, [matchingEvent]);
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+  equal((matching.players as any)["1"].vanguard.shield, 0);
+  equal((matching.players as any)["1"].vanguard.damage, 5);
+
+  const rejecting = state();
+  (rejecting.card_index as any)["test-thorn"] = attachedSubjectRelic;
+  (rejecting.card_index as any)["other-defender"] = creatureDef("other-defender", "Grove");
+  (rejecting.players as any)["2"].reserve[0] = creature("other-defender-uid", "other-defender");
+  const rejectingEvent = runtimeV02CreateResolvedAttackDamageEvent(rejecting, {
+    action_id: "attached-subject-reject",
+    packet_id: "attached-subject-reject",
+    attack_id: "test-attack",
+    source_controller_seat: 1,
+    source_creature_uid: "attacker-uid",
+    source_card_uid: "attacker-uid",
+    source_card_id: "attacker",
+    target_controller_seat: 2,
+    target_creature_uid: "other-defender-uid",
+    target_zone: "reserve",
+    target_index: 0,
+    requested_amount: 30,
+    final_packet_amount: 30,
+    shield_prevented: 0,
+    actual_hp_damage: 30,
+  });
+  const rejected = runtimeV02BeginEventListenerContinuation(rejecting, [rejectingEvent]);
+  equal(rejected.status, "complete");
+  equal(rejected.processed_listener_keys.length, 0);
+  equal((rejecting.players as any)["1"].vanguard.shield, 5);
+  equal((rejecting.players as any)["1"].vanguard.damage, 0);
+});

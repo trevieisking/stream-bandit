@@ -856,3 +856,112 @@ Deno.test("triggered APPLY_CONDITION uses source-aware Condition protection", ()
   equal(target.conditions.control, null);
   equal(runtimeV02ConditionProtectionCount(target), 0);
 });
+
+
+Deno.test("Event Listener active-seat controller predicate matches only the authoritative active seat", () => {
+  const source = creatureDefinition(
+    "gale-active-seat-proof",
+    "Active Seat Proof",
+    "Gale",
+    ability("active-seat-proof", {
+      all: [
+        { predicate: "event_subject_is_source" },
+        { predicate: "event_controller_is_active_seat" },
+      ],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+
+  const active = baseState(source);
+  const matched = begin(active);
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+  const activeCost = runtimeV02ResolveWithdrawalModifierCost(
+    active,
+    (active.players as any)["1"].vanguard,
+    1,
+    "Gale",
+    2,
+  );
+  equal(activeCost.cost, 1);
+
+  const inactive = baseState(source);
+  (inactive as any).active_seat = 2;
+  const rejected = begin(inactive);
+  equal(rejected.status, "complete");
+  equal(rejected.processed_listener_keys.length, 0);
+  const inactiveCost = runtimeV02ResolveWithdrawalModifierCost(
+    inactive,
+    (inactive.players as any)["1"].vanguard,
+    1,
+    "Gale",
+    2,
+  );
+  equal(inactiveCost.cost, 2);
+});
+
+Deno.test("Event Listener subject filters resolve the current event subject definition", () => {
+  const matchingSource = creatureDefinition(
+    "gale-subject-filter-proof",
+    "Subject Filter Proof",
+    "Gale",
+    ability("subject-filter-proof", {
+      all: [{
+        predicate: "event_subject_matches",
+        filters: { card_family: "Creature", element: "Gale" },
+      }],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+  const matchingState = baseState(matchingSource);
+  const matched = begin(matchingState);
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+
+  const rejectingSource = creatureDefinition(
+    "gale-subject-filter-reject",
+    "Subject Filter Reject",
+    "Gale",
+    ability("subject-filter-reject", {
+      all: [{
+        predicate: "event_subject_matches",
+        filters: { card_family: "Creature", element: "Ember" },
+      }],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+  const rejectingState = baseState(rejectingSource);
+  const rejected = begin(rejectingState);
+  equal(rejected.status, "complete");
+  equal(rejected.processed_listener_keys.length, 0);
+});
