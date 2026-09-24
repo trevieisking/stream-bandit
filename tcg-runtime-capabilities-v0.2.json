@@ -151,6 +151,7 @@
       "source_has_relic",
       "source_has_shield_at_least",
       "source_is_attached_creature",
+      "source_is_current_friendly_vanguard",
       "source_is_self",
       "target_damaged",
       "target_has_any_condition",
@@ -187,7 +188,6 @@
       "source_element_is",
       "source_has_condition",
       "source_in_play",
-      "source_is_current_friendly_vanguard",
       "target_became_vanguard_this_turn",
       "target_damage_at_least",
       "target_damage_at_most",
@@ -1455,6 +1455,36 @@
         "owner_family_count": 40
       },
       "note": "No runtime or test change is required; both frozen Gale formulas share one generic declaration-time predicate and canonical Atomic Switch lifecycle marker."
+    },
+    "release1_source_is_current_friendly_vanguard_v2_4_109": {
+      "accepted_proof_head": "1364263b1fe85828d84d2072416a927a43dfa5a0",
+      "card_pass_run": 1656,
+      "predicate": "source_is_current_friendly_vanguard",
+      "frozen_consumers": [
+        {
+          "card_id": "prismatic-stream-bandit-prismatic-founder",
+          "ability_id": "bandits-current",
+          "surface": "active Ability"
+        }
+      ],
+      "owners": {
+        "family": "supabase/functions/_shared/tcg-match-active-ability-search-attachment-v0-2.ts",
+        "facade": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts"
+      },
+      "semantics": {
+        "descriptor_requires_exact_predicate": true,
+        "activation_requires_source_where": "vanguard",
+        "activation_requires_source_index": null,
+        "current_vanguard_identity_rebound": true,
+        "non_vanguard_rejected_before_turn_limit_receipt": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-search-attachment.test.ts",
+        "tcg/tests/card-pass-2-runtime-active-ability-search-attachment-wiring.test.mjs"
+      ],
+      "note": "V2.4.109 adds only direct negative proof. Existing generic active-Ability owner already enforces current friendly Vanguard location and identity before consuming the once-per-turn receipt."
     }
   }
 }
