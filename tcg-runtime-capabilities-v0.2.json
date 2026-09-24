@@ -126,6 +126,7 @@
       "event_subject_matches",
       "event_zone_is",
       "friendly_other_creature_matches",
+      "hand_contains",
       "hand_count_at_least",
       "heal_actual_amount_at_least",
       "heal_controller_is_active_seat",
@@ -181,7 +182,6 @@
       "event_previous_attachment_target_is_attached_creature",
       "event_source_action_is",
       "event_target_controller_is_opponent",
-      "hand_contains",
       "shield_actual_gain_at_least",
       "shield_source_is_card_effect",
       "shield_target_is_self",
@@ -1485,6 +1485,39 @@
         "tcg/tests/card-pass-2-runtime-active-ability-search-attachment-wiring.test.mjs"
       ],
       "note": "V2.4.109 adds only direct negative proof. Existing generic active-Ability owner already enforces current friendly Vanguard location and identity before consuming the once-per-turn receipt."
+    },
+    "release1_hand_contains_v2_4_110": {
+      "accepted_proof_head": "8722b23477354adf417ab51ac2be2cba519b9976",
+      "card_pass_run": 1659,
+      "predicate": "hand_contains",
+      "frozen_consumers": [
+        {
+          "card_id": "volt-dynamozer",
+          "ability_id": "overcharge-engine",
+          "surface": "active Ability activation requirement"
+        }
+      ],
+      "owners": {
+        "paid_active_ability": "supabase/functions/_shared/tcg-match-active-ability-paid-attachment-v0-2.ts",
+        "activation_cost": "supabase/functions/_shared/tcg-match-active-ability-activation-cost-v0-2.ts",
+        "card_cost_choice": "supabase/functions/_shared/tcg-match-card-cost-choice-v0-2.ts"
+      },
+      "semantics": {
+        "requirement_filters_equal_cost_filters": {
+          "card_family": "Tactic",
+          "tactic_subtype": "Device"
+        },
+        "source_of_truth": "actual controller hand at activation-cost choice",
+        "insufficient_matching_hand_cards_fail_closed": true,
+        "failed_preflight_consumes_turn_limit": false,
+        "private_choice": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-paid-attachment.test.ts"
+      ],
+      "note": "V2.4.110 adds only direct negative proof. Existing generic card-cost choice already evaluates the hand_contains requirement semantically by constructing the exact filtered mandatory hand-discard choice from the live private hand."
     }
   }
 }
