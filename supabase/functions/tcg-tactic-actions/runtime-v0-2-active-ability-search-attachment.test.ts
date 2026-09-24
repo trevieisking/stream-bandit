@@ -220,6 +220,28 @@ Deno.test("search-selection attachment descriptor is operation-shaped and preser
   assertEquals(descriptor.shuffle, { player: "self" });
 });
 
+Deno.test("search-selection attachment requirement rejects a non-Vanguard source before consuming the turn limit", () => {
+  const s = state();
+  assertThrows(
+    () => runtimeV02CreateActiveAbilityLiveChoice(
+      s,
+      1,
+      {
+        where: "reserve" as const,
+        index: 0,
+        instance: card("source-uid", "test-search-attachment-source"),
+      },
+      "reserve-source-choice",
+    ),
+    Error,
+    "tcg_v0_2_search_attachment_source_must_be_vanguard",
+  );
+  assertEquals(
+    runtimeV02CurrentTurnActiveAbilityUseCount(s, 1, "search-new-element"),
+    0,
+  );
+});
+
 Deno.test("live active-Ability search choice is private and excludes already-attached Essence elements", () => {
   const s = state();
   const pending = runtimeV02CreateActiveAbilityLiveChoice(
