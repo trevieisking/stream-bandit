@@ -1191,3 +1191,7 @@ The exact consumers are Tide Rillrunner, Reefshell and Tidal Lens. Their union u
 ## 404 — Movement Listener ownership and direct proof already exist
 `tcg-match-movement-listener-v0-2.ts` generically evaluates all four against canonical `essence_moved` events. The deterministic movement-listener suite directly proves Reefshell, Rillrunner and Tidal Lens, including same-turn limits, wrong-element rejection, wrong-controller rejection and legacy no-op. No gameplay implementation or proof addition is justified.
 
+
+## 405 — V2.4.106 Essence Movement capability reconciliation accepted
+Freeze head `2c91679ce009e452369ba31cfebff9a6cd4d620d` passed Card Pass #1649. Accepted capability head `921ff4d0e26efc2f619a7daaaefc8cc17688cb9e` passed Card Pass #1650. Exactly four predicates moved missing -> implemented: `essence_move_destination_is_self`, `essence_move_element_is`, `essence_move_source_is_attached_creature`, and `essence_move_source_is_self`. Release Control is synchronized to capability blob `ce8ed09b5a6623a483504427d43a238ff604e5c2`. No gameplay runtime, tests or Edge closures changed.
+

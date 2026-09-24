@@ -3723,3 +3723,21 @@ If the freeze head remains green:
 
 Owner-family count remains **40**. No gameplay-runtime/test source, main merge, deployment or live promotion is authorized.
 
+
+## V2.4.106 — implementation acceptance
+
+**Freeze head:** `2c91679ce009e452369ba31cfebff9a6cd4d620d` — Card Pass #1649 **SUCCESS**.  
+**Accepted capability head:** `921ff4d0e26efc2f619a7daaaefc8cc17688cb9e` — Card Pass #1650 **SUCCESS**.
+
+V2.4.106 closed as a pure capability/release-control reconciliation with **no gameplay-runtime or test change**.
+
+Existing Movement Listener ownership and deterministic proof cover Rillrunner, Reefshell and Tidal Lens. Exactly four predicates moved missing -> implemented:
+- `essence_move_destination_is_self`;
+- `essence_move_element_is`;
+- `essence_move_source_is_attached_creature`;
+- `essence_move_source_is_self`;
+
+Release Control now points to capability blob `ce8ed09b5a6623a483504427d43a238ff604e5c2`. Edge runtime source and dependency closures did not change.
+
+Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
+

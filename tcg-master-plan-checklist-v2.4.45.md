@@ -1284,10 +1284,12 @@
 - [x] Confirm deterministic runtime proof covers all three accepted consumer shapes.
 - [x] Confirm wrong-element, wrong-controller, limit and legacy no-op behavior.
 - [x] Confirm no card-ID/name dispatch and no new owner is needed.
-- [ ] Pass exact-head Card Pass on the V2.4.106 freeze head.
-- [ ] Move exactly four frozen Essence Movement predicates missing -> implemented.
-- [ ] Update Release Control capability-manifest fingerprint atomically.
-- [ ] Pass exact-head Card Pass after capability reconciliation.
-- [ ] Append V2.4.106 acceptance across plan/checklist/ledger.
+- [x] Pass exact-head Card Pass on the V2.4.106 freeze head.
+- [x] Move exactly four frozen Essence Movement predicates missing -> implemented.
+- [x] Update Release Control capability-manifest fingerprint atomically.
+- [x] Pass exact-head Card Pass after capability reconciliation.
+- [x] Append V2.4.106 acceptance across plan/checklist/ledger.
 - [x] Preserve 40 owner families; no main/live promotion in this slice.
 
+
+**Acceptance:** freeze `2c91679ce009e452369ba31cfebff9a6cd4d620d` / Card Pass #1649 SUCCESS; capability head `921ff4d0e26efc2f619a7daaaefc8cc17688cb9e` / #1650 SUCCESS; no runtime/test/main/live change.
