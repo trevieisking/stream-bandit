@@ -1120,6 +1120,14 @@ function executeUntilChoice(state: any) {
         ownerSeat,
         zoneSeat,
         descriptor,
+        {
+          action_kind: "tactic",
+          source_controller_seat: ownerSeat as 1 | 2,
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_creature_uid: null,
+          phase: String(state.phase || "effect_resolution"),
+        },
       );
       vars[descriptor.as] = inspected.cards.map((card) => ({ ...card }));
       inspectionProvenanceMap(vars)[descriptor.as] = structuredClone(
@@ -1142,6 +1150,14 @@ function executeUntilChoice(state: any) {
             ownerSeat,
             seat,
             count,
+            {
+          action_kind: "tactic",
+          source_controller_seat: ownerSeat as 1 | 2,
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_creature_uid: null,
+          phase: String(state.phase || "effect_resolution"),
+        },
           );
           vars[variable] = bound.cards.map((card) => ({ ...card }));
           boundDeckSetProvenanceMap(vars)[variable] = structuredClone(
@@ -1152,7 +1168,21 @@ function executeUntilChoice(state: any) {
         }
       }
       vars[variable] = player.deck.splice(0, count);
-      if (count > 0) recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck_top");
+      if (count > 0) {
+        recordRuntimeV02HiddenInformationView(
+          state,
+          seat as 1 | 2,
+          "deck_top",
+          {
+            action_kind: "tactic",
+            source_controller_seat: ownerSeat as 1 | 2,
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            source_creature_uid: null,
+            phase: String(state.phase || "effect_resolution"),
+          },
+        );
+      }
       effect.cursor++;
       continue;
     }
@@ -1298,7 +1328,19 @@ function executeUntilChoice(state: any) {
       const player = state.players[String(seat)];
       const options = cardOptions(state, player.deck, step.selection?.filters, ownerSeat);
       const bounds = choiceBounds(step.selection, options.length, true);
-      recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck");
+      recordRuntimeV02HiddenInformationView(
+        state,
+        seat as 1 | 2,
+        "deck",
+        {
+          action_kind: "tactic",
+          source_controller_seat: ownerSeat as 1 | 2,
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_creature_uid: null,
+          phase: String(state.phase || "effect_resolution"),
+        },
+      );
       setPending(state, effect, {
         seat: ownerSeat,
         kind: "search_deck",
