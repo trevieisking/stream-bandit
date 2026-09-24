@@ -1288,3 +1288,15 @@ Head `821362b42b853e70067bafd0ef204ac555936cd3` restores the prior probe boundar
 ## 436 — V2.4.114 target_element_is accepted
 Capability head `21237c037b1e1668d3fba16ad7b47c112855b1b3` passed Card Pass #1676. Exactly `target_element_is` moved missing -> implemented. Capability blob `195391418a8490a16e7e0b61b141e5f262522e29`. Owner-family count remains 40; production remains unchanged.
 
+
+## 437 — V2.4.115 source_element_is has one frozen Release 1 consumer
+The exact structured-card sweep across Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt and Founder finds one use only: Astral Orbit Ring / `orbit-ring-after-attack` on `attack_finished`.
+
+## 438 — Event Listener owns source_element_is generically
+The existing Event Listener now resolves `event.source_creature_uid` to the current source Creature and compares its structured definition element with the declared listener element. Missing/unresolved source identity fails closed. No Orbit Ring/card-name dispatch or owner-family expansion is used.
+
+## 439 — V2.4.115 runtime proof passed
+Head `4d141b15f3393cd07048727457b2616fba0340f6` passed Card Pass #1678. The deterministic Orbit Ring regression accepts an Astral attack source and rejects the same source after its element is changed to Gale.
+
+## 440 — V2.4.115 source_element_is accepted
+Capability head `39eb324e1ca57f372693a263589240998659f5e5` passed Card Pass #1679. Exactly `source_element_is` moved missing -> implemented. Capability blob is `230f0eb0b01333b4885c5134e39bfed1dda515cd`. Owner-family count remains 40; production remains unchanged.

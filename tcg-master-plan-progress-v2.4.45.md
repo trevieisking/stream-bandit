@@ -4004,3 +4004,37 @@ Exactly `target_element_is` moved missing -> implemented. Capability blob is `19
 
 Release Control is synchronized to the repaired Match/Tactic closures and capability manifest. Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred.
 
+
+## V2.4.115 — `source_element_is` Event Listener parity
+
+**Baseline authority head:** `597efafa9f9cf460046819e3441cd9211c046b7e` — Card Pass #1677 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep across Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt and Founder finds exactly **one** `source_element_is` consumer:
+- Astral — Orbit Ring / `orbit-ring-after-attack` / `attack_finished`.
+
+Its companion requirements `source_is_attached_creature` and `source_controller_is_self` were already generic Event Listener predicates.
+
+### Generic repair
+V2.4.115 extends the existing Event Listener owner only:
+- read `event.source_creature_uid`;
+- resolve that exact current battlefield Creature;
+- read the Creature's structured definition `element`;
+- compare it with the listener's declared `element`;
+- fail closed when the source uid is absent or no longer resolves.
+
+No Orbit Ring/card-name dispatch, helper owner or new owner family is introduced.
+
+### Deterministic proof
+Runtime head `4d141b15f3393cd07048727457b2616fba0340f6` passed Card Pass #1678 **SUCCESS**.
+
+The Event Listener regression proves both sides of the predicate:
+- Astral attack source -> Orbit Ring listener is processed;
+- the same source changed to Gale -> Orbit Ring listener is rejected.
+
+### Capability acceptance
+Capability head `39eb324e1ca57f372693a263589240998659f5e5` passed Card Pass #1679 **SUCCESS**.
+
+Exactly `source_element_is` moved missing -> implemented. Capability blob is `230f0eb0b01333b4885c5134e39bfed1dda515cd`.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

@@ -1454,3 +1454,22 @@
 
 **Acceptance:** capability blob `195391418a8490a16e7e0b61b141e5f262522e29`; all four owner surfaces covered.
 
+
+### V2.4.115 — source_element_is Event Listener parity
+- [x] Sweep frozen Astral/Ember/Gale/Grove/Shade/Stone/Tide/Volt/Foundation structured sources for `source_element_is`.
+- [x] Confirm exactly one frozen consumer: Astral Orbit Ring / `orbit-ring-after-attack` / `attack_finished`.
+- [x] Confirm `source_is_attached_creature` and `source_controller_is_self` remain existing generic Event Listener ownership.
+- [x] Add generic `source_element_is` evaluation to the existing Event Listener owner.
+- [x] Resolve source identity through `event.source_creature_uid`.
+- [x] Fail closed when the source uid is absent or unresolved.
+- [x] Compare the source Creature structured definition element to the declared listener element.
+- [x] Add positive Astral-source Orbit Ring proof.
+- [x] Add negative non-Astral-source Orbit Ring proof.
+- [x] Confirm no card-ID/name dispatch and no new owner family.
+- [x] Pass runtime head `4d141b15f3393cd07048727457b2616fba0340f6` / Card Pass #1678 SUCCESS.
+- [x] Move exactly `source_element_is` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint.
+- [x] Pass capability head `39eb324e1ca57f372693a263589240998659f5e5` / Card Pass #1679 SUCCESS.
+- [x] Preserve 40 owner families; no database/Edge/main/live promotion.
+
+**Acceptance:** capability blob `230f0eb0b01333b4885c5134e39bfed1dda515cd`; sole frozen consumer covered.
