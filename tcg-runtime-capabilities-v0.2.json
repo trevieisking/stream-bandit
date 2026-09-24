@@ -147,6 +147,7 @@
       "source_controller_is_self",
       "source_counter_at_least",
       "source_damaged",
+      "source_has_relic",
       "source_has_shield_at_least",
       "source_is_attached_creature",
       "source_is_self",
@@ -185,7 +186,6 @@
       "source_became_vanguard_this_turn",
       "source_element_is",
       "source_has_condition",
-      "source_has_relic",
       "source_in_play",
       "source_is_current_friendly_vanguard",
       "target_became_vanguard_this_turn",
@@ -1384,6 +1384,44 @@
         }
       },
       "note": "The sole frozen ATTACH_ESSENCE_FROM_SELECTION consumer now executes through a bounded owner-#31 active-Ability search/private-choice submodule, Hidden Information #33, canonical Essence Attachment owner #22, existing Event/Movement/Heal continuation and the shared Randomization engine. effect_owned_selection remains logical provenance only; the selected card stays physically in deck until owner #22 attaches it from the true deck origin. No owner #41."
+    },
+    "release1_source_has_relic_v2_4_107": {
+      "freeze_head": "146cf553704447e79a7979d638074de32f6ddfda",
+      "card_pass_run": 1651,
+      "predicate": "source_has_relic",
+      "frozen_consumers": [
+        {
+          "card_id": "stone-rampartusk",
+          "surface": "continuous incoming Attack damage",
+          "effect_id": "rampart-plating-reduction"
+        },
+        {
+          "card_id": "stone-rampartusk",
+          "surface": "Attack conditional_add",
+          "attack_id": "wall-break"
+        },
+        {
+          "card_id": "stone-citadelhorn",
+          "surface": "continuous incoming Attack damage",
+          "effect_id": "fortress-heart-reduction"
+        }
+      ],
+      "owners": {
+        "incoming_attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts",
+        "conditional_add": "supabase/functions/_shared/tcg-match-attack-conditional-add-evaluator-v0-2.ts",
+        "attack_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-evaluation.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-prevention-authority.test.ts"
+      ],
+      "semantics": {
+        "continuous": "attached Relic presence gates the source Creature continuous incoming Attack damage reduction",
+        "attack_formula": "legal-declaration context reads the authoritative current Vanguard Relic slot",
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "note": "No gameplay runtime or test change is required; existing generic owners and deterministic positive/negative proof cover all frozen Release 1 source_has_relic consumers."
     }
   }
 }
