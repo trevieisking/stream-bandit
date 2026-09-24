@@ -1022,6 +1022,9 @@ function requirementLeaf(
       return (candidate.kind === "relic" || candidate.kind === "essence") &&
         !!candidate.field &&
         String(event.source_creature_uid || "") === candidate.field.top.uid;
+    case "event_attachment_target_is_source":
+      return !!candidate.field &&
+        String(event.attachment_target_uid || "") === candidate.field.top.uid;
     case "event_controller_is_self":
       return event.controller_seat === candidate.seat;
     case "event_controller_is_opponent":
