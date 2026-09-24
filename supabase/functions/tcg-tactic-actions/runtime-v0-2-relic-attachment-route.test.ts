@@ -143,7 +143,7 @@ Deno.test("Relic Attachment route triggers Flintkin Layered Hide through generic
     { phase: "play", action_kind: "manual_relic" },
   );
 
-  assert.equal(fixture.flintkin.relic?.uid, "relic-uid");
+  assert.equal((fixture.flintkin.relic as { uid: string } | null)?.uid, "relic-uid");
   assert.equal(fixture.flintkin.damage, 10);
   assert.equal(result.listener_event.event, "relic_attached");
   assert.equal(result.listener_event.attachment_target_uid, "flintkin-uid");
@@ -164,7 +164,7 @@ Deno.test("Relic Attachment route rejects Flintkin Layered Hide when a different
     { phase: "play", action_kind: "manual_relic" },
   );
 
-  assert.equal(fixture.other.relic?.uid, "relic-uid");
+  assert.equal((fixture.other.relic as { uid: string } | null)?.uid, "relic-uid");
   assert.equal(fixture.flintkin.damage, 20);
   assert.equal(fixture.other.damage, 20);
   assert.equal(result.flow.status, "complete");
