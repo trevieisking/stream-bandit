@@ -1166,3 +1166,10 @@ The Release 1 audit identifies eight capability entries that remain marked missi
 ## 397 — five predicates already have broad runtime proof; three need direct assertions
 Existing deterministic Event Listener tests exercise source identity, origin/destination zones, phase and source/self across multiple listener families. Direct proof is still required for active-seat controller comparison, event-subject definition filters and attached-Creature subject identity before capability promotion. V2.4.104 is therefore proof-only unless those tests expose a real runtime defect.
 
+
+## 398 — V2.4.104 direct predicate proof is green
+Proof head `5b68a60ff79a4eea0829da0deb596d63f5b6852a` passed Card Pass #1643. Runtime tests directly prove active-seat controller match/non-match, event-subject definition filter match/non-match, and attached-Creature subject match/non-match. The proof commit changes tests only.
+
+## 399 — eight core Event Listener predicates are capability-complete for Release 1
+Accepted head `445759beccccde2c60afaf93905c0f074ce093cc` passed Card Pass #1644. Exactly eight predicates moved missing -> implemented: `event_subject_is_source`, `event_origin_zone_is`, `event_controller_is_active_seat`, `event_destination_zone_is`, `source_is_self`, `event_phase_is`, `event_subject_matches`, and `event_subject_is_attached_creature`. Release Control is synchronized to capability blob `73d94115359b28379301c50a38fee4556f4a8ac4`. No Edge runtime source or closure changed.
+

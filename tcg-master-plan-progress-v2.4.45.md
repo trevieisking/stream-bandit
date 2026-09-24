@@ -3536,3 +3536,37 @@ V2.4.104 adds **proof only** for those three semantics. If exact-head Card Pass 
 
 Owner-family count remains **40**. No gameplay-runtime source, main merge, deployment or live promotion is authorized by this slice.
 
+
+## V2.4.104 — implementation acceptance
+
+**Proof head:** `5b68a60ff79a4eea0829da0deb596d63f5b6852a` — Card Pass #1643 **SUCCESS**.  
+**Accepted capability head:** `445759beccccde2c60afaf93905c0f074ce093cc` — Card Pass #1644 **SUCCESS**.
+
+V2.4.104 closed as a proof/capability reconciliation with **no gameplay-runtime change**.
+
+The generic Event Listener engine already owned the accepted semantics. New deterministic proofs established:
+- `event_controller_is_active_seat` matches only when the event controller is the authoritative active seat;
+- `event_subject_matches` resolves the current event subject definition and rejects a mismatching element filter;
+- `event_subject_is_attached_creature` matches only the Creature carrying the listening Relic and rejects an event for another Creature.
+
+Existing deterministic suites already covered the other five frozen predicates across creature-entered, evolved and essence-attached flows:
+`event_subject_is_source`,
+`event_origin_zone_is`,
+`event_destination_zone_is`,
+`event_phase_is`,
+and `source_is_self`.
+
+Exactly eight predicates moved missing -> implemented:
+- `event_subject_is_source`;
+- `event_origin_zone_is`;
+- `event_controller_is_active_seat`;
+- `event_destination_zone_is`;
+- `source_is_self`;
+- `event_phase_is`;
+- `event_subject_matches`;
+- `event_subject_is_attached_creature`;
+
+Release Control now points to capability blob `73d94115359b28379301c50a38fee4556f4a8ac4`. The proof commit touched test files only and the reconciliation commit touched capability/release-control metadata only; no Edge runtime closure changed.
+
+Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
+

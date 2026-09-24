@@ -1246,13 +1246,15 @@
 - [x] Confirm generic Event Listener cases already exist for all eight.
 - [x] Confirm broad deterministic proof for subject source, origin, destination, phase and source/self.
 - [x] Confirm no card-ID/name dispatch or second interpreter is required.
-- [ ] Add direct active-seat controller match/non-match proof.
-- [ ] Add direct subject-definition filter match/non-match proof.
-- [ ] Add direct attached-creature subject match/non-match proof.
-- [ ] Pass exact-head Card Pass after proof-only tests.
-- [ ] Move exactly eight frozen predicates missing -> implemented.
-- [ ] Update Release Control capability-manifest fingerprint atomically.
-- [ ] Pass exact-head Card Pass after capability reconciliation.
-- [ ] Append V2.4.104 acceptance across plan/checklist/ledger.
+- [x] Add direct active-seat controller match/non-match proof.
+- [x] Add direct subject-definition filter match/non-match proof.
+- [x] Add direct attached-creature subject match/non-match proof.
+- [x] Pass exact-head Card Pass after proof-only tests.
+- [x] Move exactly eight frozen predicates missing -> implemented.
+- [x] Update Release Control capability-manifest fingerprint atomically.
+- [x] Pass exact-head Card Pass after capability reconciliation.
+- [x] Append V2.4.104 acceptance across plan/checklist/ledger.
 - [x] Preserve 40 owner families; no main/live promotion in this slice.
 
+
+**Acceptance:** proof `5b68a60ff79a4eea0829da0deb596d63f5b6852a` / Card Pass #1643 SUCCESS; capability head `445759beccccde2c60afaf93905c0f074ce093cc` / #1644 SUCCESS; owner families 40; no gameplay-runtime/main/live change.
