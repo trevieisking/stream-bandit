@@ -37,6 +37,8 @@ const RESERVE_ID = "attack-declared-reserve";
 const RESERVE_UID = `${RESERVE_ID}:uid`;
 const TARGET_ID = "attack-declared-target";
 const TARGET_UID = `${TARGET_ID}:uid`;
+const OPP_RESERVE_ID = "attack-declared-opponent-reserve";
+const OPP_RESERVE_UID = `${OPP_RESERVE_ID}:uid`;
 
 const DAMAGE_HISTORY_REQUIREMENT = {
   predicate: "damage_history_count_at_least",
@@ -67,6 +69,27 @@ function ability(steps: Record<string, unknown>[] = [{
     },
     costs: [],
     steps,
+  };
+}
+
+function skyrendAbility(): Record<string, unknown> {
+  return {
+    id: "open-sky-hunter",
+    name: "Open Sky Hunter",
+    mode: "triggered",
+    event: "attack_declared",
+    timing: "attack",
+    limit: null,
+    requirements: {
+      all: [
+        { predicate: "event_attack_source_is_self" },
+        { predicate: "event_attack_id_is", attack_id: "sky-rend" },
+        { predicate: "event_attack_target_zone_is", zone: "reserve" },
+        { predicate: "event_attack_target_controller_is_opponent" },
+      ],
+    },
+    costs: [],
+    steps: [{ op: "MODIFY_CURRENT_ATTACK_DAMAGE", delta: -20 }],
   };
 }
 
@@ -184,6 +207,59 @@ function input(overrides: Partial<RuntimeV02AttackDeclaredDamageInput> = {}) {
     ...overrides,
   };
 }
+
+Deno.test("Skyrend attack-declared metadata predicates gate Open Sky Hunter generically", () => {
+  const makeMatch = () => {
+    const match = state() as any;
+    match.card_index[SOURCE_ID] = definition(SOURCE_ID, skyrendAbility());
+    match.card_index[OPP_RESERVE_ID] = definition(OPP_RESERVE_ID, null);
+    match.players["2"].reserve[0] = creature(OPP_RESERVE_UID, OPP_RESERVE_ID);
+    return match;
+  };
+  const reserveInput = (overrides: Partial<RuntimeV02AttackDeclaredDamageInput> = {}) => input({
+    action_id: "sky-rend-action",
+    attack_id: "sky-rend",
+    source_creature_uid: SOURCE_UID,
+    target_controller_seat: 2,
+    target_creature_uid: OPP_RESERVE_UID,
+    target_zone: "reserve",
+    base_damage: 110,
+    ...overrides,
+  });
+
+  const positive = runtimeV02ResolveAttackDeclaredDamageListeners(makeMatch(), reserveInput());
+  if (!positive) throw new Error("Skyrend structured attack-declared result required");
+  assertEquals(positive.damage_delta, -20);
+  assertEquals(positive.damage, 90);
+
+  const wrongAttack = runtimeV02ResolveAttackDeclaredDamageListeners(
+    makeMatch(),
+    reserveInput({ action_id: "razorwind-action", attack_id: "razorwind" }),
+  );
+  if (!wrongAttack) throw new Error("Skyrend wrong-attack result required");
+  assertEquals(wrongAttack.damage_delta, 0);
+  assertEquals(wrongAttack.damage, 110);
+
+  const vanguardTarget = runtimeV02ResolveAttackDeclaredDamageListeners(
+    makeMatch(),
+    input({ action_id: "sky-rend-vanguard", attack_id: "sky-rend", base_damage: 110 }),
+  );
+  if (!vanguardTarget) throw new Error("Skyrend Vanguard-target result required");
+  assertEquals(vanguardTarget.damage_delta, 0);
+  assertEquals(vanguardTarget.damage, 110);
+
+  const selfTarget = runtimeV02ResolveAttackDeclaredDamageListeners(
+    makeMatch(),
+    reserveInput({
+      action_id: "sky-rend-self",
+      target_controller_seat: 1,
+      target_creature_uid: RESERVE_UID,
+    }),
+  );
+  if (!selfTarget) throw new Error("Skyrend self-target result required");
+  assertEquals(selfTarget.damage_delta, 0);
+  assertEquals(selfTarget.damage, 110);
+});
 
 Deno.test("qualifying current-turn self damage applies the generic current-attack delta once", () => {
   const match = state();

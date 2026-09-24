@@ -3247,6 +3247,34 @@ function attackDeclaredRequirement(
     return candidate.seat === input.source_controller_seat &&
       candidate.field?.top.uid === input.source_creature_uid;
   }
+  if (predicate === "event_attack_id_is") {
+    const unsupported = Object.keys(value).find((key) => key !== "predicate" && key !== "attack_id");
+    if (unsupported) {
+      throw new Error(`tcg_v0_2_attack_declared_listener_attack_id_field_unsupported:${unsupported}`);
+    }
+    const attackId = requiredString(
+      value.attack_id,
+      "tcg_v0_2_attack_declared_listener_attack_id_predicate_required",
+    );
+    return input.attack_id === attackId;
+  }
+  if (predicate === "event_attack_target_zone_is") {
+    const unsupported = Object.keys(value).find((key) => key !== "predicate" && key !== "zone");
+    if (unsupported) {
+      throw new Error(`tcg_v0_2_attack_declared_listener_target_zone_field_unsupported:${unsupported}`);
+    }
+    const zone = String(value.zone || "");
+    if (zone !== "vanguard" && zone !== "reserve") {
+      throw new Error("tcg_v0_2_attack_declared_listener_target_zone_predicate_invalid");
+    }
+    return input.target_zone === zone;
+  }
+  if (predicate === "event_attack_target_controller_is_opponent") {
+    if (Object.keys(value).some((key) => key !== "predicate")) {
+      throw new Error("tcg_v0_2_attack_declared_listener_target_controller_predicate_field_unsupported");
+    }
+    return input.target_controller_seat !== candidate.seat;
+  }
   if (predicate === "damage_history_count_at_least") {
     if (!candidate.field) {
       throw new Error(
