@@ -3935,3 +3935,35 @@ Exactly `target_stage_in` moved missing -> implemented. Capability blob is `a4a5
 
 Release Control capability fingerprint is synchronized. Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred.
 
+## V2.4.113 — `target_zone_is` predicate reconciliation
+
+**Baseline authority head:** `8eca7b8bb245a7d4af4cc4aaca8af112f1c2a0da` — Card Pass #1670 **SUCCESS**.
+
+### Exact Release 1 consumer
+Exactly one frozen consumer uses `target_zone_is`:
+- **Gale Draft Essence / Draft Attach Withdrawal** — `essence_attached`, requiring `$attached_creature` to be in `reserve`.
+
+The canonical Essence Attachment eligibility owner already freezes the target Creature's battlefield zone at trigger time and evaluates the predicate generically. There is no Draft Essence/card-ID/name dispatch.
+
+### Bounded proof
+Proof head `9ce5d45ecddc6a13d52b4dda053ccc84290c05ee` adds an explicit negative regression: the same frozen Reserve attachment target rejects a Vanguard-only `target_zone_is` requirement.
+
+Card Pass #1671 **SUCCESS**. No gameplay-runtime source changed.
+
+### Capability acceptance
+Accepted capability head `a632fa67be0024e5ca64b98d8965fa00399f5f67` passed Card Pass #1672 **SUCCESS**.
+
+Exactly `target_zone_is` moved missing -> implemented. Capability blob is `f1361fca48abfebdbdc5525d768a88f48fec51c7`.
+
+### Draft Essence remains partially open
+V2.4.113 does **not** accept:
+- `voluntary_withdrawal_legal_with_incoming`;
+- `PERFORM_VOLUNTARY_WITHDRAWAL`.
+
+The audit found the current attachment snapshot's withdrawal-legality quote is incomplete relative to authoritative normal Withdrawal. Normal Withdrawal resolves:
+`base/continuous cost -> structured withdrawal modifiers -> before_voluntary_withdrawal_cost listeners -> exact attached-Essence Payment -> Atomic Switch`.
+
+Draft Essence must reuse that complete ownership chain, including player-selected exact Essence payment. Its current snapshot legality must not be stretched into acceptance until the same quote is used.
+
+Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred.
+

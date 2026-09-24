@@ -1258,3 +1258,15 @@ Head `90b9a24192824eb5e4d76d1dd2e0b12406dd24c0` / #1667 proved positive/negative
 ## 426 — V2.4.112 target_stage_in accepted
 Capability head `80b74c688042ae90cc9d2aa94f6905e6b21e51cd` passed Card Pass #1669. Exactly `target_stage_in` moved missing -> implemented. Capability blob is `a4a515fc213a1a0d86704ed0dd2a9e63505436bd`. Runtime source, production Edge functions and owner-family count remain unchanged.
 
+## 427 — V2.4.113 freezes one target_zone_is consumer
+Release 1 uses `target_zone_is` exactly once: Gale Draft Essence / Draft Attach Withdrawal requires its just-attached Creature to occupy Reserve.
+
+## 428 — target_zone_is is immutable attachment-snapshot truth
+The Essence Attachment eligibility owner freezes the target battlefield zone at trigger time and evaluates `target_zone_is` without card identity. Head `9ce5d45ecddc6a13d52b4dda053ccc84290c05ee` adds an explicit negative proof that a frozen Reserve target fails a Vanguard requirement; Card Pass #1671 succeeded.
+
+## 429 — Draft withdrawal legality and execution remain separate HOLD items
+Draft Essence also uses `voluntary_withdrawal_legal_with_incoming` and `PERFORM_VOLUNTARY_WITHDRAWAL`. Audit found its current snapshot legality only proves a subset of authoritative Withdrawal cost semantics. Normal Withdrawal additionally applies structured lifecycle modifiers and the synchronous `before_voluntary_withdrawal_cost` listener before exact Payment and Atomic Switch. Those capabilities must not inherit V2.4.113 acceptance.
+
+## 430 — V2.4.113 target_zone_is accepted
+Capability head `a632fa67be0024e5ca64b98d8965fa00399f5f67` passed Card Pass #1672. Exactly `target_zone_is` moved missing -> implemented. Capability blob is `f1361fca48abfebdbdc5525d768a88f48fec51c7`. Runtime source, production Edge functions and owner-family count remain unchanged.
+

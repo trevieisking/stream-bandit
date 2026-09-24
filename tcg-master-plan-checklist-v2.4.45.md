@@ -1411,3 +1411,21 @@
 
 **Acceptance:** capability blob `a4a515fc213a1a0d86704ed0dd2a9e63505436bd`; two owner surfaces proved positive/negative; runtime source unchanged.
 
+### V2.4.113 — target_zone_is predicate reconciliation
+- [x] Freeze exact Release 1 consumer: Gale Draft Essence / Draft Attach Withdrawal.
+- [x] Confirm consumer event is `essence_attached`.
+- [x] Bind predicate to immutable Essence Attachment eligibility snapshot ownership.
+- [x] Confirm positive Reserve-zone proof.
+- [x] Add explicit Vanguard-zone rejection proof.
+- [x] Pass proof head `9ce5d45ecddc6a13d52b4dda053ccc84290c05ee` / Card Pass #1671 SUCCESS.
+- [x] Confirm no gameplay-runtime source change and no card-ID/name dispatch.
+- [x] Move exactly `target_zone_is` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint atomically.
+- [x] Pass capability head `a632fa67be0024e5ca64b98d8965fa00399f5f67` / Card Pass #1672 SUCCESS.
+- [x] Preserve 40 owner families.
+- [ ] `voluntary_withdrawal_legal_with_incoming` remains open pending complete canonical Withdrawal quote parity.
+- [ ] `PERFORM_VOLUNTARY_WITHDRAWAL` remains open pending exact Payment + Atomic Switch execution parity.
+- [x] No database/Edge/main/live promotion.
+
+**Acceptance:** capability blob `f1361fca48abfebdbdc5525d768a88f48fec51c7`; `target_zone_is` only.
+
