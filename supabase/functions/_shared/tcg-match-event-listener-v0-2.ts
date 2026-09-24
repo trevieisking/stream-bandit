@@ -8,7 +8,10 @@ import {
   type RuntimeV02SwitchMovementEvent,
 } from "./tcg-match-switch-context-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
-import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
+import {
+  recordRuntimeV02HiddenInformationView,
+  type RuntimeV02HiddenInformationOccurrence,
+} from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02RandomSampleHiddenZone } from "./tcg-match-hidden-zone-sample-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { runtimeV02InstallWithdrawalModifier } from "./tcg-match-withdrawal-modifier-v0-2.ts";
@@ -36,7 +39,10 @@ import {
   evaluateRuntimeV02DamageHistoryCountRequirement,
   normalizeRuntimeV02DamageHistoryCountRequirement,
 } from "./tcg-match-requirement-evaluator-v0-2.ts";
-import type { RuntimeV02CardZoneInstance } from "./tcg-match-card-zone-engine-v0-2.ts";
+import {
+  runtimeV02ApplyCardZoneReorder,
+  type RuntimeV02CardZoneInstance,
+} from "./tcg-match-card-zone-engine-v0-2.ts";
 import type {
   RuntimeV02DamageProgramCreatureRef,
   RuntimeV02DamageProgramState,
@@ -95,6 +101,7 @@ export type RuntimeV02EventListenerEvent = {
   source_card_uid: string | null;
   action_kind: string;
   turn_seq: number;
+  zone?: "deck_top" | "deck";
   attachment_target_uid?: string;
   attachment_kind?: string;
   attack_id?: string;
@@ -712,10 +719,20 @@ function player(
 function playerForToken(
   candidate: Candidate,
   token: unknown,
+  event?: RuntimeV02EventListenerEvent,
 ): 1 | 2 {
   const value = String(token || "self");
   if (value === "self") return candidate.seat;
   if (value === "opponent") return candidate.seat === 1 ? 2 : 1;
+  if (value === "$event_controller") {
+    if (!event) {
+      throw new Error("tcg_v0_2_event_listener_event_controller_context_required");
+    }
+    return normalizedSeat(
+      event.controller_seat,
+      "tcg_v0_2_event_listener_event_controller_invalid",
+    );
+  }
   throw new Error(`tcg_v0_2_event_listener_player_unsupported:${value}`);
 }
 
@@ -996,6 +1013,12 @@ function requirementLeaf(
       return event.phase === String(value.phase || "");
     case "event_action_kind_is":
       return event.action_kind === String(value.action_kind || "");
+    case "event_zone_is":
+      return String(event.zone || "") === String(value.zone || "");
+    case "source_is_attached_creature":
+      return (candidate.kind === "relic" || candidate.kind === "essence") &&
+        !!candidate.field &&
+        String(event.source_creature_uid || "") === candidate.field.top.uid;
     case "event_controller_is_self":
       return event.controller_seat === candidate.seat;
     case "event_controller_is_opponent":
@@ -1086,7 +1109,7 @@ function requirementLeaf(
       return Number(target.cr.damage || 0) > 0;
     }
     case "hand_count_at_least": {
-      const seat = playerForToken(candidate, value.controller);
+      const seat = playerForToken(candidate, value.controller, event);
       return (player(state, seat).hand as Inst[]).length >= Number(value.count || 0);
     }
     case "control_condition_slot_empty": {
@@ -1098,7 +1121,7 @@ function requirementLeaf(
         throw new Error("tcg_v0_2_event_listener_event_window_unsupported");
       }
       const name = requiredString(value.event, "tcg_v0_2_event_listener_event_name_required");
-      const controller = playerForToken(candidate, value.controller);
+      const controller = playerForToken(candidate, value.controller, event);
       const minCount = Number(value.min_count ?? 1);
       if (!Number.isInteger(minCount) || minCount < 1) {
         throw new Error("tcg_v0_2_event_listener_event_min_count_invalid");
@@ -1387,6 +1410,7 @@ function setPrivateInspection(
 function inspectDeckTop(
   state: Record<string, unknown>,
   candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
   ownerSeat: 1 | 2,
   count: number,
   exactMinimum: number,
@@ -1413,6 +1437,38 @@ function inspectDeckTop(
       state,
       candidate.seat,
       "deck_top",
+      {
+        action_kind: requiredString(
+          event.action_kind,
+          "tcg_v0_2_event_listener_hidden_view_action_kind_required",
+        ),
+        source_controller_seat: event.source_controller_seat == null
+          ? candidate.seat
+          : normalizedSeat(
+            event.source_controller_seat,
+            "tcg_v0_2_event_listener_hidden_view_source_controller_invalid",
+          ),
+        source_action_id: requiredString(
+          event.source_action_id,
+          "tcg_v0_2_event_listener_hidden_view_source_action_required",
+        ),
+        source_card_uid: event.source_card_uid == null
+          ? candidate.source.uid
+          : requiredString(
+            event.source_card_uid,
+            "tcg_v0_2_event_listener_hidden_view_source_card_required",
+          ),
+        source_creature_uid: event.source_creature_uid == null
+          ? candidate.field?.top.uid || null
+          : requiredString(
+            event.source_creature_uid,
+            "tcg_v0_2_event_listener_hidden_view_source_creature_invalid",
+          ),
+        phase: requiredString(
+          event.phase,
+          "tcg_v0_2_event_listener_hidden_view_phase_required",
+        ),
+      },
     );
     setPrivateInspection(state, candidate.seat, ownerSeat, "deck_top", cards);
   }
@@ -1422,9 +1478,10 @@ function inspectDeckTop(
 function randomSampleHiddenZone(
   state: Record<string, unknown>,
   candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
   step: Record<string, unknown>,
 ): CardRef[] {
-  const ownerSeat = playerForToken(candidate, step.player);
+  const ownerSeat = playerForToken(candidate, step.player, event);
   if (String(step.zone || "") !== "hand") {
     throw new Error("tcg_v0_2_event_listener_hidden_sample_zone_unsupported");
   }
@@ -1556,13 +1613,14 @@ function zoneCards(
 function cardOptions(
   state: Record<string, unknown>,
   candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
   step: Record<string, unknown>,
 ): Array<{
   id: string;
   label: string;
   data: Record<string, unknown>;
 }> {
-  const ownerSeat = playerForToken(candidate, step.player);
+  const ownerSeat = playerForToken(candidate, step.player, event);
   const zone = String(step.zone || "") as CardRef["zone"];
   if (zone !== "discard" && zone !== "hand") {
     throw new Error("tcg_v0_2_event_listener_card_zone_unsupported");
@@ -1722,7 +1780,7 @@ function executeStep(
 
   if (op === "OPTIONAL") {
     installChoice(state, continuation, candidate, event, {
-      seat: playerForToken(candidate, step.player),
+      seat: playerForToken(candidate, step.player, event),
       kind: "optional",
       prompt: "Use optional effect?",
       min: 1,
@@ -1738,11 +1796,12 @@ function executeStep(
   }
 
   if (op === "LOOK_TOP") {
-    const owner = playerForToken(candidate, step.player);
+    const owner = playerForToken(candidate, step.player, event);
     const count = Math.max(0, Number(step.count || 0));
     continuation.vars[String(step.as || "looked")] = inspectDeckTop(
       state,
       candidate,
+      event,
       owner,
       count,
       0,
@@ -1752,7 +1811,7 @@ function executeStep(
   }
 
   if (op === "INSPECT_ZONE") {
-    const owner = playerForToken(candidate, step.player);
+    const owner = playerForToken(candidate, step.player, event);
     const wanted = range(step.selection);
     if (
       String(step.visibility || "") !== "controller_private" ||
@@ -1808,7 +1867,7 @@ function executeStep(
   }
 
   if (op === "RANDOM_SAMPLE_HIDDEN_ZONE") {
-    continuation.vars[String(step.as || "sampled")] = randomSampleHiddenZone(state, candidate, step);
+    continuation.vars[String(step.as || "sampled")] = randomSampleHiddenZone(state, candidate, event, step);
     continuation.step_cursor++;
     return "continue";
   }
@@ -1875,7 +1934,7 @@ function executeStep(
   }
 
   if (op === "SELECT_CARDS") {
-    const options = cardOptions(state, candidate, step);
+    const options = cardOptions(state, candidate, event, step);
     const wanted = range(objectRecord(step.selection) || {});
     if (options.length < wanted.min) {
       throw new Error("tcg_v0_2_event_listener_card_choice_unavailable");
@@ -1926,7 +1985,7 @@ function executeStep(
       data: { ref: card },
     }));
     installChoice(state, continuation, candidate, event, {
-      seat: playerForToken(candidate, step.player),
+      seat: playerForToken(candidate, step.player, event),
       kind: "order_cards",
       prompt: "Choose card order",
       min: options.length,
@@ -1939,12 +1998,50 @@ function executeStep(
   }
 
   if (op === "DRAW") {
-    const seat = playerForToken(candidate, step.player);
+    const seat = playerForToken(candidate, step.player, event);
     const owner = player(state, seat);
     const deck = owner.deck as Inst[];
     const hand = owner.hand as Inst[];
     const count = Math.max(0, Number(step.count || 0));
     hand.push(...deck.splice(0, Math.min(count, deck.length)));
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "MOVE_ZONE_POSITION") {
+    const seat = playerForToken(candidate, step.player, event);
+    if (
+      String(step.zone || "") !== "deck" ||
+      String(step.from || "") !== "top" ||
+      String(step.to || "") !== "bottom" ||
+      Number(step.count) !== 1 ||
+      String(step.visibility || "") !== "no_additional_reveal"
+    ) {
+      throw new Error("tcg_v0_2_event_listener_move_zone_position_shape_unsupported");
+    }
+    const owner = player(state, seat);
+    const deck = owner.deck as Inst[];
+    if (deck.length > 0) {
+      const top = deck[0];
+      runtimeV02ApplyCardZoneReorder(deck, {
+        cause: "effect",
+        action_kind: "event_listener",
+        source_action_id: `listener:${listenerId(candidate)}`,
+        source_card_uid: candidate.source.uid,
+        zone: {
+          controller_seat: seat,
+          zone: "deck",
+          owner_card_uid: null,
+        },
+        card_uids: [
+          requiredString(
+            top.uid,
+            "tcg_v0_2_event_listener_move_zone_position_top_uid_required",
+          ),
+        ],
+        destination_position: "bottom",
+      });
+    }
     continuation.step_cursor++;
     return "continue";
   }
@@ -2158,7 +2255,7 @@ function executeStep(
     if (zone !== "hand" && zone !== "discard") {
       throw new Error("tcg_v0_2_event_listener_attachment_zone_unsupported");
     }
-    const options = cardOptions(state, candidate, step);
+    const options = cardOptions(state, candidate, event, step);
     const wanted = range(objectRecord(step.selection) || {});
     if (options.length < wanted.min) {
       throw new Error("tcg_v0_2_event_listener_attachment_choice_unavailable");
@@ -2380,6 +2477,77 @@ function recordEvent(
   if (!events.some((entry) => entry.event_id === event.event_id)) {
     events.push({ ...event });
   }
+}
+
+export function runtimeV02AdaptHiddenInformationOccurrencesForListener(
+  state: Record<string, unknown>,
+  occurrences: RuntimeV02HiddenInformationOccurrence[],
+): RuntimeV02EventListenerEvent[] {
+  if (!Array.isArray(occurrences)) {
+    throw new Error("tcg_v0_2_hidden_information_listener_occurrences_required");
+  }
+  const turn = currentTurn(state);
+  return occurrences.map((occurrence, index) => {
+    if (Number(occurrence.turn_seq) !== turn) {
+      throw new Error(
+        `tcg_v0_2_hidden_information_listener_occurrence_turn_stale:${index}`,
+      );
+    }
+    const controller = normalizedSeat(
+      occurrence.controller_seat,
+      `tcg_v0_2_hidden_information_listener_controller_invalid:${index}`,
+    );
+    const sourceController = normalizedSeat(
+      occurrence.source_controller_seat,
+      `tcg_v0_2_hidden_information_listener_source_controller_invalid:${index}`,
+    );
+    const viewedZone = String(occurrence.zone || "");
+    if (viewedZone !== "deck_top" && viewedZone !== "deck") {
+      throw new Error(
+        `tcg_v0_2_hidden_information_listener_zone_invalid:${index}`,
+      );
+    }
+    const sourceCardUid = requiredString(
+      occurrence.source_card_uid,
+      `tcg_v0_2_hidden_information_listener_source_card_invalid:${index}`,
+    );
+    const event: RuntimeV02EventListenerEvent = {
+      event_id: requiredString(
+        occurrence.occurrence_id,
+        `tcg_v0_2_hidden_information_listener_occurrence_id_invalid:${index}`,
+      ),
+      event: "hidden_information_viewed",
+      subject_uid: sourceCardUid,
+      controller_seat: controller,
+      source_controller_seat: sourceController,
+      origin_zone: viewedZone,
+      destination_zone: viewedZone,
+      destination_index: null,
+      phase: requiredString(
+        occurrence.phase,
+        `tcg_v0_2_hidden_information_listener_phase_invalid:${index}`,
+      ),
+      source_action_id: requiredString(
+        occurrence.source_action_id,
+        `tcg_v0_2_hidden_information_listener_source_action_invalid:${index}`,
+      ),
+      source_card_uid: sourceCardUid,
+      action_kind: requiredString(
+        occurrence.action_kind,
+        `tcg_v0_2_hidden_information_listener_action_kind_invalid:${index}`,
+      ),
+      turn_seq: turn,
+      zone: viewedZone,
+      source_creature_uid: occurrence.source_creature_uid == null
+        ? undefined
+        : requiredString(
+          occurrence.source_creature_uid,
+          `tcg_v0_2_hidden_information_listener_source_creature_invalid:${index}`,
+        ),
+    };
+    recordEvent(state, event);
+    return { ...event };
+  });
 }
 
 export type RuntimeV02ResolvedAttackDamageEventInput = {
