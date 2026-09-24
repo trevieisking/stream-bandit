@@ -110,11 +110,14 @@
       "event_active_seat_is_controller",
       "event_attachment_kind_is",
       "event_attachment_target_is_source",
+      "event_attack_id_is",
       "event_attack_source_attached_essence_count_at_least",
       "event_attack_source_has_attached_essence_kind",
       "event_attack_source_is_self",
+      "event_attack_target_controller_is_opponent",
       "event_attack_target_damaged",
       "event_attack_target_has_condition",
+      "event_attack_target_zone_is",
       "event_controller_is_active_seat",
       "event_controller_is_opponent",
       "event_controller_is_self",
@@ -178,9 +181,6 @@
       "essence_discarded_attachment_kind_is",
       "essence_discarded_by_own_card_effect",
       "essence_discarded_source_controller_is_self",
-      "event_attack_id_is",
-      "event_attack_target_controller_is_opponent",
-      "event_attack_target_zone_is",
       "event_change_kind_in",
       "event_condition_is",
       "event_condition_slot_is",
@@ -1830,6 +1830,38 @@
       },
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts"
+      ]
+    },
+    "release1_skyrend_attack_metadata_v2_4_118": {
+      "accepted_runtime_head": "10936bfb16c8e4dff5f2490ea94b4e8b0b9f761f",
+      "card_pass_run": 1688,
+      "card_id": "gale-skyrend",
+      "ability_id": "open-sky-hunter",
+      "event": "attack_declared",
+      "predicates": [
+        "event_attack_id_is",
+        "event_attack_target_zone_is",
+        "event_attack_target_controller_is_opponent"
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+      "existing_dependencies": {
+        "event_attack_source_is_self": "implemented",
+        "MODIFY_CURRENT_ATTACK_DAMAGE": "implemented"
+      },
+      "semantics": {
+        "required_attack_id": "sky-rend",
+        "required_target_zone": "reserve",
+        "target_controller": "opponent",
+        "positive_damage": 90,
+        "base_damage": 110,
+        "wrong_attack_damage": 110,
+        "vanguard_target_damage": 110,
+        "self_target_damage": 110,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-declared-damage-listener.test.ts"
       ]
     }
   }
