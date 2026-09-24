@@ -721,6 +721,14 @@ function movementListenerAudit(flow: any) {
     emitted_heal_packet_ids: flow.emitted_heal_packet_ids || [],
   };
 }
+function eventListenerAudit(flow: any) {
+  return {
+    status: flow.status,
+    processed_listener_keys: flow.processed_listener_keys || [],
+    emitted_heal_packet_ids: flow.emitted_heal_packet_ids || [],
+    emitted_movement_event_count: flow.emitted_movement_events?.length || 0,
+  };
+}
 function setTacticMovementResume(state: any, effect: EffectState) {
   state.pending_tactic_movement_resume = {
     effect_id: effect.id,
@@ -3026,6 +3034,128 @@ Deno.serve(async (req) => {
     }
 
     const effect = state.effect_resolution as EffectState | null;
+    const eventPending = state.pending_event_listener_choice as RuntimeV02PendingEventListenerChoice | null;
+    if (eventPending) {
+      if (!effect || state.phase !== "effect_resolution") {
+        return json({ ok: false, version: VERSION, error: "no_tactic_event_choice_pending" }, 400);
+      }
+      let resolved;
+      try {
+        readTacticEventResume(state, effect);
+        const ids = Array.isArray(body.choice_ids)
+          ? body.choice_ids.map((value: unknown) => String(value))
+          : [];
+        resolved = runtimeV02ResolveEventListenerChoice(
+          state,
+          seat as 1 | 2,
+          String(body.choice_id || ""),
+          ids,
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message === "tcg_v0_2_event_listener_choice_not_yours") {
+          return json({ ok: false, version: VERSION, error: message }, 403);
+        }
+        if (
+          message.includes("_stale") ||
+          message.includes("_turn_stale") ||
+          message.includes("_owner_changed") ||
+          message.includes("_cursor_changed")
+        ) {
+          return json({ ok: false, version: VERSION, error: message }, 409);
+        }
+        if (
+          message.startsWith("tcg_v0_2_event_listener_choice_") ||
+          message.startsWith("tcg_v0_2_tactic_event_resume_")
+        ) {
+          return json({ ok: false, version: VERSION, error: message }, 400);
+        }
+        throw error;
+      }
+      const eventAudit = eventListenerAudit(resolved);
+      if ((resolved.emitted_movement_events || []).length) {
+        throw new Error(
+          "tcg_v0_2_tactic_hidden_event_movement_output_not_yet_supported",
+        );
+      }
+      if (resolved.status === "player_choice_required") {
+        const result = await commit("resolve_tactic_event_listener_choice", {
+          seat,
+          pending_choice: true,
+          event_listener: eventAudit,
+        });
+        return json({
+          ok: true,
+          version: VERSION,
+          result,
+          pending_choice: choiceView(state.pending_choice || null, seat),
+          pending_event_listener_choice:
+            runtimeV02PendingEventListenerChoiceView(
+              resolved.pending_choice,
+              seat as 1 | 2,
+            ),
+          pending_heal_listener_choice: null,
+          pending_movement_listener_choice: null,
+          private_event_inspection:
+            runtimeV02PrivateEventInspectionView(state, seat as 1 | 2),
+          private_movement_inspection:
+            runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+          private_reward_inspection:
+            runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
+        });
+      }
+      delete state.pending_tactic_event_resume;
+      if ((resolved.emitted_heal_packet_ids || []).length) {
+        const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+          state,
+          resolved.emitted_heal_packet_ids,
+          effect.owner_seat as 1 | 2,
+        );
+        if (healFlow.status === "player_choice_required") {
+          setTacticHealResume(state, effect);
+        }
+      }
+      const hiddenPending = state.pending_heal_listener_choice
+        ? true
+        : drainTacticHiddenInformationEvents(state, effect);
+      if (!hiddenPending) executeUntilChoice(state);
+      const result = await commit("resolve_tactic_event_listener_choice", {
+        seat,
+        pending_choice: !!state.pending_choice,
+        pending_event_listener_choice: !!state.pending_event_listener_choice,
+        pending_heal_listener_choice: !!state.pending_heal_listener_choice,
+        pending_movement_listener_choice: !!state.pending_movement_listener_choice,
+        event_listener: eventAudit,
+      });
+      return json({
+        ok: true,
+        version: VERSION,
+        result,
+        pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_event_listener_choice:
+          runtimeV02PendingEventListenerChoiceView(
+            state.pending_event_listener_choice || null,
+            seat as 1 | 2,
+          ),
+        pending_heal_listener_choice:
+          runtimeV02PendingHealListenerChoiceView(
+            state.pending_heal_listener_choice || null,
+            seat as 1 | 2,
+          ),
+        pending_movement_listener_choice:
+          runtimeV02PendingMovementListenerChoiceView(
+            state.pending_movement_listener_choice || null,
+            seat as 1 | 2,
+          ),
+        private_event_inspection:
+          runtimeV02PrivateEventInspectionView(state, seat as 1 | 2),
+        private_movement_inspection:
+          runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection:
+          runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
+      });
+    }
+
     const movementPending = state.pending_movement_listener_choice as RuntimeV02PendingMovementListenerChoice | null;
     if (movementPending) {
       if (!effect || state.phase !== "effect_resolution") {
