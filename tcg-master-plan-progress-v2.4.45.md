@@ -3871,3 +3871,40 @@ Exactly `hand_contains` moved missing -> implemented. Release Control now points
 
 No gameplay-runtime source changed. The only proof change is the no-matching-Device regression. No database, Edge deployment, main merge or live promotion occurred. Owner-family count remains **40**; PR #591 remains draft/unmerged.
 
+## V2.4.111 — `event_attachment_target_is_source` + Relic Attachment event parity
+
+**Baseline authority head:** `25304a5e327a6bf15014b11189497bdf38f8715b` — Card Pass #1661 **SUCCESS**.
+
+### Exact Release 1 consumers
+Exactly four structured consumers use this predicate:
+- **Stone Gravibble / Pebble Guard** — `essence_attached`;
+- **Stone Flintkin / Layered Hide** — `relic_attached`;
+- **Tide Puddlepip / Freshwater Coat** — `essence_attached`;
+- **Volt Railhorn / Power Rail** — `essence_attached`.
+
+The three Essence consumers were already owned by immutable trigger-time Essence Attachment snapshots. Flintkin exposed a real parity gap: marked v0.2 Relic attachment still bypassed generic `relic_attached` event ownership and used a temporary card-ID heal fallback.
+
+### Generic repair
+V2.4.111 adds a Relic Attachment route submodule parallel to the existing Essence route:
+`Relic owner receipt -> relic_attached event -> Event Listener -> Movement/Heal continuation -> defeat scan -> play`.
+
+The generic Event Listener now evaluates `event_attachment_target_is_source` as exact event `attachment_target_uid` equality to the candidate source Creature uid.
+
+Marked v0.2 Match orchestration no longer dispatches `stone-flintkin` by card ID. The old raw-heal fallback remains only on the unmarked legacy path.
+
+### Validation correction history
+The first bounded runtime head `ac9cf0d6eaa9942127aa6081799e881cfc53075c` failed Card Pass #1662 because validation bindings were stale: Edge closure fingerprints, one forced-promotion resume assertion, and one test type annotation.
+
+The repaired binding head `159e018ead3e2024f83104bed3383cae1c12ce64` failed Card Pass #1663 with **983 existing runtime tests passing and only the two new Relic route tests failing**. That failure exposed a separate generic schema-parity defect: the authoritative card schema permits triggered Ability timing `any_turn`, while Event Listener accepted `any` but rejected `any_turn`.
+
+The schema-valid timing correction is generic and card-ID free. Triggered Ability `any_turn` now means unrestricted turn ownership, while existing `own_turn` and `build` gates remain unchanged.
+
+**Accepted runtime head:** `42e871cb63ca34c43207ef4bceee8c2dcbbf4553` — Card Pass #1664 **SUCCESS**.
+
+### Capability acceptance
+**Accepted capability head:** `59a6e4afdd524ded1f57054184b7781ace2c12ee` — Card Pass #1665 **SUCCESS**.
+
+Exactly `event_attachment_target_is_source` moved missing -> implemented. Capability blob is `8546a44b79fd9de595a4279557221997b9cea562`.
+
+Release Control is synchronized to the repaired Edge closures and capability manifest. Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred; production TCG functions remain Match v9 / Tactic v4 / Private Alpha v3.
+

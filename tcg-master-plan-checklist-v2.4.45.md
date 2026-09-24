@@ -1365,3 +1365,28 @@
 
 **Acceptance:** capability blob `d0e78fbd34f748da52c4443859edb6dd8b22ecb9`; runtime source unchanged; one negative proof test added.
 
+### V2.4.111 — event_attachment_target_is_source + Relic Attachment parity
+- [x] Freeze four consumers: Gravibble, Flintkin, Puddlepip, Railhorn.
+- [x] Confirm Gravibble/Puddlepip/Railhorn are already trigger-time Essence Attachment snapshot-owned.
+- [x] Confirm Essence snapshot predicate is exact attachment-target/source-Creature identity.
+- [x] Identify Flintkin's marked v0.2 card-ID raw-heal fallback as the remaining parity gap.
+- [x] Add generic Relic Attachment route from Relic receipt to Event Listener.
+- [x] Add generic Event Listener `event_attachment_target_is_source` leaf.
+- [x] Reuse existing Event -> Movement -> Heal continuation instead of adding another owner/helper family.
+- [x] Remove Flintkin card-ID dispatch from marked v0.2 runtime only.
+- [x] Preserve unmarked legacy Flintkin raw-heal compatibility.
+- [x] Refresh Match/Tactic Edge closure fingerprints after new route/Event Listener bytes.
+- [x] Repair forced-promotion ownership assertion and test typing only where validation demanded.
+- [x] Record #1662 failure; do not treat it as PASS.
+- [x] Record #1663 failure; 983 prior runtime tests passed, two new Relic-route tests exposed missing `any_turn` support.
+- [x] Confirm schema authority permits `any_turn`.
+- [x] Add generic `any_turn` Event Listener timing support and direct cross-turn regression.
+- [x] Pass runtime head `42e871cb63ca34c43207ef4bceee8c2dcbbf4553` / Card Pass #1664 SUCCESS.
+- [x] Move exactly `event_attachment_target_is_source` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint atomically.
+- [x] Pass capability head `59a6e4afdd524ded1f57054184b7781ace2c12ee` / Card Pass #1665 SUCCESS.
+- [x] Preserve 40 owner families.
+- [x] No database/Edge/main/live promotion.
+
+**Acceptance:** capability blob `8546a44b79fd9de595a4279557221997b9cea562`; marked runtime is generic; legacy unmarked compatibility remains isolated.
+

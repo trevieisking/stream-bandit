@@ -1231,3 +1231,18 @@ The paid active-Ability owner binds the requirement and cost filters, then canon
 ## 417 — V2.4.110 hand_contains capability reconciliation accepted
 Proof head `8722b23477354adf417ab51ac2be2cba519b9976` passed Card Pass #1659. Accepted capability head `c93625b3456ae7a3cc8f177a84665071fd8912dd` passed Card Pass #1660. Exactly `hand_contains` moved missing -> implemented. Release Control is synchronized to capability blob `d0e78fbd34f748da52c4443859edb6dd8b22ecb9`. Runtime source and Edge closures are unchanged; owner-family count remains 40.
 
+## 418 — V2.4.111 freezes four attachment-target consumers
+`event_attachment_target_is_source` has four Release 1 consumers: Stone Gravibble / Pebble Guard, Stone Flintkin / Layered Hide, Tide Puddlepip / Freshwater Coat and Volt Railhorn / Power Rail. Gravibble, Puddlepip and Railhorn were already evaluated through immutable Essence Attachment trigger snapshots. Flintkin was the sole Relic-attachment parity exception.
+
+## 419 — Relic Attachment now enters generic event ownership
+A Relic Attachment route adapts the canonical Relic owner receipt into `relic_attached` with exact `attachment_target_uid`, then enters existing Event Listener, Movement Listener and Heal Listener ownership. Marked v0.2 Match runtime no longer heals Flintkin by card ID. Unmarked legacy compatibility remains isolated.
+
+## 420 — any_turn schema parity is generic
+Card Pass #1663 exposed that the frozen schema allows triggered Ability timing `any_turn` while Event Listener rejected it. V2.4.111 adds `any_turn` to generic unrestricted timing semantics and a direct regression with a non-active source controller. No Flintkin-specific timing branch exists.
+
+## 421 — V2.4.111 validation history is fail-closed
+Initial runtime head `ac9cf0d6eaa9942127aa6081799e881cfc53075c` failed #1662 due validation-binding drift. Binding-repair head `159e018ead3e2024f83104bed3383cae1c12ce64` failed #1663 with 983 existing runtime tests passing and only the two new Relic-route tests exposing `any_turn` parity. Neither failed head is acceptance evidence.
+
+## 422 — V2.4.111 attachment-target predicate accepted
+Runtime head `42e871cb63ca34c43207ef4bceee8c2dcbbf4553` passed Card Pass #1664. Capability head `59a6e4afdd524ded1f57054184b7781ace2c12ee` passed Card Pass #1665. Exactly `event_attachment_target_is_source` moved missing -> implemented; capability blob `8546a44b79fd9de595a4279557221997b9cea562`. Owner-family count remains 40 and production is unchanged.
+
