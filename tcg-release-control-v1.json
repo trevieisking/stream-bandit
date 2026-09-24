@@ -582,7 +582,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "89e543c3950ba0801e0b1efc776c5c08df6ada9e",
         "file_count": 53,
-        "closure_sha256": "564408d9405b27dc17efa3e012fc330825c2f18db6d9c9a74bf95f25cf0f04f0",
+        "closure_sha256": "18c6082f3b75d94f3fae65a5481dc9b78722724af0d0b692bac0c38ded0afc5a",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -702,7 +702,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "14b62ce1698357a356ce20adf5f40143b12562f2"
+            "git_blob_sha": "c2820aa53dd00054009b2fb6b4ff0ea01d515b96"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
