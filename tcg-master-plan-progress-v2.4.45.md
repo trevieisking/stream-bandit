@@ -3908,3 +3908,30 @@ Exactly `event_attachment_target_is_source` moved missing -> implemented. Capabi
 
 Release Control is synchronized to the repaired Edge closures and capability manifest. Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred; production TCG functions remain Match v9 / Tactic v4 / Private Alpha v3.
 
+## V2.4.112 — `target_stage_in` predicate reconciliation
+
+**Baseline authority head:** `ffb8db05095c3ebaf6a7d33cc89e9264dd475637` — Card Pass #1666 **SUCCESS**.
+
+### Exact Release 1 consumers and owners
+Exactly two structured consumers use this predicate:
+- **Grove Bloom Essence / Bloom Attach Heal** — `essence_attached`, owned by immutable Essence Attachment eligibility snapshot;
+- **Grove Symbiote Essence / Symbiote Reciprocal Heal** — `after_heal_packet`, owned by canonical Heal Listener dispatch.
+
+Bloom's owner snapshots the attached Creature's printed stage at trigger time and tests membership in the declared stages. Symbiote's Heal Listener resolves the attached Creature definition and applies the same structured stage-membership requirement generically.
+
+### Bounded proof history
+Proof head `90b9a24192824eb5e4d76d1dd2e0b12406dd24c0` added a negative Essence Attachment snapshot regression proving a frozen Teen target fails an Adult-only stage list. Card Pass #1667 **SUCCESS**.
+
+A subsequent exact-consumer audit caught that Symbiote is an `after_heal_packet` consumer, not an `essence_attached` consumer. No metadata was reconciled at that point.
+
+Proof head `64cb430b1aa6067d97d18f5c7e2d11dd1d744a16` added a Heal Listener negative regression: changing the attached Grove source from Teen to Baby blocks only Symbiote while unrelated Shellip and Moonlit listener behaviour remains intact. Card Pass #1668 **SUCCESS**.
+
+No gameplay-runtime source changed in either proof commit.
+
+### Capability acceptance
+**Accepted capability head:** `80b74c688042ae90cc9d2aa94f6905e6b21e51cd` — Card Pass #1669 **SUCCESS**.
+
+Exactly `target_stage_in` moved missing -> implemented. Capability blob is `a4a515fc213a1a0d86704ed0dd2a9e63505436bd`.
+
+Release Control capability fingerprint is synchronized. Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion occurred.
+

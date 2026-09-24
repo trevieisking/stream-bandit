@@ -1390,3 +1390,24 @@
 
 **Acceptance:** capability blob `8546a44b79fd9de595a4279557221997b9cea562`; marked runtime is generic; legacy unmarked compatibility remains isolated.
 
+### V2.4.112 — target_stage_in predicate reconciliation
+- [x] Freeze exact consumers: Grove Bloom Essence and Grove Symbiote Essence.
+- [x] Bind Bloom Essence to immutable Essence Attachment eligibility ownership.
+- [x] Confirm trigger-time snapshot captures printed attached-Creature stage.
+- [x] Confirm generic stage-list membership evaluation.
+- [x] Add explicit Bloom-owner negative stage proof.
+- [x] Pass proof head `90b9a24192824eb5e4d76d1dd2e0b12406dd24c0` / Card Pass #1667 SUCCESS.
+- [x] Catch Symbiote's distinct `after_heal_packet` owner before capability reconciliation.
+- [x] Bind Symbiote Essence to canonical Heal Listener dispatch.
+- [x] Confirm Heal Listener generic `target_stage_in` implementation for `$attached_creature`.
+- [x] Confirm existing Teen positive Symbiote execution.
+- [x] Add explicit Baby negative Symbiote proof while preserving unrelated listeners.
+- [x] Pass proof head `64cb430b1aa6067d97d18f5c7e2d11dd1d744a16` / Card Pass #1668 SUCCESS.
+- [x] Confirm no card-ID/name dispatch and no gameplay-runtime source change.
+- [x] Move exactly `target_stage_in` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint atomically.
+- [x] Pass capability head `80b74c688042ae90cc9d2aa94f6905e6b21e51cd` / Card Pass #1669 SUCCESS.
+- [x] Preserve 40 owner families; no main/live promotion.
+
+**Acceptance:** capability blob `a4a515fc213a1a0d86704ed0dd2a9e63505436bd`; two owner surfaces proved positive/negative; runtime source unchanged.
+

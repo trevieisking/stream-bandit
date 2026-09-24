@@ -1246,3 +1246,15 @@ Initial runtime head `ac9cf0d6eaa9942127aa6081799e881cfc53075c` failed #1662 due
 ## 422 — V2.4.111 attachment-target predicate accepted
 Runtime head `42e871cb63ca34c43207ef4bceee8c2dcbbf4553` passed Card Pass #1664. Capability head `59a6e4afdd524ded1f57054184b7781ace2c12ee` passed Card Pass #1665. Exactly `event_attachment_target_is_source` moved missing -> implemented; capability blob `8546a44b79fd9de595a4279557221997b9cea562`. Owner-family count remains 40 and production is unchanged.
 
+## 423 — V2.4.112 freezes two target_stage_in consumers
+The Release 1 `target_stage_in` consumers are Grove Bloom Essence / Bloom Attach Heal and Grove Symbiote Essence / Symbiote Reciprocal Heal. They intentionally live on different event owners: `essence_attached` and `after_heal_packet`.
+
+## 424 — both existing owners already implement structured stage membership
+Essence Attachment eligibility snapshots printed target stage at trigger time and evaluates declared stage membership. Heal Listener dispatch evaluates the attached Creature's structured definition stage for the same predicate. Neither implementation depends on card identity.
+
+## 425 — V2.4.112 proof was expanded after exact consumer audit
+Head `90b9a24192824eb5e4d76d1dd2e0b12406dd24c0` / #1667 proved positive/negative attachment-snapshot semantics. Before metadata reconciliation, exact consumer audit caught Symbiote's Heal Listener surface. Head `64cb430b1aa6067d97d18f5c7e2d11dd1d744a16` / #1668 then proved a Baby attached source rejects Symbiote while unrelated listener behaviour remains intact.
+
+## 426 — V2.4.112 target_stage_in accepted
+Capability head `80b74c688042ae90cc9d2aa94f6905e6b21e51cd` passed Card Pass #1669. Exactly `target_stage_in` moved missing -> implemented. Capability blob is `a4a515fc213a1a0d86704ed0dd2a9e63505436bd`. Runtime source, production Edge functions and owner-family count remain unchanged.
+
