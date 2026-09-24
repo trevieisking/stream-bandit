@@ -1347,3 +1347,21 @@
 
 **Acceptance:** capability blob `ae2a92997fca04a47f25b77283a45f330794a805`; runtime source unchanged; one negative proof test added.
 
+### V2.4.110 — hand_contains predicate reconciliation
+- [x] Freeze exact consumer: Volt Dynamozer / Overcharge Engine.
+- [x] Confirm `hand_contains` Device filters equal the mandatory hand-discard cost filters.
+- [x] Confirm canonical Card-Cost choice reads the actual private hand.
+- [x] Confirm legal options are structured-filter matches only.
+- [x] Confirm insufficient matching hand cards fail closed.
+- [x] Add direct no-Device negative proof while leaving eligible Volt Essence available.
+- [x] Confirm failed hand preflight does not consume the active-Ability turn receipt.
+- [x] Confirm no Dynamozer/card-ID/name runtime dispatch and no new owner.
+- [x] Pass proof head `8722b23477354adf417ab51ac2be2cba519b9976` / Card Pass #1659 SUCCESS.
+- [x] Move exactly `hand_contains` missing -> implemented.
+- [x] Synchronize Release Control capability fingerprint atomically.
+- [x] Pass capability head `c93625b3456ae7a3cc8f177a84665071fd8912dd` / Card Pass #1660 SUCCESS.
+- [x] Append plan/checklist/ledger acceptance.
+- [x] Preserve 40 owner families; no main/live promotion.
+
+**Acceptance:** capability blob `d0e78fbd34f748da52c4443859edb6dd8b22ecb9`; runtime source unchanged; one negative proof test added.
+

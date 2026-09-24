@@ -3844,3 +3844,30 @@ Exactly `source_is_current_friendly_vanguard` moved missing -> implemented. Rele
 
 No gameplay runtime source changed. The only proof change is the negative active-Ability regression. No database, Edge deployment, main merge or live promotion occurred. Owner-family count remains **40**; PR #591 remains draft/unmerged.
 
+## V2.4.110 — `hand_contains` predicate reconciliation
+
+**Baseline authority head:** `af233e9a5452e54a77f40c8d5857b06338e02e4b` — Card Pass #1658 **SUCCESS**.
+
+### Exact Release 1 consumer
+Exactly one structured consumer uses this predicate:
+- **Volt Dynamozer / Overcharge Engine** active Ability.
+
+The frozen requirement/cost pair is:
+- `hand_contains` with Device filters `Tactic + Device`;
+- mandatory `CHOOSE_HAND_TO_DISCARD` count 1 with the exact same filters;
+- independent legal Basic Volt Essence availability in discard.
+
+### Canonical ownership and proof
+The paid active-Ability family validates that the `hand_contains` requirement filters agree with the mandatory Card-Cost filters. Canonical Card-Cost choice then enumerates the controller's actual private hand, applies the structured filters, and fails closed if fewer than the mandatory count exist.
+
+V2.4.110 added one direct negative regression with an eligible Volt Essence still present in discard but **no Device in hand**. The activation fails with the canonical insufficient-hand-cost error and the once-per-turn Ability receipt remains unconsumed.
+
+**Proof head:** `8722b23477354adf417ab51ac2be2cba519b9976` — Card Pass #1659 **SUCCESS**.
+
+### Implementation acceptance
+**Accepted capability head:** `c93625b3456ae7a3cc8f177a84665071fd8912dd` — Card Pass #1660 **SUCCESS**.
+
+Exactly `hand_contains` moved missing -> implemented. Release Control now points to capability blob `d0e78fbd34f748da52c4443859edb6dd8b22ecb9`.
+
+No gameplay-runtime source changed. The only proof change is the no-matching-Device regression. No database, Edge deployment, main merge or live promotion occurred. Owner-family count remains **40**; PR #591 remains draft/unmerged.
+

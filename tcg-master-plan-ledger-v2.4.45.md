@@ -1222,3 +1222,12 @@ The search-selection attachment owner requires the exact predicate in the descri
 ## 414 — V2.4.109 current-Vanguard predicate reconciliation accepted
 Proof head `1364263b1fe85828d84d2072416a927a43dfa5a0` passed Card Pass #1656. Accepted capability head `e2c48ab21b0dfa351c4dc282050c38215dcbbfb6` passed Card Pass #1657. Exactly `source_is_current_friendly_vanguard` moved missing -> implemented. Release Control is synchronized to capability blob `ae2a92997fca04a47f25b77283a45f330794a805`. Runtime source and Edge closures are unchanged; owner-family count remains 40.
 
+## 415 — V2.4.110 freezes the Release 1 hand_contains requirement
+The sole Release 1 consumer of `hand_contains` is Volt Dynamozer / Overcharge Engine. Its Device filters are identical to its mandatory `CHOOSE_HAND_TO_DISCARD` activation-cost filters, while Basic Volt Essence availability is a separate discard-zone requirement.
+
+## 416 — Card-Cost ownership already evaluates the hand requirement semantically
+The paid active-Ability owner binds the requirement and cost filters, then canonical Card-Cost choice enumerates the live private hand and applies structured card-selection filters. If fewer than the mandatory count exist it fails closed before Ability use is recorded. V2.4.110 adds explicit no-Device proof with eligible Volt Essence still available, isolating the hand predicate without changing gameplay runtime.
+
+## 417 — V2.4.110 hand_contains capability reconciliation accepted
+Proof head `8722b23477354adf417ab51ac2be2cba519b9976` passed Card Pass #1659. Accepted capability head `c93625b3456ae7a3cc8f177a84665071fd8912dd` passed Card Pass #1660. Exactly `hand_contains` moved missing -> implemented. Release Control is synchronized to capability blob `d0e78fbd34f748da52c4443859edb6dd8b22ecb9`. Runtime source and Edge closures are unchanged; owner-family count remains 40.
+
