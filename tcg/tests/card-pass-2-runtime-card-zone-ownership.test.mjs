@@ -208,7 +208,12 @@ test('server-only top-deck attack keeps inspection authority while delegating de
 });
 
 test('private top-deck card choice keeps hidden/choice legality while Card-Zone owns the atomic chosen/remainder partition', () => {
-  assert.ok(topChoice.includes('recordRuntimeV02HiddenInformationView(state, seat, "deck_top")'));
+  assert.ok(topChoice.includes('recordRuntimeV02HiddenInformationView(state, seat, "deck_top", {'));
+  assert.ok(topChoice.includes('action_kind: "attack"'));
+  assert.ok(topChoice.includes('source_controller_seat: seat'));
+  assert.ok(topChoice.includes('source_action_id: descriptor.attack_id'));
+  assert.ok(topChoice.includes('source_card_uid: source.uid'));
+  assert.ok(topChoice.includes('source_creature_uid: source.uid'));
   const start = topChoice.indexOf('export function runtimeV02ResolveTopDeckCardChoice(');
   assert.notEqual(start, -1, 'missing top-deck choice resolver');
   const block = topChoice.slice(start);
@@ -348,7 +353,14 @@ test('tactic SEARCH_DECK keeps hidden/search choice authority while Card-Zone ow
   );
   assert.ok(searchBlock.includes('cardOptions(state, player.deck, step.selection?.filters, ownerSeat)'));
   assert.ok(searchBlock.includes('choiceBounds(step.selection, options.length, true)'));
-  assert.ok(searchBlock.includes('recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck")'));
+  assert.ok(searchBlock.includes('recordRuntimeV02HiddenInformationView('));
+  assert.ok(searchBlock.includes('"deck"'));
+  assert.ok(searchBlock.includes('action_kind: "tactic"'));
+  assert.ok(searchBlock.includes('source_controller_seat: ownerSeat as 1 | 2'));
+  assert.ok(searchBlock.includes('source_action_id: effect.id'));
+  assert.ok(searchBlock.includes('source_card_uid: effect.source_card.uid'));
+  assert.ok(searchBlock.includes('source_creature_uid: null'));
+  assert.ok(searchBlock.includes('drainTacticHiddenInformationEvents(state, effect);'));
   assert.ok(searchBlock.includes('reveal: step.reveal || null'));
 
   const block = functionSlice(
