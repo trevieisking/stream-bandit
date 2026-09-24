@@ -476,7 +476,14 @@ export function runtimeV02CreateSearchSelectionAttachmentChoice(
   );
   sameSource(sourceTop(state, controllerSeat), sourceInstance);
   const options = searchOptions(state, controllerSeat, descriptor);
-  recordRuntimeV02HiddenInformationView(state, controllerSeat, "deck");
+  recordRuntimeV02HiddenInformationView(state, controllerSeat, "deck", {
+    action_kind: "ability",
+    source_controller_seat: controllerSeat,
+    source_action_id: descriptor.ability_id,
+    source_card_uid: sourceInstance.uid,
+    source_creature_uid: sourceInstance.uid,
+    phase: String(state.phase || "play"),
+  });
   return {
     id: req(choiceId, "tcg_v0_2_search_attachment_choice_id_required"),
     seat: controllerSeat,
