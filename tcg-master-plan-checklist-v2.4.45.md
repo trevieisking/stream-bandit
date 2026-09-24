@@ -1229,11 +1229,13 @@
 - [x] Confirm existing deterministic proof for Heatguard recoil and Thorn-style reflect/rejection.
 - [x] Confirm no Release 1 consumer requires after-packet `damage_packet_condition_is`.
 - [x] Freeze scope as capability reconciliation; no gameplay runtime code change.
-- [ ] Add deterministic Heatguard Scorched-condition match + non-match proof.
-- [ ] Pass exact-head Card Pass after proof-only test change.
-- [ ] Move exactly six frozen Damage-Packet predicates missing -> implemented.
-- [ ] Update Release Control capability-manifest fingerprint atomically.
-- [ ] Pass exact-head Card Pass after capability/release-control reconciliation.
-- [ ] Append V2.4.103 acceptance to master plan/checklist/ledger.
+- [x] Add deterministic Heatguard Scorched-condition match + non-match proof.
+- [x] Pass exact-head Card Pass after proof-only test change.
+- [x] Move exactly six frozen Damage-Packet predicates missing -> implemented.
+- [x] Update Release Control capability-manifest fingerprint atomically.
+- [x] Pass exact-head Card Pass after capability/release-control reconciliation.
+- [x] Append V2.4.103 acceptance to master plan/checklist/ledger.
 - [x] Preserve owner-family count 40; no main/live promotion in this slice.
 
+
+**Acceptance:** `6d37f636b806a6701eab45ef7b0c2e92ba38b9ae` / Card Pass #1640 SUCCESS; proof head `cfb91e4c866df8cdebed684441e8c274eab80fba` / #1639 SUCCESS; no gameplay-runtime or live change.

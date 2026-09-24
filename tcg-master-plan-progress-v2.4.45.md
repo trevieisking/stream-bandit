@@ -3452,3 +3452,29 @@ One proof gap remains before capability promotion:
 
 Owner-family count remains **40**. No card-ID/name dispatch, helper owner, main merge, deployment or live promotion is authorized by this slice.
 
+
+## V2.4.103 — implementation acceptance
+
+**Accepted head:** `6d37f636b806a6701eab45ef7b0c2e92ba38b9ae`  
+**Card Pass:** #1640 — **SUCCESS**  
+**Proof head:** `cfb91e4c866df8cdebed684441e8c274eab80fba`, Card Pass #1639 — **SUCCESS**.
+
+V2.4.103 closed as a stale-capability reconciliation with no gameplay-runtime modification:
+
+- the Before-Damage Packet owner already supported all six accepted predicates, including normalized `damage_packet_condition_is`;
+- the canonical packet context already carried condition provenance;
+- the generic Event Listener already supported the five after-packet predicates used by Thorn Crown;
+- existing Thorn Crown tests proved the after-packet reflect path and rejection cases;
+- the new proof-only Heatguard test proves the full accepted nested branch: Scorched condition packets match, the same attachment consumes its once-per-turn limit, and Venomed does not match;
+- exactly six predicates moved missing -> implemented:
+  `damage_packet_target_is_attached_creature`,
+  `damage_packet_class_is`,
+  `damage_packet_condition_is`,
+  `damage_packet_source_controller_is_opponent`,
+  `damage_packet_target_zone_is`,
+  `damage_packet_amount_at_least`;
+- Release Control points at capability blob `6c01e3298efb9c21e5d040b8db3940eb76147187`;
+- Edge closure identities were not changed by this proof/capability-only slice.
+
+Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
+

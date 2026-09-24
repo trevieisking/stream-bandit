@@ -1152,3 +1152,10 @@ Before-Damage Packet owner `tcg-match-damage-packet-listener-v0-2.ts` evaluates 
 ## 393 — only missing evidence is the Heatguard Scorched branch
 Existing tests prove Heatguard recoil and Thorn-style after-packet reflect/rejection. V2.4.103 requires one additional deterministic proof that a condition-class Scorched packet matches Heatguard's accepted predicate branch, a different condition does not match, and normal attachment-limit behavior is preserved. Capability status remains unchanged until that proof and exact-head validation pass.
 
+
+## 394 — V2.4.103 proof closes Heatguard's condition branch
+Proof head `cfb91e4c866df8cdebed684441e8c274eab80fba` passed Card Pass #1639. The added deterministic test uses Heatguard's full accepted predicate tree and proves Scorched reduces the current packet by 10, a second same-turn occurrence is blocked by the attachment limit, and Venomed does not match.
+
+## 395 — six Damage-Packet predicates are capability-complete for Release 1
+Accepted head `6d37f636b806a6701eab45ef7b0c2e92ba38b9ae` passed Card Pass #1640. Exactly six predicates moved missing -> implemented: `damage_packet_target_is_attached_creature`, `damage_packet_class_is`, `damage_packet_condition_is`, `damage_packet_source_controller_is_opponent`, `damage_packet_target_zone_is`, and `damage_packet_amount_at_least`. Release Control is synchronized to capability blob `6c01e3298efb9c21e5d040b8db3940eb76147187`. No gameplay-runtime source or Edge closure changed in the reconciliation commit.
+
