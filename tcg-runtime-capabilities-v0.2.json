@@ -156,6 +156,7 @@
       "source_is_current_friendly_vanguard",
       "source_is_self",
       "target_damaged",
+      "target_element_is",
       "target_has_any_condition",
       "target_has_condition",
       "target_printed_hp_at_least",
@@ -194,7 +195,6 @@
       "target_damage_at_least",
       "target_damage_at_most",
       "target_damage_equals",
-      "target_element_is",
       "target_has_any_named_condition",
       "target_remaining_hp_at_least",
       "target_remaining_hp_at_most",
@@ -1637,6 +1637,109 @@
         "operation": "PERFORM_VOLUNTARY_WITHDRAWAL",
         "reason": "Draft Essence withdrawal legality/operation remains unaccepted until effect-driven Withdrawal reuses the complete canonical Withdrawal quote, lifecycle/current-cost modifiers, exact attached-Essence Payment and Atomic Switch ownership."
       }
+    },
+    "release1_target_element_is_v2_4_114": {
+      "accepted_runtime_head": "821362b42b853e70067bafd0ef204ac555936cd3",
+      "card_pass_run": 1675,
+      "predicate": "target_element_is",
+      "frozen_consumers": [
+        {
+          "card_id": "ember-hearth-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "ember-smolder-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "ember-cinder-charm",
+          "surface": "relic_continuous_attack_damage"
+        },
+        {
+          "card_id": "gale-draft-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "grove-bloom-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "grove-symbiote-essence",
+          "surface": "after_heal_packet"
+        },
+        {
+          "card_id": "shade-veil-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "stone-fault-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "stone-granite-essence",
+          "surface": "withdrawal_increase_immunity"
+        },
+        {
+          "card_id": "tide-calm-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "tide-flow-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "tide-brine-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "volt-surge-essence",
+          "surface": "essence_attached"
+        }
+      ],
+      "owners": {
+        "essence_attachment_snapshot": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+        "heal_listener_dispatch": "supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts",
+        "withdrawal_continuous": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+        "outgoing_relic_attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts"
+      },
+      "cinder_parity": {
+        "generic_relic_outgoing_attack_damage": true,
+        "target_element_gate": "attached Creature structured definition element",
+        "amount_formula": "default/cases",
+        "case_predicate": "target_printed_hp_at_least",
+        "case_predicate_owner": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
+        "no_card_id_dispatch": true
+      },
+      "proof": {
+        "essence_positive_negative": true,
+        "heal_positive_negative": true,
+        "withdrawal_stone_positive_and_non_stone_negative": true,
+        "cinder_ember_under_200_plus_10": true,
+        "cinder_ember_200_plus_plus_20": true,
+        "cinder_non_ember_plus_0": true,
+        "owner_family_count": 40
+      },
+      "validation_history": [
+        {
+          "head": "da93fa4684ba8b09e9c39c7001487ee3615a8a70",
+          "run": 1674,
+          "conclusion": "failure",
+          "reason": "structured runtime probe was widened to Relic identity and broke legacy-compatible damage-prevention test states by returning null"
+        },
+        {
+          "head": "821362b42b853e70067bafd0ef204ac555936cd3",
+          "run": 1675,
+          "conclusion": "success",
+          "reason": "restored prior structured probe boundary while retaining generic outgoing Relic Attack Damage execution"
+        }
+      ],
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-heal-listener-dispatch.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-withdrawal-bridge.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-source-state-requirements.test.ts"
+      ]
     }
   }
 }
