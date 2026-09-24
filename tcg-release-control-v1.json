@@ -590,7 +590,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "5898af6ddbc6fba4be1e9c53579160820b6e32b6",
         "file_count": 54,
-        "closure_sha256": "600ce673ba7295eb22d74096401634a6249b1df3e52b4f4d91712c38179b8938",
+        "closure_sha256": "324d7a11c3d889f6227da104dc081bb718dfd0ab06a3e7d8548e7cd9ca5729bd",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -762,7 +762,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
-            "git_blob_sha": "51bb44e1211afe096bb892a328c88532256c3a14"
+            "git_blob_sha": "fedcb25b4356b89d879a045b78df2523e56bd7c9"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
