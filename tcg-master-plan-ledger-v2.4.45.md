@@ -1126,3 +1126,19 @@ Celestial Observatory's accepted branch is exactly deck top -> deck bottom, coun
 ## 385 — V2.4.102 freeze checkpoint is green
 Head `1e3a1254740830eb9ca5192f6b679715b7d4f08d` passed Card Pass #1604 with both Set One/effect-grammar/release-control validation and deterministic runtime/type-check validation green. GitHub combined status returned no external statuses. Production/main/live remain unchanged and promotion remains HOLD while V2.4.102 source parity is implemented and proven.
 
+
+## 386 — V2.4.102 implementation accepted
+Implementation head `d91e1ec293a29991f03519bba3092599758333e1` passed Card Pass #1636. Both Set One/effect-grammar/release-control validation and deterministic runtime/type-check validation completed successfully. Combined external commit statuses contained no additional statuses.
+
+## 387 — Hidden Information #33 now has history plus trigger occurrences
+The existing de-duplicated current-turn hidden-view ledger remains authoritative for turn-history checks. A separate private per-occurrence queue now records one provenance-only trigger occurrence for every actual hidden-information view. The queue never stores the viewed card UID/ID, deck ordering or private choice options. Match/Tactic orchestration consumes the queue into generic Event Listener work.
+
+## 388 — five accepted Astral hidden-view listeners are proven generically
+Deterministic runtime coverage proves Orbitortoise / Forecast Shell, Prismowl / Wide Eyes, Starwhale / Star Current, Celestial Observatory / Observatory Topshift and Dreamglass / Foresight Heal. The same coverage proves event-controller ownership, resumable private discard/optional choices, repeat-occurrence limits, Dreamglass source-Creature matching and no hidden-card leakage.
+
+## 389 — MOVE_ZONE_POSITION remains Card-Zone owner #30
+Event Listener supports only the accepted bounded deck top -> bottom / count 1 / no-additional-reveal shape. It rebinds the exact current top at resolution and delegates the physical same-zone reorder to `runtimeV02ApplyCardZoneReorder`. Celestial Observatory therefore cannot move a stale inspected UID. Owner-family count remains 40.
+
+## 390 — capability and release-control reconciliation complete
+`tcg-runtime-capabilities-v0.2.json` now classifies `MOVE_ZONE_POSITION`, `event_controller_is_self`, `event_zone_is` and `source_is_attached_creature` as implemented. Release Control v1 now fingerprints the exact accepted Edge closures: Match 119 files / `dd577d4492b6753a8f7ac5563ce3d133867e12499fb1cf4bd4551ff3ed457263`; Tactic 53 files / `09067b17567483869def6e55204e45b25ee77d0a8161fb1dfd41367a13920461`; Private Alpha unchanged at 8 files. Production/main/live remain unchanged.
+

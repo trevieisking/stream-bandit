@@ -1200,19 +1200,22 @@
 - [x] Freeze hidden-view trigger privacy: no card UID/ID, ordering, inspected value or private option may enter the public/event-history record.
 - [x] Freeze occurrence semantics: actual hidden views produce distinct trigger occurrences even when current-turn history metadata is de-duplicated.
 - [x] Freeze Dreamglass source semantics: `source_is_attached_creature` compares event source Creature UID to the Relic's attached Creature; Tactic-only views have no source Creature.
-- [ ] Extend Hidden Information #33 with exact per-occurrence event provenance while preserving the existing de-duplicated history ledger.
-- [ ] Add the generic hidden-view -> Event Listener adapter/factory and record the event in canonical effect history.
-- [ ] Add `event_zone_is` and `source_is_attached_creature` to Event Listener predicate evaluation.
-- [ ] Add `$event_controller` player-token resolution from the current event only.
-- [ ] Add bounded Event Listener `MOVE_ZONE_POSITION` validation and delegate physical mutation to Card-Zone #30.
-- [ ] Rebind the exact current top card UID at resolution; never reuse a stale viewed UID and never reveal it.
-- [ ] Preserve Match source choice/continuation while hidden-view listeners resolve first.
-- [ ] Add equivalent Tactic Event Listener choice projection/resume without duplicating Event Listener ownership.
-- [ ] Route Dreamglass emitted Heal Packets through canonical Heal Listener continuation before resuming the source action.
-- [ ] Add deterministic runtime tests for all 5 hidden-view listeners plus repeat-occurrence, stale-top, privacy and opponent-event-controller cases.
-- [ ] Add static wiring proof: no card ID/name dispatch, owner-family count 40, Card-Zone #30 mutation only.
-- [ ] Refresh Match/Tactic release closures after source stabilizes.
-- [ ] Move `MOVE_ZONE_POSITION` missing -> implemented only after the singleton is green end-to-end.
-- [ ] Synchronize capability + release control + master plan/checklist/ledger and pass final exact-head Card Pass.
+- [x] Extend Hidden Information #33 with exact per-occurrence event provenance while preserving the existing de-duplicated history ledger.
+- [x] Add the generic hidden-view -> Event Listener adapter/factory and record the event in canonical effect history.
+- [x] Add `event_zone_is` and `source_is_attached_creature` to Event Listener predicate evaluation.
+- [x] Add `$event_controller` player-token resolution from the current event only.
+- [x] Add bounded Event Listener `MOVE_ZONE_POSITION` validation and delegate physical mutation to Card-Zone #30.
+- [x] Rebind the exact current top card UID at resolution; never reuse a stale viewed UID and never reveal it.
+- [x] Preserve Match source choice/continuation while hidden-view listeners resolve first.
+- [x] Add equivalent Tactic Event Listener choice projection/resume without duplicating Event Listener ownership.
+- [x] Route Dreamglass emitted Heal Packets through canonical Heal Listener continuation before resuming the source action.
+- [x] Add deterministic runtime tests for all 5 hidden-view listeners plus repeat-occurrence, stale-top, privacy and opponent-event-controller cases.
+- [x] Add static wiring proof: no card ID/name dispatch, owner-family count 40, Card-Zone #30 mutation only.
+- [x] Refresh Match/Tactic release closures after source stabilizes.
+- [x] Move `MOVE_ZONE_POSITION` missing -> implemented only after the singleton is green end-to-end.
+- [x] Synchronize capability + release control + master plan/checklist/ledger and pass final exact-head Card Pass.
 - [x] No production/main/live promotion during V2.4.102 implementation.
+
+
+**V2.4.102 acceptance evidence:** implementation head `d91e1ec293a29991f03519bba3092599758333e1`; Card Pass #1636 SUCCESS with both workflow jobs green; capability/release-control synchronized; owner-family count 40; production/main/live unchanged.
 

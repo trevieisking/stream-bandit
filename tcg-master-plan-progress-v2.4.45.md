@@ -3350,3 +3350,26 @@ Card identities, inspected/search results, deck ordering and private choice opti
 
 Freeze checkpoint: Card Pass **#1604 SUCCESS** on `1e3a1254740830eb9ca5192f6b679715b7d4f08d`; both validation jobs green; combined commit status contains no external statuses. No production/main/live change.
 
+
+## V2.4.102 — implementation acceptance
+
+**Implementation acceptance head:** `d91e1ec293a29991f03519bba3092599758333e1`  
+**Card Pass:** #1636 — **SUCCESS**  
+**Validation:** Set One 193-card / effect-grammar / release-control ✅; deterministic v0.2 runtime + Match/Tactic type-checks ✅; combined external commit statuses: none found.
+
+V2.4.102 is accepted as the shared Hidden Information -> Event Listener parity slice:
+
+- Hidden Information owner #33 now preserves the de-duplicated current-turn history ledger **and** records distinct source-only trigger occurrences for every actual hidden-information view.
+- Trigger occurrence payloads carry controller, viewed zone, action kind, source controller, source action, source card and source Creature provenance only; viewed card identity, ordering and private choice payloads remain private.
+- Event Listener now generically adapts `hidden_information_viewed` occurrences, records canonical effect-history events, evaluates `event_zone_is` and `source_is_attached_creature`, and resolves `$event_controller` from the current event.
+- `MOVE_ZONE_POSITION` is implemented only for the accepted bounded shape used by Celestial Observatory: event-controller deck, top -> bottom, count 1, no additional reveal. Event Listener validates/binds the operation and Card-Zone owner #30 performs the reorder via `runtimeV02ApplyCardZoneReorder`.
+- The current top card is rebound at resolution. The previously viewed top UID is never trusted as the mutation target and is never exposed in public effect history.
+- Match and Tactic source flows drain hidden-view listener work before returning their source choice, preserve resumable Event Listener choices, and route emitted Heal Packets through the canonical Heal Listener before resuming.
+- Deterministic coverage proves all five accepted Astral listeners: Orbitortoise / Forecast Shell, Prismowl / Wide Eyes, Starwhale / Star Current, Celestial Observatory / Observatory Topshift, and Dreamglass / Foresight Heal.
+- Coverage additionally proves repeat-occurrence semantics, private-state non-projection, event-controller ownership, stale-top rebinding and Dreamglass Ability/Attack source matching.
+- Runtime capability inventory now classifies `MOVE_ZONE_POSITION`, `event_controller_is_self`, `event_zone_is` and `source_is_attached_creature` as implemented.
+- Release-control fingerprints were refreshed against the exact Edge dependency closures: Match **119 files / `dd577d4492b6753a8f7ac5563ce3d133867e12499fb1cf4bd4551ff3ed457263`**; Tactic **53 files / `09067b17567483869def6e55204e45b25ee77d0a8161fb1dfd41367a13920461`**; Private Alpha unchanged at 8 files.
+- Owner-family count remains **40**. No owner #41, no card-ID/name dispatch was added for this slice, and no production/main/live promotion occurred.
+
+The documentation synchronization that follows this accepted implementation head is record-only and does not alter runtime behavior.
+
