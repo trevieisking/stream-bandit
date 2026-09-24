@@ -1195,3 +1195,12 @@ The exact consumers are Tide Rillrunner, Reefshell and Tidal Lens. Their union u
 ## 405 — V2.4.106 Essence Movement capability reconciliation accepted
 Freeze head `2c91679ce009e452369ba31cfebff9a6cd4d620d` passed Card Pass #1649. Accepted capability head `921ff4d0e26efc2f619a7daaaefc8cc17688cb9e` passed Card Pass #1650. Exactly four predicates moved missing -> implemented: `essence_move_destination_is_self`, `essence_move_element_is`, `essence_move_source_is_attached_creature`, and `essence_move_source_is_self`. Release Control is synchronized to capability blob `ce8ed09b5a6623a483504427d43a238ff604e5c2`. No gameplay runtime, tests or Edge closures changed.
 
+## 406 — V2.4.107 freezes the Release 1 source_has_relic family
+The exact consumers are Stone Rampartusk twice (Rampart Plating continuous incoming-Attack reduction and Wall Break conditional_add) plus Stone Citadelhorn once (Fortress Heart continuous incoming-Attack reduction). No other Release 1 structured consumer uses `source_has_relic`.
+
+## 407 — generic Relic-state ownership and deterministic proof already exist
+`tcg-match-attack-damage-v0-2.ts` evaluates the continuous-Ability shape from the live Creature Relic slot. `tcg-match-attack-conditional-add-evaluator-v0-2.ts` evaluates the Attack-formula shape, and Match constructs its declaration context from `!!p.vanguard.relic`. Existing tests prove Wall Break-style true/false evaluation and Fortress Heart with/without a Relic. Rampart Plating shares the same continuous predicate owner. No gameplay implementation change is justified.
+
+## 408 — V2.4.107 source_has_relic capability reconciliation accepted
+Freeze head `146cf553704447e79a7979d638074de32f6ddfda` passed Card Pass #1651. Accepted capability head `830ac7dbec6614500b9135f0b2f800bcd3ae77ec` passed Card Pass #1652. Exactly `source_has_relic` moved missing -> implemented. Release Control is synchronized to capability blob `e6763c176e840b757d3886cde050b4c2ed30ae77`. No gameplay runtime, tests or Edge closures changed. Owner-family count remains 40.
+

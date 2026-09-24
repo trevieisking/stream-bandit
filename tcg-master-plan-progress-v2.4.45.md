@@ -3741,3 +3741,52 @@ Release Control now points to capability blob `ce8ed09b5a6623a483504427d43a238ff
 
 Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
 
+## V2.4.107 — `source_has_relic` predicate reconciliation (freeze)
+
+**Freeze head:** `146cf553704447e79a7979d638074de32f6ddfda` — Card Pass #1651 **SUCCESS**.
+
+### Exact Release 1 consumers
+
+The structured Set One audit finds exactly three frozen uses:
+
+- **Stone — Rampartusk / Rampart Plating**: continuous `incoming_attack_damage`, gated by `source_has_relic`, amount -10.
+- **Stone — Rampartusk / Wall Break**: Attack `conditional_add`, +20 when `source_has_relic`.
+- **Stone — Citadelhorn / Fortress Heart**: continuous `incoming_attack_damage`, gated by `source_has_relic`, amount -20.
+
+No other Release 1 structured consumer uses this predicate.
+
+### Existing canonical ownership and proof
+
+This is a stale-capability reconciliation, not a new engine:
+
+- `tcg-match-attack-damage-v0-2.ts` generically evaluates `source_has_relic` for continuous incoming self-Ability damage from the live Creature Relic slot.
+- `tcg-match-attack-conditional-add-evaluator-v0-2.ts` generically evaluates the same predicate from declaration-time context.
+- `tcg-match-actions/index.ts` constructs that context from `!!p.vanguard.relic`, so Wall Break reads authoritative current battlefield state.
+- `runtime-v0-2-attack-conditional-add-evaluation.test.ts` proves the Wall Break-style positive and negative branches.
+- `runtime-v0-2-attack-damage-prevention-authority.test.ts` proves the Fortress Heart shape with and without a Relic. Rampart Plating is the same generic continuous predicate family with a different numeric amount.
+
+No card ID/name dispatch participates. No gameplay runtime or new proof is required.
+
+### Bounded V2.4.107 action
+
+1. Move exactly `source_has_relic` missing -> implemented.
+2. Synchronize Release Control's capability-manifest fingerprint in the same commit.
+3. Require fresh exact-head Card Pass.
+4. Close master plan/checklist/ledger only after that gate passes.
+
+Owner-family count remains **40**. No runtime/test source, Edge Function, database, main merge, deployment or live promotion is authorized by this slice.
+
+
+## V2.4.107 — implementation acceptance
+
+**Freeze head:** `146cf553704447e79a7979d638074de32f6ddfda` — Card Pass #1651 **SUCCESS**.  
+**Accepted capability head:** `830ac7dbec6614500b9135f0b2f800bcd3ae77ec` — Card Pass #1652 **SUCCESS**.
+
+V2.4.107 closed as a pure capability/release-control reconciliation with **no gameplay-runtime or test change**.
+
+Exactly one predicate moved missing -> implemented: `source_has_relic`.
+
+Release Control now points to capability blob `e6763c176e840b757d3886cde050b4c2ed30ae77`. Match/Tactic/Private Alpha runtime source and dependency closures did not change.
+
+Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
+

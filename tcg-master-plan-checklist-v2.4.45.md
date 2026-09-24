@@ -1293,3 +1293,23 @@
 
 
 **Acceptance:** freeze `2c91679ce009e452369ba31cfebff9a6cd4d620d` / Card Pass #1649 SUCCESS; capability head `921ff4d0e26efc2f619a7daaaefc8cc17688cb9e` / #1650 SUCCESS; no runtime/test/main/live change.
+
+### V2.4.107 — source_has_relic predicate reconciliation
+- [x] Freeze exact Release 1 consumers: Rampart Plating, Wall Break, Fortress Heart.
+- [x] Confirm `source_has_relic` is still classified missing before this slice.
+- [x] Confirm incoming Attack-damage continuous ownership already evaluates the predicate generically from the Creature Relic slot.
+- [x] Confirm conditional_add ownership already evaluates the predicate generically.
+- [x] Confirm Match constructs declaration context from the authoritative current Vanguard Relic slot.
+- [x] Confirm deterministic positive/negative Wall Break-style proof.
+- [x] Confirm deterministic with-Relic/without-Relic Fortress Heart proof.
+- [x] Confirm Rampart Plating shares the same generic continuous predicate family.
+- [x] Confirm no card-ID/name dispatch and no new owner is needed.
+- [x] Pass exact-head Card Pass on freeze head `146cf553704447e79a7979d638074de32f6ddfda` (#1651 SUCCESS).
+- [x] Move exactly `source_has_relic` missing -> implemented.
+- [x] Update Release Control capability-manifest fingerprint atomically.
+- [x] Pass exact-head Card Pass after capability reconciliation: `830ac7dbec6614500b9135f0b2f800bcd3ae77ec` (#1652 SUCCESS).
+- [x] Append V2.4.107 acceptance across plan/checklist/ledger.
+- [x] Preserve 40 owner families; no runtime/main/live promotion in this slice.
+
+**Acceptance:** freeze `146cf553704447e79a7979d638074de32f6ddfda` / Card Pass #1651 SUCCESS; capability head `830ac7dbec6614500b9135f0b2f800bcd3ae77ec` / #1652 SUCCESS; capability blob `e6763c176e840b757d3886cde050b4c2ed30ae77`; no runtime/test/main/live change.
+
