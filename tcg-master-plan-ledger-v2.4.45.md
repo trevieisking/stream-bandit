@@ -1184,3 +1184,10 @@ The exact structured consumers are Symbiote Essence, Shellip and Moonlit Reef. T
 ## 402 — V2.4.105 Heal capability reconciliation accepted
 Freeze head `395a88b63cc4f61ef75245878feb2c62919b9958` passed Card Pass #1646. Accepted capability head `ebece9cef2872d205bfa2e4dfc080e4ff2e02071` passed Card Pass #1647. Exactly eight Heal predicates moved missing -> implemented: `heal_packet_source_is_attached_creature`, `heal_packet_target_controller_is_self`, `heal_packet_target_is_not_source`, `heal_packet_target_is_self`, `heal_actual_amount_at_least`, `heal_source_is_card_effect`, `heal_controller_is_active_seat`, and `heal_target_element_is`. Release Control is synchronized to capability blob `c7d8c34be26d54c804e6bc70f9f243be838cbc8d`. No gameplay runtime, tests or Edge closures changed.
 
+
+## 403 — V2.4.106 freezes the Release 1 Essence Movement predicate family
+The exact consumers are Tide Rillrunner, Reefshell and Tidal Lens. Their union uses four predicates still classified missing: `essence_move_destination_is_self`, `essence_move_element_is`, `essence_move_source_is_attached_creature`, and `essence_move_source_is_self`.
+
+## 404 — Movement Listener ownership and direct proof already exist
+`tcg-match-movement-listener-v0-2.ts` generically evaluates all four against canonical `essence_moved` events. The deterministic movement-listener suite directly proves Reefshell, Rillrunner and Tidal Lens, including same-turn limits, wrong-element rejection, wrong-controller rejection and legacy no-op. No gameplay implementation or proof addition is justified.
+

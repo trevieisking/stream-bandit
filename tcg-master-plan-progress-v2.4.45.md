@@ -3666,3 +3666,60 @@ Release Control now points to capability blob `c7d8c34be26d54c804e6bc70f9f243be8
 
 Owner-family count remains **40**. PR #591 remains draft/unmerged. Production/main/live are unchanged.
 
+
+## V2.4.106 — Essence Movement predicate reconciliation (freeze)
+
+**Freeze head:** `23cd8971eaa23e15367d326f9d1b21280f748c6b`  
+**Inherited gate:** V2.4.105 documentation head Card Pass #1648 **SUCCESS**.
+
+### Exact Release 1 consumers
+
+The structured-card audit finds exactly three Tide identities in this family:
+
+**Rillrunner / Running Current**
+- `essence_move_element_is(Tide)`;
+- `essence_move_source_is_self` OR `essence_move_destination_is_self`.
+
+**Reefshell / Breakwater Current**
+- `essence_move_destination_is_self`;
+- `essence_move_element_is(Tide)`.
+
+**Tidal Lens / Tidal Lens Heal**
+- `essence_move_source_is_attached_creature`;
+- `essence_move_element_is(Tide)`.
+
+No other Release 1 identity uses these four predicates.
+
+### Existing canonical ownership
+
+`supabase/functions/_shared/tcg-match-movement-listener-v0-2.ts` already evaluates all four generically from the canonical `essence_moved` event and listener candidate context.
+
+The accepted semantics remain:
+- exact source Creature identity;
+- exact destination Creature identity;
+- exact moved Essence element;
+- attached-carrier identity for Relic listeners.
+
+No card ID/name dispatch participates.
+
+### Existing deterministic proof
+
+`runtime-v0-2-movement-listener.test.ts` directly proves the frozen consumers:
+
+- **Reefshell**: matching Tide movement to self grants Shield; a second same-turn trigger is limited.
+- **Rillrunner**: Tide Essence leaving or reaching self installs the one-use Attack bonus; wrong element does not trigger.
+- **Tidal Lens**: movement from the attached Creature emits a canonical Heal Packet; second same-turn trigger is limited.
+- the suite also proves wrong-controller rejection and legacy-state no-op.
+
+### Bounded V2.4.106 action
+
+This is a **metadata reconciliation only** unless exact-head validation contradicts the existing runtime proof.
+
+If the freeze head remains green:
+1. move exactly the four frozen predicates missing -> implemented;
+2. update Release Control capability-manifest fingerprint atomically;
+3. pass exact-head Card Pass;
+4. close master plan/checklist/ledger.
+
+Owner-family count remains **40**. No gameplay-runtime/test source, main merge, deployment or live promotion is authorized.
+

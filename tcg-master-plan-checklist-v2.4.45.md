@@ -1276,3 +1276,18 @@
 
 
 **Acceptance:** freeze `395a88b63cc4f61ef75245878feb2c62919b9958` / Card Pass #1646 SUCCESS; capability head `ebece9cef2872d205bfa2e4dfc080e4ff2e02071` / #1647 SUCCESS; no runtime/test/main/live change.
+
+### V2.4.106 — Essence Movement predicate reconciliation
+- [x] Freeze exact consumers: Rillrunner, Reefshell, Tidal Lens.
+- [x] Confirm exactly four missing capability predicates in the accepted family.
+- [x] Confirm Movement Listener already implements all four generically.
+- [x] Confirm deterministic runtime proof covers all three accepted consumer shapes.
+- [x] Confirm wrong-element, wrong-controller, limit and legacy no-op behavior.
+- [x] Confirm no card-ID/name dispatch and no new owner is needed.
+- [ ] Pass exact-head Card Pass on the V2.4.106 freeze head.
+- [ ] Move exactly four frozen Essence Movement predicates missing -> implemented.
+- [ ] Update Release Control capability-manifest fingerprint atomically.
+- [ ] Pass exact-head Card Pass after capability reconciliation.
+- [ ] Append V2.4.106 acceptance across plan/checklist/ledger.
+- [x] Preserve 40 owner families; no main/live promotion in this slice.
+
