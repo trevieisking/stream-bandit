@@ -1419,6 +1419,7 @@ function executeUntilChoice(state: any) {
           reveal: step.reveal || null,
         },
       });
+      drainTacticHiddenInformationEvents(state, effect);
       return;
     }
     if (op === "SEARCH_DECK_GROUP") {
