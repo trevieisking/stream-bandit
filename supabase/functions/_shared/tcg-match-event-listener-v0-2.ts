@@ -35,6 +35,7 @@ import {
   clearRuntimeCondition,
   hasRuntimeCondition,
   runtimeConditions,
+  runtimeV02ConditionSlot,
   type ApplyConditionMode,
 } from "./tcg-match-condition-engine-v0-2.ts";
 import {
@@ -126,7 +127,118 @@ export type RuntimeV02EventListenerEvent = {
   actual_hp_damage?: number;
   source_card_id?: string;
   target_remains_in_play_after_damage?: boolean;
+  condition?: string;
+  condition_slot?: "scorched" | "venomed" | "control" | "modifier";
 };
+
+export type RuntimeV02ConditionAppliedEventInput = {
+  event_id: string;
+  source_controller_seat: 1 | 2;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  condition: string;
+  source_action_id: string;
+  source_card_uid: string | null;
+  source_card_id?: string | null;
+  source_creature_uid?: string | null;
+  action_kind: string;
+  phase: string;
+};
+
+export function runtimeV02CreateConditionAppliedEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ConditionAppliedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const sourceController = normalizedSeat(
+    input.source_controller_seat,
+    "tcg_v0_2_condition_applied_source_controller_invalid",
+  );
+  const targetController = normalizedSeat(
+    input.target_controller_seat,
+    "tcg_v0_2_condition_applied_target_controller_invalid",
+  );
+  const eventId = requiredString(
+    input.event_id,
+    "tcg_v0_2_condition_applied_event_id_required",
+  );
+  const targetUid = requiredString(
+    input.target_creature_uid,
+    "tcg_v0_2_condition_applied_target_uid_required",
+  );
+  const condition = requiredString(
+    input.condition,
+    "tcg_v0_2_condition_applied_condition_required",
+  );
+  const sourceActionId = requiredString(
+    input.source_action_id,
+    "tcg_v0_2_condition_applied_source_action_required",
+  );
+  const actionKind = requiredString(
+    input.action_kind,
+    "tcg_v0_2_condition_applied_action_kind_required",
+  );
+  const phase = requiredString(
+    input.phase,
+    "tcg_v0_2_condition_applied_phase_required",
+  );
+  if (input.target_zone !== "vanguard" && input.target_zone !== "reserve") {
+    throw new Error("tcg_v0_2_condition_applied_target_zone_invalid");
+  }
+  const targetIndex = input.target_zone === "reserve"
+    ? Number(input.target_index)
+    : null;
+  if (
+    input.target_zone === "reserve" &&
+    (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex > 3)
+  ) {
+    throw new Error("tcg_v0_2_condition_applied_target_index_invalid");
+  }
+  const sourceCardUid = input.source_card_uid == null
+    ? null
+    : requiredString(
+      input.source_card_uid,
+      "tcg_v0_2_condition_applied_source_card_uid_invalid",
+    );
+  const sourceCardId = input.source_card_id == null
+    ? undefined
+    : requiredString(
+      input.source_card_id,
+      "tcg_v0_2_condition_applied_source_card_id_invalid",
+    );
+  const sourceCreatureUid = input.source_creature_uid == null
+    ? undefined
+    : requiredString(
+      input.source_creature_uid,
+      "tcg_v0_2_condition_applied_source_creature_uid_invalid",
+    );
+  const event: RuntimeV02EventListenerEvent = {
+    event_id: eventId,
+    event: "condition_applied",
+    subject_uid: targetUid,
+    controller_seat: sourceController,
+    source_controller_seat: sourceController,
+    origin_zone: input.target_zone,
+    destination_zone: input.target_zone,
+    destination_index: targetIndex,
+    phase,
+    source_action_id: sourceActionId,
+    source_card_uid: sourceCardUid,
+    action_kind: actionKind,
+    turn_seq: turn,
+    source_creature_uid: sourceCreatureUid,
+    target_creature_uid: targetUid,
+    target_controller_seat: targetController,
+    target_zone: input.target_zone,
+    condition,
+    condition_slot: runtimeV02ConditionSlot(condition),
+    ...(sourceCardId ? { source_card_id: sourceCardId } : {}),
+  };
+  recordEvent(state, event);
+  return event;
+}
 
 export type RuntimeV02DamagePreventedEventInput = {
   turn_seq: number;
@@ -1065,6 +1177,31 @@ function requirementLeaf(
       return event.controller_seat === (candidate.seat === 1 ? 2 : 1);
     case "source_controller_is_self":
       return event.source_controller_seat === candidate.seat;
+    case "event_condition_is": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "condition"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_event_condition_field_unsupported:${unsupported}`,
+        );
+      }
+      const condition = requiredString(
+        value.condition,
+        "tcg_v0_2_event_listener_event_condition_required",
+      );
+      return event.event === "condition_applied" &&
+        String(event.condition || "") === condition;
+    }
+    case "event_target_controller_is_opponent": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_event_target_controller_field_unsupported:${unsupported}`,
+        );
+      }
+      return event.target_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    }
     case "source_element_is": {
       const sourceUid = String(event.source_creature_uid || "").trim();
       if (!sourceUid) return false;
