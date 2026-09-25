@@ -8,6 +8,10 @@ const owner = fs.readFileSync(
   "supabase/functions/_shared/tcg-match-bound-set-choice-v0-2.ts",
   "utf8",
 );
+const reorderOwner = fs.readFileSync(
+  "supabase/functions/_shared/tcg-match-deck-reorder-event-v0-2.ts",
+  "utf8",
+);
 const astral = fs.readFileSync("tcg-card-pass-2-astral.md", "utf8");
 const gale = fs.readFileSync("tcg-card-pass-2-gale.md", "utf8");
 const volt = fs.readFileSync("tcg-card-pass-2-volt.md", "utf8");
@@ -37,7 +41,7 @@ for (const marker of [
   'kind: "choose_bound_set"',
   'apply: "bind_bound_set_choice"',
   "runtimeV02ApplyCardZonePartitionTransfer",
-  "runtimeV02ApplyCardZoneReorder",
+  "runtimeV02ApplyDeckReorderWithOccurrence",
   "runtimeV02BoundDeckSetAfterRemoval",
   'apply: "order_bound_deck_remainder"',
   "step.to ?? step.destination",
@@ -51,6 +55,18 @@ for (const marker of [
 
 if (!tactic.includes('vars[variable] = player.deck.splice(0, count)')) {
   throw new Error("unrelated accepted LOOK_TOP fallback must remain");
+}
+
+for (const marker of [
+  "runtimeV02ApplyDeckReorderWithOccurrence",
+  "runtimeV02ApplyCardZoneReorder",
+]) {
+  if (!reorderOwner.includes(marker)) {
+    throw new Error(`deck-reorder adapter ownership marker missing: ${marker}`);
+  }
+}
+if (tactic.includes("runtimeV02ApplyCardZoneReorder")) {
+  throw new Error("Tactic must not bypass the deck-reorder event adapter");
 }
 
 for (const marker of [
@@ -79,5 +95,5 @@ for (const forbidden of [
 }
 
 process.stdout.write(
-  "V2.4.98 affected Tactic CHOOSE_FROM_SET families use owner-31 binding and owner-30 mutation.\n",
+  "V2.4.122 affected Tactic CHOOSE_FROM_SET families preserve owner-31 binding and delegate deck mutation through the event adapter to owner-30.\n",
 );

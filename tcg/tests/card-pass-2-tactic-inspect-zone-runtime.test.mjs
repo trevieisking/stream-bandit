@@ -34,6 +34,20 @@ for (const marker of [
 
 const tactic = fs.readFileSync("supabase/functions/tcg-tactic-actions/index.ts", "utf8");
 const owner = fs.readFileSync("supabase/functions/_shared/tcg-match-inspection-v0-2.ts", "utf8");
+const reorderOwner = fs.readFileSync(
+  "supabase/functions/_shared/tcg-match-deck-reorder-event-v0-2.ts",
+  "utf8",
+);
+for (const marker of [
+  "runtimeV02ApplyDeckReorderWithOccurrence",
+  "runtimeV02ApplyCardZoneReorder",
+]) if (!reorderOwner.includes(marker)) {
+  throw new Error(`deck-reorder adapter ownership marker missing: ${marker}`);
+}
+if (tactic.includes("runtimeV02ApplyCardZoneReorder")) {
+  throw new Error("Tactic inspection must not bypass the deck-reorder event adapter");
+}
+
 for (const marker of [
   "runtimeV02NormalizeInspectZoneStep",
   'if (op === "INSPECT_ZONE")',
@@ -41,7 +55,7 @@ for (const marker of [
   "runtimeV02ResolveRewardInspectionChoice",
   "runtimeV02InspectDeckTopEffectOwnedSet",
   "runtimeV02ApplyCardZonePartitionTransfer",
-  "runtimeV02ApplyCardZoneReorder",
+  "runtimeV02ApplyDeckReorderWithOccurrence",
   "runtimeV02RebindInspectionRemainder",
   'kind: "order_inspected_deck_top"',
   'apply: "order_inspected_deck_top"',
@@ -65,4 +79,4 @@ for (const forbidden of [
   }
 }
 
-process.stdout.write("V2.4.97 Tactic INSPECT_ZONE uses canonical private inspection and Card-Zone ownership.\n");
+process.stdout.write("V2.4.122 Tactic INSPECT_ZONE preserves canonical private inspection and delegates deck reorder through the event adapter to Card-Zone ownership.\n");
