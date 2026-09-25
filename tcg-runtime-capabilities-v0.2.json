@@ -90,6 +90,9 @@
   "predicates": {
     "implemented": [
       "attached_essence_distinct_element_count_at_least",
+      "attack_actual_damage_at_least",
+      "attack_source_is_attached_creature",
+      "attack_target_is_opponent_vanguard",
       "card_matches",
       "control_condition_present",
       "control_condition_slot_empty",
@@ -176,9 +179,6 @@
     "missing": [
       "attached_essence_distinct_element_count_at_most",
       "attached_essence_distinct_element_count_equals",
-      "attack_actual_damage_at_least",
-      "attack_source_is_attached_creature",
-      "attack_target_is_opponent_vanguard",
       "current_attack_damage_at_least",
       "essence_discarded_attachment_kind_is",
       "essence_discarded_by_own_card_effect",
@@ -2038,6 +2038,48 @@
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-deck-reorder-event-listener.test.ts",
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-deck-planning.test.ts",
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-deck-reading.test.ts"
+      ]
+    },
+    "release1_faultstone_after_attack_damage_v2_4_123": {
+      "accepted_runtime_head": "b49388e182729dcb7dee975120a6d6b4f542a517",
+      "card_pass_run": 1708,
+      "card_id": "stone-faultstone",
+      "listener_id": "faultstone-crush",
+      "event": "after_attack_damage",
+      "predicates": [
+        "attack_source_is_attached_creature",
+        "attack_target_is_opponent_vanguard",
+        "attack_actual_damage_at_least"
+      ],
+      "existing_dependency": {
+        "target_remains_in_play_after_damage": "implemented"
+      },
+      "owners": {
+        "attack_damage_packet": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "condition_state": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts"
+      },
+      "semantics": {
+        "preserves_after_damage_packet": true,
+        "after_attack_damage_is_metadata_view_of_resolved_packet": true,
+        "source_must_be_attached_creature": true,
+        "target_must_be_opponent_vanguard": true,
+        "actual_hp_damage_threshold": 100,
+        "target_must_remain_in_play": true,
+        "effect": "apply Crushed to exact $attack_target with apply_if_empty",
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": {
+        "implementation_head": "ff11da019191b41c06cd13f46789e95b787d830c",
+        "implementation_card_pass": 1707,
+        "implementation_result": "failure_static_attack_recoil_order_guard_only",
+        "runtime_and_all_typechecks_green_on_1707": true,
+        "corrected_runtime_head": "b49388e182729dcb7dee975120a6d6b4f542a517",
+        "corrected_card_pass": 1708
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-after-attack-damage-event-listener.test.ts"
       ]
     }
   }
