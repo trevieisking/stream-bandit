@@ -77,7 +77,7 @@ test('primary attack damage packet listener is resolved before structured after-
   assertInOrder([
     'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
     'const attackDamagePacketEvent=s.runtime_registry_v0_2!=null?runtimeV02CreateResolvedAttackDamageEvent(',
-    'const attackDamagePacketFlow=attackDamagePacketEvent?runtimeV02BeginEventListenerContinuation(s,[attackDamagePacketEvent])',
+    'const attackDamagePacketFlow=attackDamagePacketEvent&&afterAttackDamageEvent?runtimeV02BeginEventListenerContinuation(s,[attackDamagePacketEvent,afterAttackDamageEvent])',
     'const structuredRecoilEffects=structuredRuntimeAfterDamageRecoilEffects(',
   ], 'attack damage packet event ordering changed');
   assert.ok(matchSource.includes('recoil_damage_packet_event_listener:recoilDamagePacketAudit'));
