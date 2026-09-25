@@ -4362,3 +4362,80 @@ Capability catalogue is now **61/72 operations + 82/108 predicates = 143/180 (79
 Owner-family count remains **40**. The reorder adapter is an event bridge between existing Card-Zone #30 and Event Listener #28 ownership, not a new owner family.
 
 Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.123 — Faultstone / resolved Attack post-damage event parity
+
+**Baseline authority head:** `53186f2483a225d4c57ee746e03b938429a886f3` — Card Pass #1706 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly one consumer each for:
+- `attack_source_is_attached_creature`;
+- `attack_target_is_opponent_vanguard`;
+- `attack_actual_damage_at_least`.
+
+All three belong to Stone Faultstone / `faultstone-crush` on event `after_attack_damage`.
+
+Faultstone also depends on already-implemented `target_remains_in_play_after_damage` and applies `Crushed` to `$attack_target` with `apply_if_empty`.
+
+### Existing packet ownership preserved
+The Attack pipeline already creates the authoritative resolved Attack packet through `runtimeV02CreateResolvedAttackDamageEvent`, including:
+- exact Attack/source/target identities;
+- target zone/controller;
+- requested/final packet amount;
+- Shield prevention;
+- actual HP damage.
+
+Grove Thorn Crown already consumes that exact `after_damage_packet` event. V2.4.123 does **not** rename, repurpose or replace it.
+
+Instead, Event Listener owner #28 creates a second metadata-only `after_attack_damage` view from the same resolved packet after Match computes whether the target remains in play. Both events enter the same Event Listener continuation in order:
+1. existing `after_damage_packet`;
+2. new `after_attack_damage`.
+
+No second Attack Damage engine or condition engine is introduced.
+
+### Generic Event Listener parity
+The `after_attack_damage` view supports:
+- `attack_source_is_attached_creature`: listener attachment field top uid must equal resolved Attack source Creature uid;
+- `attack_target_is_opponent_vanguard`: resolved target must be the opposing Vanguard relative to listener controller;
+- `attack_actual_damage_at_least`: threshold compares against actual HP damage after Shield/prevention;
+- existing `target_remains_in_play_after_damage`: reads the resolved survival boolean without reclassifying the capability;
+- `$attack_target`: resolves the exact packet target Creature for canonical Condition application.
+
+Faultstone therefore delegates `Crushed` mutation to the existing Condition Engine through Event Listener `APPLY_CONDITION`.
+
+### Deterministic proof and static guard correction
+Runtime implementation head `ff11da019191b41c06cd13f46789e95b787d830c` ran Card Pass #1707:
+- deterministic runtime core **SUCCESS**;
+- Match/Tactic/Private Alpha/Withdrawal/Attack-Damage/Surge type-checks **SUCCESS**;
+- release-control static fingerprints and all three Edge closures **SUCCESS**;
+- overall structure job **FAIL** only because one stale recoil-order static assertion still searched for the old one-event `[attackDamagePacketEvent]` listener call.
+
+Guard-only head `b49388e182729dcb7dee975120a6d6b4f542a517` updated that assertion to recognize the ordered two-event flow `[attackDamagePacketEvent, afterAttackDamageEvent]`. Card Pass #1708 passed **SUCCESS** end-to-end.
+
+Dedicated Faultstone proof covers:
+- 100 actual HP damage to opponent Vanguard from the attached Creature -> Crushed applied;
+- 99 damage -> rejected;
+- Reserve target -> rejected;
+- wrong attacking source -> rejected;
+- lethal target / does not remain in play -> rejected;
+- original `after_damage_packet` event remains present and unchanged.
+
+Accepted closures:
+- Match Edge: **123 files**, SHA-256 `60f368c79ebf915c70fe47fd0a11de6b9c3208b314bf076ed6e93c8a648ca83c`;
+- Tactic Edge: **55 files**, SHA-256 `08fa47c6b828bef60832a6582a0b7c26617e022cbe153c05820e21fc4979da32`.
+
+### Capability acceptance
+Capability head `cff6c3ade3d7195c8017bee164e4153b70aa5251` passed Card Pass #1709 **SUCCESS**.
+
+Exactly the three Faultstone predicates moved missing -> implemented:
+- `attack_source_is_attached_creature`;
+- `attack_target_is_opponent_vanguard`;
+- `attack_actual_damage_at_least`.
+
+`target_remains_in_play_after_damage` stayed implemented and was not reclassified.
+
+Capability blob is `4616f466fa17ed4579ab2ce17b670c9b0767d3c4`.
+
+Capability catalogue is now **61/72 operations + 85/108 predicates = 146/180 (81.1%)** implemented. Frozen Release 1 used-missing falls from **20 to 17**.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

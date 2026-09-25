@@ -1632,3 +1632,29 @@
 - [x] Pass capability head `276521d0ac1b2d453b79ce08cad972d994f997f6` / Card Pass #1705 SUCCESS.
 
 **Acceptance:** capability blob `e89d7333449697568ed69212bedb5f4c9ec5a0b8`; Nova Essence is fed by canonical deck-reorder events across all current Release 1 structured reorder surfaces; 40 owner families preserved.
+
+### V2.4.123 — Faultstone / resolved Attack post-damage event parity
+- [x] Sweep frozen Release 1 sources for `attack_source_is_attached_creature`.
+- [x] Sweep frozen Release 1 sources for `attack_target_is_opponent_vanguard`.
+- [x] Sweep frozen Release 1 sources for `attack_actual_damage_at_least`.
+- [x] Confirm exactly one consumer of each: Stone Faultstone / `faultstone-crush`.
+- [x] Confirm `target_remains_in_play_after_damage` was already implemented.
+- [x] Preserve Grove Thorn Crown's existing `after_damage_packet` event unchanged.
+- [x] Derive a second metadata-only `after_attack_damage` event from the same authoritative resolved Attack packet.
+- [x] Compute target-survival from canonical Match state after primary Attack damage.
+- [x] Feed `after_damage_packet` before `after_attack_damage` through the existing Event Listener continuation.
+- [x] Add generic attached-source matching.
+- [x] Add generic opponent-Vanguard target matching.
+- [x] Compare threshold to actual HP damage after Shield/prevention.
+- [x] Add Event Listener parity for existing target-survival predicate without reclassifying it.
+- [x] Bind `$attack_target` to the exact resolved packet target.
+- [x] Reuse canonical Condition Engine `APPLY_CONDITION` for Crushed.
+- [x] Prove positive 100+ damage and negative sub-100 / Reserve / wrong-source / lethal-target cases.
+- [x] Confirm no Faultstone/card-name dispatch and no new owner family.
+- [x] Record #1707 as one stale static recoil-order assertion only; runtime/type-checks/closures were green.
+- [x] Pass corrected runtime head `b49388e182729dcb7dee975120a6d6b4f542a517` / Card Pass #1708 SUCCESS.
+- [x] Move exactly the three Faultstone predicates missing -> implemented.
+- [x] Leave `target_remains_in_play_after_damage` implemented and unchanged.
+- [x] Pass capability head `cff6c3ade3d7195c8017bee164e4153b70aa5251` / Card Pass #1709 SUCCESS.
+
+**Acceptance:** capability blob `4616f466fa17ed4579ab2ce17b670c9b0767d3c4`; Faultstone is runnable through canonical Attack Damage -> Event Listener -> Condition Engine ownership while Thorn Crown remains unchanged; 40 owner families preserved.

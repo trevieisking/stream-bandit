@@ -1384,3 +1384,15 @@ Head `e052451934c287a4d227a15d4b4f9c5ffa4b63d6` had deterministic runtime/type c
 
 ## 468 — V2.4.122 event_count_at_least accepted
 Capability head `276521d0ac1b2d453b79ce08cad972d994f997f6` passed Card Pass #1705. Exactly `event_count_at_least` moved missing -> implemented. Capability blob is `e89d7333449697568ed69212bedb5f4c9ec5a0b8`. Coverage is 143/180 (79.4%), frozen used-missing falls to 20, owner-family count remains 40 and production remains unchanged.
+
+## 469 — V2.4.123 Faultstone owns three one-consumer post-Attack predicates
+The frozen Release 1 sweep finds exactly one consumer each for `attack_source_is_attached_creature`, `attack_target_is_opponent_vanguard` and `attack_actual_damage_at_least`: Stone Faultstone / `faultstone-crush`. Its `target_remains_in_play_after_damage` dependency was already implemented.
+
+## 470 — after_attack_damage is a metadata view of the canonical resolved Attack packet
+Grove Thorn Crown's existing `after_damage_packet` remains unchanged. Event Listener #28 now derives a second `after_attack_damage` view from the same resolved Attack packet after Match computes target survival. The new view carries no second damage mutation path and binds `$attack_target` to the exact packet target for canonical Condition Engine mutation.
+
+## 471 — V2.4.123 runtime proof passed after one stale static guard correction
+Head `ff11da019191b41c06cd13f46789e95b787d830c` had deterministic runtime, all type-checks and release-control closure checks green while #1707 failed only a static recoil-order assertion that still expected the old single-event packet listener call. Guard-only head `b49388e182729dcb7dee975120a6d6b4f542a517` updated that assertion and passed #1708 end-to-end. Dedicated proof covers positive 100+ actual HP damage plus sub-100, Reserve, wrong-source and lethal-target rejection while preserving `after_damage_packet`.
+
+## 472 — V2.4.123 Faultstone predicates accepted
+Capability head `cff6c3ade3d7195c8017bee164e4153b70aa5251` passed Card Pass #1709. Exactly the three Faultstone predicates moved missing -> implemented; `target_remains_in_play_after_damage` stayed implemented. Capability blob is `4616f466fa17ed4579ab2ce17b670c9b0767d3c4`. Coverage is 146/180 (81.1%), frozen used-missing falls to 17, owner-family count remains 40 and production remains unchanged.
