@@ -36,12 +36,17 @@ export type RuntimeV02AttackAfterFinishedConditionResult = {
   attack_id: string;
   phase: "after_attack_finished";
   target: "$current_opponent_vanguard";
+  source_uid: string;
+  source_card_id: string;
   target_controller_seat: Seat;
+  target_creature_uid: string;
   condition: string;
   mode: ApplyConditionMode;
   applied: boolean;
   prevented: boolean;
   reason: string | null;
+  condition_slot: "scorched" | "venomed" | "control" | "modifier";
+  change_kind: "apply" | "replace" | null;
 };
 
 function record(value: unknown, code: string): Record<string, unknown> {
@@ -330,15 +335,24 @@ export function runtimeV02ResolveAttackAfterFinishedConditionContinuation(
     },
   );
   delete state.pending_attack_after_finished_condition;
+  const targetTop = top(
+    target.creature,
+    "tcg_v0_2_attack_after_finished_condition_target_top_invalid",
+  );
   return {
     attack_id: currentDescriptor.attack_id,
     phase: "after_attack_finished",
     target: "$current_opponent_vanguard",
+    source_uid: receipt.source_uid,
+    source_card_id: receipt.source_card_id,
     target_controller_seat: target.seat,
+    target_creature_uid: targetTop.uid,
     condition: currentDescriptor.effect.condition,
     mode: currentDescriptor.effect.mode,
     applied: result.applied,
     prevented: result.prevented,
     reason: result.reason || null,
+    condition_slot: result.condition_slot,
+    change_kind: result.change_kind,
   };
 }

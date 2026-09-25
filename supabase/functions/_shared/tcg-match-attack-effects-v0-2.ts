@@ -35,6 +35,8 @@ export type RuntimeV02AttackConditionEffectResult = {
   applied: boolean;
   prevented: boolean;
   reason: string | null;
+  condition_slot: "scorched" | "venomed" | "control" | "modifier";
+  change_kind: "apply" | "replace" | null;
 };
 
 export type RuntimeV02AttackConditionPhaseResult = {
@@ -189,6 +191,8 @@ export function structuredRuntimeAfterDamageConditionEffects(
       applied: result.applied,
       prevented: result.prevented,
       reason: result.reason || null,
+      condition_slot: result.condition_slot,
+      change_kind: result.change_kind,
     };
   });
 

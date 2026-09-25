@@ -53,7 +53,10 @@ export type RuntimeV02ActiveAbilityConditionReplacementResolution<
   kind: "replace_opponent_vanguard_control_condition";
   ability_id: string;
   activation_permit: RuntimeV02ActiveAbilityActivationCostPermit<T>;
+  source_creature_uid: string;
+  source_card_id: string;
   target_controller_seat: Seat;
+  target_creature_uid: string;
   previous_condition: string;
   requested_condition: RuntimeV02ConditionName;
   resulting_condition: string | null;
@@ -61,6 +64,8 @@ export type RuntimeV02ActiveAbilityConditionReplacementResolution<
   prevented: boolean;
   reason: string | null;
   protection_id: string | null;
+  condition_slot: "scorched" | "venomed" | "control" | "modifier";
+  change_kind: "apply" | "replace" | null;
 };
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -481,11 +486,18 @@ function executeOnce<T extends RuntimeV02CardZoneInstance>(
     );
   const resulting = runtimeConditions(target.creature).control;
 
+  const targetTop = topInstance(
+    target.creature,
+    "tcg_v0_2_active_condition_replacement_target_top_invalid",
+  );
   return {
     kind: "replace_opponent_vanguard_control_condition",
     ability_id: descriptor.ability_id,
     activation_permit: activation.permit,
+    source_creature_uid: boundSource.instance.uid,
+    source_card_id: boundSource.instance.card_id,
     target_controller_seat: target.seat,
+    target_creature_uid: targetTop.uid,
     previous_condition: target.current_condition,
     requested_condition: descriptor.step.condition,
     resulting_condition: resulting,
@@ -493,6 +505,8 @@ function executeOnce<T extends RuntimeV02CardZoneInstance>(
     prevented: result.prevented,
     reason: result.reason || null,
     protection_id: result.protection?.protection_id || null,
+    condition_slot: result.condition_slot,
+    change_kind: result.change_kind,
   };
 }
 

@@ -129,6 +129,7 @@ export type RuntimeV02EventListenerEvent = {
   target_remains_in_play_after_damage?: boolean;
   condition?: string;
   condition_slot?: "scorched" | "venomed" | "control" | "modifier";
+  change_kind?: "apply" | "replace";
   actual_shield_gained?: number;
   card_effect?: boolean;
 };
@@ -243,6 +244,124 @@ export function runtimeV02CreateConditionAppliedEvent(
   };
   recordEvent(state, event);
   return event;
+}
+
+export type RuntimeV02ConditionChangedEventInput = {
+  event_id: string;
+  source_controller_seat: 1 | 2;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  condition: string;
+  condition_slot: "scorched" | "venomed" | "control" | "modifier";
+  change_kind: "apply" | "replace";
+  source_action_id: string;
+  source_card_uid: string | null;
+  source_card_id?: string | null;
+  source_creature_uid?: string | null;
+  action_kind: string;
+  phase: string;
+};
+
+export function runtimeV02CreateConditionChangedEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ConditionChangedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const sourceController = normalizedSeat(
+    input.source_controller_seat,
+    "tcg_v0_2_condition_changed_source_controller_invalid",
+  );
+  const targetController = normalizedSeat(
+    input.target_controller_seat,
+    "tcg_v0_2_condition_changed_target_controller_invalid",
+  );
+  const eventId = requiredString(
+    input.event_id,
+    "tcg_v0_2_condition_changed_event_id_required",
+  );
+  const targetUid = requiredString(
+    input.target_creature_uid,
+    "tcg_v0_2_condition_changed_target_uid_required",
+  );
+  const conditionName = requiredString(
+    input.condition,
+    "tcg_v0_2_condition_changed_condition_required",
+  );
+  const canonicalSlot = runtimeV02ConditionSlot(conditionName);
+  if (input.condition_slot !== canonicalSlot) {
+    throw new Error("tcg_v0_2_condition_changed_slot_mismatch");
+  }
+  if (input.change_kind !== "apply" && input.change_kind !== "replace") {
+    throw new Error("tcg_v0_2_condition_changed_kind_invalid");
+  }
+  const sourceActionId = requiredString(
+    input.source_action_id,
+    "tcg_v0_2_condition_changed_source_action_required",
+  );
+  const actionKind = requiredString(
+    input.action_kind,
+    "tcg_v0_2_condition_changed_action_kind_required",
+  );
+  const phase = requiredString(
+    input.phase,
+    "tcg_v0_2_condition_changed_phase_required",
+  );
+  if (input.target_zone !== "vanguard" && input.target_zone !== "reserve") {
+    throw new Error("tcg_v0_2_condition_changed_target_zone_invalid");
+  }
+  let targetIndex: number | null = null;
+  if (input.target_zone === "reserve") {
+    const reserveIndex = Number(input.target_index);
+    if (!Number.isInteger(reserveIndex) || reserveIndex < 0 || reserveIndex > 3) {
+      throw new Error("tcg_v0_2_condition_changed_target_index_invalid");
+    }
+    targetIndex = reserveIndex;
+  }
+  const sourceCardUid = input.source_card_uid == null
+    ? null
+    : requiredString(
+      input.source_card_uid,
+      "tcg_v0_2_condition_changed_source_card_uid_invalid",
+    );
+  const sourceCardId = input.source_card_id == null
+    ? undefined
+    : requiredString(
+      input.source_card_id,
+      "tcg_v0_2_condition_changed_source_card_id_invalid",
+    );
+  const sourceCreatureUid = input.source_creature_uid == null
+    ? undefined
+    : requiredString(
+      input.source_creature_uid,
+      "tcg_v0_2_condition_changed_source_creature_uid_invalid",
+    );
+  const changedEvent: RuntimeV02EventListenerEvent = {
+    event_id: eventId,
+    event: "condition_changed",
+    subject_uid: targetUid,
+    controller_seat: targetController,
+    source_controller_seat: sourceController,
+    origin_zone: input.target_zone,
+    destination_zone: input.target_zone,
+    destination_index: targetIndex,
+    phase,
+    source_action_id: sourceActionId,
+    source_card_uid: sourceCardUid,
+    action_kind: actionKind,
+    turn_seq: turn,
+    source_creature_uid: sourceCreatureUid,
+    target_creature_uid: targetUid,
+    target_controller_seat: targetController,
+    target_zone: input.target_zone,
+    condition: conditionName,
+    condition_slot: input.condition_slot,
+    change_kind: input.change_kind,
+    ...(sourceCardId ? { source_card_id: sourceCardId } : {}),
+  };
+  recordEvent(state, changedEvent);
+  return changedEvent;
 }
 
 export type RuntimeV02ShieldGainedEventInput = {
@@ -1303,6 +1422,47 @@ function requirementLeaf(
         );
       }
       return event.target_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    }
+    case "event_condition_slot_is": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "slot"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_condition_slot_field_unsupported:${unsupported}`,
+        );
+      }
+      const slot = requiredString(
+        value.slot,
+        "tcg_v0_2_event_listener_condition_slot_required",
+      );
+      if (!["scorched", "venomed", "control", "modifier"].includes(slot)) {
+        throw new Error("tcg_v0_2_event_listener_condition_slot_invalid");
+      }
+      return event.event === "condition_changed" &&
+        event.condition_slot === slot;
+    }
+    case "event_change_kind_in": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "values"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_condition_change_kind_field_unsupported:${unsupported}`,
+        );
+      }
+      if (!Array.isArray(value.values) || value.values.length < 1) {
+        throw new Error("tcg_v0_2_event_listener_condition_change_kind_values_required");
+      }
+      const values = value.values.map((entry) => String(entry));
+      if (
+        new Set(values).size !== values.length ||
+        values.some((entry) => entry !== "apply" && entry !== "replace")
+      ) {
+        throw new Error("tcg_v0_2_event_listener_condition_change_kind_values_invalid");
+      }
+      return event.event === "condition_changed" &&
+        values.includes(String(event.change_kind || ""));
     }
     case "shield_target_is_self": {
       const unsupported = Object.keys(value).find((key) => key !== "predicate");
@@ -2672,7 +2832,8 @@ function executeStep(
       state.active_seat,
       "tcg_v0_2_event_listener_condition_active_seat_invalid",
     );
-    applyRuntimeConditionWithContext(
+    const stepIndex = continuation.step_cursor;
+    const conditionResult = applyRuntimeConditionWithContext(
       target.cr,
       condition,
       turn,
@@ -2683,10 +2844,36 @@ function executeStep(
         source_controller_seat: candidate.seat,
         target_controller_seat: target.seat,
         card_effect: true,
-        source_action_id: `event-listener:${event.event_id}:${listenerId(candidate)}:${continuation.step_cursor}`,
+        source_action_id: `event-listener:${event.event_id}:${listenerId(candidate)}:${stepIndex}`,
       },
     );
     continuation.step_cursor++;
+    if (conditionResult.change_kind) {
+      const nestedEvent = runtimeV02CreateConditionChangedEvent(state, {
+        event_id:
+          `condition-changed:${turn}:${event.event_id}:${candidate.source.uid}:${listenerId(candidate)}:${stepIndex}:${target.top.uid}`,
+        source_controller_seat: candidate.seat,
+        target_controller_seat: target.seat,
+        target_creature_uid: target.top.uid,
+        target_zone: target.where,
+        target_index: target.index,
+        condition,
+        condition_slot: conditionResult.condition_slot,
+        change_kind: conditionResult.change_kind,
+        source_action_id:
+          `event-listener:${event.event_id}:${listenerId(candidate)}:${stepIndex}`,
+        source_card_uid: candidate.source.uid,
+        source_card_id: candidate.source.card_id,
+        source_creature_uid: candidate.field?.top.uid ?? null,
+        action_kind: candidate.kind,
+        phase: String(event.phase || "effect_resolution"),
+      });
+      continuation.work.splice(
+        continuation.work_index + 1,
+        0,
+        ...eventWorkItems(state, nestedEvent),
+      );
+    }
     return "continue";
   }
 
