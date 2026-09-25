@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "594a72bd0de275b0259cd624300d49a35058da65",
+        "entrypoint_git_blob_sha": "3f450b3c6af76f9ed2ee70d1b0a1297da1342058",
         "file_count": 123,
-        "closure_sha256": "386064d899740e2e5bbb862afff91f7b7755d8b8b3c3d3dd239bac52f2f31c2a",
+        "closure_sha256": "9c3a02d3bfbdd0c4740e02785f36d089de8a20819b5d55072f10ed032d841f1d",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -114,15 +114,15 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-continuation-v0-2.ts",
-            "git_blob_sha": "ecf4340b578e436c7fbc2b1bbf0c14205d32b8ed"
+            "git_blob_sha": "c69b98151bd74daef0d3af346bda082f9d48fc16"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-deck-planning-v0-2.ts",
-            "git_blob_sha": "347e50abe57ef70ec41a0e1033c46ea58d60a226"
+            "git_blob_sha": "de54db412adb709a722d33d061ba99a97379c93a"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
-            "git_blob_sha": "f517e9c624fa1fc7e14ad57acc168c3db4e2b36c"
+            "git_blob_sha": "93381d430d4dc43ee83bd9e961d96349cecf7e1f"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-essence-redistribution-v0-2.ts",
@@ -582,7 +582,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "594a72bd0de275b0259cd624300d49a35058da65"
+            "git_blob_sha": "3f450b3c6af76f9ed2ee70d1b0a1297da1342058"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",

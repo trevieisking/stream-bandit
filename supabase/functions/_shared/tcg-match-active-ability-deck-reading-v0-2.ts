@@ -1,9 +1,11 @@
 import { runtimeV02CurrentTurnActiveAbilityUseCount } from "./tcg-match-active-ability-choice-v0-2.ts";
 import { runtimeV02EvaluateActiveAbilityIf } from "./tcg-match-active-ability-if-v0-2.ts";
 import {
-  runtimeV02ApplyCardZoneReorder,
   type RuntimeV02CardZoneInstance,
 } from "./tcg-match-card-zone-engine-v0-2.ts";
+import {
+  runtimeV02ApplyDeckReorderWithOccurrence,
+} from "./tcg-match-deck-reorder-event-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 import {
@@ -466,19 +468,27 @@ export function runtimeV02ResolveActiveAbilityDeckReadingChoice(
   }
   const selectedSet = selected ? [top] : [];
   if (selected) {
-    runtimeV02ApplyCardZoneReorder(deck, {
-      cause: "effect",
-      action_kind: "ability",
-      source_action_id: choice.ability_id,
-      source_card_uid: choice.source_uid,
-      zone: {
-        controller_seat: choice.opponent_seat,
-        zone: "deck",
-        owner_card_uid: null,
+    runtimeV02ApplyDeckReorderWithOccurrence(
+      state,
+      deck,
+      {
+        cause: "effect",
+        action_kind: "ability",
+        source_action_id: choice.ability_id,
+        source_card_uid: choice.source_uid,
+        zone: {
+          controller_seat: choice.opponent_seat,
+          zone: "deck",
+          owner_card_uid: null,
+        },
+        card_uids: [top.uid],
+        destination_position: "bottom",
       },
-      card_uids: [top.uid],
-      destination_position: "bottom",
-    });
+      {
+        source_controller_seat: controllerSeat,
+        phase: String(state.phase || "ability_effect_resolution"),
+      },
+    );
   }
 
   const ifMatched = runtimeV02EvaluateActiveAbilityIf(choice.when, {
@@ -510,5 +520,45 @@ export function runtimeV02ResolveActiveAbilityDeckReadingChoice(
     moved_to_deck_bottom_count: selected ? 1 : 0,
     scheduled_action_id: scheduledActionId,
     emitted_packet_ids: [],
+  };
+}
+
+export type RuntimeV02ActiveAbilityDeckReadingEventResume = {
+  kind: "deck_reading_after_reorder_event";
+  turn_seq: number;
+  seat: Seat;
+  ability_id: string;
+  selected_count: 0 | 1;
+  moved_to_deck_bottom_count: 0 | 1;
+  scheduled_action_id: string | null;
+};
+
+export type RuntimeV02ActiveAbilityDeckReadingEventResumeResolution = {
+  kind: "deck_reading_after_reorder_event";
+  ability_id: string;
+  selected_count: 0 | 1;
+  moved_to_deck_bottom_count: 0 | 1;
+  scheduled_action_id: string | null;
+};
+
+export function runtimeV02ResumeActiveAbilityDeckReadingEvent(
+  state: Record<string, unknown>,
+  resume: RuntimeV02ActiveAbilityDeckReadingEventResume,
+): RuntimeV02ActiveAbilityDeckReadingEventResumeResolution {
+  if (currentTurn(state) !== resume.turn_seq) {
+    throw new Error("tcg_v0_2_active_ability_deck_reading_resume_turn_stale");
+  }
+  if (resume.seat !== 1 && resume.seat !== 2) {
+    throw new Error("tcg_v0_2_active_ability_deck_reading_resume_seat_invalid");
+  }
+  if (Number(state.active_seat) !== resume.seat) {
+    throw new Error("tcg_v0_2_active_ability_deck_reading_resume_active_seat_changed");
+  }
+  return {
+    kind: resume.kind,
+    ability_id: resume.ability_id,
+    selected_count: resume.selected_count,
+    moved_to_deck_bottom_count: resume.moved_to_deck_bottom_count,
+    scheduled_action_id: resume.scheduled_action_id,
   };
 }

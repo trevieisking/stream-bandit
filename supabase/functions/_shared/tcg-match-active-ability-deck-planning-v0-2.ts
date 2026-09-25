@@ -2,9 +2,11 @@ import {
   runtimeV02CurrentTurnActiveAbilityUseCount,
 } from "./tcg-match-active-ability-choice-v0-2.ts";
 import {
-  runtimeV02ApplyCardZoneReorder,
   type RuntimeV02CardZoneInstance,
 } from "./tcg-match-card-zone-engine-v0-2.ts";
+import {
+  runtimeV02ApplyDeckReorderWithOccurrence,
+} from "./tcg-match-deck-reorder-event-v0-2.ts";
 import {
   runtimeV02BindDeckTopSet,
   runtimeV02BoundDeckSetAfterRemoval,
@@ -497,19 +499,27 @@ export function runtimeV02ResolveActiveAbilityDeckPlanningChoice(
     );
     const own = player(state, controllerSeat);
     if (resolved.length) {
-      runtimeV02ApplyCardZoneReorder(own.deck as Inst[], {
-        cause: "effect",
-        action_kind: "ability",
-        source_action_id: choice.ability_id,
-        source_card_uid: choice.source_uid,
-        zone: {
-          controller_seat: controllerSeat,
-          zone: "deck",
-          owner_card_uid: null,
+      runtimeV02ApplyDeckReorderWithOccurrence(
+        state,
+        own.deck as Inst[],
+        {
+          cause: "effect",
+          action_kind: "ability",
+          source_action_id: choice.ability_id,
+          source_card_uid: choice.source_uid,
+          zone: {
+            controller_seat: controllerSeat,
+            zone: "deck",
+            owner_card_uid: null,
+          },
+          card_uids: resolved.map((card) => card.uid),
+          destination_position: "bottom",
         },
-        card_uids: resolved.map((card) => card.uid),
-        destination_position: "bottom",
-      });
+        {
+          source_controller_seat: controllerSeat,
+          phase: String(state.phase || "ability_effect_resolution"),
+        },
+      );
     }
     const nextProvenance = runtimeV02BoundDeckSetAfterRemoval(
       choice.provenance,
@@ -579,7 +589,8 @@ export function runtimeV02ResolveActiveAbilityDeckPlanningChoice(
     current,
     selected,
   );
-  runtimeV02ApplyCardZoneReorder(
+  runtimeV02ApplyDeckReorderWithOccurrence(
+    state,
     player(state, controllerSeat).deck as Inst[],
     {
       cause: "effect",
@@ -594,6 +605,10 @@ export function runtimeV02ResolveActiveAbilityDeckPlanningChoice(
       card_uids: ordered.map((card) => card.uid),
       destination_position: "top",
     },
+    {
+      source_controller_seat: controllerSeat,
+      phase: String(state.phase || "ability_effect_resolution"),
+    },
   );
   return {
     kind: choice.kind,
@@ -603,5 +618,59 @@ export function runtimeV02ResolveActiveAbilityDeckPlanningChoice(
     moved_to_deck_bottom_count: choice.selected_bottom_count,
     reordered_remainder_count: ordered.length,
     emitted_packet_ids: [],
+  };
+}
+
+export type RuntimeV02ActiveAbilityDeckPlanningEventResume = {
+  kind: "deck_planning_after_reorder_event";
+  turn_seq: number;
+  seat: Seat;
+  ability_id: string;
+  selected_count: number;
+  moved_to_deck_bottom_count: number;
+  reordered_remainder_count: number;
+  pending_choice: RuntimeV02PendingActiveAbilityDeckPlanningChoice | null;
+};
+
+export type RuntimeV02ActiveAbilityDeckPlanningEventResumeResolution = {
+  kind: "deck_planning_after_reorder_event";
+  ability_id: string;
+  selected_count: number;
+  moved_to_deck_bottom_count: number;
+  reordered_remainder_count: number;
+  pending_choice: RuntimeV02PendingActiveAbilityDeckPlanningChoice | null;
+};
+
+export function runtimeV02ResumeActiveAbilityDeckPlanningEvent(
+  state: Record<string, unknown>,
+  resume: RuntimeV02ActiveAbilityDeckPlanningEventResume,
+): RuntimeV02ActiveAbilityDeckPlanningEventResumeResolution {
+  if (currentTurn(state) !== resume.turn_seq) {
+    throw new Error("tcg_v0_2_active_ability_deck_planning_resume_turn_stale");
+  }
+  if (resume.seat !== 1 && resume.seat !== 2) {
+    throw new Error("tcg_v0_2_active_ability_deck_planning_resume_seat_invalid");
+  }
+  if (Number(state.active_seat) !== resume.seat) {
+    throw new Error("tcg_v0_2_active_ability_deck_planning_resume_active_seat_changed");
+  }
+  if (resume.pending_choice) {
+    if (
+      resume.pending_choice.seat !== resume.seat ||
+      resume.pending_choice.turn_seq !== resume.turn_seq ||
+      resume.pending_choice.ability_id !== resume.ability_id
+    ) {
+      throw new Error("tcg_v0_2_active_ability_deck_planning_resume_choice_changed");
+    }
+  }
+  return {
+    kind: resume.kind,
+    ability_id: resume.ability_id,
+    selected_count: resume.selected_count,
+    moved_to_deck_bottom_count: resume.moved_to_deck_bottom_count,
+    reordered_remainder_count: resume.reordered_remainder_count,
+    pending_choice: resume.pending_choice
+      ? structuredClone(resume.pending_choice)
+      : null,
   };
 }
