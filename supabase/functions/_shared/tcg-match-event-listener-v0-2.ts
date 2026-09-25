@@ -187,14 +187,17 @@ export function runtimeV02CreateConditionAppliedEvent(
   if (input.target_zone !== "vanguard" && input.target_zone !== "reserve") {
     throw new Error("tcg_v0_2_condition_applied_target_zone_invalid");
   }
-  const targetIndex = input.target_zone === "reserve"
-    ? Number(input.target_index)
-    : null;
-  if (
-    input.target_zone === "reserve" &&
-    (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex > 3)
-  ) {
-    throw new Error("tcg_v0_2_condition_applied_target_index_invalid");
+  let targetIndex: number | null = null;
+  if (input.target_zone === "reserve") {
+    const reserveIndex = Number(input.target_index);
+    if (
+      !Number.isInteger(reserveIndex) ||
+      reserveIndex < 0 ||
+      reserveIndex > 3
+    ) {
+      throw new Error("tcg_v0_2_condition_applied_target_index_invalid");
+    }
+    targetIndex = reserveIndex;
   }
   const sourceCardUid = input.source_card_uid == null
     ? null
