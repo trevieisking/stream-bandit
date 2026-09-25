@@ -38,9 +38,7 @@ import {
   runtimeV02ConditionSlot,
   type ApplyConditionMode,
 } from "./tcg-match-condition-engine-v0-2.ts";
-import {
-  addRuntimeShield,
-} from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { runtimeV02AddShield } from "./tcg-match-damage-engine-v0-2.ts";
 import { runtimeV02ApplyDirectDamage } from "./tcg-match-direct-damage-v0-2.ts";
 import {
   evaluateRuntimeV02DamageHistoryCountRequirement,
@@ -129,6 +127,8 @@ export type RuntimeV02EventListenerEvent = {
   target_remains_in_play_after_damage?: boolean;
   condition?: string;
   condition_slot?: "scorched" | "venomed" | "control" | "modifier";
+  actual_shield_gained?: number;
+  card_effect?: boolean;
 };
 
 export type RuntimeV02ConditionAppliedEventInput = {
@@ -241,6 +241,103 @@ export function runtimeV02CreateConditionAppliedEvent(
   };
   recordEvent(state, event);
   return event;
+}
+
+export type RuntimeV02ShieldGainedEventInput = {
+  event_id: string;
+  source_controller_seat: 1 | 2;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  requested_amount: number;
+  actual_shield_gained: number;
+  source_action_id: string;
+  source_card_uid: string | null;
+  source_card_id?: string | null;
+  source_creature_uid?: string | null;
+  action_kind: string;
+  phase: string;
+  card_effect: boolean;
+};
+
+export function runtimeV02CreateShieldGainedEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ShieldGainedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const sourceController = normalizedSeat(
+    input.source_controller_seat,
+    "tcg_v0_2_shield_gained_source_controller_invalid",
+  );
+  const targetController = normalizedSeat(
+    input.target_controller_seat,
+    "tcg_v0_2_shield_gained_target_controller_invalid",
+  );
+  const eventId = requiredString(input.event_id, "tcg_v0_2_shield_gained_event_id_required");
+  const targetUid = requiredString(input.target_creature_uid, "tcg_v0_2_shield_gained_target_uid_required");
+  const sourceActionId = requiredString(input.source_action_id, "tcg_v0_2_shield_gained_source_action_required");
+  const actionKind = requiredString(input.action_kind, "tcg_v0_2_shield_gained_action_kind_required");
+  const phase = requiredString(input.phase, "tcg_v0_2_shield_gained_phase_required");
+  const requested = Number(input.requested_amount);
+  const actual = Number(input.actual_shield_gained);
+  if (!Number.isFinite(requested) || requested <= 0) {
+    throw new Error("tcg_v0_2_shield_gained_requested_amount_invalid");
+  }
+  if (!Number.isFinite(actual) || actual <= 0 || actual > requested) {
+    throw new Error("tcg_v0_2_shield_gained_actual_amount_invalid");
+  }
+  if (typeof input.card_effect !== "boolean") {
+    throw new Error("tcg_v0_2_shield_gained_card_effect_invalid");
+  }
+  if (input.target_zone !== "vanguard" && input.target_zone !== "reserve") {
+    throw new Error("tcg_v0_2_shield_gained_target_zone_invalid");
+  }
+  let targetIndex: number | null = null;
+  if (input.target_zone === "reserve") {
+    const reserveIndex = Number(input.target_index);
+    if (!Number.isInteger(reserveIndex) || reserveIndex < 0 || reserveIndex > 3) {
+      throw new Error("tcg_v0_2_shield_gained_target_index_invalid");
+    }
+    targetIndex = reserveIndex;
+  }
+  const sourceCardUid = input.source_card_uid == null
+    ? null
+    : requiredString(input.source_card_uid, "tcg_v0_2_shield_gained_source_card_uid_invalid");
+  if (input.card_effect && sourceCardUid == null) {
+    throw new Error("tcg_v0_2_shield_gained_card_effect_source_required");
+  }
+  const sourceCardId = input.source_card_id == null
+    ? undefined
+    : requiredString(input.source_card_id, "tcg_v0_2_shield_gained_source_card_id_invalid");
+  const sourceCreatureUid = input.source_creature_uid == null
+    ? undefined
+    : requiredString(input.source_creature_uid, "tcg_v0_2_shield_gained_source_creature_uid_invalid");
+  const shieldEvent: RuntimeV02EventListenerEvent = {
+    event_id: eventId,
+    event: "shield_gained",
+    subject_uid: targetUid,
+    controller_seat: sourceController,
+    source_controller_seat: sourceController,
+    origin_zone: input.target_zone,
+    destination_zone: input.target_zone,
+    destination_index: targetIndex,
+    phase,
+    source_action_id: sourceActionId,
+    source_card_uid: sourceCardUid,
+    action_kind: actionKind,
+    turn_seq: turn,
+    source_creature_uid: sourceCreatureUid,
+    target_creature_uid: targetUid,
+    target_controller_seat: targetController,
+    target_zone: input.target_zone,
+    requested_amount: requested,
+    actual_shield_gained: actual,
+    card_effect: input.card_effect,
+    ...(sourceCardId ? { source_card_id: sourceCardId } : {}),
+  };
+  recordEvent(state, shieldEvent);
+  return shieldEvent;
 }
 
 export type RuntimeV02DamagePreventedEventInput = {
@@ -1204,6 +1301,38 @@ function requirementLeaf(
         );
       }
       return event.target_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    }
+    case "shield_target_is_self": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_shield_target_self_field_unsupported:${unsupported}`);
+      return event.event === "shield_gained" &&
+        !!candidate.field &&
+        candidate.field.top.uid === String(event.target_creature_uid || event.subject_uid || "");
+    }
+    case "shield_source_is_card_effect": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_shield_card_effect_field_unsupported:${unsupported}`);
+      return event.event === "shield_gained" && event.card_effect === true;
+    }
+    case "shield_actual_gain_at_least": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "value"
+      );
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_shield_gain_field_unsupported:${unsupported}`);
+      const minimum = Number(value.value);
+      if (!Number.isFinite(minimum) || minimum < 1) {
+        throw new Error("tcg_v0_2_event_listener_shield_gain_threshold_invalid");
+      }
+      const actual = Number(event.actual_shield_gained);
+      return event.event === "shield_gained" && Number.isFinite(actual) && actual >= minimum;
+    }
+    case "event_source_action_is": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "action_id"
+      );
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_source_action_field_unsupported:${unsupported}`);
+      const actionId = requiredString(value.action_id, "tcg_v0_2_event_listener_source_action_required");
+      return String(event.source_action_id || "") === actionId;
     }
     case "source_element_is": {
       const sourceUid = String(event.source_creature_uid || "").trim();
@@ -2459,8 +2588,41 @@ function executeStep(
 
   if (op === "ADD_SHIELD") {
     const target = targetField(state, continuation, candidate, event, step.target);
-    addRuntimeShield(target.cr, Math.max(0, numberValue(step.amount, "tcg_v0_2_event_listener_shield_amount_invalid")));
+    const requestedAmount = Math.max(
+      0,
+      numberValue(step.amount, "tcg_v0_2_event_listener_shield_amount_invalid"),
+    );
+    const stepIndex = continuation.step_cursor;
+    const receipt = runtimeV02AddShield(target.cr, requestedAmount);
     continuation.step_cursor++;
+    if (receipt.actual_shield_gained > 0) {
+      const sourceActionId = step.source_key == null
+        ? `${candidate.kind}:${listenerId(candidate)}`
+        : requiredString(step.source_key, "tcg_v0_2_event_listener_shield_source_key_invalid");
+      const nestedEvent = runtimeV02CreateShieldGainedEvent(state, {
+        event_id:
+          `shield-gained:${currentTurn(state)}:${event.event_id}:${candidate.source.uid}:${listenerId(candidate)}:${stepIndex}:${target.top.uid}`,
+        source_controller_seat: candidate.seat,
+        target_controller_seat: target.seat,
+        target_creature_uid: target.top.uid,
+        target_zone: target.where,
+        target_index: target.index,
+        requested_amount: receipt.requested_amount,
+        actual_shield_gained: receipt.actual_shield_gained,
+        source_action_id: sourceActionId,
+        source_card_uid: candidate.source.uid,
+        source_card_id: candidate.source.card_id,
+        source_creature_uid: candidate.field?.top.uid ?? null,
+        action_kind: candidate.kind,
+        phase: String(event.phase || "effect_resolution"),
+        card_effect: true,
+      });
+      continuation.work.splice(
+        continuation.work_index + 1,
+        0,
+        ...eventWorkItems(state, nestedEvent),
+      );
+    }
     return "continue";
   }
 

@@ -26,6 +26,7 @@ import {
   runtimeV02AdaptDeckReorderOccurrencesForListener,
   runtimeV02AdaptHiddenInformationOccurrencesForListener,
   runtimeV02BeginEventListenerContinuation,
+  runtimeV02CreateShieldGainedEvent,
   runtimeV02PendingEventListenerChoiceView,
   runtimeV02PrivateEventInspectionView,
   runtimeV02ResolveEventListenerChoice,
@@ -46,7 +47,8 @@ import {
   type RuntimeV02PredicateLeaf,
 } from "../_shared/tcg-match-predicate-tree-v0-2.ts";
 import { evaluateRuntimeV02EventOccurredRequirement } from "../_shared/tcg-match-event-history-query-v0-2.ts";
-import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions, type ApplyConditionMode } from "./runtime-v0-2-core.ts";
+import { clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions, type ApplyConditionMode } from "./runtime-v0-2-core.ts";
+import { runtimeV02AddShield } from "../_shared/tcg-match-damage-engine-v0-2.ts";
 import {
   runtimeV02ApplyDevicePlayLock,
   runtimeV02NormalizeDevicePlayLockStep,
@@ -851,6 +853,75 @@ function applyTacticDeckReorder(
     },
   );
 }
+function beginTacticShieldEventFlow(
+  state: any,
+  effect: EffectState,
+  events: any[],
+): boolean {
+  if (!events.length) return false;
+  const flow = runtimeV02BeginEventListenerContinuation(state, events);
+  if ((flow.emitted_movement_events || []).length) {
+    throw new Error("tcg_v0_2_tactic_shield_event_movement_output_not_yet_supported");
+  }
+  if (flow.status === "player_choice_required") {
+    setTacticEventResume(state, effect);
+    return true;
+  }
+  if ((flow.emitted_heal_packet_ids || []).length) {
+    const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+      state,
+      flow.emitted_heal_packet_ids,
+      effect.owner_seat as 1 | 2,
+    );
+    if (healFlow.status === "player_choice_required") {
+      setTacticHealResume(state, effect);
+      return true;
+    }
+  }
+  return false;
+}
+
+function applyTacticShieldGain(
+  state: any,
+  effect: EffectState,
+  step: any,
+  found: any,
+  amount: number,
+  ordinal: number,
+) {
+  const target = topInst(found.cr);
+  if (!target) throw new Error("tcg_v0_2_tactic_shield_target_top_required");
+  const sourceSeat = Number(effect.owner_seat);
+  const targetSeat = Number(found.seat);
+  if (sourceSeat !== 1 && sourceSeat !== 2) {
+    throw new Error("tcg_v0_2_tactic_shield_source_seat_invalid");
+  }
+  if (targetSeat !== 1 && targetSeat !== 2) {
+    throw new Error("tcg_v0_2_tactic_shield_target_seat_invalid");
+  }
+  const receipt = runtimeV02AddShield(found.cr, amount);
+  if (receipt.actual_shield_gained <= 0) return null;
+  const sourceKey = String(step.source_key || "").trim() || effect.id;
+  return runtimeV02CreateShieldGainedEvent(state, {
+    event_id:
+      `shield-gained:${Number(state.turn_seq || 0)}:${effect.id}:${effect.cursor}:${ordinal}:${target.uid}`,
+    source_controller_seat: sourceSeat as 1 | 2,
+    target_controller_seat: targetSeat as 1 | 2,
+    target_creature_uid: target.uid,
+    target_zone: found.where,
+    target_index: found.index,
+    requested_amount: receipt.requested_amount,
+    actual_shield_gained: receipt.actual_shield_gained,
+    source_action_id: sourceKey,
+    source_card_uid: effect.source_card.uid,
+    source_card_id: effect.source_card_id,
+    source_creature_uid: null,
+    action_kind: "tactic",
+    phase: String(state.phase || "effect_resolution"),
+    card_effect: true,
+  });
+}
+
 function tacticCreatureTarget(
   state: any,
   ownerSeat: number,
@@ -1972,11 +2043,23 @@ function executeUntilChoice(state: any) {
       if (!Number.isFinite(amount) || amount <= 0) {
         throw new Error("tcg_v0_2_tactic_add_shield_each_amount_invalid");
       }
+      const shieldEvents: any[] = [];
+      let ordinal = 0;
       for (const ref of refs as CreatureRef[]) {
         const found = findCreature(state, ref);
-        if (found) addRuntimeShield(found.cr, amount);
+        if (!found) continue;
+        const shieldEvent = applyTacticShieldGain(
+          state,
+          effect,
+          step,
+          found,
+          amount,
+          ordinal++,
+        );
+        if (shieldEvent) shieldEvents.push(shieldEvent);
       }
       effect.cursor++;
+      if (beginTacticShieldEventFlow(state, effect, shieldEvents)) return;
       continue;
     }
     if (op === "DIRECT_DAMAGE") {
@@ -2106,13 +2189,33 @@ function executeUntilChoice(state: any) {
       effect.cursor++;
       continue;
     }
-    if (op === "ADD_SHIELD" || op === "CLEAR_CONDITION_IF_PRESENT" || op === "CLEAR_CONDITION") {
+    if (op === "ADD_SHIELD") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
-      if (found) {
-        if (op === "ADD_SHIELD") addRuntimeShield(found.cr, Number(step.amount || 0));
-        else clearCondition(found.cr, String(step.condition || ""));
+      const amount = Number(step.amount);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        throw new Error("tcg_v0_2_tactic_add_shield_amount_invalid");
       }
+      const shieldEvents: any[] = [];
+      if (found) {
+        const shieldEvent = applyTacticShieldGain(
+          state,
+          effect,
+          step,
+          found,
+          amount,
+          0,
+        );
+        if (shieldEvent) shieldEvents.push(shieldEvent);
+      }
+      effect.cursor++;
+      if (beginTacticShieldEventFlow(state, effect, shieldEvents)) return;
+      continue;
+    }
+    if (op === "CLEAR_CONDITION_IF_PRESENT" || op === "CLEAR_CONDITION") {
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (found) clearCondition(found.cr, String(step.condition || ""));
       effect.cursor++;
       continue;
     }

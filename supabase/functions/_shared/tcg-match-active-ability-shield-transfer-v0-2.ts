@@ -88,6 +88,10 @@ export type RuntimeV02ActiveAbilityShieldTransferResolution =
       kind: "transfer_shield_between_friendly_creatures";
       stage: "complete";
       ability_id: string;
+      source_creature_uid: string;
+      source_card_id: string;
+      source_where: FieldWhere;
+      source_index: number | null;
       target_creature_uid: string;
       target_where: FieldWhere;
       target_index: number | null;
@@ -699,6 +703,10 @@ export function runtimeV02ResolveActiveAbilityShieldTransferChoice(
     kind: "transfer_shield_between_friendly_creatures",
     stage: "complete",
     ability_id: choice.ability_id,
+    source_creature_uid: source.top.uid,
+    source_card_id: source.top.card_id,
+    source_where: source.where,
+    source_index: source.index,
     target_creature_uid: target.top.uid,
     target_where: target.where,
     target_index: target.index,
