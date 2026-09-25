@@ -8,6 +8,7 @@ const live=fs.readFileSync('supabase/functions/_shared/tcg-match-active-ability-
 const match=fs.readFileSync('supabase/functions/tcg-match-actions/index.ts','utf8');
 const scheduled=fs.readFileSync('supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts','utf8');
 const cardZone=fs.readFileSync('supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts','utf8');
+const reorderOwner=fs.readFileSync('supabase/functions/_shared/tcg-match-deck-reorder-event-v0-2.ts','utf8');
 
 function cardsFrom(markdown){
   const fence=String.fromCharCode(96).repeat(3);
@@ -68,7 +69,10 @@ test('deck-reading owner is card-id-free and delegates IF, hidden-info, Card-Zon
   assert.match(owner,/source_action_id: descriptor\.ability_id/);
   assert.match(owner,/source_card_uid: sourceInstance\.uid/);
   assert.match(owner,/source_creature_uid: sourceInstance\.uid/);
-  assert.match(owner,/runtimeV02ApplyCardZoneReorder\(/);
+  assert.match(owner,/runtimeV02ApplyDeckReorderWithOccurrence\(/);
+  assert.equal(owner.includes('runtimeV02ApplyCardZoneReorder'),false,'deck-reading must not bypass the deck-reorder event adapter');
+  assert.match(reorderOwner,/runtimeV02ApplyDeckReorderWithOccurrence/);
+  assert.match(reorderOwner,/runtimeV02ApplyCardZoneReorder\(/);
   assert.match(owner,/runtimeV02ScheduleAction\(/);
   assert.match(cardZone,/export function runtimeV02ApplyCardZoneReorder/);
   assert.match(scheduled,/export function runtimeV02ResolveControllerAftermathScheduledActions/);
@@ -93,4 +97,7 @@ test('Match resolves deck-reading without exposing inspected card identity and e
   assert.equal(/card_id:resolved\./.test(branch),false,'public deck-reading receipt leaked inspected card ID');
   assert.equal(/uid:resolved\./.test(branch),false,'public deck-reading receipt leaked inspected card UID');
   assert.match(match,/runtimeV02ResolveControllerAftermathScheduledActions\(s,Number\(s\.active_seat\) as 1\|2\)/);
+  assert.match(match,/runtimeV02PendingDeckReorderOccurrences\(s\)/);
+  assert.match(match,/continueActiveAbilityAfterDeckReorderEvents/);
+  assert.match(match,/deck_reading_after_reorder_event/);
 });

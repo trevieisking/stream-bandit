@@ -13,6 +13,10 @@ const match = fs.readFileSync(
   "supabase/functions/tcg-match-actions/index.ts",
   "utf8",
 );
+const reorderOwner = fs.readFileSync(
+  "supabase/functions/_shared/tcg-match-deck-reorder-event-v0-2.ts",
+  "utf8",
+);
 
 for (const marker of [
   '"id":"astral-celestyr-dream-cartographer"',
@@ -32,7 +36,7 @@ for (const marker of [
   "runtimeV02CreateActiveAbilityDeckPlanningChoice",
   "runtimeV02ResolveActiveAbilityDeckPlanningChoice",
   '"plan_own_deck_top"',
-  "runtimeV02ApplyCardZoneReorder",
+  "runtimeV02ApplyDeckReorderWithOccurrence",
   "runtimeV02BindDeckTopSet",
   "runtimeV02RebindBoundDeckSet",
 ]) {
@@ -42,12 +46,27 @@ for (const marker of [
 }
 
 for (const marker of [
+  "runtimeV02ApplyDeckReorderWithOccurrence",
+  "runtimeV02ApplyCardZoneReorder",
+]) {
+  if (!reorderOwner.includes(marker)) {
+    throw new Error(`deck-reorder adapter ownership marker missing: ${marker}`);
+  }
+}
+if (planning.includes("runtimeV02ApplyCardZoneReorder")) {
+  throw new Error("active deck-planning must not bypass the deck-reorder event adapter");
+}
+
+for (const marker of [
   'pending.kind==="plan_own_deck_top"?{card_selection_min:pending.min,card_selection_max:pending.max}',
   'if(resolved.kind==="plan_own_deck_top")',
   'resolved.stage==="order_required"',
   'pending_ability_choice:runtimeV02PendingActiveAbilityLiveChoiceView(resolved.pending_choice,seat as 1|2)',
   "moved_to_deck_bottom_count:resolved.moved_to_deck_bottom_count",
   "reordered_remainder_count:resolved.reordered_remainder_count",
+  "runtimeV02PendingDeckReorderOccurrences(s)",
+  "continueActiveAbilityAfterDeckReorderEvents",
+  '"deck_planning_after_reorder_event"',
 ]) {
   if (!match.includes(marker)) {
     throw new Error(`Match deck-planning wiring marker missing: ${marker}`);
@@ -89,5 +108,5 @@ for (const forbidden of [
 }
 
 process.stdout.write(
-  "V2.4.98 Celestyr deck planning is operation-shaped, private, and Card-Zone-owned for mutation.\n",
+  "V2.4.122 Celestyr deck planning stays operation-shaped/private and delegates reorder events through the adapter to Card-Zone ownership.\n",
 );
