@@ -4439,3 +4439,71 @@ Capability blob is `4616f466fa17ed4579ab2ce17b670c9b0767d3c4`.
 Capability catalogue is now **61/72 operations + 85/108 predicates = 146/180 (81.1%)** implemented. Frozen Release 1 used-missing falls from **20 to 17**.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.124 — Pinionserpent condition-applied event parity
+
+**Baseline authority head:** `86835f481755d6e9a461c4916e0b92d01def6fab` — Card Pass #1710 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly one consumer each for:
+- `event_condition_is`;
+- `event_target_controller_is_opponent`.
+
+Both belong to Gale Pinionserpent / Wind Coil on `condition_applied`.
+
+The frozen Release 1 Blinded producers are both Attack-owned:
+- Pinionserpent / Blindside Spiral — `APPLY_CONDITION Blinded` after damage;
+- Aeralith / Eye of the Storm — `APPLY_CONDITION Blinded` after attack finished.
+
+### Owner-safe event production
+Condition mutation remains exclusively with canonical Condition Engine ownership. V2.4.124 derives a metadata-only `condition_applied` Event Listener view only after the canonical condition owner reports a successful application.
+
+The event carries:
+- applying/source controller as `controller_seat`;
+- affected Creature controller as `target_controller_seat`;
+- exact condition name;
+- canonical Condition slot metadata for future expansion;
+- target Creature identity and field zone;
+- source action metadata when available.
+
+Event Listener #28 now owns strict generic leaves:
+- `event_condition_is`;
+- `event_target_controller_is_opponent`.
+
+Wind Coil still delegates its effect to the existing Withdrawal Modifier owner. Its card-instance once-per-turn limit remains owned by Event Listener limit receipts. No card-ID dispatch, Condition mutation duplicate, Withdrawal duplicate, or new owner family is introduced.
+
+### Frozen live-route coverage
+Blindside Spiral creates the event immediately after its successful canonical after-damage Condition mutation. Conditional Attack-condition programs share the same generic bridge.
+
+Eye of the Storm creates the same metadata view after the existing delayed after-attack-finished Condition continuation resolves, including the movement/heal resume paths that converge on Attack finalization.
+
+Current frozen condition-applied listeners are synchronous and emit no nested choice/movement/heal output. Unexpected future condition-applied listener choice or output fails closed at this live seam rather than skipping remaining Attack effects. The generic event shape and Condition-slot metadata leave the future extension point explicit.
+
+### Validation and repair
+Runtime head `f8236020740da81880bbe256d173d36dfa5912a1` ran Card Pass #1711:
+- structure / starter / grammar / release-control validation **SUCCESS**;
+- runtime test phase stopped at TypeScript compile with exactly two TS18047 errors because a local Reserve target index was typed `number | null`.
+
+No gameplay assertion failed.
+
+Repair head `0c7f50997517dc699dd5e7dee84cdd1f2b7d5959` changed only the target-index narrowing plus the corresponding Match/Tactic closure fingerprints. Card Pass #1712 passed **SUCCESS** end-to-end:
+- deterministic Wind Coil event tests;
+- Match dispatcher type-check;
+- Tactic interpreter type-check;
+- Private Alpha, Withdrawal, Attack-Damage and Surge type-checks;
+- Match and Tactic release-control closures.
+
+Accepted closures:
+- Match Edge: **123 files**, SHA-256 `735d4c6b845cefa3b61b52c6b072c40a91f35d05edf43238a09578671c2ed9b4`;
+- Tactic Edge: **55 files**, SHA-256 `88e86c38f435df15d2e0e8eff473e7fa6856575b3321e32cccb6447a5d72e5c0`.
+
+### Capability acceptance
+Capability head `67e82cbb7c9622150a99f7d9862cd66e8b8e6d4d` passed Card Pass #1713 **SUCCESS**.
+
+Exactly `event_condition_is` and `event_target_controller_is_opponent` moved missing -> implemented. `event_condition_slot_is` deliberately remains missing even though the producer now carries canonical slot metadata.
+
+Capability blob is `a16df58b0e6d1636eb4feb519b246d46487bdc24`.
+
+Capability catalogue is now **61/72 operations + 87/108 predicates = 148/180 (82.2%)** implemented. Frozen Release 1 used-missing falls from **17 to 15**.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

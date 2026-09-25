@@ -1396,3 +1396,15 @@ Head `ff11da019191b41c06cd13f46789e95b787d830c` had deterministic runtime, all t
 
 ## 472 — V2.4.123 Faultstone predicates accepted
 Capability head `cff6c3ade3d7195c8017bee164e4153b70aa5251` passed Card Pass #1709. Exactly the three Faultstone predicates moved missing -> implemented; `target_remains_in_play_after_damage` stayed implemented. Capability blob is `4616f466fa17ed4579ab2ce17b670c9b0767d3c4`. Coverage is 146/180 (81.1%), frozen used-missing falls to 17, owner-family count remains 40 and production remains unchanged.
+
+## 473 — V2.4.124 Pinionserpent owns two frozen condition-applied predicates
+The frozen Release 1 sweep finds exactly one consumer each for `event_condition_is` and `event_target_controller_is_opponent`: Gale Pinionserpent / Wind Coil. Release 1 has two Blinded producers relevant to this event family, Blindside Spiral after damage and Aeralith Eye of the Storm after attack finished.
+
+## 474 — Condition mutation stays canonical; Event Listener receives metadata only
+V2.4.124 does not duplicate Condition mutation. Successful canonical Condition Engine results are adapted into metadata-only `condition_applied` events carrying applying controller, affected controller, target identity, exact condition and canonical Condition slot. Event Listener #28 owns the two new predicate leaves and Wind Coil continues to delegate its modifier to the Withdrawal Modifier owner.
+
+## 475 — V2.4.124 runtime proof passed after a type-only repair
+Head `f8236020740da81880bbe256d173d36dfa5912a1` / Card Pass #1711 stopped on two TS18047 nullable Reserve-index errors after structure/closure validation had passed; no gameplay assertion failed. Head `0c7f50997517dc699dd5e7dee84cdd1f2b7d5959` narrowed the Reserve index safely, refreshed Match/Tactic fingerprints and passed Card Pass #1712 end-to-end.
+
+## 476 — V2.4.124 condition event predicates accepted
+Capability head `67e82cbb7c9622150a99f7d9862cd66e8b8e6d4d` passed Card Pass #1713. Exactly `event_condition_is` and `event_target_controller_is_opponent` moved missing -> implemented. `event_condition_slot_is` remains missing while its producer metadata is already reserved. Capability blob is `a16df58b0e6d1636eb4feb519b246d46487bdc24`; coverage is 148/180 (82.2%), frozen used-missing is 15, owner-family count remains 40 and production is unchanged.

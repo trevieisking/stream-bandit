@@ -1658,3 +1658,31 @@
 - [x] Pass capability head `cff6c3ade3d7195c8017bee164e4153b70aa5251` / Card Pass #1709 SUCCESS.
 
 **Acceptance:** capability blob `4616f466fa17ed4579ab2ce17b670c9b0767d3c4`; Faultstone is runnable through canonical Attack Damage -> Event Listener -> Condition Engine ownership while Thorn Crown remains unchanged; 40 owner families preserved.
+
+### V2.4.124 — Pinionserpent condition-applied event parity
+- [x] Sweep frozen Release 1 sources for `event_condition_is`.
+- [x] Sweep frozen Release 1 sources for `event_target_controller_is_opponent`.
+- [x] Confirm exactly one consumer of each: Gale Pinionserpent / Wind Coil.
+- [x] Confirm frozen Blinded producers are Pinionserpent Blindside Spiral and Aeralith Eye of the Storm.
+- [x] Preserve canonical Condition Engine as the sole Condition mutation owner.
+- [x] Create a generic metadata-only `condition_applied` Event Listener view after successful canonical mutation.
+- [x] Bind event controller to the applying controller.
+- [x] Bind event target controller to the affected Creature controller.
+- [x] Carry exact condition name and canonical Condition slot metadata.
+- [x] Add strict `event_condition_is` leaf ownership to Event Listener #28.
+- [x] Add strict `event_target_controller_is_opponent` leaf ownership to Event Listener #28.
+- [x] Route successful after-damage Attack conditions into the generic event.
+- [x] Route delayed after-attack-finished conditions into the same generic event after continuation completion.
+- [x] Reuse existing Wind Coil card-instance once-per-turn limit ownership.
+- [x] Reuse existing Withdrawal Modifier owner for Wind Coil's zero-cost one-use withdrawal modifier.
+- [x] Prove wrong condition, friendly target and non-active applying controller do not trigger Wind Coil.
+- [x] Prove the second same-turn Wind Coil trigger is rejected.
+- [x] Preserve future `event_condition_slot_is` extension metadata without reclassifying that predicate.
+- [x] Record #1711 as a local target-index TypeScript narrowing failure only; structure/closure validation passed and no gameplay assertion failed.
+- [x] Repair only the nullable Reserve index validation and corresponding closure hashes.
+- [x] Pass corrected runtime head `0c7f50997517dc699dd5e7dee84cdd1f2b7d5959` / Card Pass #1712 SUCCESS.
+- [x] Move exactly `event_condition_is` and `event_target_controller_is_opponent` missing -> implemented.
+- [x] Pass capability head `67e82cbb7c9622150a99f7d9862cd66e8b8e6d4d` / Card Pass #1713 SUCCESS.
+- [x] Preserve 40 owner families and unchanged production.
+
+**Acceptance:** capability blob `a16df58b0e6d1636eb4feb519b246d46487bdc24`; frozen Pinionserpent condition-applied family is runnable through canonical Condition, Event Listener and Withdrawal owners.
