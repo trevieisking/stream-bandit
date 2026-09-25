@@ -26,6 +26,7 @@ import {
   runtimeV02AdaptDeckReorderOccurrencesForListener,
   runtimeV02AdaptHiddenInformationOccurrencesForListener,
   runtimeV02BeginEventListenerContinuation,
+  runtimeV02CreateConditionChangedEvent,
   runtimeV02CreateShieldGainedEvent,
   runtimeV02PendingEventListenerChoiceView,
   runtimeV02PrivateEventInspectionView,
@@ -852,7 +853,7 @@ function applyTacticDeckReorder(
     },
   );
 }
-function beginTacticShieldEventFlow(
+function beginTacticEffectEventFlow(
   state: any,
   effect: EffectState,
   events: any[],
@@ -2060,7 +2061,7 @@ function executeUntilChoice(state: any) {
         if (shieldEvent) shieldEvents.push(shieldEvent);
       }
       effect.cursor++;
-      if (beginTacticShieldEventFlow(state, effect, shieldEvents)) return;
+      if (beginTacticEffectEventFlow(state, effect, shieldEvents)) return;
       continue;
     }
     if (op === "DIRECT_DAMAGE") {
@@ -2173,7 +2174,7 @@ function executeUntilChoice(state: any) {
       if (targetSeat !== 1 && targetSeat !== 2) throw new Error("tcg_v0_2_tactic_condition_target_seat_invalid");
       const sourceActionId = String(effect.id || "").trim();
       if (!sourceActionId) throw new Error("tcg_v0_2_tactic_condition_action_required");
-      applyRuntimeConditionWithContext(
+      const conditionResult = applyRuntimeConditionWithContext(
         found.cr,
         condition,
         turn,
@@ -2187,7 +2188,31 @@ function executeUntilChoice(state: any) {
           source_action_id: sourceActionId,
         },
       );
+      const conditionEvents: any[] = [];
+      if (conditionResult.change_kind) {
+        const target = topInst(found.cr);
+        if (!target) throw new Error("tcg_v0_2_tactic_condition_target_top_required");
+        conditionEvents.push(runtimeV02CreateConditionChangedEvent(state, {
+          event_id:
+            `condition-changed:${turn}:tactic:${effect.id}:${effect.cursor}:${target.uid}`,
+          source_controller_seat: sourceSeat as 1 | 2,
+          target_controller_seat: targetSeat as 1 | 2,
+          target_creature_uid: target.uid,
+          target_zone: found.where,
+          target_index: found.index,
+          condition,
+          condition_slot: conditionResult.condition_slot,
+          change_kind: conditionResult.change_kind,
+          source_action_id: sourceActionId,
+          source_card_uid: effect.source_card.uid,
+          source_card_id: effect.source_card_id,
+          source_creature_uid: null,
+          action_kind: "tactic",
+          phase: String(state.phase || "effect_resolution"),
+        }));
+      }
       effect.cursor++;
+      if (beginTacticEffectEventFlow(state, effect, conditionEvents)) return;
       continue;
     }
     if (op === "ADD_SHIELD" || op === "CLEAR_CONDITION_IF_PRESENT" || op === "CLEAR_CONDITION") {
@@ -2216,7 +2241,7 @@ function executeUntilChoice(state: any) {
         }
       }
       effect.cursor++;
-      if (beginTacticShieldEventFlow(state, effect, shieldEvents)) return;
+      if (beginTacticEffectEventFlow(state, effect, shieldEvents)) return;
       continue;
     }
     if (op === "HEAL_EACH") {
