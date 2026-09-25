@@ -125,6 +125,7 @@ export type RuntimeV02EventListenerEvent = {
   shield_prevented?: number;
   actual_hp_damage?: number;
   source_card_id?: string;
+  target_remains_in_play_after_damage?: boolean;
 };
 
 export type RuntimeV02DamagePreventedEventInput = {
@@ -861,6 +862,18 @@ function targetField(
     if (found) return found;
     throw new Error("tcg_v0_2_event_listener_damage_packet_source_creature_missing");
   }
+  if (token === "$attack_target") {
+    if (event.event !== "after_attack_damage") {
+      throw new Error("tcg_v0_2_event_listener_attack_target_event_invalid");
+    }
+    const uid = String(event.target_creature_uid || "").trim();
+    if (!uid) {
+      throw new Error("tcg_v0_2_event_listener_attack_target_required");
+    }
+    const found = fieldByUid(state, uid);
+    if (found) return found;
+    throw new Error("tcg_v0_2_event_listener_attack_target_missing");
+  }
   if (token === "$current_friendly_vanguard") {
     const found = allFields(state).find((field) =>
       field.seat === candidate.seat && field.where === "vanguard"
@@ -1093,6 +1106,58 @@ function requirementLeaf(
       }
       const amount = Number(event.final_packet_amount);
       return Number.isFinite(amount) && amount >= minimum;
+    }
+    case "attack_source_is_attached_creature": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_source_attached_field_unsupported:${unsupported}`,
+        );
+      }
+      if (event.event !== "after_attack_damage") return false;
+      return (candidate.kind === "relic" || candidate.kind === "essence") &&
+        !!candidate.field &&
+        candidate.field.top.uid === String(event.source_creature_uid || "");
+    }
+    case "attack_target_is_opponent_vanguard": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_target_vanguard_field_unsupported:${unsupported}`,
+        );
+      }
+      if (event.event !== "after_attack_damage") return false;
+      return event.target_zone === "vanguard" &&
+        event.target_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    }
+    case "attack_actual_damage_at_least": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "value"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_actual_damage_field_unsupported:${unsupported}`,
+        );
+      }
+      if (event.event !== "after_attack_damage") return false;
+      const minimum = Number(value.value);
+      if (!Number.isInteger(minimum) || minimum < 0) {
+        throw new Error(
+          "tcg_v0_2_event_listener_attack_actual_damage_threshold_invalid",
+        );
+      }
+      const amount = Number(event.actual_hp_damage);
+      return Number.isInteger(amount) && amount >= minimum;
+    }
+    case "target_remains_in_play_after_damage": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_target_survival_field_unsupported:${unsupported}`,
+        );
+      }
+      return event.event === "after_attack_damage" &&
+        event.target_remains_in_play_after_damage === true;
     }
     case "source_counter_at_least": {
       const minimum = Number(value.value);
@@ -2839,6 +2904,56 @@ export function runtimeV02CreateResolvedAttackDamageEvent(
     final_packet_amount: finalAmount,
     shield_prevented: shieldPrevented,
     actual_hp_damage: actualHpDamage,
+  };
+  recordEvent(state, event);
+  return { ...event };
+}
+
+export function runtimeV02CreateAfterAttackDamageEvent(
+  state: Record<string, unknown>,
+  packetEvent: RuntimeV02EventListenerEvent,
+  targetRemainsInPlayAfterDamage: boolean,
+): RuntimeV02EventListenerEvent {
+  if (
+    packetEvent.event !== "after_damage_packet" ||
+    packetEvent.damage_class !== "attack" ||
+    packetEvent.action_kind !== "attack"
+  ) {
+    throw new Error("tcg_v0_2_after_attack_damage_packet_invalid");
+  }
+  if (typeof targetRemainsInPlayAfterDamage !== "boolean") {
+    throw new Error("tcg_v0_2_after_attack_damage_target_survival_invalid");
+  }
+  const packetId = requiredString(
+    packetEvent.packet_id,
+    "tcg_v0_2_after_attack_damage_packet_id_required",
+  );
+  const sourceUid = requiredString(
+    packetEvent.source_creature_uid,
+    "tcg_v0_2_after_attack_damage_source_required",
+  );
+  const targetUid = requiredString(
+    packetEvent.target_creature_uid,
+    "tcg_v0_2_after_attack_damage_target_required",
+  );
+  const source = fieldByUid(state, sourceUid);
+  const target = fieldByUid(state, targetUid);
+  if (!source || source.seat !== packetEvent.source_controller_seat) {
+    throw new Error("tcg_v0_2_after_attack_damage_source_changed");
+  }
+  if (
+    !target ||
+    target.seat !== packetEvent.target_controller_seat ||
+    target.where !== packetEvent.target_zone
+  ) {
+    throw new Error("tcg_v0_2_after_attack_damage_target_changed");
+  }
+  const event: RuntimeV02EventListenerEvent = {
+    ...packetEvent,
+    event_id: `after-attack-damage:${packetId}`,
+    event: "after_attack_damage",
+    phase: "after_attack_damage",
+    target_remains_in_play_after_damage: targetRemainsInPlayAfterDamage,
   };
   recordEvent(state, event);
   return { ...event };

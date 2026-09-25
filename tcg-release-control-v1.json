@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "3f450b3c6af76f9ed2ee70d1b0a1297da1342058",
+        "entrypoint_git_blob_sha": "f6976dc09370df3b787783227751d10c41fec8c4",
         "file_count": 123,
-        "closure_sha256": "9c3a02d3bfbdd0c4740e02785f36d089de8a20819b5d55072f10ed032d841f1d",
+        "closure_sha256": "60f368c79ebf915c70fe47fd0a11de6b9c3208b314bf076ed6e93c8a648ca83c",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -430,7 +430,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "6bdef132379a1a0ae1c5aac62f87996605209705"
+            "git_blob_sha": "25075aa41db1d41be1f2780806e9300f684e5d59"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
@@ -582,7 +582,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "3f450b3c6af76f9ed2ee70d1b0a1297da1342058"
+            "git_blob_sha": "f6976dc09370df3b787783227751d10c41fec8c4"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
@@ -594,7 +594,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "cbc23a35b66aa961eb748dfe67c7f087f7f0a5f0",
         "file_count": 55,
-        "closure_sha256": "413bc6cc782d951b949f1f02c333ba4053e59e6c0a782a770083c237a2de26e2",
+        "closure_sha256": "08fa47c6b828bef60832a6582a0b7c26617e022cbe153c05820e21fc4979da32",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -718,7 +718,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "6bdef132379a1a0ae1c5aac62f87996605209705"
+            "git_blob_sha": "25075aa41db1d41be1f2780806e9300f684e5d59"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
