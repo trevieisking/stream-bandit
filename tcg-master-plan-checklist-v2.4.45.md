@@ -1686,3 +1686,32 @@
 - [x] Preserve 40 owner families and unchanged production.
 
 **Acceptance:** capability blob `a16df58b0e6d1636eb4feb519b246d46487bdc24`; frozen Pinionserpent condition-applied family is runnable through canonical Condition, Event Listener and Withdrawal owners.
+
+### V2.4.125 — Boulderbug / generic Shield-gained event parity
+- [x] Sweep frozen Release 1 sources for `shield_target_is_self`.
+- [x] Sweep frozen Release 1 sources for `shield_source_is_card_effect`.
+- [x] Sweep frozen Release 1 sources for `shield_actual_gain_at_least`.
+- [x] Sweep frozen Release 1 sources for `event_source_action_is`.
+- [x] Confirm exactly one consumer of each: Stone Boulderbug / Compact Shell.
+- [x] Preserve Damage/Shield owner #20 as the sole physical Shield mutation owner.
+- [x] Emit metadata-only `shield_gained` events only after positive canonical actual Shield gain.
+- [x] Carry requested amount, actual gain, target identity, source action and card-effect metadata.
+- [x] Cover Tactic ADD_SHIELD / ADD_SHIELD_EACH producer routes.
+- [x] Cover Attack source-Shield and selected ADD_SHIELD_EACH producer routes.
+- [x] Cover active-Ability Shield-transfer producer route.
+- [x] Cover nested Event Listener ADD_SHIELD producer route.
+- [x] Add strict `shield_target_is_self` leaf ownership to Event Listener #28.
+- [x] Add strict `shield_source_is_card_effect` leaf ownership to Event Listener #28.
+- [x] Add strict `shield_actual_gain_at_least` leaf ownership using actual post-cap gain.
+- [x] Add strict `event_source_action_is` exact-match leaf ownership.
+- [x] Preserve Compact Shell nested source action `ability:compact-shell` so its own Shield grant does not recurse.
+- [x] Preserve existing card-instance once-per-turn listener receipt ownership.
+- [x] Confirm no Boulderbug/card-name dispatch and no new owner family.
+- [x] Record Card Pass #1715 as structure/privacy ownership-guard failure after deterministic runtime success.
+- [x] Preserve public Ability privacy and Tactic/Shield compatibility ownership fences without changing Shield semantics.
+- [x] Pass corrected runtime head `b266d1444af11db2e3f05de9fc44a5ba95ca4737` / Card Pass #1716 SUCCESS.
+- [x] Move exactly the four Boulderbug Shield-gained predicates missing -> implemented.
+- [x] Pass capability head `ddd8a5af15e7d9c6b9a6fdb57efefab617469ad4` / Card Pass #1717 SUCCESS.
+- [x] Preserve 40 owner families and unchanged production.
+
+**Acceptance:** capability blob `c7679c45facfab4849f991387e1806dd03aaa3f3`; Compact Shell is fed by generic Shield-gained events across current Release 1 Shield producer routes.

@@ -4507,3 +4507,76 @@ Capability blob is `a16df58b0e6d1636eb4feb519b246d46487bdc24`.
 Capability catalogue is now **61/72 operations + 87/108 predicates = 148/180 (82.2%)** implemented. Frozen Release 1 used-missing falls from **17 to 15**.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.125 — Boulderbug / generic Shield-gained event parity
+
+**Baseline authority head:** `0a875391834f60f70b4868e6e3490a9368263e8e` — Card Pass #1714 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **one** consumer for each of:
+- `shield_target_is_self`;
+- `shield_source_is_card_effect`;
+- `shield_actual_gain_at_least`;
+- `event_source_action_is`.
+
+All four belong to Stone Boulderbug / Compact Shell on `shield_gained`.
+
+### Canonical Shield ownership
+Shield mutation remains exclusively with Damage/Shield owner #20. V2.4.125 adds a metadata-only `shield_gained` Event Listener view only when the canonical Shield owner reports a positive **actual** gain.
+
+The generic event carries:
+- source/controller identity;
+- affected Creature identity and field zone;
+- requested Shield and actual Shield gained;
+- source action id;
+- source card / source Creature metadata when present;
+- whether the source was a card effect.
+
+Current Release 1 producer routes are covered generically:
+- Tactic `ADD_SHIELD` / `ADD_SHIELD_EACH`;
+- Attack after-damage source Shield;
+- Attack selected `ADD_SHIELD_EACH`;
+- active-Ability Shield transfer;
+- nested Event Listener `ADD_SHIELD`.
+
+### Event Listener parity
+Event Listener #28 now owns strict generic leaves:
+- `shield_target_is_self` — the Shield recipient must be the listener source Creature;
+- `shield_source_is_card_effect` — event metadata must mark a card effect;
+- `shield_actual_gain_at_least` — compares against actual gain after the canonical Shield cap;
+- `event_source_action_is` — exact source action id match.
+
+Compact Shell's nested Shield grant uses source action `ability:compact-shell`, preventing its own listener from recursively qualifying. Existing card-instance once-per-turn Event Listener limits remain authoritative.
+
+### Validation and ownership-fence correction
+Initial runtime head `e81906ee031b3b5eb33dca10aca90b49538f23b2` ran Card Pass #1715:
+- deterministic Shield-gained runtime proof **SUCCESS**;
+- overall workflow **FAIL** on structure/privacy ownership guards.
+
+No Shield semantic correction was required.
+
+Head `b266d1444af11db2e3f05de9fc44a5ba95ca4737` preserved the public Ability privacy boundary and accepted the existing Tactic/Shield compatibility ownership fences without creating a second Shield mutation path. Card Pass #1716 passed **SUCCESS** end-to-end.
+
+Dedicated proof covers:
+- Compact Shell qualifies only when its own Creature gains the required actual Shield from a card effect;
+- sub-threshold actual gain is rejected;
+- Shield gained by another Creature is rejected;
+- non-card-effect Shield gain is rejected;
+- wrong source action is rejected where declared;
+- nested Compact Shell Shield does not recurse;
+- existing once-per-turn card-instance listener ownership is preserved.
+
+### Capability acceptance
+Capability head `ddd8a5af15e7d9c6b9a6fdb57efefab617469ad4` passed Card Pass #1717 **SUCCESS**.
+
+Exactly these four predicates moved missing -> implemented:
+- `shield_target_is_self`;
+- `shield_source_is_card_effect`;
+- `shield_actual_gain_at_least`;
+- `event_source_action_is`.
+
+Capability blob is `c7679c45facfab4849f991387e1806dd03aaa3f3`.
+
+Capability catalogue is now **61/72 operations + 91/108 predicates = 152/180 (84.4%)** implemented. Frozen Release 1 used-missing falls from **15 to 11**.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

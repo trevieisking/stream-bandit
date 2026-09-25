@@ -1408,3 +1408,15 @@ Head `f8236020740da81880bbe256d173d36dfa5912a1` / Card Pass #1711 stopped on two
 
 ## 476 — V2.4.124 condition event predicates accepted
 Capability head `67e82cbb7c9622150a99f7d9862cd66e8b8e6d4d` passed Card Pass #1713. Exactly `event_condition_is` and `event_target_controller_is_opponent` moved missing -> implemented. `event_condition_slot_is` remains missing while its producer metadata is already reserved. Capability blob is `a16df58b0e6d1636eb4feb519b246d46487bdc24`; coverage is 148/180 (82.2%), frozen used-missing is 15, owner-family count remains 40 and production is unchanged.
+
+## 477 — V2.4.125 Boulderbug owns four frozen Shield-gained predicates
+The frozen Release 1 sweep finds exactly one consumer each for `shield_target_is_self`, `shield_source_is_card_effect`, `shield_actual_gain_at_least` and `event_source_action_is`: Stone Boulderbug / Compact Shell.
+
+## 478 — Shield mutation stays canonical; Event Listener receives actual-gain metadata
+V2.4.125 does not duplicate Shield mutation. Damage/Shield owner #20 remains authoritative, while Event Listener #28 receives metadata-only `shield_gained` events after positive actual gain. Current Tactic, Attack, active-Ability Shield-transfer and nested Event Listener Shield producers feed the same event shape. Compact Shell's nested source action is `ability:compact-shell`, preventing recursive self-triggering.
+
+## 479 — V2.4.125 runtime proof passed after ownership/privacy fence correction
+Head `e81906ee031b3b5eb33dca10aca90b49538f23b2` had deterministic Shield-gained runtime proof green while Card Pass #1715 failed structure/privacy ownership guards. No Shield-semantic repair was required. Head `b266d1444af11db2e3f05de9fc44a5ba95ca4737` preserved public Ability privacy and the accepted Tactic/Shield compatibility ownership fences and passed Card Pass #1716 end-to-end.
+
+## 480 — V2.4.125 Shield-gained predicates accepted
+Capability head `ddd8a5af15e7d9c6b9a6fdb57efefab617469ad4` passed Card Pass #1717. Exactly `shield_target_is_self`, `shield_source_is_card_effect`, `shield_actual_gain_at_least` and `event_source_action_is` moved missing -> implemented. Capability blob is `c7679c45facfab4849f991387e1806dd03aaa3f3`. Coverage is 152/180 (84.4%), frozen used-missing falls to 11, owner-family count remains 40 and production is unchanged.
