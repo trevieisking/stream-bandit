@@ -130,6 +130,7 @@
       "event_occurred",
       "event_origin_zone_is",
       "event_phase_is",
+      "event_source_action_is",
       "event_subject_is_attached_creature",
       "event_subject_is_source",
       "event_subject_matches",
@@ -155,6 +156,9 @@
       "prevention_target_is_attached_creature",
       "reserve_count_at_least",
       "selected_count_at_least",
+      "shield_actual_gain_at_least",
+      "shield_source_is_card_effect",
+      "shield_target_is_self",
       "source_became_vanguard_this_turn",
       "source_controller_is_self",
       "source_counter_at_least",
@@ -188,10 +192,6 @@
       "event_change_kind_in",
       "event_condition_slot_is",
       "event_previous_attachment_target_is_attached_creature",
-      "event_source_action_is",
-      "shield_actual_gain_at_least",
-      "shield_source_is_card_effect",
-      "shield_target_is_self",
       "target_damage_at_least",
       "target_damage_at_most",
       "target_damage_equals",
@@ -2134,6 +2134,56 @@
       },
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-condition-applied-event-listener.test.ts"
+      ]
+    },
+    "release1_shield_gained_compact_shell_v2_4_125": {
+      "accepted_runtime_head": "b266d1444af11db2e3f05de9fc44a5ba95ca4737",
+      "card_pass_run": 1716,
+      "predicates": [
+        "shield_target_is_self",
+        "shield_source_is_card_effect",
+        "shield_actual_gain_at_least",
+        "event_source_action_is"
+      ],
+      "frozen_consumers": [
+        {
+          "card_id": "stone-boulderbug",
+          "ability_id": "compact-shell",
+          "event": "shield_gained"
+        }
+      ],
+      "mutation_owner": "supabase/functions/_shared/tcg-match-damage-engine-v0-2.ts",
+      "event_listener_owner": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+      "producer_routes": [
+        "tactic ADD_SHIELD / ADD_SHIELD_EACH",
+        "attack after-damage source Shield",
+        "attack selected ADD_SHIELD_EACH",
+        "active Ability Shield transfer",
+        "Event Listener nested ADD_SHIELD"
+      ],
+      "semantics": {
+        "actual_gain_only": true,
+        "card_effect_metadata_required": true,
+        "target_self_bound_to_listener_source": true,
+        "source_action_exact_match": true,
+        "compact_shell_nested_source_action": "ability:compact-shell",
+        "compact_shell_no_recursion": true,
+        "compact_shell_once_per_turn_card_instance": true,
+        "shield_cap_owner_preserved": true,
+        "compatibility_facade_preserved": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": {
+        "initial_head": "e81906ee031b3b5eb33dca10aca90b49538f23b2",
+        "initial_card_pass": 1715,
+        "initial_result": "runtime_success_structure_privacy_failure",
+        "corrected_head": "b266d1444af11db2e3f05de9fc44a5ba95ca4737",
+        "corrected_card_pass": 1716,
+        "correction": "preserved public Ability privacy and accepted Tactic/Shield ownership source fences without changing Shield semantics"
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-shield-gained-event-listener.test.ts"
       ]
     }
   }
