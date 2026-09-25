@@ -93,8 +93,8 @@
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "594a72bd0de275b0259cd624300d49a35058da65",
-        "file_count": 122,
-        "closure_sha256": "59acc85516094f4c7d7b856db60aaba06c00f70ca77220c1b1f51781a1c82008",
+        "file_count": 123,
+        "closure_sha256": "386064d899740e2e5bbb862afff91f7b7755d8b8b3c3d3dd239bac52f2f31c2a",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -373,6 +373,10 @@
             "git_blob_sha": "a08712b6f379ee8842546354dea72cdf42f8d615"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-deck-reorder-event-v0-2.ts",
+            "git_blob_sha": "77a312c37ab4209d34b678ac74881c168081ac3b"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-defeat-engine-v0-2.ts",
             "git_blob_sha": "62e5b6c4259cb24c9cad8f23504a10961d506ab5"
           },
@@ -426,7 +430,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "c2820aa53dd00054009b2fb6b4ff0ea01d515b96"
+            "git_blob_sha": "6bdef132379a1a0ae1c5aac62f87996605209705"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
@@ -588,9 +592,9 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "5898af6ddbc6fba4be1e9c53579160820b6e32b6",
-        "file_count": 54,
-        "closure_sha256": "324d7a11c3d889f6227da104dc081bb718dfd0ab06a3e7d8548e7cd9ca5729bd",
+        "entrypoint_git_blob_sha": "cbc23a35b66aa961eb748dfe67c7f087f7f0a5f0",
+        "file_count": 55,
+        "closure_sha256": "413bc6cc782d951b949f1f02c333ba4053e59e6c0a782a770083c237a2de26e2",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -657,6 +661,10 @@
             "git_blob_sha": "06fcd20e1ff5935248c5d10a7b6a1440377d1f08"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-deck-reorder-event-v0-2.ts",
+            "git_blob_sha": "77a312c37ab4209d34b678ac74881c168081ac3b"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-defeat-engine-v0-2.ts",
             "git_blob_sha": "62e5b6c4259cb24c9cad8f23504a10961d506ab5"
           },
@@ -710,7 +718,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "c2820aa53dd00054009b2fb6b4ff0ea01d515b96"
+            "git_blob_sha": "6bdef132379a1a0ae1c5aac62f87996605209705"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
@@ -798,7 +806,7 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "5898af6ddbc6fba4be1e9c53579160820b6e32b6"
+            "git_blob_sha": "cbc23a35b66aa961eb748dfe67c7f087f7f0a5f0"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",

@@ -13,6 +13,11 @@ import {
   runtimeV02TakeHiddenInformationOccurrences,
   type RuntimeV02HiddenInformationOccurrence,
 } from "./tcg-match-hidden-information-v0-2.ts";
+import {
+  runtimeV02ApplyDeckReorderWithOccurrence,
+  runtimeV02TakeDeckReorderOccurrences,
+  type RuntimeV02DeckReorderOccurrence,
+} from "./tcg-match-deck-reorder-event-v0-2.ts";
 import { runtimeV02RandomSampleHiddenZone } from "./tcg-match-hidden-zone-sample-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { runtimeV02InstallWithdrawalModifier } from "./tcg-match-withdrawal-modifier-v0-2.ts";
@@ -41,7 +46,6 @@ import {
   normalizeRuntimeV02DamageHistoryCountRequirement,
 } from "./tcg-match-requirement-evaluator-v0-2.ts";
 import {
-  runtimeV02ApplyCardZoneReorder,
   runtimeV02ApplyCardZoneTransfer,
   type RuntimeV02CardZoneInstance,
 } from "./tcg-match-card-zone-engine-v0-2.ts";
@@ -104,6 +108,7 @@ export type RuntimeV02EventListenerEvent = {
   action_kind: string;
   turn_seq: number;
   zone?: "deck_top" | "deck";
+  count?: number;
   attachment_target_uid?: string;
   attachment_kind?: string;
   attack_id?: string;
@@ -1027,6 +1032,22 @@ function requirementLeaf(
         String(event.attachment_target_uid || "") === candidate.field.top.uid;
     case "event_controller_is_self":
       return event.controller_seat === candidate.seat;
+    case "event_count_at_least": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "count"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_event_count_field_unsupported:${unsupported}`,
+        );
+      }
+      const minimum = Number(value.count);
+      if (!Number.isInteger(minimum) || minimum < 1) {
+        throw new Error("tcg_v0_2_event_listener_event_count_threshold_invalid");
+      }
+      const actual = Number(event.count);
+      return Number.isInteger(actual) && actual >= minimum;
+    }
     case "event_controller_is_opponent":
       return event.controller_seat === (candidate.seat === 1 ? 2 : 1);
     case "source_controller_is_self":
@@ -2081,24 +2102,32 @@ function executeStep(
     const deck = owner.deck as Inst[];
     if (deck.length > 0) {
       const top = deck[0];
-      runtimeV02ApplyCardZoneReorder(deck, {
-        cause: "effect",
-        action_kind: "event_listener",
-        source_action_id: `listener:${listenerId(candidate)}`,
-        source_card_uid: candidate.source.uid,
-        zone: {
-          controller_seat: seat,
-          zone: "deck",
-          owner_card_uid: null,
+      runtimeV02ApplyDeckReorderWithOccurrence(
+        state,
+        deck,
+        {
+          cause: "effect",
+          action_kind: "event_listener",
+          source_action_id: `listener:${listenerId(candidate)}`,
+          source_card_uid: candidate.source.uid,
+          zone: {
+            controller_seat: seat,
+            zone: "deck",
+            owner_card_uid: null,
+          },
+          card_uids: [
+            requiredString(
+              top.uid,
+              "tcg_v0_2_event_listener_move_zone_position_top_uid_required",
+            ),
+          ],
+          destination_position: "bottom",
         },
-        card_uids: [
-          requiredString(
-            top.uid,
-            "tcg_v0_2_event_listener_move_zone_position_top_uid_required",
-          ),
-        ],
-        destination_position: "bottom",
-      });
+        {
+          source_controller_seat: candidate.seat,
+          phase: event.phase,
+        },
+      );
     }
     continuation.step_cursor++;
     return "continue";
@@ -2514,19 +2543,34 @@ function continueFlow(
     );
     const hiddenOccurrences =
       runtimeV02TakeHiddenInformationOccurrences(state);
+    const deckReorderOccurrences =
+      runtimeV02TakeDeckReorderOccurrences(state);
+    const insertedWork: WorkItem[] = [];
     if (hiddenOccurrences.length) {
       const hiddenEvents =
         runtimeV02AdaptHiddenInformationOccurrencesForListener(
           state,
           hiddenOccurrences,
         );
-      const hiddenWork = hiddenEvents.flatMap((event) =>
+      insertedWork.push(...hiddenEvents.flatMap((event) =>
         eventWorkItems(state, event)
-      );
+      ));
+    }
+    if (deckReorderOccurrences.length) {
+      const deckEvents =
+        runtimeV02AdaptDeckReorderOccurrencesForListener(
+          state,
+          deckReorderOccurrences,
+        );
+      insertedWork.push(...deckEvents.flatMap((event) =>
+        eventWorkItems(state, event)
+      ));
+    }
+    if (insertedWork.length) {
       continuation.work.splice(
         continuation.work_index + 1,
         0,
-        ...hiddenWork,
+        ...insertedWork,
       );
     }
     continuation.work_index++;
@@ -2619,6 +2663,73 @@ export function runtimeV02AdaptHiddenInformationOccurrencesForListener(
           occurrence.source_creature_uid,
           `tcg_v0_2_hidden_information_listener_source_creature_invalid:${index}`,
         ),
+    };
+    recordEvent(state, event);
+    return { ...event };
+  });
+}
+
+export function runtimeV02AdaptDeckReorderOccurrencesForListener(
+  state: Record<string, unknown>,
+  occurrences: RuntimeV02DeckReorderOccurrence[],
+): RuntimeV02EventListenerEvent[] {
+  if (!Array.isArray(occurrences)) {
+    throw new Error("tcg_v0_2_deck_reorder_listener_occurrences_required");
+  }
+  const turn = currentTurn(state);
+  return occurrences.map((occurrence, index) => {
+    if (Number(occurrence.turn_seq) !== turn) {
+      throw new Error(
+        `tcg_v0_2_deck_reorder_listener_occurrence_turn_stale:${index}`,
+      );
+    }
+    const controller = normalizedSeat(
+      occurrence.controller_seat,
+      `tcg_v0_2_deck_reorder_listener_controller_invalid:${index}`,
+    );
+    const sourceController = normalizedSeat(
+      occurrence.source_controller_seat,
+      `tcg_v0_2_deck_reorder_listener_source_controller_invalid:${index}`,
+    );
+    const count = Number(occurrence.count);
+    if (!Number.isInteger(count) || count < 1) {
+      throw new Error(
+        `tcg_v0_2_deck_reorder_listener_count_invalid:${index}`,
+      );
+    }
+    const event: RuntimeV02EventListenerEvent = {
+      event_id: requiredString(
+        occurrence.occurrence_id,
+        `tcg_v0_2_deck_reorder_listener_occurrence_id_invalid:${index}`,
+      ),
+      event: "deck_reordered",
+      subject_uid: `deck:${controller}`,
+      controller_seat: controller,
+      source_controller_seat: sourceController,
+      origin_zone: "deck",
+      destination_zone: "deck",
+      destination_index: null,
+      phase: requiredString(
+        occurrence.phase,
+        `tcg_v0_2_deck_reorder_listener_phase_invalid:${index}`,
+      ),
+      source_action_id: requiredString(
+        occurrence.source_action_id,
+        `tcg_v0_2_deck_reorder_listener_source_action_invalid:${index}`,
+      ),
+      source_card_uid: occurrence.source_card_uid == null
+        ? null
+        : requiredString(
+          occurrence.source_card_uid,
+          `tcg_v0_2_deck_reorder_listener_source_card_invalid:${index}`,
+        ),
+      action_kind: requiredString(
+        occurrence.action_kind,
+        `tcg_v0_2_deck_reorder_listener_action_kind_invalid:${index}`,
+      ),
+      turn_seq: turn,
+      zone: "deck",
+      count,
     };
     recordEvent(state, event);
     return { ...event };

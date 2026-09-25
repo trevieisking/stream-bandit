@@ -1,5 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { runtimeV02ApplyCardZonePartitionTransfer, runtimeV02ApplyCardZoneReorder, runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02ApplyCardZonePartitionTransfer, runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02ApplyDeckReorderWithOccurrence, runtimeV02TakeDeckReorderOccurrences } from "../_shared/tcg-match-deck-reorder-event-v0-2.ts";
 import { runtimeV02ShuffleInPlace } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
 import { runtimeV02RandomSampleHiddenZone } from "../_shared/tcg-match-hidden-zone-sample-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
@@ -22,6 +23,7 @@ import { runtimeV02InspectDeckTopEffectOwnedSet, runtimeV02InspectionProvenanceA
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import { runtimeV02ApplyDirectDamage, runtimeV02NormalizeDirectDamageStep } from "../_shared/tcg-match-direct-damage-v0-2.ts";
 import {
+  runtimeV02AdaptDeckReorderOccurrencesForListener,
   runtimeV02AdaptHiddenInformationOccurrencesForListener,
   runtimeV02BeginEventListenerContinuation,
   runtimeV02PendingEventListenerChoiceView,
@@ -799,12 +801,19 @@ function drainTacticHiddenInformationEvents(state: any, effect: EffectState): bo
   while (true) {
     if (++guard > 20) throw new Error("tcg_v0_2_tactic_hidden_event_guard");
     if (state.pending_event_listener_choice != null) return true;
-    const occurrences = runtimeV02TakeHiddenInformationOccurrences(state);
-    if (!occurrences.length) return false;
-    const events = runtimeV02AdaptHiddenInformationOccurrencesForListener(
-      state,
-      occurrences,
-    );
+    const hiddenOccurrences = runtimeV02TakeHiddenInformationOccurrences(state);
+    const deckReorderOccurrences = runtimeV02TakeDeckReorderOccurrences(state);
+    if (!hiddenOccurrences.length && !deckReorderOccurrences.length) return false;
+    const events = [
+      ...runtimeV02AdaptHiddenInformationOccurrencesForListener(
+        state,
+        hiddenOccurrences,
+      ),
+      ...runtimeV02AdaptDeckReorderOccurrencesForListener(
+        state,
+        deckReorderOccurrences,
+      ),
+    ];
     const flow = runtimeV02BeginEventListenerContinuation(state, events);
     if ((flow.emitted_movement_events || []).length) {
       throw new Error("tcg_v0_2_tactic_hidden_event_movement_output_not_yet_supported");
@@ -825,6 +834,22 @@ function drainTacticHiddenInformationEvents(state: any, effect: EffectState): bo
       }
     }
   }
+}
+function applyTacticDeckReorder(
+  state: any,
+  effect: EffectState,
+  deck: Inst[],
+  request: any,
+) {
+  return runtimeV02ApplyDeckReorderWithOccurrence(
+    state,
+    deck,
+    request,
+    {
+      source_controller_seat: effect.owner_seat as 1 | 2,
+      phase: String(state.phase || "effect_resolution"),
+    },
+  );
 }
 function tacticCreatureTarget(
   state: any,
@@ -1603,7 +1628,7 @@ function executeUntilChoice(state: any) {
               },
             );
           } else if (destination === "deck_bottom") {
-            runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+            applyTacticDeckReorder(state, effect, player.deck as Inst[], {
               cause: "effect",
               action_kind: "tactic",
               source_action_id: effect.id,
@@ -1843,7 +1868,7 @@ function executeUntilChoice(state: any) {
           String(step.order || "") === "player_choice"
         ) {
           const player = state.players[String(seat)];
-          runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+          applyTacticDeckReorder(state, effect, player.deck as Inst[], {
             cause: "effect",
             action_kind: "tactic",
             source_action_id: effect.id,
@@ -2736,7 +2761,7 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       );
     }
     const player = state.players[String(zoneSeat)];
-    runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+    applyTacticDeckReorder(state, effect, player.deck as Inst[], {
       cause: "effect",
       action_kind: "tactic",
       source_action_id: effect.id,
@@ -2776,7 +2801,7 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       )
     ) throw new Error("tcg_v0_2_tactic_inspection_reorder_changed");
     const player = state.players[String(zoneSeat)];
-    runtimeV02ApplyCardZoneReorder(player.deck as Inst[], {
+    applyTacticDeckReorder(state, effect, player.deck as Inst[], {
       cause: "effect",
       action_kind: "tactic",
       source_action_id: effect.id,
