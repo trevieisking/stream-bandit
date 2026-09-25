@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "9ea8182c6ce1c63fb00f05742e7971510669a1b3",
+        "entrypoint_git_blob_sha": "e5a894b49157c7307f65b8e61cca307d1ae3f79e",
         "file_count": 123,
-        "closure_sha256": "0939f33d94b8d9e2c59d9d5f0175c33af3ba44503b9aa77427ee4941ff828d72",
+        "closure_sha256": "46cc092cf16c02c8c8b6d136ea9e3374205d303f18e9c5d970e4c589e3e2ce67",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -582,7 +582,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "9ea8182c6ce1c63fb00f05742e7971510669a1b3"
+            "git_blob_sha": "e5a894b49157c7307f65b8e61cca307d1ae3f79e"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
