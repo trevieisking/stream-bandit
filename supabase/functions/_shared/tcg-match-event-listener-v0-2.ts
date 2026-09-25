@@ -38,7 +38,9 @@ import {
   runtimeV02ConditionSlot,
   type ApplyConditionMode,
 } from "./tcg-match-condition-engine-v0-2.ts";
-import { runtimeV02AddShield } from "./tcg-match-damage-engine-v0-2.ts";
+import {
+  addRuntimeShield,
+} from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02ApplyDirectDamage } from "./tcg-match-direct-damage-v0-2.ts";
 import {
   evaluateRuntimeV02DamageHistoryCountRequirement,
@@ -2593,9 +2595,9 @@ function executeStep(
       numberValue(step.amount, "tcg_v0_2_event_listener_shield_amount_invalid"),
     );
     const stepIndex = continuation.step_cursor;
-    const receipt = runtimeV02AddShield(target.cr, requestedAmount);
+    const actualShieldGained = addRuntimeShield(target.cr, requestedAmount);
     continuation.step_cursor++;
-    if (receipt.actual_shield_gained > 0) {
+    if (actualShieldGained > 0) {
       const sourceActionId = step.source_key == null
         ? `${candidate.kind}:${listenerId(candidate)}`
         : requiredString(step.source_key, "tcg_v0_2_event_listener_shield_source_key_invalid");
@@ -2607,8 +2609,8 @@ function executeStep(
         target_creature_uid: target.top.uid,
         target_zone: target.where,
         target_index: target.index,
-        requested_amount: receipt.requested_amount,
-        actual_shield_gained: receipt.actual_shield_gained,
+        requested_amount: requestedAmount,
+        actual_shield_gained: actualShieldGained,
         source_action_id: sourceActionId,
         source_card_uid: candidate.source.uid,
         source_card_id: candidate.source.card_id,
