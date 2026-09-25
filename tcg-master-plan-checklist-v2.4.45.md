@@ -1606,3 +1606,29 @@
 - [x] Pass capability head `e59857271b18438281dbeade3ac6e03abc11d89e` / Card Pass #1699 SUCCESS.
 
 **Acceptance:** capability blob `89ac252c8a800eff1b91e2a671cd9e3cc928c325`; sole frozen `source_in_play` consumer is runnable end-to-end through canonical switch/listener owners; 40 owner families preserved.
+
+### V2.4.122 — Nova Essence / canonical deck-reorder event foundation
+- [x] Sweep frozen Release 1 sources for `event_count_at_least`.
+- [x] Confirm exactly one consumer: Astral Nova Essence / `nova-essence-reorder-burst`.
+- [x] Confirm its event is `deck_reordered`.
+- [x] Confirm its threshold is the current reorder count >= 2, not historical event frequency.
+- [x] Preserve Card-Zone #30 as the sole physical deck-reorder mutation owner.
+- [x] Add a metadata-only deck-reorder occurrence adapter that delegates to Card-Zone.
+- [x] Never record reordered card identities in the occurrence.
+- [x] Preserve affected-deck controller and source controller as separate metadata.
+- [x] Adapt canonical occurrences into Event Listener #28 `deck_reordered` events.
+- [x] Add strict positive-integer `event_count_at_least` Event Listener matching.
+- [x] Route Tactic deck-reorder surfaces through the occurrence adapter.
+- [x] Route Event Listener deck top -> bottom reorder through the occurrence adapter.
+- [x] Route Active Ability deck-planning reorder through the occurrence adapter.
+- [x] Route Active Ability deck-reading reorder through the occurrence adapter.
+- [x] Preserve existing Tactic private choice/resume ownership.
+- [x] Preserve existing Active Ability private choice/resume ownership.
+- [x] Record #1701 as two stale static Tactic ownership-guard failures only; deterministic runtime/type checks were green.
+- [x] Pass corrected Tactic ownership-guard head `e0350cc24304cea7ad0c6d9cb1775d259b8e74b7` / Card Pass #1702 SUCCESS.
+- [x] Record #1703 as two stale static Active Ability ownership-guard failures only; deterministic runtime/type checks were green.
+- [x] Pass corrected full-runtime head `9dbd93775935ac197553a70cb8f2c357b9cd84a7` / Card Pass #1704 SUCCESS.
+- [x] Move exactly `event_count_at_least` missing -> implemented.
+- [x] Pass capability head `276521d0ac1b2d453b79ce08cad972d994f997f6` / Card Pass #1705 SUCCESS.
+
+**Acceptance:** capability blob `e89d7333449697568ed69212bedb5f4c9ec5a0b8`; Nova Essence is fed by canonical deck-reorder events across all current Release 1 structured reorder surfaces; 40 owner families preserved.

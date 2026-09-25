@@ -4297,3 +4297,68 @@ Exactly `source_in_play` moved missing -> implemented. `SWITCH_WITH_VANGUARD` st
 Capability catalogue is now **61/72 operations + 81/108 predicates = 142/180 (78.9%)** implemented. The frozen Release 1 used-missing surface falls from **22 to 21** capabilities.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.122 — Nova Essence / canonical deck-reorder event foundation
+
+**Baseline authority head:** `6683fe98c382298c760db31226dc6a8f297aef8b` — Card Pass #1700 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep finds exactly **one** `event_count_at_least` consumer:
+- Astral Nova Essence — `nova-essence-reorder-burst`.
+
+Its listener is:
+- event: `deck_reordered`;
+- requirements: `event_controller_is_self` and `event_count_at_least:2`;
+- limit: once per attachment;
+- effect: +20 Attack damage to the attached Creature until end of turn, maximum one use, consumed on a legal Attack declaration.
+
+`event_controller_is_self`, attachment-limit ownership and Attack-modifier ownership were already implemented before this slice.
+
+### Canonical deck-reorder occurrence ownership
+V2.4.122 adds one metadata-only reorder occurrence adapter:
+- physical same-zone deck mutation remains exclusively in Card-Zone owner #30 via `runtimeV02ApplyCardZoneReorder`;
+- `tcg-match-deck-reorder-event-v0-2.ts` delegates to Card-Zone and records only event metadata;
+- reordered card identities are never copied into the occurrence;
+- the occurrence records current turn, affected deck controller, source controller, action kind/id/card uid, destination position, reordered count and phase;
+- Event Listener owner #28 adapts each occurrence to one `deck_reordered` event.
+
+The generic `event_count_at_least` predicate now compares its positive integer threshold against the **current canonical reorder receipt count**. It does not mean historical event frequency.
+
+### Producer coverage
+All current Release 1 structured deck-reorder surfaces are routed through the adapter:
+- Tactic deck reorders, including ordered deck-top returns, remainder-to-bottom and inspection/bound-set reorder choices;
+- Event Listener `MOVE_ZONE_POSITION` deck top -> bottom;
+- Active Ability deck planning;
+- Active Ability deck reading.
+
+Tactic and Active Ability routes drain the metadata-only occurrences into the existing Event Listener continuation. Existing private choice/resume contracts remain in their original owners.
+
+### Validation history
+Foundation head `e052451934c287a4d227a15d4b4f9c5ffa4b63d6` ran Card Pass #1701:
+- deterministic runtime/type-check job **SUCCESS**;
+- structure suite **FAIL** only because two static Tactic ownership guards still required direct `runtimeV02ApplyCardZoneReorder` markers:
+  - bound-set wiring;
+  - inspection wiring.
+
+Guard-update head `e0350cc24304cea7ad0c6d9cb1775d259b8e74b7` updated those assertions to require the deck-reorder adapter and passed Card Pass #1702 **SUCCESS**.
+
+Active-Ability routing head `29764c1eeb3ec12a8f73c3f0cadf253d738b3ee1` then routed deck-planning and deck-reading through the same occurrence adapter. Card Pass #1703 again had deterministic runtime/type checks **SUCCESS** and structure **FAIL** only because two static Active Ability ownership guards still expected direct Card-Zone reorder calls:
+- Celestyr deck planning;
+- Noctivane deck reading.
+
+Guard-update head `9dbd93775935ac197553a70cb8f2c357b9cd84a7` updated those ownership assertions and passed Card Pass #1704 **SUCCESS** end-to-end.
+
+Accepted closure identities at that head:
+- Match Edge: **123 files**, SHA-256 `9c3a02d3bfbdd0c4740e02785f36d089de8a20819b5d55072f10ed032d841f1d`;
+- Tactic Edge: **55 files**, SHA-256 `413bc6cc782d951b949f1f02c333ba4053e59e6c0a782a770083c237a2de26e2`.
+
+### Capability acceptance
+Capability head `276521d0ac1b2d453b79ce08cad972d994f997f6` passed Card Pass #1705 **SUCCESS**.
+
+Exactly `event_count_at_least` moved missing -> implemented. Capability blob is `e89d7333449697568ed69212bedb5f4c9ec5a0b8`.
+
+Capability catalogue is now **61/72 operations + 82/108 predicates = 143/180 (79.4%)** implemented. Frozen Release 1 used-missing falls from **21 to 20** capabilities.
+
+Owner-family count remains **40**. The reorder adapter is an event bridge between existing Card-Zone #30 and Event Listener #28 ownership, not a new owner family.
+
+Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

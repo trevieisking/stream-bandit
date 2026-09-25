@@ -1372,3 +1372,15 @@ Runtime head `620578a0f064093f04698f1a46df6a1f2a779ffa` passed deterministic run
 
 ## 464 — V2.4.121 source_in_play accepted
 Capability head `e59857271b18438281dbeade3ac6e03abc11d89e` passed Card Pass #1699. Exactly `source_in_play` moved missing -> implemented; `SWITCH_WITH_VANGUARD` remained implemented. Capability blob is `89ac252c8a800eff1b91e2a671cd9e3cc928c325`. Capability coverage is 142/180 (78.9%), frozen used-missing falls to 21, owner-family count remains 40 and production remains unchanged.
+
+## 465 — V2.4.122 event_count_at_least has one frozen Release 1 consumer
+The frozen sweep finds exactly one use: Astral Nova Essence / `nova-essence-reorder-burst` on `deck_reordered`, requiring the affected deck to be self-controlled and the current canonical reorder receipt count to be at least 2. The listener remains once per attachment and reuses existing Attack-modifier ownership.
+
+## 466 — Deck reorder events bridge Card-Zone #30 to Event Listener #28 without duplicating mutation ownership
+`tcg-match-deck-reorder-event-v0-2.ts` delegates physical same-zone deck mutation to `runtimeV02ApplyCardZoneReorder`, then records metadata-only occurrence state. Reordered card identities are not recorded. Tactic, Event Listener MOVE_ZONE_POSITION, Active Ability deck-planning and Active Ability deck-reading reorder surfaces all route through this adapter and feed the existing Event Listener continuation.
+
+## 467 — V2.4.122 static ownership guards were corrected without runtime repair
+Head `e052451934c287a4d227a15d4b4f9c5ffa4b63d6` had deterministic runtime/type checks green while #1701 failed only two stale Tactic static guards that expected direct Card-Zone reorder markers; `e0350cc24304cea7ad0c6d9cb1775d259b8e74b7` updated those guards and #1702 passed. Head `29764c1eeb3ec12a8f73c3f0cadf253d738b3ee1` likewise had runtime/type checks green while #1703 failed only two stale Active Ability ownership guards; `9dbd93775935ac197553a70cb8f2c357b9cd84a7` updated them and #1704 passed.
+
+## 468 — V2.4.122 event_count_at_least accepted
+Capability head `276521d0ac1b2d453b79ce08cad972d994f997f6` passed Card Pass #1705. Exactly `event_count_at_least` moved missing -> implemented. Capability blob is `e89d7333449697568ed69212bedb5f4c9ec5a0b8`. Coverage is 143/180 (79.4%), frozen used-missing falls to 20, owner-family count remains 40 and production remains unchanged.
