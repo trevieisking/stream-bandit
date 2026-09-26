@@ -1,5 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02QuoteVoluntaryWithdrawal, structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdrawal-v0-2.ts";
 import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "../_shared/tcg-match-withdrawal-transaction-v0-2.ts";
 import { runtimeV02ConsumeWithdrawalModifiers, runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
 import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
@@ -537,6 +537,16 @@ Deno.serve(async(req)=>{
    return out;
   };
   const withdrawalDeclaration=(rawIndex:any,requireTarget:boolean,consumeCostListeners:boolean):any=>{
+   if(s.runtime_registry_v0_2!=null){
+    return runtimeV02QuoteVoluntaryWithdrawal(s,{
+     controller_seat:seat as 1|2,
+     reserve_index:requireTarget?Number(rawIndex):null,
+     require_target:requireTarget,
+     consume_cost_listeners:consumeCostListeners,
+     action_id:"withdraw",
+     resolve_cost_listeners:runtimeV02ResolveVoluntaryWithdrawalCostListeners
+    });
+   }
    const turn=Number(s.turn_seq||0);
    if(Number(flags.withdraw_turn??-1)===turn)return{ok:false,error:"withdrawal_already_used_this_turn",cost:null,legal_targets:[],payment_options:[]};
    if(!p.vanguard)return{ok:false,error:"vanguard_required",cost:null,legal_targets:[],payment_options:[]};

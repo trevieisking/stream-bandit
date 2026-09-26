@@ -11,6 +11,13 @@ import {
   runtimeV02ConditionProtectionCount,
   runtimeV02InstallConditionProtection,
 } from "../_shared/tcg-match-condition-protection-v0-2.ts";
+import {
+  recordRuntimeV02EssenceAttachmentEvent,
+  runtimeV02CreateEssenceAttachedEvent,
+} from "../_shared/tcg-match-essence-attachment-event-v0-2.ts";
+import { runtimeV02InstallWithdrawalModifier } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
+import { runtimeV02QuoteVoluntaryWithdrawal } from "../_shared/tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02ResolveVoluntaryWithdrawalCostListeners } from "../_shared/tcg-match-event-listener-v0-2.ts";
 
 function assert(
   condition: unknown,
@@ -77,6 +84,34 @@ function creatureDefinition(
       attacks: [],
     },
     essence: null,
+    tactic: null,
+  };
+}
+
+function essenceDefinition(
+  id: string,
+  name: string,
+  element: string,
+  listeners: Record<string, unknown>[] = [],
+  continuous: Record<string, unknown>[] = [],
+) {
+  return {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id,
+    name,
+    card_family: "Essence",
+    element,
+    creature: null,
+    essence: {
+      subtype: "Special",
+      provides: [{ element, amount: 1 }],
+      attach_requirements: [],
+      on_attach: [],
+      continuous,
+      lifecycle: null,
+      listeners,
+    },
     tactic: null,
   };
 }
@@ -785,6 +820,244 @@ Deno.test("Tinkit chooses a Device from discard and moves it to deck bottom", ()
   equal(complete.status, "complete");
   equal((state.players as any)["1"].discard.length, 0);
   equal((state.players as any)["1"].deck[0].uid, "device-uid");
+});
+
+
+Deno.test("Draft Essence quotes and executes the complete canonical voluntary Withdrawal chain", () => {
+  const draft = instance("draft-uid", "gale-draft-essence");
+  const breeze = instance("breeze-uid", "gale-breeze-essence");
+  const payment = instance("payment-uid", "gale-basic-payment");
+  const outgoing = instance("outgoing-uid", "gale-outgoing");
+  const incoming = instance("incoming-uid", "gale-incoming");
+  const opponent = instance("opponent-uid", "test-opponent-vanguard");
+  const realm = instance("realm-uid", "test-withdrawal-realm");
+
+  const draftDefinition = essenceDefinition(
+    "gale-draft-essence",
+    "Draft Essence",
+    "Gale",
+    [{
+      id: "draft-attach-withdrawal",
+      event: "essence_attached",
+      requirements: {
+        all: [
+          { predicate: "source_is_self" },
+          { predicate: "event_origin_zone_is", zone: "hand" },
+          {
+            predicate: "target_element_is",
+            target: "$attached_creature",
+            element: "Gale",
+          },
+          {
+            predicate: "target_zone_is",
+            target: "$attached_creature",
+            zone: "reserve",
+          },
+          {
+            predicate: "voluntary_withdrawal_legal_with_incoming",
+            player: "self",
+            incoming_target: "$attached_creature",
+          },
+        ],
+      },
+      limit: null,
+      steps: [{
+        op: "OPTIONAL",
+        player: "self",
+        steps: [{
+          op: "PERFORM_VOLUNTARY_WITHDRAWAL",
+          player: "self",
+          incoming_target: "$attached_creature",
+        }],
+      }],
+    }],
+  );
+  const breezeDefinition = essenceDefinition(
+    "gale-breeze-essence",
+    "Breeze Essence",
+    "Gale",
+    [],
+    [{
+      id: "breeze-withdrawal",
+      kind: "withdrawal",
+      target: "$attached_creature",
+      when: null,
+      amount: -1,
+      minimum: 0,
+      filters: { action_kind: "voluntary_withdrawal" },
+    }],
+  );
+  const paymentDefinition = essenceDefinition(
+    "gale-basic-payment",
+    "Basic Gale Essence",
+    "Gale",
+  );
+  const realmDefinition: any = tacticDefinition(
+    "test-withdrawal-realm",
+    "Withdrawal Realm",
+    "Realm",
+  );
+  realmDefinition.tactic.listeners = [{
+    id: "first-withdrawal-reducer",
+    event: "before_voluntary_withdrawal_cost",
+    controller_scope: "any",
+    requirements: {
+      all: [{ predicate: "event_active_seat_is_controller" }],
+    },
+    limit: { scope: "turn", count: 1, owner: "event_controller" },
+    steps: [{
+      op: "MODIFY_CURRENT_WITHDRAWAL_COST",
+      delta: -1,
+      minimum: 0,
+    }],
+  }];
+
+  const outgoingField: any = field(outgoing);
+  outgoingField.essence = [breeze, payment];
+  const incomingField: any = field(incoming);
+  incomingField.essence = [draft];
+  const definitions = [
+    creatureDefinition("gale-outgoing", "Outgoing", "Gale", null, 4),
+    creatureDefinition("gale-incoming", "Incoming", "Gale", null, 1),
+    creatureDefinition(
+      "test-opponent-vanguard",
+      "Opponent",
+      "Shade",
+      null,
+      1,
+    ),
+    draftDefinition,
+    breezeDefinition,
+    paymentDefinition,
+    realmDefinition,
+  ];
+  const state: Record<string, unknown> = {
+    turn_seq: 7,
+    active_seat: 1,
+    personal_turns: { "1": 3, "2": 3 },
+    runtime_registry_v0_2: { ...marker },
+    effect_events: [],
+    turn_flags: { "1": {} },
+    card_index: Object.fromEntries(definitions.map((definition) => [
+      String(definition.id),
+      { definition_v0_2: definition },
+    ])),
+    realm: { owner_seat: 1, card: realm },
+    players: {
+      "1": {
+        vanguard: outgoingField,
+        reserve: [incomingField, null, null, null],
+        hand: [],
+        deck: [],
+        discard: [],
+        rewards: [],
+      },
+      "2": {
+        vanguard: field(opponent),
+        reserve: [null, null, null, null],
+        hand: [],
+        deck: [],
+        discard: [],
+        rewards: [],
+      },
+    },
+  };
+
+  runtimeV02InstallWithdrawalModifier(
+    state,
+    outgoingField,
+    {
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    },
+    {
+      source_controller_seat: 1,
+      target_controller_seat: 1,
+      source_card_uid: "test-modifier-source",
+      source_action_id: "test-modifier",
+    },
+  );
+
+  const preview = runtimeV02QuoteVoluntaryWithdrawal(state, {
+    controller_seat: 1,
+    reserve_index: 0,
+    incoming_target_uid: "incoming-uid",
+    require_target: true,
+    consume_cost_listeners: false,
+    action_id: "withdraw",
+    resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+  });
+  equal(preview.ok, true);
+  equal(preview.cost, 1);
+  equal(preview.payment_options.length, 2);
+
+  const receipt = recordRuntimeV02EssenceAttachmentEvent(
+    state,
+    1,
+    "incoming-uid",
+    draft,
+    "hand",
+    "manual_essence",
+  );
+  const attachedEvent = runtimeV02CreateEssenceAttachedEvent(
+    receipt,
+    { destination_index: 0 },
+  );
+  const optional = runtimeV02BeginEventListenerContinuation(
+    state,
+    [attachedEvent as any],
+  );
+  equal(optional.pending_choice?.kind, "optional");
+
+  const pay = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    optional.pending_choice!.id,
+    ["accept"],
+  );
+  equal(pay.pending_choice?.kind, "withdrawal_payment");
+  equal(pay.pending_choice?.min, 1);
+  equal(pay.pending_choice?.max, 1);
+  equal((state.players as any)["1"].vanguard.stack[0].uid, "outgoing-uid");
+  equal((state.players as any)["1"].discard.length, 0);
+
+  const complete = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    pay.pending_choice!.id,
+    ["essence:payment-uid"],
+  );
+  equal(complete.status, "complete");
+  equal((state.players as any)["1"].vanguard.stack[0].uid, "incoming-uid");
+  equal((state.players as any)["1"].reserve[0].stack[0].uid, "outgoing-uid");
+  equal((state.players as any)["1"].reserve[0].essence.length, 1);
+  equal((state.players as any)["1"].reserve[0].essence[0].uid, "breeze-uid");
+  equal((state.players as any)["1"].discard.length, 1);
+  equal((state.players as any)["1"].discard[0].uid, "payment-uid");
+  equal((state.turn_flags as any)["1"].withdraw_turn, 7);
+  equal(complete.emitted_movement_events.length, 2);
+  equal(complete.emitted_movement_events[0].event, "moved_to_reserve");
+  equal(complete.emitted_movement_events[1].event, "became_vanguard");
+
+  const secondQuote = runtimeV02QuoteVoluntaryWithdrawal(state, {
+    controller_seat: 1,
+    reserve_index: 0,
+    incoming_target_uid: "outgoing-uid",
+    require_target: true,
+    consume_cost_listeners: false,
+    action_id: "withdraw",
+    resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+  });
+  equal(secondQuote.ok, false);
+  equal(secondQuote.error, "withdrawal_already_used_this_turn");
 });
 
 Deno.test("unmarked legacy matches preserve raw play behavior", () => {

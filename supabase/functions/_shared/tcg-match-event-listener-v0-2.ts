@@ -21,6 +21,8 @@ import {
 import { runtimeV02RandomSampleHiddenZone } from "./tcg-match-hidden-zone-sample-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { runtimeV02InstallWithdrawalModifier } from "./tcg-match-withdrawal-modifier-v0-2.ts";
+import { runtimeV02QuoteVoluntaryWithdrawal } from "./tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "./tcg-match-withdrawal-transaction-v0-2.ts";
 import { applyRuntimeV02AttachmentAttackDamageModifier } from "./tcg-match-surge-lifecycle-v0-2.ts";
 import type { RuntimeV02EssenceAttachedListenerEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
 import { runtimeV02ApplyEssenceAttachmentTransaction } from "./tcg-match-essence-attachment-engine-v0-2.ts";
@@ -627,7 +629,8 @@ export type RuntimeV02PendingEventListenerChoice = {
     | "inspect_rewards"
     | "clear_condition"
     | "order_cards"
-    | "attach_essence";
+    | "attach_essence"
+    | "withdrawal_payment";
   prompt: string;
   min: number;
   max: number;
@@ -959,15 +962,59 @@ function essenceAttachedEvent(
   } as RuntimeV02EssenceAttachedListenerEvent);
 }
 
+function requirementContainsPredicate(raw: unknown, wanted: string): boolean {
+  if (Array.isArray(raw)) {
+    return raw.some((item) => requirementContainsPredicate(item, wanted));
+  }
+  const value = objectRecord(raw);
+  if (!value) return false;
+  if (String(value.predicate || "") === wanted) return true;
+  return Object.values(value).some((item) =>
+    requirementContainsPredicate(item, wanted)
+  );
+}
+
 function essenceAttachedWorkItems(
   state: Record<string, unknown>,
   event: RuntimeV02EventListenerEvent,
 ): WorkItem[] {
   const attachmentEvent = essenceAttachedEvent(event);
+  const candidates = collectCandidates(state, attachmentEvent.event);
+  const descriptors = candidates.map(attachmentCandidateDescriptor);
+  const needsWithdrawalQuote = candidates.some((candidate) =>
+    requirementContainsPredicate(
+      candidate.listener.requirements,
+      "voluntary_withdrawal_legal_with_incoming",
+    )
+  );
+  let withdrawalLegal: boolean | undefined;
+  if (needsWithdrawalQuote) {
+    const incoming = fieldByUid(state, attachmentEvent.attachment_target_uid);
+    if (
+      !incoming || incoming.seat !== attachmentEvent.controller_seat ||
+      incoming.where !== "reserve" || incoming.index == null
+    ) {
+      withdrawalLegal = false;
+    } else {
+      const quote = runtimeV02QuoteVoluntaryWithdrawal(state, {
+        controller_seat: attachmentEvent.controller_seat,
+        reserve_index: incoming.index,
+        incoming_target_uid: incoming.top.uid,
+        require_target: true,
+        consume_cost_listeners: false,
+        action_id: "withdraw",
+        resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+      });
+      withdrawalLegal = quote.ok;
+    }
+  }
   const plan = runtimeV02BuildEssenceAttachedTriggerPlan(
     state,
     attachmentEvent,
-    collectCandidates(state, attachmentEvent.event).map(attachmentCandidateDescriptor),
+    descriptors,
+    withdrawalLegal == null
+      ? {}
+      : { voluntary_withdrawal_legal_with_incoming: withdrawalLegal },
   );
   return plan.work.map((frozen) => ({
     event: structuredClone(plan.snapshot.event),
@@ -2256,6 +2303,92 @@ function reorderDeckTop(
   deck.splice(0, deck.length, ...ordered, ...rest);
 }
 
+function quoteEventListenerWithdrawal(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  incoming: Field,
+  consumeCostListeners: boolean,
+) {
+  if (
+    incoming.seat !== candidate.seat || incoming.where !== "reserve" ||
+    incoming.index == null
+  ) {
+    throw new Error("tcg_v0_2_event_listener_withdrawal_target_invalid");
+  }
+  return runtimeV02QuoteVoluntaryWithdrawal(state, {
+    controller_seat: candidate.seat,
+    reserve_index: incoming.index,
+    incoming_target_uid: incoming.top.uid,
+    require_target: true,
+    consume_cost_listeners: consumeCostListeners,
+    action_id: "withdraw",
+    resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+  });
+}
+
+function markEventListenerWithdrawalUsed(
+  state: Record<string, unknown>,
+  seat: 1 | 2,
+): void {
+  const turn = currentTurn(state);
+  const rawRoot = state.turn_flags;
+  if (rawRoot != null && !objectRecord(rawRoot)) {
+    throw new Error("tcg_v0_2_event_listener_turn_flags_invalid");
+  }
+  const root = objectRecord(rawRoot) || {};
+  const rawSeat = root[String(seat)];
+  if (rawSeat != null && !objectRecord(rawSeat)) {
+    throw new Error("tcg_v0_2_event_listener_turn_seat_flags_invalid");
+  }
+  const flags = objectRecord(rawSeat) || {};
+  flags.withdraw_turn = turn;
+  root[String(seat)] = flags;
+  state.turn_flags = root;
+}
+
+function applyEventListenerVoluntaryWithdrawal(
+  state: Record<string, unknown>,
+  continuation: Continuation,
+  candidate: Candidate,
+  incoming: Field,
+  paymentUids: string[],
+  expectedCost: number,
+): void {
+  const quote = quoteEventListenerWithdrawal(
+    state,
+    candidate,
+    incoming,
+    true,
+  );
+  if (!quote.ok || quote.reserve_index == null || quote.cost == null) {
+    throw new Error(
+      `tcg_v0_2_event_listener_withdrawal_no_longer_legal:${String(quote.error || "unknown")}`,
+    );
+  }
+  if (quote.cost !== expectedCost) {
+    throw new Error("tcg_v0_2_event_listener_withdrawal_cost_stale");
+  }
+  const owner = player(state, candidate.seat);
+  const vanguard = allFields(state).find((field) =>
+    field.seat === candidate.seat && field.where === "vanguard"
+  );
+  if (!vanguard) {
+    throw new Error("tcg_v0_2_event_listener_withdrawal_vanguard_missing");
+  }
+  const transaction = runtimeV02ApplyWithdrawalPaymentAndSwitch(
+    state,
+    candidate.seat,
+    quote.reserve_index,
+    vanguard.cr.essence,
+    owner.discard as Inst[],
+    paymentUids,
+    quote.cost,
+  );
+  markEventListenerWithdrawalUsed(state, candidate.seat);
+  continuation.emitted_movement_events.push(...transaction.switched.events);
+  continuation.step_cursor++;
+}
+
 function executeStep(
   state: Record<string, unknown>,
   continuation: Continuation,
@@ -2919,6 +3052,71 @@ function executeStep(
       context: {
         target: creatureRef(target),
         attachment_state: step.attachment_state || null,
+      },
+    });
+    return "choice";
+  }
+
+  if (op === "PERFORM_VOLUNTARY_WITHDRAWAL") {
+    const unsupported = Object.keys(step).find((field) =>
+      !["op", "player", "incoming_target"].includes(field)
+    );
+    if (unsupported) {
+      throw new Error(
+        `tcg_v0_2_event_listener_withdrawal_step_field_unsupported:${unsupported}`,
+      );
+    }
+    if (
+      String(step.player || "") !== "self" ||
+      String(step.incoming_target || "") !== "$attached_creature"
+    ) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_shape_unsupported");
+    }
+    const incoming = targetField(
+      state,
+      continuation,
+      candidate,
+      event,
+      step.incoming_target,
+    );
+    const quote = quoteEventListenerWithdrawal(
+      state,
+      candidate,
+      incoming,
+      false,
+    );
+    if (!quote.ok || quote.cost == null || quote.reserve_index == null) {
+      throw new Error(
+        `tcg_v0_2_event_listener_withdrawal_no_longer_legal:${String(quote.error || "unknown")}`,
+      );
+    }
+    if (quote.cost === 0) {
+      applyEventListenerVoluntaryWithdrawal(
+        state,
+        continuation,
+        candidate,
+        incoming,
+        [],
+        0,
+      );
+      return "continue";
+    }
+    installChoice(state, continuation, candidate, event, {
+      seat: candidate.seat,
+      kind: "withdrawal_payment",
+      prompt: `Choose exactly ${quote.cost} attached Essence to pay for Withdrawal.`,
+      min: quote.cost,
+      max: quote.cost,
+      mode: "select",
+      options: quote.payment_options.map((option) => ({
+        id: `essence:${option.uid}`,
+        label: option.label,
+        data: { uid: option.uid, card_id: option.card_id },
+      })),
+      context: {
+        reserve_index: quote.reserve_index,
+        incoming_target_uid: incoming.top.uid,
+        required_cost: quote.cost,
       },
     });
     return "choice";
@@ -3788,6 +3986,53 @@ export function runtimeV02ResolveEventListenerChoice(
       continuation.work.push(...essenceAttachedWorkItems(state, transaction.listener_event));
     }
     continuation.step_cursor++;
+  } else if (pending.kind === "withdrawal_payment") {
+    const reserveIndex = Number(pending.context.reserve_index);
+    const incomingUid = requiredString(
+      pending.context.incoming_target_uid,
+      "tcg_v0_2_event_listener_withdrawal_pending_target_invalid",
+    );
+    const expectedCost = Number(pending.context.required_cost);
+    if (!Number.isInteger(expectedCost) || expectedCost < 1) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_pending_cost_invalid");
+    }
+    const incoming = fieldByUid(state, incomingUid);
+    if (
+      !incoming || incoming.seat !== candidate.seat ||
+      incoming.where !== "reserve" || incoming.index !== reserveIndex
+    ) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_target_stale");
+    }
+    const preview = quoteEventListenerWithdrawal(
+      state,
+      candidate,
+      incoming,
+      false,
+    );
+    if (
+      !preview.ok || preview.cost !== expectedCost ||
+      preview.reserve_index !== reserveIndex
+    ) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_quote_stale");
+    }
+    const allowed = new Set(preview.payment_options.map((option) => option.uid));
+    const paymentUids = selected.map((option) =>
+      requiredString(
+        option.data.uid,
+        "tcg_v0_2_event_listener_withdrawal_payment_uid_invalid",
+      )
+    );
+    if (paymentUids.some((uid) => !allowed.has(uid))) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_payment_stale");
+    }
+    applyEventListenerVoluntaryWithdrawal(
+      state,
+      continuation,
+      candidate,
+      incoming,
+      paymentUids,
+      expectedCost,
+    );
   } else if (pending.kind === "inspect_rewards") {
     const positions = selected.map((option) => Number(option.data.position));
     const inspected = runtimeV02InspectRewardPositions(

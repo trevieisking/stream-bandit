@@ -1,6 +1,7 @@
 import {
   runtimeV02EssenceAttachedSnapshotPredicate,
   runtimeV02SnapshotEssenceAttachedEligibility,
+  type RuntimeV02EssenceAttachedEligibilityOptions,
   type RuntimeV02EssenceAttachedEligibilitySnapshot,
   type RuntimeV02EssenceAttachedPredicateContext,
 } from "./tcg-match-essence-attachment-eligibility-v0-2.ts";
@@ -156,11 +157,16 @@ export function runtimeV02BuildEssenceAttachedTriggerPlan(
   state: Record<string, unknown>,
   event: RuntimeV02EssenceAttachedListenerEvent,
   candidates: RuntimeV02EssenceAttachedCandidateDescriptor[],
+  snapshotOptions: RuntimeV02EssenceAttachedEligibilityOptions = {},
 ): RuntimeV02EssenceAttachedTriggerPlan {
   if (!Array.isArray(candidates)) {
     throw new Error("tcg_v0_2_attachment_trigger_candidates_required");
   }
-  const snapshot = runtimeV02SnapshotEssenceAttachedEligibility(state, event);
+  const snapshot = runtimeV02SnapshotEssenceAttachedEligibility(
+    state,
+    event,
+    snapshotOptions,
+  );
   const work = candidates
     .filter((candidate) =>
       runtimeV02EssenceAttachedCandidateEligibleAtTrigger(snapshot, candidate)

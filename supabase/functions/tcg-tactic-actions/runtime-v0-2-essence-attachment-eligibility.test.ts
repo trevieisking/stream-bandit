@@ -64,7 +64,11 @@ Deno.test('essence_attached snapshot covers every frozen attachment predicate an
   const { state, attached, target, vanguard } = markedState();
   const receipt = recordRuntimeV02EssenceAttachmentEvent(state, 1, 'target-uid', attached, 'hand', 'manual_essence', 'temporary');
   const event = runtimeV02CreateEssenceAttachedEvent(receipt, { destination_index: 0 });
-  const snapshot = runtimeV02SnapshotEssenceAttachedEligibility(state, event);
+  const snapshot = runtimeV02SnapshotEssenceAttachedEligibility(
+    state,
+    event,
+    { voluntary_withdrawal_legal_with_incoming: true },
+  );
   const context = { source_uid: attached.uid, source_controller_seat: 1 as const, source_creature_uid: 'target-uid' };
   const yes = (predicate: Record<string, unknown>) =>
     assert.equal(runtimeV02EssenceAttachedSnapshotPredicate(snapshot, predicate, context), true);
@@ -135,7 +139,11 @@ Deno.test('essence_attached snapshot covers every frozen attachment predicate an
 Deno.test('essence_attached snapshot freezes an ineligible withdrawal window as false', () => {
   const { state, attached } = markedState({ blocked: true });
   const receipt = recordRuntimeV02EssenceAttachmentEvent(state, 1, 'target-uid', attached, 'hand', 'manual_essence');
-  const snapshot = runtimeV02SnapshotEssenceAttachedEligibility(state, runtimeV02CreateEssenceAttachedEvent(receipt, { destination_index: 0 }));
+  const snapshot = runtimeV02SnapshotEssenceAttachedEligibility(
+    state,
+    runtimeV02CreateEssenceAttachedEvent(receipt, { destination_index: 0 }),
+    { voluntary_withdrawal_legal_with_incoming: false },
+  );
   const context = { source_uid: attached.uid, source_controller_seat: 1 as const, source_creature_uid: 'target-uid' };
   assert.equal(runtimeV02EssenceAttachedSnapshotPredicate(
     snapshot,

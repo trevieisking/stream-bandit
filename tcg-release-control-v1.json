@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "e5a894b49157c7307f65b8e61cca307d1ae3f79e",
+        "entrypoint_git_blob_sha": "12ce27098c55344fa2defc11909a575ea89c926f",
         "file_count": 123,
-        "closure_sha256": "9eb91319e59a57f1e2c7e11f99e9192745706c3051a3b4e4341cf59a7b92c171",
+        "closure_sha256": "7463cc4123a03317c8ff57b344be400bea252d2a441a7514d12e95af95293328",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -390,7 +390,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
-            "git_blob_sha": "8066bd9e0333e9b171aeffd602ccc155e40e70d6"
+            "git_blob_sha": "7473fd3ebbb6ed4c28e81798904f76b05078cddd"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
@@ -410,7 +410,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-work-v0-2.ts",
-            "git_blob_sha": "9ec1d9d1a2a3c300f8bdc4d70a83d53fa66de851"
+            "git_blob_sha": "3c5e745caf88c7f4cafe7e4bec20475e19ec96f4"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-movement-v0-2.ts",
@@ -430,7 +430,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "dea64de847f515e9f16083843c55c4e1da3b1de0"
+            "git_blob_sha": "75b794ea6f930132d2e04d98914dda0c405b5fba"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
@@ -574,7 +574,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
-            "git_blob_sha": "4dbf7ee6f2e3cfaded47060655c406110a3aea1f"
+            "git_blob_sha": "abccdda1f8a28cd54982357902868289474b6508"
           },
           {
             "path": "supabase/functions/_shared/tcg-runtime-registry-v0-2.ts",
@@ -582,7 +582,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "e5a894b49157c7307f65b8e61cca307d1ae3f79e"
+            "git_blob_sha": "12ce27098c55344fa2defc11909a575ea89c926f"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
@@ -593,8 +593,8 @@
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "430ec363710597ec948f728d84ad3c868a3d9423",
-        "file_count": 55,
-        "closure_sha256": "08e2bd33ff3307218603a6c8179e51250b6ae8286b2712ae25ecc4f3a1afca8a",
+        "file_count": 57,
+        "closure_sha256": "a2d8c0dcf874e9ab31adce7becf8a24e1a5a81ee14d10f2fe0c69c88322c5974",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -678,7 +678,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
-            "git_blob_sha": "8066bd9e0333e9b171aeffd602ccc155e40e70d6"
+            "git_blob_sha": "7473fd3ebbb6ed4c28e81798904f76b05078cddd"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
@@ -698,7 +698,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-work-v0-2.ts",
-            "git_blob_sha": "9ec1d9d1a2a3c300f8bdc4d70a83d53fa66de851"
+            "git_blob_sha": "3c5e745caf88c7f4cafe7e4bec20475e19ec96f4"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-movement-v0-2.ts",
@@ -718,7 +718,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "dea64de847f515e9f16083843c55c4e1da3b1de0"
+            "git_blob_sha": "75b794ea6f930132d2e04d98914dda0c405b5fba"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
@@ -761,6 +761,10 @@
             "git_blob_sha": "17c4b7002507d46b7308e9988ca66474205cca68"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-payment-v0-2.ts",
+            "git_blob_sha": "2e105fdc4b6a641e0fbaaf9366263a308e4387c8"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-predicate-tree-v0-2.ts",
             "git_blob_sha": "31740aac5ddb6f89c3c2a658014d91081e5dd0b1"
           },
@@ -797,8 +801,12 @@
             "git_blob_sha": "18502072b357cd6ca3a7f5b2ffa7dbd2c6344d33"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts",
+            "git_blob_sha": "e3b38d264fdab828572629b1c466813a26bcf420"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
-            "git_blob_sha": "4dbf7ee6f2e3cfaded47060655c406110a3aea1f"
+            "git_blob_sha": "abccdda1f8a28cd54982357902868289474b6508"
           },
           {
             "path": "supabase/functions/_shared/tcg-runtime-registry-v0-2.ts",
