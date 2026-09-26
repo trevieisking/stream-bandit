@@ -236,9 +236,6 @@ export function runtimeV02QuoteVoluntaryWithdrawal(
     throw new Error("tcg_v0_2_withdrawal_quote_vanguard_definition_missing");
   }
   const element = String(definition.element || "").trim();
-  if (!element) {
-    throw new Error("tcg_v0_2_withdrawal_quote_vanguard_element_missing");
-  }
 
   const printed = quotePrintedWithdrawal(definition);
   let cost = structuredRuntimeWithdrawalBaseCost(
