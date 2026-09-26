@@ -30,21 +30,38 @@ test('board-only match uses the dedicated TCG config bridge without the Stream B
   assert.doesNotMatch(battle, /stream-bandit-theme-projector/i);
 });
 
-test('phone battle scrolls vertically instead of trapping the board inside one viewport', () => {
-  assert.match(battle, /@media\(max-width:640px\)/);
-  assert.match(battle, /overflow-y:auto/);
-  assert.match(battle, /-webkit-overflow-scrolling:touch/);
-  assert.match(battle, /\.sb-battle\{height:auto;min-height:100dvh/);
-  assert.match(battle, /\.sb-board\s*\{[\s\S]*?height:auto;min-height:100dvh/);
+test('phone battle keeps the full tabletop in one viewport with a horizontal bottom-edge hand peek rail', () => {
+  assert.match(battle, /V0\.17 compact tabletop/);
+  assert.match(battle, /html,body\{height:100%;min-height:0;overflow:hidden\}/);
+  assert.match(battle, /\.sb-battle\{height:100dvh;min-height:0;[\s\S]*?overflow:hidden/);
+  assert.match(battle, /\.sb-board\{[\s\S]*?height:100dvh;min-height:0;overflow:hidden[\s\S]*?grid-template-rows:44px minmax\(0,1fr\) 64px minmax\(0,1fr\) 94px/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?height:76px[\s\S]*?overflow-x:auto;overflow-y:hidden[\s\S]*?-webkit-overflow-scrolling:touch/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:152px[\s\S]*?margin-right:-14px/);
+  assert.match(battle, /\.sb-card-inspector\{display:grid!important;padding:8px\}/);
+  assert.match(battle, /\.sb-card-inspector\[hidden\]\{display:none!important\}/);
 });
 
-test('battle cards are wired to the canonical TCG art resolver', () => {
+
+test('wide battle card fit is viewport-driven and does not depend on mouse pointer classification', () => {
+  assert.match(battle, /@media\(min-width:641px\)\{/);
+  assert.doesNotMatch(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--card-w\),10\.36dvh\);[\s\S]*?height:auto/);
+  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--active-w\),11\.79dvh\);[\s\S]*?height:auto/);
+  assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?position:relative/);
+  assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(390px,36vw,48dvh\)/);
+  assert.match(battle, /field cards remain physical-card previews but are bounded by viewport height/);
+});
+
+test('battle cards are wired to the canonical shared card renderer and repository art sources', () => {
   assert.match(battle, /stream-bandit-tcg-art-resolver-v2-4-36\.js/);
+  assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
+  assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.css/);
   assert.match(battle, /data-sb-tcg-page="battle"/);
-  assert.match(controller, /class="sb-tcg-card sb-card-control/);
-  assert.match(controller, /class="sb-tcg-card sb-hand-card/);
-  assert.match(controller, /data-card-id="/);
-  assert.match(controller, /class="sb-card-art"/);
+  assert.match(battle, /data-sb-tcg-card-face="v1"/);
+  assert.match(controller, /StreamBanditTCGCardRendererV2451/);
+  assert.match(controller, /renderCardFace\(cardId/);
+  assert.match(controller, /sb-card-control-shell/);
+  assert.match(controller, /sb-hand-card-shell/);
 });
 
 test('paired battle startup waits for a completed auth decision before rejecting the player', () => {
@@ -66,6 +83,20 @@ test('opponent cosmetic is bound to authoritative match identity and sb_profiles
 test('match page does not contain matchmaking, room-code, or out-of-match menu controls', () => {
   assert.doesNotMatch(battle, /joinCode|join code|createRoom|Matchmake|private room/i);
   assert.doesNotMatch(battle, /Main Menu|Create New Deck|Find Opponent/i);
+});
+
+test('battle settings exposes only explicit server concession and terminal results return to fresh matchmaking', () => {
+  assert.match(battle, /id="battleSettings"/);
+  assert.match(battle, /data-concede="1"/);
+  assert.match(battle, />Quit Match<\/button>/);
+  assert.match(battle, /Quit Match is a concession/);
+  assert.match(controller, /async function runConcede\(\)/);
+  assert.match(controller, /callEdge\(API_MATCH, actionBase\('concede'\)\)/);
+  assert.doesNotMatch(controller, /\bconfirm\s*\(/);
+  assert.doesNotMatch(controller, /beforeunload[\s\S]{0,500}concede/);
+  assert.match(controller, />Back to Matchmaking<\/button>/);
+  assert.match(controller, /window\.location\.href = 'tcg-play\.html'/);
+  assert.doesNotMatch(controller, /data-result-continue[\s\S]{0,500}match_id/);
 });
 
 test('existing battle controller still binds the route to authoritative match identity', () => {

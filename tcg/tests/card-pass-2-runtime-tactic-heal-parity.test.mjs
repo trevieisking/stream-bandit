@@ -76,7 +76,7 @@ test('tactic HEAL and HEAL_EACH use the canonical v0.2 heal owner without card-s
   assert.ok(helper.includes('index: found.index'));
 
   const healBlock = blockBetween(tactic, 'if (op === "HEAL") {', 'if (op === "ADD_SHIELD"');
-  const healEachBlock = blockBetween(tactic, 'if (op === "HEAL_EACH") {', 'if (op === "CHOOSE_AND_CLEAR_CONDITION")');
+  const healEachBlock = blockBetween(tactic, 'if (op === "HEAL_EACH") {', 'if (op === "CHOOSE_AND_CLEAR_CONDITION" || op === "CHOOSE_AND_CLEAR_CONTROL_CONDITION")');
   for (const block of [healBlock, healEachBlock]) {
     const cursor = block.indexOf('effect.cursor++');
     const begin = block.indexOf('runtimeV02BeginTacticHealListenerContinuation');

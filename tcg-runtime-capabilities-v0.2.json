@@ -11,128 +11,112 @@
   "operations": {
     "implemented": [
       "ADD_ATTACK_DAMAGE_MODIFIER",
-      "ADD_INCOMING_ATTACK_DAMAGE_MODIFIER",
       "ADD_CONDITION_IMMUNITY",
       "ADD_CONDITION_PROTECTION",
       "ADD_DAMAGE_PROTECTION",
+      "ADD_INCOMING_ATTACK_DAMAGE_MODIFIER",
       "ADD_SHIELD",
+      "ADD_SHIELD_EACH",
+      "APPLY_CONDITION",
+      "ATTACH_ESSENCE_FROM_SELECTION",
+      "ATTACH_ESSENCE_FROM_ZONE",
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
+      "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
+      "CHOOSE_FROM_SET",
       "CHOOSE_HAND_TO_DECK_BOTTOM",
       "CHOOSE_HAND_TO_DISCARD",
       "CHOOSE_PLAYER",
       "CLEAR_CONDITION",
       "CLEAR_CONDITION_IF_PRESENT",
+      "DIRECT_DAMAGE",
+      "DISCARD_ATTACHED_ESSENCE",
+      "DISCARD_DECK_TOP",
       "DISCARD_HAND",
       "DRAIN_VITALITY",
       "DRAW",
       "DRAW_FIXED",
       "HEAL",
-      "LOOK_TOP",
-      "MODIFY_CURRENT_ATTACK_DAMAGE",
-      "MOVE_ATTACHED_ESSENCE",
-      "MOVE_CARDS",
-      "PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE",
-      "PUT_REMAINDER_ON_DECK_BOTTOM",
-      "REPEAT_OPTIONAL",
-      "RETURN_REMAINDER_TO_DECK_TOP",
-      "RETURN_SET_TO_DECK_TOP",
-      "SEARCH_DECK",
-      "SEARCH_DECK_GROUP",
-      "SELECT_CREATURE",
-      "SHUFFLE_DECK",
-      "SWITCH_WITH_VANGUARD"
-    ],
-    "partial": [
-      "ATTACH_ESSENCE_FROM_ZONE",
-      "CHOOSE_FROM_SET",
       "HEAL_EACH",
-      "SET_ATTACK_ELIGIBILITY",
-      "SET_WITHDRAWAL_MODIFIER"
-    ],
-    "missing": [
-      "ADD_SHIELD_EACH",
-      "APPLY_CONDITION",
-      "ATTACH_ESSENCE_FROM_SELECTION",
-      "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
-      "DEAL_EFFECT_DAMAGE",
-      "DEFEAT_EACH_MATCHING",
-      "DEFEAT_TARGET_IF",
-      "DIRECT_DAMAGE",
-      "DISCARD_ATTACHED_ESSENCE",
-      "DISCARD_DECK_TOP",
       "IF",
       "INCREMENT_SOURCE_COUNTER",
       "INSPECT_ZONE",
+      "LOOK_TOP",
+      "MODIFY_CURRENT_ATTACK_DAMAGE",
       "MODIFY_CURRENT_DAMAGE_PACKET",
       "MODIFY_CURRENT_HEAL",
       "MODIFY_CURRENT_WITHDRAWAL_COST",
-      "MOVE_DAMAGE",
+      "MOVE_ATTACHED_ESSENCE",
+      "MOVE_CARDS",
       "MOVE_ZONE_POSITION",
       "OPTIONAL",
+      "PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE",
+      "PUT_REMAINDER_ON_DECK_BOTTOM",
+      "RANDOM_SAMPLE_HIDDEN_ZONE",
+      "RECORD_EVENT",
+      "REPEAT_OPTIONAL",
+      "REPLACE_CONTROL_CONDITION",
+      "RETURN_REMAINDER_TO_DECK_TOP",
+      "RETURN_SET_TO_DECK_TOP",
+      "SCHEDULE_ACTION",
+      "SCHEDULE_SOURCE_DISCARD",
+      "SEARCH_DECK",
+      "SEARCH_DECK_GROUP",
+      "SELECT_CARDS",
+      "SELECT_CREATURE",
+      "SET_ATTACK_ELIGIBILITY",
+      "SET_DEVICE_PLAY_LOCK",
+      "SET_WITHDRAWAL_MODIFIER",
+      "SHUFFLE_DECK",
+      "SHUFFLE_ZONE_INTO_DECK",
+      "SWITCH_WITH_VANGUARD",
+      "TRANSFER_SHIELD"
+    ],
+    "partial": [],
+    "missing": [
+      "DEAL_EFFECT_DAMAGE",
+      "DEFEAT_EACH_MATCHING",
+      "DEFEAT_TARGET_IF",
+      "MOVE_DAMAGE",
       "PERFORM_VOLUNTARY_WITHDRAWAL",
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
-      "RANDOM_SAMPLE_HIDDEN_ZONE",
-      "RECORD_EVENT",
-      "REPLACE_CONTROL_CONDITION",
-      "SCHEDULE_ACTION",
-      "SCHEDULE_SOURCE_DISCARD",
-      "SELECT_CARDS",
       "SET_ATTACK_COST_FLOOR",
-      "SET_DEVICE_PLAY_LOCK",
       "SET_RESOLVING_CARD_DESTINATION",
-      "SHUFFLE_ZONE_INTO_DECK",
       "SUPPRESS_ABILITY",
-      "TIMEFOLD",
-      "TRANSFER_SHIELD"
+      "TIMEFOLD"
     ]
   },
   "predicates": {
     "implemented": [
       "attached_essence_distinct_element_count_at_least",
-      "damage_history_count_at_least",
-      "defeat_history_count_at_least",
-      "event_action_kind_is",
-      "event_attachment_kind_is",
-      "event_controller_is_opponent",
-      "source_controller_is_self",
-      "event_attack_source_is_self"
-    ],
-    "partial": [
-      "reserve_count_at_least",
-      "target_has_condition",
-      "target_printed_hp_at_least"
-    ],
-    "missing": [
-      "attached_essence_distinct_element_count_at_most",
-      "attached_essence_distinct_element_count_equals",
       "attack_actual_damage_at_least",
       "attack_source_is_attached_creature",
       "attack_target_is_opponent_vanguard",
       "card_matches",
       "control_condition_present",
       "control_condition_slot_empty",
-      "current_attack_damage_at_least",
+      "damage_history_count_at_least",
       "damage_packet_amount_at_least",
       "damage_packet_class_is",
       "damage_packet_condition_is",
       "damage_packet_source_controller_is_opponent",
       "damage_packet_target_is_attached_creature",
       "damage_packet_target_zone_is",
-      "essence_discarded_attachment_kind_is",
-      "essence_discarded_by_own_card_effect",
-      "essence_discarded_source_controller_is_self",
+      "defeat_history_count_at_least",
       "essence_move_count_at_least",
       "essence_move_destination_is_self",
       "essence_move_element_is",
       "essence_move_source_is_attached_creature",
       "essence_move_source_is_self",
+      "event_action_kind_is",
       "event_active_seat_is_controller",
+      "event_attachment_kind_is",
       "event_attachment_target_is_source",
       "event_attack_id_is",
       "event_attack_source_attached_essence_count_at_least",
       "event_attack_source_has_attached_essence_kind",
+      "event_attack_source_is_self",
       "event_attack_target_controller_is_opponent",
       "event_attack_target_damaged",
       "event_attack_target_has_condition",
@@ -141,18 +125,19 @@
       "event_condition_is",
       "event_condition_slot_is",
       "event_controller_is_active_seat",
+      "event_controller_is_opponent",
       "event_controller_is_self",
       "event_count_at_least",
       "event_destination_zone_is",
       "event_occurred",
       "event_origin_zone_is",
       "event_phase_is",
-      "event_previous_attachment_target_is_attached_creature",
       "event_source_action_is",
       "event_subject_is_attached_creature",
       "event_subject_is_source",
       "event_subject_matches",
       "event_target_controller_is_opponent",
+      "current_attack_damage_at_least",
       "event_zone_is",
       "friendly_other_creature_matches",
       "hand_contains",
@@ -172,11 +157,13 @@
       "prevention_amount_at_least",
       "prevention_source_is_attached_card",
       "prevention_target_is_attached_creature",
+      "reserve_count_at_least",
       "selected_count_at_least",
       "shield_actual_gain_at_least",
       "shield_source_is_card_effect",
       "shield_target_is_self",
       "source_became_vanguard_this_turn",
+      "source_controller_is_self",
       "source_counter_at_least",
       "source_damaged",
       "source_element_is",
@@ -188,32 +175,37 @@
       "source_is_current_friendly_vanguard",
       "source_is_self",
       "target_became_vanguard_this_turn",
-      "target_damage_at_least",
-      "target_damage_at_most",
-      "target_damage_equals",
       "target_damaged",
       "target_element_is",
       "target_has_any_condition",
+      "target_has_condition",
+      "target_printed_hp_at_least",
+      "target_remains_in_play_after_damage",
+      "target_stage_in",
+      "target_zone_is"
+    ],
+    "partial": [],
+    "missing": [
+      "attached_essence_distinct_element_count_at_most",
+      "attached_essence_distinct_element_count_equals",
+      "essence_discarded_attachment_kind_is",
+      "essence_discarded_by_own_card_effect",
+      "essence_discarded_source_controller_is_self",
+      "event_previous_attachment_target_is_attached_creature",
+      "target_damage_at_least",
+      "target_damage_at_most",
+      "target_damage_equals",
       "target_has_any_named_condition",
       "target_remaining_hp_at_least",
       "target_remaining_hp_at_most",
       "target_remaining_hp_equals",
-      "target_remains_in_play_after_damage",
-      "target_stage_in",
-      "target_zone_is",
       "voluntary_withdrawal_legal_with_incoming"
     ]
   },
   "known_legacy_equivalents": {
-    "SET_WITHDRAWAL_MODIFIER": "tcg-tactic-actions currently implements legacy SET_WITHDRAWAL_COST lifecycle storage; v0.2 parameter/semantic normalization remains",
-    "IF": "tcg-tactic-actions has narrow legacy IF_CONDITION / IF_VANGUARD_PRINTED_HP_AT_LEAST branches rather than the generic predicate tree",
-    "ATTACH_ESSENCE_FROM_ZONE": "existing runner is constrained to older source/parameter assumptions and does not yet accept every v0.2 selection variant"
+    "SET_WITHDRAWAL_MODIFIER": "tcg-tactic-actions currently implements legacy SET_WITHDRAWAL_COST lifecycle storage; v0.2 parameter/semantic normalization remains"
   },
-  "known_legacy_predicate_equivalents": {
-    "reserve_count_at_least": "tcg-tactic-actions has a narrow RESERVE_COUNT_AT_LEAST play-requirement branch rather than the generic v0.2 predicate tree",
-    "target_has_condition": "tcg-tactic-actions has a narrow IF_CONDITION branch using server-owned condition state rather than the generic v0.2 predicate tree",
-    "target_printed_hp_at_least": "tcg-tactic-actions has IF_VANGUARD_PRINTED_HP_AT_LEAST for the current Vanguard only rather than the generic v0.2 predicate tree"
-  },
+  "known_legacy_predicate_equivalents": {},
   "attack_runtime_debt": {
     "printed_english_parser_present": true,
     "card_id_gameplay_branches_present": true,
@@ -229,5 +221,1970 @@
     "zero_card_specific_runtime_branches": false,
     "zero_printed_english_runtime_parsing": false,
     "runtime_interpreter_parity": false
+  },
+  "reconciliation_evidence": {
+    "release1_if_v2_4_75": {
+      "accepted_head": "148bcc1164c05cd6c523b8fc3566f748705f5c15",
+      "card_pass_run": 1319,
+      "if_instances": 29,
+      "tactic_if_instances": 7,
+      "attack_if_instances": 13,
+      "ability_if_instances": 9,
+      "operation": "IF",
+      "predicates": [
+        "card_matches",
+        "control_condition_slot_empty",
+        "essence_move_count_at_least",
+        "event_attack_target_damaged",
+        "event_attack_target_has_condition",
+        "event_occurred",
+        "friendly_other_creature_matches",
+        "hand_count_at_least",
+        "legal_card_available",
+        "modifier_condition_slot_empty",
+        "reserve_count_at_least",
+        "selected_count_at_least",
+        "source_counter_at_least",
+        "source_damaged",
+        "source_has_shield_at_least",
+        "target_damaged",
+        "target_has_any_condition",
+        "target_has_condition",
+        "target_printed_hp_at_least",
+        "target_remains_in_play_after_damage"
+      ]
+    },
+    "release1_control_condition_replace_v2_4_79": {
+      "accepted_head": "fdef1ac7fa8099222079373aa31c0509235d7efb",
+      "card_pass_run": 1369,
+      "operation": "REPLACE_CONTROL_CONDITION",
+      "operation_consumers": [
+        {
+          "id": "shade-hollowcrown",
+          "path": "creature.ability.steps.0"
+        },
+        {
+          "id": "shade-umbravale-thought-hunter",
+          "path": "creature.attacks.1.after_damage.0.then.0"
+        }
+      ],
+      "predicate": "control_condition_present",
+      "predicate_consumers": [
+        {
+          "id": "shade-murkmite",
+          "path": "creature.ability.continuous.0.when"
+        },
+        {
+          "id": "shade-hollowcrown",
+          "path": "creature.ability.requirements.all.0"
+        },
+        {
+          "id": "shade-umbravale-thought-hunter",
+          "path": "creature.ability.requirements.all.0"
+        }
+      ]
+    },
+    "release1_discard_attached_essence_v2_4_80": {
+      "accepted_head": "d370d0db839456f8e2c83dab247fcd5d0802e315",
+      "card_pass_run": 1371,
+      "operation": "DISCARD_ATTACHED_ESSENCE",
+      "consumers": [
+        {
+          "card_id": "volt-stormmane",
+          "attack_id": "storm-break"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
+      "mutation_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+      "compatibility_note": "legacy-only Stormmane fallback remains for unmarked snapshots; marked v0.2 Stormmane uses the generic structured owner"
+    },
+    "release1_attack_declaration_events_v2_4_81": {
+      "accepted_head": "0489e85fcbe7ad2da12a1aea8939e1776661dd20",
+      "card_pass_run": 1379,
+      "operation": "RECORD_EVENT",
+      "consumers": [
+        {
+          "card_id": "volt-stormmane",
+          "attack_id": "storm-break",
+          "predicate": "event_attack_source_attached_essence_count_at_least"
+        },
+        {
+          "card_id": "volt-stormcoil-living-circuit",
+          "attack_id": "chainstorm",
+          "predicate": "event_attack_source_has_attached_essence_kind"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-attack-declaration-events-v0-2.ts"
+    },
+    "release1_discard_deck_top_v2_4_82": {
+      "accepted_head": "bc1dbf623ba665b9acf78dd99b54b637d9d8829a",
+      "card_pass_run": 1384,
+      "operation": "DISCARD_DECK_TOP",
+      "consumers": [
+        {
+          "card_id": "shade-nightmaw",
+          "attack_id": "dread-crush"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",
+      "movement_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+      "event": "deck_cards_discarded"
+    },
+    "release1_schedule_action_v2_4_83": {
+      "accepted_head": "4b70aecf96e7cbe70fc04ca7da04d644e298f823",
+      "card_pass_run": 1389,
+      "operation": "SCHEDULE_ACTION",
+      "consumers": [
+        {
+          "card_id": "shade-noctivane",
+          "ability_id": "night-reading"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts",
+      "caller": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
+      "trigger": "controller_aftermath_finished",
+      "nested_step": "DRAW_FIXED"
+    },
+    "release1_shuffle_zone_into_deck_v2_4_84": {
+      "accepted_head": "99e09efd1fab4380e30822bb23dc573a480b79db",
+      "card_pass_run": 1398,
+      "operation": "SHUFFLE_ZONE_INTO_DECK",
+      "consumers": [
+        {
+          "card_id": "astral-archivist-sol",
+          "step": 0,
+          "player": "self",
+          "zone": "hand",
+          "visibility": "owner_private"
+        },
+        {
+          "card_id": "astral-archivist-sol",
+          "step": 1,
+          "player": "opponent",
+          "zone": "hand",
+          "visibility": "owner_private"
+        }
+      ],
+      "dispatcher": "supabase/functions/tcg-tactic-actions/index.ts",
+      "movement_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+      "randomization_owner": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
+      "tactic_closure_sha256": "d8ff415928c85b9ea2bec5168eaa1154c6c4e423a58c0a24b818db51c3cebf73"
+    },
+    "release1_choose_clear_control_condition_v2_4_85": {
+      "accepted_head": "e37f0f14dd789544c32213252ed85301736c15fb",
+      "card_pass_run": 1403,
+      "operation": "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
+      "consumers": [
+        {
+          "card_id": "shade-quiet-step",
+          "tactic_program_path": "steps.2.steps.0",
+          "target": "$switch_outgoing_vanguard"
+        }
+      ],
+      "dispatcher": "supabase/functions/tcg-tactic-actions/index.ts",
+      "mutation_owner": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts",
+      "compatibility_facade": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts"
+    },
+    "release1_damage_prevented_relic_listener_v2_4_86": {
+      "accepted_head": "9d3bf34346de60559d1952826e6c2bf078f9acc7",
+      "card_pass_run": 1420,
+      "operations": [
+        "INCREMENT_SOURCE_COUNTER",
+        "SCHEDULE_SOURCE_DISCARD"
+      ],
+      "predicates": [
+        "prevention_target_is_attached_creature",
+        "prevention_source_is_attached_card",
+        "prevention_amount_at_least",
+        "source_counter_at_least"
+      ],
+      "consumers": {
+        "incoming_relic_damage": [
+          "shade-gloom-locket",
+          "stone-bastion-plate",
+          "tide-shellguard-pendant"
+        ],
+        "damage_prevented_listeners": [
+          "stone-bastion-plate",
+          "tide-shellguard-pendant"
+        ],
+        "source_counter": [
+          "stone-bastion-plate"
+        ],
+        "scheduled_source_discard": [
+          "stone-bastion-plate",
+          "tide-shellguard-pendant"
+        ]
+      },
+      "owners": {
+        "attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "scheduled_action": "supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts",
+        "relic": "supabase/functions/_shared/tcg-match-relic-engine-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 102,
+          "sha256": "9dc39ff55b849b76ffbf1593c3ea30d2c1a886d7b050c86a962b1c2cb65eb68c"
+        },
+        "tactic_actions": {
+          "file_count": 41,
+          "sha256": "9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65"
+        }
+      },
+      "note": "source_counter_at_least was already labeled implemented; V2.4.86 supplies executable evidence for its sole frozen attached-Relic listener consumer."
+    },
+    "release1_before_heal_modifier_v2_4_87": {
+      "accepted_head": "a9e4bf3cc9b863ab238ac8cd18b00c7cfcab2c6a",
+      "card_pass_run": 1425,
+      "operation": "MODIFY_CURRENT_HEAL",
+      "predicates": [
+        "heal_packet_target_is_attached_creature",
+        "heal_packet_source_action_kind_is"
+      ],
+      "consumers": {
+        "MODIFY_CURRENT_HEAL": [
+          "grove-sapstone-charm"
+        ],
+        "heal_packet_target_is_attached_creature": [
+          "grove-sapstone-charm"
+        ],
+        "heal_packet_source_action_kind_is": [
+          "grove-sapstone-charm",
+          "grove-symbiote-essence"
+        ]
+      },
+      "owners": {
+        "before_heal": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
+        "heal_packet": "supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts",
+        "after_heal_listener": "supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts"
+      },
+      "deterministic_tests": [
+        "before-heal owner applies Sapstone-style attachment modifier once per turn",
+        "Heal #21 applies before-heal modifier before HP mutation and records modified requested amount",
+        "after-heal dispatcher resolves Shellip and Symbiote while deferring Moonlit",
+        "source instance turn limits block a second trigger and reset next turn"
+      ],
+      "note": "No runtime source change is required. Existing Heal #21 and after-heal listener owners already execute the complete frozen semantics generically."
+    },
+    "release1_shield_each_attack_tactic_parity_v2_4_88": {
+      "accepted_head": "0d875a926b6cb23740ca7f3a2a3ca84b93e24913",
+      "card_pass_run": 1438,
+      "operation": "ADD_SHIELD_EACH",
+      "consumers": {
+        "attack": [
+          "stone-crowncrag-mountain-warden"
+        ],
+        "tactic": [
+          "stone-reversal-seal"
+        ]
+      },
+      "owners": {
+        "attack_shield_choice": "supabase/functions/_shared/tcg-match-attack-shield-choice-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "shield_primitive": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts"
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 103,
+          "sha256": "3e288b0c448d1456f508ff680a0153bded59a118c403ebbbdf0e6a57fe76edcc"
+        },
+        "tactic_actions": {
+          "file_count": 41,
+          "sha256": "9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65"
+        }
+      },
+      "evidence": [
+        "Crown-style mixed after-damage Shield program is parsed generically",
+        "Crown-style begin applies source Shield and exposes only legal filtered targets",
+        "Crown-style multi-select resolves up to two targets through the shared Shield cap",
+        "Crown-style optional choice accepts zero selected targets",
+        "Crown-style resolution rebinds every selected target before any target Shield mutation",
+        "frozen ADD_SHIELD_EACH inventory is exactly Crowncrag plus Reversal Seal",
+        "Tactic interpreter owns ADD_SHIELD_EACH generically through the shared Shield primitive"
+      ],
+      "note": "Attack/Tactic parity is complete without card-ID dispatch. Crowncrag uses the generic Attack private-choice specialist; Reversal Seal remains on the existing Tactic interpreter path; both delegate Shield mutation to addRuntimeShield."
+    },
+    "release1_heatguard_damage_packet_modifier_v2_4_89": {
+      "accepted_head": "5a1d94b769812a045ec276b9a15a1ec17ddeb77e",
+      "card_pass_run": 1443,
+      "operation": "MODIFY_CURRENT_DAMAGE_PACKET",
+      "consumers": [
+        "ember-heatguard-bracer"
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-damage-packet-listener-v0-2.ts",
+      "packet_owner": "supabase/functions/_shared/tcg-match-damage-packet-v0-2.ts",
+      "deterministic_evidence": [
+        "Damage #20 generic packet owner also satisfies existing Heatguard recoil contract",
+        "Damage #20 attachment packet modifier consumes once per turn"
+      ],
+      "semantics": {
+        "event": "before_damage_packet",
+        "delta": -10,
+        "minimum": 0,
+        "limit": {
+          "scope": "turn",
+          "count": 1,
+          "owner": "attachment"
+        }
+      },
+      "shared_predicates_not_promoted": [
+        "damage_packet_target_is_attached_creature",
+        "damage_packet_class_is",
+        "damage_packet_condition_is"
+      ],
+      "note": "No runtime source change is required. Damage owner #20 already executes the frozen Heatguard modifier generically. Shared damage-packet predicates remain separately gated because they have other frozen consumers."
+    },
+    "release1_highwind_voluntary_withdrawal_cost_v2_4_90": {
+      "accepted_head": "558b007ff66bab4bfd7515d049c2a0c2105434c0",
+      "card_pass_run": 1457,
+      "operation": "MODIFY_CURRENT_WITHDRAWAL_COST",
+      "predicates": [
+        "event_active_seat_is_controller"
+      ],
+      "frozen_consumers": [
+        "gale-highwind-spires"
+      ],
+      "event": "before_voluntary_withdrawal_cost",
+      "listener_id": "highwind-first-withdrawal",
+      "owners": {
+        "base_cost": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+        "listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "payment_and_switch": "supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts",
+        "orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "controller_scope": "any",
+        "limit": {
+          "scope": "turn",
+          "count": 1,
+          "owner": "event_controller"
+        },
+        "modifier": {
+          "delta": -1,
+          "minimum": 0
+        },
+        "preview": "field_actions resolves on structuredClone(state), so presentation cannot consume authoritative listener state",
+        "authoritative": "withdraw resolves the listener after canonical base cost and before exact Payment/Atomic Switch transaction",
+        "grammar": "MODIFY_CURRENT_WITHDRAWAL_COST accepts exactly op + delta + minimum for the frozen Release 1 shape"
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 103,
+          "sha256": "c8d1b9180312565b25fe29c522e5454fe867074ea423c43cb6e046886116f404"
+        },
+        "tactic_actions": {
+          "file_count": 41,
+          "sha256": "a1793729e2efc333bc20f1a14ec711d416b607db79bb4de3096b118ab4b83bd6"
+        }
+      },
+      "note": "No Highwind identity dispatch and no new owner family; Payment and Atomic Switch ownership are unchanged."
+    },
+    "release1_pilot_sera_attack_eligibility_v2_4_91": {
+      "accepted_head": "ccb995b99131c2292e79d84a4bd0ba415c0564de",
+      "card_pass_run": 1468,
+      "operation": "SET_ATTACK_ELIGIBILITY",
+      "frozen_consumers": [
+        "gale-pilot-sera"
+      ],
+      "frozen_shape": {
+        "prefix": {
+          "op": "REPEAT_OPTIONAL",
+          "max": 2
+        },
+        "eligibility": {
+          "op": "SET_ATTACK_ELIGIBILITY",
+          "scope": "controller_turn",
+          "rule": "only_final_vanguard_may_attack"
+        }
+      },
+      "owners": {
+        "attack_eligibility": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "attack_projection_and_command": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "grammar": "SET_ATTACK_ELIGIBILITY accepts exactly op + scope + rule for the frozen Release 1 shape",
+        "installation": "after Pilot Sera's repeated optional switches resolve, the shared owner anchors the final current Vanguard Creature",
+        "enforcement": "field_actions projection and authoritative attack both call the same shared block-reason owner",
+        "evolution": "the anchored Creature remains eligible when evolved because its anchor uid remains in the Vanguard stack",
+        "later_same_turn_switch": "a different Vanguard is blocked from attacking for that controller turn",
+        "expiry": "turn_seq change expires the controller-turn receipt semantically",
+        "controller_scope": "receipt ownership is per controller seat"
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-eligibility.test.ts",
+        "tcg/tests/card-pass-2-attack-eligibility-runtime.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 104,
+          "sha256": "8651b93e05cac1e995575563ecfef5e618f4e4348d016d51d8e04dd25f71333f"
+        },
+        "tactic_actions": {
+          "file_count": 42,
+          "sha256": "3deacabefcaf906388cf32dfbb347ac4b5484fd62554ac0c6f779b5817bcec91"
+        }
+      },
+      "note": "Pilot Sera remains data only. Tactic and Match no longer interpret lifecycle_attack_eligibility fields directly; no new owner family, database change, deployment or live write is required."
+    },
+    "release1_withdrawal_modifier_lifecycle_v2_4_92": {
+      "accepted_head": "e8bb4026e3950d6cec947feb241655c7eedc9524",
+      "card_pass_run": 1480,
+      "operation": "SET_WITHDRAWAL_MODIFIER",
+      "frozen_consumers": [
+        "astral-starwhale",
+        "gale-featherstep",
+        "gale-jetstream-essence",
+        "gale-pinionserpent",
+        "gale-slipwing",
+        "gale-whiffin",
+        "stone-keeper-tor",
+        "tide-undertow-net",
+        "volt-copperkite"
+      ],
+      "owners": {
+        "withdrawal_modifier": "supabase/functions/_shared/tcg-match-withdrawal-modifier-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "withdrawal_base": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts",
+        "aftermath": "supabase/functions/_shared/tcg-match-aftermath-v0-2.ts",
+        "payment_and_switch": "supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts"
+      },
+      "semantics": {
+        "modes": [
+          "set",
+          "delta"
+        ],
+        "amount": "integer or frozen target_has_condition case formula",
+        "minimum_floor": true,
+        "maximum_after_this_source": true,
+        "source_category": true,
+        "withdrawal_increase_immunity": "opponent-card-effect increases honor canonical attached-Essence immunity",
+        "expires_on": [
+          "end_of_turn",
+          "controller_aftermath",
+          "target_controller_aftermath_started"
+        ],
+        "one_use": "max_uses + legal_voluntary_withdrawal_declared consumption",
+        "failed_transaction": "request-local mutation is not persisted when Payment/Atomic Switch fails"
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-withdrawal-modifier.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-withdrawal-modifier-runtime.test.mjs",
+        "tcg/tests/card-pass-2-runtime-creature-entered-play.test.mjs",
+        "tcg-runtime-pass-b-withdrawal-wire.mjs --check"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 105,
+          "sha256": "4a48a1c2de811cef3303f0408baf513823737d33477e071313dcb025a847bfba"
+        },
+        "tactic_actions": {
+          "file_count": 43,
+          "sha256": "45bb40d0caf00dbce9e1450c768998fd296b6f8a2ecf786fb28774dedce9d84b"
+        }
+      },
+      "note": "One structured Withdrawal-modifier lifecycle owner now serves triggered Event Listener and Tactic producers; Match resolves/consumes it and Aftermath expires it. No card-ID dispatch, no new owner family, and Payment/Atomic Switch ownership are unchanged."
+    },
+    "release1_heal_each_all_consumer_parity_v2_4_93": {
+      "accepted_head": "60ea34dfe7bf23663e7903df99b47f254afc4eae",
+      "card_pass_run": 1488,
+      "operation": "HEAL_EACH",
+      "frozen_consumers": [
+        {
+          "card_id": "grove-verdantusk",
+          "surface": "Attack after_damage"
+        },
+        {
+          "card_id": "grove-elderbloom-first-canopy",
+          "surface": "active Ability"
+        },
+        {
+          "card_id": "tide-marevault-heart-of-tides",
+          "surface": "Attack after_damage_finished mixed program"
+        },
+        {
+          "card_id": "tide-reef-medic-olan",
+          "surface": "Tactic"
+        }
+      ],
+      "owners": {
+        "attack_after_damage": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
+        "active_ability_selected_heal": "supabase/functions/_shared/tcg-match-active-ability-selected-heal-v0-2.ts",
+        "mixed_attack_after_damage_finished": "supabase/functions/_shared/tcg-match-attack-after-damage-finished-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "heal_packet": "supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts",
+        "heal_listener_live": "supabase/functions/_shared/tcg-match-heal-listener-live-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "heal_each_owner": "all HEAL_EACH mutations delegate to canonical Heal Packet ownership",
+        "private_choice_transport": "existing generic server-owned min/max/options choice transport",
+        "multi_target_preflight": "all selected targets are rebound before any multi-target heal mutation",
+        "movement_boundary": "Marevault Essence moves complete canonical Movement Listener handling before HEAL_EACH selection",
+        "heal_listener_boundary": "HEAL_EACH packets complete canonical after_heal_packet listeners before later mixed-program steps",
+        "optional_switch": "Marevault final optional switch delegates to Atomic Switch",
+        "card_id_dispatch": false
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-heal-each-effects.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-heal-each-packet-wiring.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-heal-each.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-after-damage-finished.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-heal-listener-live.test.ts",
+        "tcg/tests/card-pass-2-active-ability-heal-each.test.mjs",
+        "tcg/tests/card-pass-2-attack-after-damage-finished.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 106,
+          "sha256": "fba619ffb652ab1365a4b290b15069379f7f6678cf4e17491da01a3bfe90293e"
+        },
+        "tactic_actions": {
+          "file_count": 43,
+          "sha256": "df7154b1d85c37dfc1c36f2aba500dea2a369a0c92173ab181689853b3b209f2"
+        }
+      },
+      "note": "Verdantusk Attack, Elderbloom active Ability, Marevault mixed after-damage-finished Attack and Reef Medic Olan Tactic now execute HEAL_EACH through canonical Heal Packet/listener ownership. No second Heal engine and no new owner family."
+    },
+    "release1_select_cards_all_surface_v2_4_94": {
+      "accepted_head": "795a9e94da7e5eadedf41c653fed3cc44be8c8e5",
+      "card_pass_run": 1502,
+      "operation": "SELECT_CARDS",
+      "frozen_consumers": [
+        {
+          "card_id": "grove-capscout",
+          "surface": "triggered Ability / Event Listener",
+          "shape": "discard Device 0-1 -> deck_bottom preserve"
+        },
+        {
+          "card_id": "grove-myceliarch",
+          "surface": "Attack after_damage",
+          "shape": "discard Device 0-1 -> deck_bottom preserve"
+        },
+        {
+          "card_id": "grove-forager-nia",
+          "surface": "Tactic",
+          "shape": "discard Device 0-2 -> player-ordered deck_bottom -> draw 1"
+        },
+        {
+          "card_id": "tide-surgefin",
+          "surface": "active Ability",
+          "shape": "discard Basic Tide Essence 0-1 -> Tide Reserve target -> attachment -> conditional heal"
+        },
+        {
+          "card_id": "volt-tinkit",
+          "surface": "triggered Ability / Event Listener",
+          "shape": "discard Device 0-1 -> deck_bottom preserve"
+        },
+        {
+          "card_id": "volt-stormcoil-living-circuit",
+          "surface": "active Ability",
+          "shape": "discard Basic Volt Essence 1 -> Volt field target -> borrowed attachment"
+        },
+        {
+          "card_id": "volt-quickcharge-cell",
+          "surface": "Tactic",
+          "shape": "discard Basic Volt Essence 1 -> Volt field target -> temporary attachment"
+        }
+      ],
+      "owners": {
+        "card_selection": "supabase/functions/_shared/tcg-match-card-selection-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "attack_discard_recycle": "supabase/functions/_shared/tcg-match-attack-discard-recycle-choice-v0-2.ts",
+        "active_ability": "supabase/functions/_shared/tcg-match-active-ability-supply-attachment-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "card_zone_mutation": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+        "essence_attachment_mutation": "supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts"
+      },
+      "semantics": {
+        "selection_owner": "legal option construction, min/max validation, exact current-zone/card/filter rebind and variable binding",
+        "hidden_identity": "selected hidden-zone card identity remains server-private",
+        "optional_zero": "min=0 selection may bind an empty set without manufacturing a card move",
+        "ordering": "player-chosen deck-bottom order is a fresh private continuation before Card-Zone mutation",
+        "attachment": "cards-bound ATTACH_ESSENCE_FROM_ZONE consumes the already-selected exact ref and delegates physical attachment",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-card-selection.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-supply-attachment.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-discard-recycle-choice.test.ts",
+        "tcg/tests/card-pass-2-tactic-select-cards-runtime.test.mjs",
+        "tcg/tests/card-pass-2-runtime-active-ability-choice-wiring.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 108,
+          "sha256": "26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286"
+        },
+        "tactic_actions": {
+          "file_count": 45,
+          "sha256": "ea17df9e55af4e18d80585113fe73045321d70d60b2d6c6160880a9c18bfb5d6"
+        }
+      },
+      "note": "All seven frozen Release 1 SELECT_CARDS consumers now execute through canonical surface owners with one generic selection contract. Physical card movement and Essence attachment remain delegated to owner families #30 and #22. No owner #41."
+    },
+    "release1_apply_condition_all_surface_v2_4_95": {
+      "accepted_head": "196b1901add715b259a3c5fbe37158508872d00e",
+      "card_pass_run": 1511,
+      "operation": "APPLY_CONDITION",
+      "frozen_use_count": 20,
+      "surface_counts": {
+        "event_listener": 6,
+        "attack_after_damage": 12,
+        "attack_after_attack_finished": 1,
+        "tactic_program": 1
+      },
+      "condition_counts": {
+        "Scorched": 2,
+        "Blinded": 2,
+        "Venomed": 2,
+        "Rooted": 2,
+        "Silenced": 2,
+        "Dazed": 4,
+        "Crushed": 3,
+        "Drenched": 1,
+        "Stunned": 2
+      },
+      "modes": {
+        "apply_if_empty": 19,
+        "apply_if_empty_or_same": 1
+      },
+      "owners": {
+        "condition": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "direct_attack": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
+        "conditional_attack": "supabase/functions/_shared/tcg-match-attack-conditional-condition-v0-2.ts",
+        "overcharge_attack": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
+        "after_attack_finished": "supabase/functions/_shared/tcg-match-attack-after-finished-condition-v0-2.ts",
+        "tactic": "supabase/functions/tcg-tactic-actions/index.ts",
+        "orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "state_owner": "Condition owner #19 remains sole condition-state mutation authority",
+        "source_context": "structured Event Listener, Attack and Tactic producers use source-aware condition application",
+        "protection": "opponent-card temporary condition protection is consumed before mutation where applicable",
+        "late_targeting": "after_attack_finished resolves the current opponent Vanguard after optional switch and nested Movement/Heal listener completion",
+        "bound_attack_target": "generic direct Attack route accepts $bound_attack_target without card-specific dispatch",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-condition-engine.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-condition-protection-integration.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-condition-effects.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-condition.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-overcharge-discard-choice.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-after-finished-condition.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-apply-condition-context.test.mjs",
+        "tcg/tests/card-pass-2-attack-after-finished-condition.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 109,
+          "sha256": "0eab3c83084c2ee60230be602cf22e1e5b451b713ad9655838008b9300c105c0"
+        },
+        "tactic_actions": {
+          "file_count": 45,
+          "sha256": "c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2"
+        }
+      },
+      "note": "All 20 frozen Release 1 APPLY_CONDITION uses now route through canonical Condition ownership. Aeralith's after-attack-finished Blinded timing is preserved across optional switch and listener pauses. No owner #41."
+    },
+    "release1_optional_all_surface_v2_4_96": {
+      "accepted_head": "f3fc2343ee9c3484045f9c291ee2595e222c91ac",
+      "card_pass_run": 1518,
+      "operation": "OPTIONAL",
+      "frozen_inventory": {
+        "total": 19,
+        "surfaces": {
+          "event_listener": 9,
+          "ordinary_attack_after_damage": 6,
+          "tactic_program": 3,
+          "mixed_attack_after_damage_finished": 1
+        },
+        "ordinary_attack_consumers": [
+          "ember-sootwing",
+          "gale-skyweaver",
+          "gale-tempestalon",
+          "gale-aeralith-storm-shepherd",
+          "shade-wispbat",
+          "tide-mistmarten"
+        ]
+      },
+      "owners": {
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "attack_optional_switch": "supabase/functions/_shared/tcg-match-attack-switch-choice-v0-2.ts",
+        "mixed_attack_program": "supabase/functions/_shared/tcg-match-attack-after-damage-finished-v0-2.ts",
+        "switch_mutation": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "consent_resume_only": true,
+        "decline": "zero selections; no Atomic Switch or movement events",
+        "accept": "server-owned Reserve choice, current turn/source/Reserve anchor revalidation, then Atomic Switch",
+        "reserve_filters": "operation-shaped; frozen element filter supported without card identity routing",
+        "nested_ownership": "OPTIONAL does not absorb Switch, Card-Zone, Damage, Draw/discard, Condition, Withdrawal or destination semantics",
+        "legacy_compatibility": "legacy effect-text / caller switch-index route remains compatibility-only when structured owner does not claim the attack",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-switch-choice.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-after-damage-finished.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-runtime-attack-optional-switch.test.mjs",
+        "tcg/tests/card-pass-2-runtime-attack-switch-choice.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 109,
+          "sha256": "8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6"
+        },
+        "tactic_actions": {
+          "file_count": 45,
+          "sha256": "c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2"
+        }
+      },
+      "note": "OPTIONAL is accepted as a shared consent/resume operation across all 19 frozen consumers. The six ordinary Attack OPTIONAL switch programs now use the canonical server choice + Atomic Switch path. No owner #41."
+    },
+    "release1_inspect_zone_all_surface_v2_4_97": {
+      "accepted_head": "aae70b4fa61ce193301e9e4ca7a33e4351c52d69",
+      "card_pass_run": 1526,
+      "operation": "INSPECT_ZONE",
+      "frozen_node_count": 13,
+      "frozen_consumers": [
+        "astral-cosmarch",
+        "astral-moonbit",
+        "astral-comettail",
+        "astral-nebulynx",
+        "astral-parallax-window",
+        "shade-gloamkin",
+        "shade-noctivane",
+        "shade-wispbat",
+        "shade-graveglider",
+        "shade-veil-essence",
+        "shade-seer-nyx"
+      ],
+      "surface_counts": {
+        "attack": 3,
+        "event_listener": 6,
+        "active_ability": 2,
+        "tactic": 2
+      },
+      "owners": {
+        "inspection": "supabase/functions/_shared/tcg-match-inspection-v0-2.ts",
+        "reward": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
+        "hidden_information": "supabase/functions/_shared/tcg-match-hidden-information-v0-2.ts",
+        "card_zone": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts"
+      },
+      "semantics": {
+        "reward_same_position": true,
+        "effect_owned_top_set": true,
+        "stale_revalidation": true,
+        "selected_discard_delegates_card_zone": true,
+        "remainder_reorder_delegates_card_zone": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 109,
+          "sha256": "8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6"
+        },
+        "tactic_actions": {
+          "file_count": 46,
+          "sha256": "5defbc3ccf666ee96191aea62b2f98bfda7800ed56f86c5e4e8e7501f1cef876"
+        }
+      }
+    },
+    "release1_choose_from_set_all_surface_v2_4_98": {
+      "accepted_head": "4d3781c12c8b42f953de203eb4acdf14b09ee5e2",
+      "card_pass_run": 1541,
+      "operation": "CHOOSE_FROM_SET",
+      "frozen_consumers": [
+        {
+          "card_id": "astral-stardot",
+          "surface": "Event Listener",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-star-essence",
+          "surface": "Event Listener",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-orbit-ring",
+          "surface": "Event Listener",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-celestyr-dream-cartographer",
+          "surface": "active Ability",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "shade-noctivane",
+          "surface": "active Ability",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-celestyr-dream-ray",
+          "surface": "Attack",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "astral-future-draw",
+          "surface": "Tactic",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "gale-scout-zeph",
+          "surface": "Tactic",
+          "grammar": "set + selection"
+        },
+        {
+          "card_id": "shade-seer-nyx",
+          "surface": "Tactic",
+          "grammar": "source + min/max"
+        },
+        {
+          "card_id": "volt-circuit-scanner",
+          "surface": "Tactic",
+          "grammar": "source + min/max + filters.any"
+        }
+      ],
+      "owners": {
+        "bound_set_choice": "supabase/functions/_shared/tcg-match-bound-set-choice-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "active_deck_reading": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
+        "active_deck_planning": "supabase/functions/_shared/tcg-match-active-ability-deck-planning-v0-2.ts",
+        "attack_top_deck_choice": "supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "hidden_information": "supabase/functions/_shared/tcg-match-hidden-information-v0-2.ts",
+        "card_zone_mutation": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts"
+      },
+      "semantics": {
+        "grammars": [
+          "source_range",
+          "set_selection"
+        ],
+        "filters_any": true,
+        "optional_zero": true,
+        "hidden_choice": "controller-private / server-owned",
+        "stale_rebind": "bound set identity and live deck-top provenance fail closed before mutation",
+        "mutation_owner": "Card-Zone #30",
+        "visibility_owner": "Hidden Information #33",
+        "choice_owner": "Card Search / Filter / Inspection #31",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-bound-set-choice.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-deck-planning.test.ts",
+        "tcg/tests/card-pass-2-tactic-bound-set-choice-runtime.test.mjs",
+        "tcg/tests/card-pass-2-active-ability-deck-planning-runtime.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 111,
+          "sha256": "e1035dbc68dae15d980843b8a7a3d8a11fc076ba9fab72100ccc4f78e7fe09bc"
+        },
+        "tactic_actions": {
+          "file_count": 47,
+          "sha256": "5fe799462c53855691f0901fba11740c79d99d691d40bc2173ee6c1a40ae70ac"
+        }
+      },
+      "note": "All ten frozen Release 1 CHOOSE_FROM_SET nodes are covered across preserved Event Listener / Noctivane / Dream Ray / Seer Nyx specialists plus the repaired Tactic families and generic active deck-planning family. Owner #31 owns choice semantics only; owner #30 owns physical deck mutation. No owner #41."
+    },
+    "release1_direct_damage_all_surface_v2_4_99": {
+      "accepted_head": "27b3cb2b5a041fae1bc8e7c389d7319cb55ff121",
+      "card_pass_run": 1558,
+      "operation": "DIRECT_DAMAGE",
+      "frozen_consumers": [
+        {
+          "card_id": "ember-bristleflare",
+          "surface": "triggered Ability / Event Listener",
+          "shape": "self 10 effect"
+        },
+        {
+          "card_id": "ember-magmagedcko",
+          "surface": "active Ability",
+          "shape": "selected friendly Ember Creature 10 effect"
+        },
+        {
+          "card_id": "ember-pyrohorn-ash-crown",
+          "surface": "Attack modifier-consume rider",
+          "shape": "modifier target 20 effect"
+        },
+        {
+          "card_id": "ember-bristleflare",
+          "surface": "Attack after_damage",
+          "attack_id": "reckless-rush",
+          "shape": "source Creature 10 recoil"
+        },
+        {
+          "card_id": "ember-furnacefang",
+          "surface": "Attack after_damage",
+          "attack_id": "meltline-charge",
+          "shape": "source Creature 20 recoil"
+        },
+        {
+          "card_id": "ember-ashen-gamble",
+          "surface": "Tactic",
+          "shape": "selected friendly Ember Creature 20 effect"
+        },
+        {
+          "card_id": "ember-volcanic-caldera",
+          "surface": "triggered Tactic / Event Listener",
+          "shape": "moved-to-reserve subject 10 effect"
+        },
+        {
+          "card_id": "grove-thorn-crown",
+          "surface": "triggered Tactic / Event Listener",
+          "shape": "damage-packet source Creature 10 effect"
+        }
+      ],
+      "owners": {
+        "direct_damage": "supabase/functions/_shared/tcg-match-direct-damage-v0-2.ts",
+        "damage_packet": "supabase/functions/_shared/tcg-match-damage-packet-v0-2.ts",
+        "damage_engine": "supabase/functions/_shared/tcg-match-damage-engine-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "attack_recoil": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
+        "attack_modifier_rider": "supabase/functions/tcg-match-actions/index.ts",
+        "active_ability": "supabase/functions/_shared/tcg-match-active-ability-hand-attachment-damage-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "defeat": "supabase/functions/_shared/tcg-match-defeat-engine-v0-2.ts"
+      },
+      "semantics": {
+        "damage_classes": [
+          "effect",
+          "recoil"
+        ],
+        "amounts": [
+          10,
+          20
+        ],
+        "packet_protection": true,
+        "before_damage_packet_listener": true,
+        "after_damage_packet_listener": true,
+        "recoil_source_attack_binding": true,
+        "tactic_defeat_scan": true,
+        "tactic_reward_promotion_queue": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-direct-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener-direct-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-recoil-effects.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-hand-attachment-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-hand-attachment-damage-live.test.ts",
+        "tcg/tests/card-pass-2-active-ability-direct-damage.test.mjs",
+        "tcg/tests/card-pass-2-runtime-attack-recoil-wiring.test.mjs",
+        "tcg/tests/card-pass-2-runtime-attack-modifier-live-wiring.test.mjs",
+        "tcg/tests/card-pass-2-tactic-direct-damage-runtime.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 116,
+          "sha256": "383ab7bf0eefafb1a41a767cb5f41374d50e76922f03f4c0432ed786851a0c02"
+        },
+        "tactic_actions": {
+          "file_count": 53,
+          "sha256": "9698a8aa2aeb63d7d10b3e4aa224a90f0d27bc1d492f949c3bb28aaa6048409f"
+        }
+      },
+      "note": "All eight frozen Release 1 DIRECT_DAMAGE consumers now execute through canonical packet/protection/listener ownership. Tactic effect damage additionally routes canonical Defeat #34, Reward/promotion queue semantics, and returns to resolution when required. No owner #41."
+    },
+    "release1_attach_essence_from_zone_all_surface_v2_4_100": {
+      "accepted_head": "d0d37294f7cd9e81196691d6e91bf117923862de",
+      "card_pass_run": 1576,
+      "operation": "ATTACH_ESSENCE_FROM_ZONE",
+      "frozen_use_count": 7,
+      "surface_counts": {
+        "active_ability": 4,
+        "triggered_ability_event_listener": 2,
+        "tactic_program": 1
+      },
+      "source_grammars": {
+        "inline_hand_selection": 2,
+        "inline_discard_selection": 2,
+        "prior_select_cards_ref": 3
+      },
+      "attachment_state_counts": {
+        "permanent_default": 3,
+        "temporary": 3,
+        "borrowed": 1
+      },
+      "frozen_consumers": [
+        {
+          "card_id": "ember-magmagecko",
+          "surface": "active Ability",
+          "source": "hand inline selection",
+          "attachment_state": "permanent/default"
+        },
+        {
+          "card_id": "tide-surgefin",
+          "surface": "active Ability",
+          "source": "discard prior SELECT_CARDS ref",
+          "attachment_state": "permanent/default"
+        },
+        {
+          "card_id": "volt-dynamozer",
+          "surface": "active Ability",
+          "source": "discard inline selection after Device discard cost",
+          "attachment_state": "temporary"
+        },
+        {
+          "card_id": "volt-stormcoil-living-circuit",
+          "surface": "active Ability",
+          "source": "discard prior SELECT_CARDS ref",
+          "attachment_state": "borrowed"
+        },
+        {
+          "card_id": "volt-arcprowler",
+          "surface": "triggered Ability / Event Listener",
+          "source": "hand inline selection",
+          "attachment_state": "permanent/default"
+        },
+        {
+          "card_id": "volt-coilclank",
+          "surface": "triggered Ability / Event Listener",
+          "source": "discard inline selection",
+          "attachment_state": "temporary"
+        },
+        {
+          "card_id": "volt-quickcharge-cell",
+          "surface": "Tactic",
+          "source": "discard prior SELECT_CARDS ref",
+          "attachment_state": "temporary"
+        }
+      ],
+      "owners": {
+        "essence_attachment": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
+        "attachment_route": "supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts",
+        "attachment_state": "supabase/functions/_shared/tcg-match-essence-attachment-state-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "active_ability_paid_attachment": "supabase/functions/_shared/tcg-match-active-ability-paid-attachment-v0-2.ts",
+        "active_ability_supply_attachment": "supabase/functions/_shared/tcg-match-active-ability-supply-attachment-v0-2.ts",
+        "active_ability_hand_attachment_damage": "supabase/functions/_shared/tcg-match-active-ability-hand-attachment-damage-v0-2.ts",
+        "active_ability_router": "supabase/functions/_shared/tcg-match-active-ability-live-route-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts"
+      },
+      "semantics": {
+        "physical_attachment_owner": 22,
+        "selection_ownership_preserved": true,
+        "event_movement_heal_continuations_preserved": true,
+        "temporary_borrowed_aftermath_cleanup_preserved": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-hand-attachment-damage.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-supply-attachment.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-paid-attachment.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener-evolved.test.ts",
+        "tcg/tests/card-pass-2-tactic-select-cards-runtime.test.mjs",
+        "tcg/tests/card-pass-2-runtime-active-ability-paid-attachment-wiring.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 118,
+          "sha256": "ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1"
+        },
+        "tactic_actions": {
+          "file_count": 53,
+          "sha256": "ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e"
+        }
+      },
+      "note": "All seven frozen Release 1 ATTACH_ESSENCE_FROM_ZONE consumers are covered through existing selection owners and canonical Essence Attachment owner #22. Six routes were already canonical; V2.4.100 added only the missing generic paid self-attachment live route for Dynamozer and reused the existing Event/Movement/Heal continuation. No owner #41."
+    },
+    "release1_attach_essence_from_selection_singleton_v2_4_101": {
+      "accepted_head": "8cadb7ce31e98548c868aa1817fe2ab59f5abcac",
+      "card_pass_run": 1595,
+      "operation": "ATTACH_ESSENCE_FROM_SELECTION",
+      "frozen_use_count": 1,
+      "frozen_consumers": [
+        {
+          "card_id": "prismatic-stream-bandit-prismatic-founder",
+          "surface": "active Ability",
+          "ability_id": "bandits-current",
+          "sequence": [
+            "SEARCH_DECK",
+            "ATTACH_ESSENCE_FROM_SELECTION",
+            "SHUFFLE_DECK"
+          ],
+          "search": {
+            "player": "self",
+            "reveal": "public",
+            "min": 0,
+            "max": 1,
+            "filters": {
+              "card_family": "Essence",
+              "essence_subtype": "Basic",
+              "dynamic_element_exclusion": "attached_essence_elements"
+            },
+            "destination": "effect_owned_selection",
+            "hidden_fail_allowed": true
+          },
+          "attachment": {
+            "target": "$source_creature",
+            "manual_attachment": false,
+            "attachment_state": "normal/permanent",
+            "true_origin_zone": "deck"
+          }
+        }
+      ],
+      "owners": {
+        "card_search_filter_inspection_31_submodule": "supabase/functions/_shared/tcg-match-active-ability-search-attachment-v0-2.ts",
+        "hidden_information": "supabase/functions/_shared/tcg-match-hidden-information-v0-2.ts",
+        "essence_attachment_22": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
+        "essence_attachment_route": "supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "randomization": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
+        "active_ability_facade": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
+        "active_ability_continuation": "supabase/functions/_shared/tcg-match-active-ability-continuation-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "effect_owned_selection_is_logical_provenance": true,
+        "selected_card_remains_in_deck_until_attachment": true,
+        "dynamic_element_eligibility_revalidated_before_mutation": true,
+        "source_turn_and_limit_revalidated": true,
+        "optional_zero_selection_shuffles_without_attachment": true,
+        "attachment_listeners_complete_before_shuffle": true,
+        "physical_attachment_owner": 22,
+        "search_choice_owner": 31,
+        "hidden_information_preserved": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-search-attachment.test.ts",
+        "tcg/tests/card-pass-2-runtime-active-ability-search-attachment-wiring.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 119,
+          "sha256": "96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d"
+        },
+        "tactic_actions": {
+          "file_count": 53,
+          "sha256": "ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e"
+        }
+      },
+      "note": "The sole frozen ATTACH_ESSENCE_FROM_SELECTION consumer now executes through a bounded owner-#31 active-Ability search/private-choice submodule, Hidden Information #33, canonical Essence Attachment owner #22, existing Event/Movement/Heal continuation and the shared Randomization engine. effect_owned_selection remains logical provenance only; the selected card stays physically in deck until owner #22 attaches it from the true deck origin. No owner #41."
+    },
+    "release1_source_has_relic_v2_4_107": {
+      "freeze_head": "146cf553704447e79a7979d638074de32f6ddfda",
+      "card_pass_run": 1651,
+      "predicate": "source_has_relic",
+      "frozen_consumers": [
+        {
+          "card_id": "stone-rampartusk",
+          "surface": "continuous incoming Attack damage",
+          "effect_id": "rampart-plating-reduction"
+        },
+        {
+          "card_id": "stone-rampartusk",
+          "surface": "Attack conditional_add",
+          "attack_id": "wall-break"
+        },
+        {
+          "card_id": "stone-citadelhorn",
+          "surface": "continuous incoming Attack damage",
+          "effect_id": "fortress-heart-reduction"
+        }
+      ],
+      "owners": {
+        "incoming_attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts",
+        "conditional_add": "supabase/functions/_shared/tcg-match-attack-conditional-add-evaluator-v0-2.ts",
+        "attack_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-evaluation.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-prevention-authority.test.ts"
+      ],
+      "semantics": {
+        "continuous": "attached Relic presence gates the source Creature continuous incoming Attack damage reduction",
+        "attack_formula": "legal-declaration context reads the authoritative current Vanguard Relic slot",
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "note": "No gameplay runtime or test change is required; existing generic owners and deterministic positive/negative proof cover all frozen Release 1 source_has_relic consumers."
+    },
+    "release1_source_became_vanguard_this_turn_v2_4_108": {
+      "freeze_head": "84d7b824fde3a6e2f4e5e6922b88cc2d4311dbad",
+      "card_pass_run": 1653,
+      "predicate": "source_became_vanguard_this_turn",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-gustfox",
+          "attack_id": "tailwind-strike",
+          "surface": "Attack conditional_add"
+        },
+        {
+          "card_id": "gale-zephyrhare",
+          "attack_id": "zephyr-kick",
+          "surface": "Attack conditional_add"
+        }
+      ],
+      "owners": {
+        "switch_lifecycle": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+        "conditional_add": "supabase/functions/_shared/tcg-match-attack-conditional-add-evaluator-v0-2.ts",
+        "attack_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-evaluation.test.ts"
+      ],
+      "semantics": {
+        "marker": "Atomic Switch writes incoming.became_vanguard_turn = turn_seq",
+        "declaration_context": "Match evaluates current Vanguard became_vanguard_turn against current turn_seq",
+        "positive_and_negative": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "note": "No runtime or test change is required; both frozen Gale formulas share one generic declaration-time predicate and canonical Atomic Switch lifecycle marker."
+    },
+    "release1_source_is_current_friendly_vanguard_v2_4_109": {
+      "accepted_proof_head": "1364263b1fe85828d84d2072416a927a43dfa5a0",
+      "card_pass_run": 1656,
+      "predicate": "source_is_current_friendly_vanguard",
+      "frozen_consumers": [
+        {
+          "card_id": "prismatic-stream-bandit-prismatic-founder",
+          "ability_id": "bandits-current",
+          "surface": "active Ability"
+        }
+      ],
+      "owners": {
+        "family": "supabase/functions/_shared/tcg-match-active-ability-search-attachment-v0-2.ts",
+        "facade": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts"
+      },
+      "semantics": {
+        "descriptor_requires_exact_predicate": true,
+        "activation_requires_source_where": "vanguard",
+        "activation_requires_source_index": null,
+        "current_vanguard_identity_rebound": true,
+        "non_vanguard_rejected_before_turn_limit_receipt": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-search-attachment.test.ts",
+        "tcg/tests/card-pass-2-runtime-active-ability-search-attachment-wiring.test.mjs"
+      ],
+      "note": "V2.4.109 adds only direct negative proof. Existing generic active-Ability owner already enforces current friendly Vanguard location and identity before consuming the once-per-turn receipt."
+    },
+    "release1_hand_contains_v2_4_110": {
+      "accepted_proof_head": "8722b23477354adf417ab51ac2be2cba519b9976",
+      "card_pass_run": 1659,
+      "predicate": "hand_contains",
+      "frozen_consumers": [
+        {
+          "card_id": "volt-dynamozer",
+          "ability_id": "overcharge-engine",
+          "surface": "active Ability activation requirement"
+        }
+      ],
+      "owners": {
+        "paid_active_ability": "supabase/functions/_shared/tcg-match-active-ability-paid-attachment-v0-2.ts",
+        "activation_cost": "supabase/functions/_shared/tcg-match-active-ability-activation-cost-v0-2.ts",
+        "card_cost_choice": "supabase/functions/_shared/tcg-match-card-cost-choice-v0-2.ts"
+      },
+      "semantics": {
+        "requirement_filters_equal_cost_filters": {
+          "card_family": "Tactic",
+          "tactic_subtype": "Device"
+        },
+        "source_of_truth": "actual controller hand at activation-cost choice",
+        "insufficient_matching_hand_cards_fail_closed": true,
+        "failed_preflight_consumes_turn_limit": false,
+        "private_choice": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-paid-attachment.test.ts"
+      ],
+      "note": "V2.4.110 adds only direct negative proof. Existing generic card-cost choice already evaluates the hand_contains requirement semantically by constructing the exact filtered mandatory hand-discard choice from the live private hand."
+    },
+    "release1_event_attachment_target_is_source_v2_4_111": {
+      "accepted_runtime_head": "42e871cb63ca34c43207ef4bceee8c2dcbbf4553",
+      "card_pass_run": 1664,
+      "predicate": "event_attachment_target_is_source",
+      "frozen_consumers": [
+        {
+          "card_id": "stone-gravibble",
+          "ability_id": "pebble-guard",
+          "event": "essence_attached"
+        },
+        {
+          "card_id": "stone-flintkin",
+          "ability_id": "layered-hide",
+          "event": "relic_attached"
+        },
+        {
+          "card_id": "tide-puddlepip",
+          "ability_id": "freshwater-coat",
+          "event": "essence_attached"
+        },
+        {
+          "card_id": "volt-railhorn",
+          "ability_id": "power-rail",
+          "event": "essence_attached"
+        }
+      ],
+      "owners": {
+        "essence_snapshot": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+        "relic_attachment_route": "supabase/functions/_shared/tcg-match-relic-attachment-route-v0-2.ts",
+        "generic_event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "match_orchestrator": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "essence_attachment_target_identity": "immutable snapshot attachment_target_uid equals source Creature uid",
+        "relic_attachment_target_identity": "event attachment_target_uid equals candidate source Creature uid",
+        "schema_valid_any_turn_supported": true,
+        "marked_runtime_flintkin_card_id_dispatch_removed": true,
+        "legacy_unmarked_flintkin_compatibility_preserved": true,
+        "no_new_owner_family": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-work.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-relic-attachment-route.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-runtime-relic-ownership.test.mjs"
+      ],
+      "note": "V2.4.111 closes all four Release 1 consumers. Essence-attached consumers were already trigger-time snapshot-owned; Flintkin now uses the generic Relic Attachment -> Event Listener -> Heal Packet path. The generic listener also accepts schema-valid any_turn timing. Legacy unmarked raw-heal compatibility remains isolated."
+    },
+    "release1_target_stage_in_v2_4_112": {
+      "accepted_proof_head": "64cb430b1aa6067d97d18f5c7e2d11dd1d744a16",
+      "card_pass_run": 1668,
+      "predicate": "target_stage_in",
+      "frozen_consumers": [
+        {
+          "card_id": "grove-bloom-essence",
+          "listener_id": "bloom-attach-heal",
+          "event": "essence_attached"
+        },
+        {
+          "card_id": "grove-symbiote-essence",
+          "listener_id": "symbiote-reciprocal-heal",
+          "event": "after_heal_packet"
+        }
+      ],
+      "owners": {
+        "essence_attachment_snapshot": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+        "heal_listener_dispatch": "supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts"
+      },
+      "semantics": {
+        "essence_attachment_stage_source": "printed target Creature stage frozen at trigger time",
+        "heal_listener_stage_source": "current attached Creature definition stage at heal-listener dispatch",
+        "allowed_stages": [
+          "Teen",
+          "Adult"
+        ],
+        "positive_and_negative_proof_on_both_owner_surfaces": true,
+        "no_card_id_dispatch": true,
+        "no_runtime_source_change": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-heal-listener-dispatch.test.ts"
+      ],
+      "note": "V2.4.112 closes target_stage_in across both Release 1 owner surfaces. Bloom uses immutable essence_attached snapshot truth; Symbiote uses generic after_heal_packet attachment dispatch. Proof head includes explicit rejecting-stage regressions without changing runtime source."
+    },
+    "release1_target_zone_is_v2_4_113": {
+      "accepted_proof_head": "9ce5d45ecddc6a13d52b4dda053ccc84290c05ee",
+      "card_pass_run": 1671,
+      "predicate": "target_zone_is",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-draft-essence",
+          "listener_id": "draft-attach-withdrawal",
+          "event": "essence_attached",
+          "target": "$attached_creature",
+          "zone": "reserve"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+      "semantics": {
+        "target_zone_source": "immutable essence-attached trigger snapshot",
+        "accepted_zone": "reserve",
+        "explicit_negative_zone": "vanguard",
+        "no_card_id_dispatch": true,
+        "no_runtime_source_change": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts"
+      ],
+      "held_separately": {
+        "predicate": "voluntary_withdrawal_legal_with_incoming",
+        "operation": "PERFORM_VOLUNTARY_WITHDRAWAL",
+        "reason": "Draft Essence withdrawal legality/operation remains unaccepted until effect-driven Withdrawal reuses the complete canonical Withdrawal quote, lifecycle/current-cost modifiers, exact attached-Essence Payment and Atomic Switch ownership."
+      }
+    },
+    "release1_target_element_is_v2_4_114": {
+      "accepted_runtime_head": "821362b42b853e70067bafd0ef204ac555936cd3",
+      "card_pass_run": 1675,
+      "predicate": "target_element_is",
+      "frozen_consumers": [
+        {
+          "card_id": "ember-hearth-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "ember-smolder-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "ember-cinder-charm",
+          "surface": "relic_continuous_attack_damage"
+        },
+        {
+          "card_id": "gale-draft-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "grove-bloom-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "grove-symbiote-essence",
+          "surface": "after_heal_packet"
+        },
+        {
+          "card_id": "shade-veil-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "stone-fault-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "stone-granite-essence",
+          "surface": "withdrawal_increase_immunity"
+        },
+        {
+          "card_id": "tide-calm-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "tide-flow-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "tide-brine-essence",
+          "surface": "essence_attached"
+        },
+        {
+          "card_id": "volt-surge-essence",
+          "surface": "essence_attached"
+        }
+      ],
+      "owners": {
+        "essence_attachment_snapshot": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+        "heal_listener_dispatch": "supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts",
+        "withdrawal_continuous": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+        "outgoing_relic_attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts"
+      },
+      "cinder_parity": {
+        "generic_relic_outgoing_attack_damage": true,
+        "target_element_gate": "attached Creature structured definition element",
+        "amount_formula": "default/cases",
+        "case_predicate": "target_printed_hp_at_least",
+        "case_predicate_owner": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
+        "no_card_id_dispatch": true
+      },
+      "proof": {
+        "essence_positive_negative": true,
+        "heal_positive_negative": true,
+        "withdrawal_stone_positive_and_non_stone_negative": true,
+        "cinder_ember_under_200_plus_10": true,
+        "cinder_ember_200_plus_plus_20": true,
+        "cinder_non_ember_plus_0": true,
+        "owner_family_count": 40
+      },
+      "validation_history": [
+        {
+          "head": "da93fa4684ba8b09e9c39c7001487ee3615a8a70",
+          "run": 1674,
+          "conclusion": "failure",
+          "reason": "structured runtime probe was widened to Relic identity and broke legacy-compatible damage-prevention test states by returning null"
+        },
+        {
+          "head": "821362b42b853e70067bafd0ef204ac555936cd3",
+          "run": 1675,
+          "conclusion": "success",
+          "reason": "restored prior structured probe boundary while retaining generic outgoing Relic Attack Damage execution"
+        }
+      ],
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-heal-listener-dispatch.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-withdrawal-bridge.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-source-state-requirements.test.ts"
+      ]
+    },
+    "release1_source_element_is_v2_4_115": {
+      "accepted_runtime_head": "4d141b15f3393cd07048727457b2616fba0340f6",
+      "card_pass_run": 1678,
+      "predicate": "source_element_is",
+      "frozen_consumers": [
+        {
+          "card_id": "astral-orbit-ring",
+          "listener_id": "orbit-ring-after-attack",
+          "event": "attack_finished"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+      "semantics": {
+        "source_identity": "event.source_creature_uid resolves the current battlefield source Creature",
+        "source_element": "structured source Creature definition element",
+        "required_element": "Astral",
+        "missing_source_fails_closed": true,
+        "positive_and_negative_proof": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts"
+      ],
+      "note": "V2.4.115 closes the sole Release 1 source_element_is consumer. Orbit Ring remains on the generic attack_finished Event Listener route; source_is_attached_creature and source_controller_is_self remain existing generic predicates."
+    },
+    "release1_source_has_condition_v2_4_116": {
+      "accepted_runtime_head": "ff88bf0a4b05414d051d5eae45ee4e476175fa60",
+      "card_pass_run": 1681,
+      "predicate": "source_has_condition",
+      "frozen_consumers": [
+        {
+          "card_id": "ember-cinderburrow",
+          "action_id": "burrow-burst",
+          "surface": "attack_conditional_add"
+        },
+        {
+          "card_id": "ember-kilnback",
+          "ability_id": "furnace-hide",
+          "effect_id": "furnace-hide-reduction",
+          "surface": "incoming_attack_damage"
+        }
+      ],
+      "owners": {
+        "attack_formula": "supabase/functions/_shared/tcg-match-attack-conditional-add-evaluator-v0-2.ts",
+        "condition_state": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts",
+        "incoming_attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts"
+      },
+      "parity": {
+        "cinderburrow_existing_generic_context": true,
+        "kilnback_reuses_hasRuntimeCondition": true,
+        "kilnback_scorched_prevents_10": true,
+        "kilnback_non_scorched_prevents_0": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-evaluation.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-add-direct-authority-evaluation.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts"
+      ]
+    },
+    "release1_target_became_vanguard_this_turn_v2_4_117": {
+      "accepted_runtime_head": "ca6bc8967064788178ba55ed8538c7b7d7f783af",
+      "card_pass_run": 1684,
+      "predicate": "target_became_vanguard_this_turn",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-wingclip-charm",
+          "effect_id": "wingclip-vanguard-pressure",
+          "surface": "outgoing_attached_relic_attack_damage"
+        }
+      ],
+      "owners": {
+        "switch_marker": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+        "attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts"
+      },
+      "semantics": {
+        "target": "$attached_creature",
+        "current_turn_marker": "attached_creature.became_vanguard_turn === state.turn_seq",
+        "target_element_filter_scope": "attached_creature",
+        "positive_current_turn_gale": true,
+        "negative_previous_turn_gale": true,
+        "negative_current_turn_non_gale": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-bridge.test.ts"
+      ]
+    },
+    "release1_skyrend_attack_metadata_v2_4_118": {
+      "accepted_runtime_head": "10936bfb16c8e4dff5f2490ea94b4e8b0b9f761f",
+      "card_pass_run": 1688,
+      "card_id": "gale-skyrend",
+      "ability_id": "open-sky-hunter",
+      "event": "attack_declared",
+      "predicates": [
+        "event_attack_id_is",
+        "event_attack_target_zone_is",
+        "event_attack_target_controller_is_opponent"
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+      "existing_dependencies": {
+        "event_attack_source_is_self": "implemented",
+        "MODIFY_CURRENT_ATTACK_DAMAGE": "implemented"
+      },
+      "semantics": {
+        "required_attack_id": "sky-rend",
+        "required_target_zone": "reserve",
+        "target_controller": "opponent",
+        "positive_damage": 90,
+        "base_damage": 110,
+        "wrong_attack_damage": 110,
+        "vanguard_target_damage": 110,
+        "self_target_damage": 110,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-declared-damage-listener.test.ts"
+      ]
+    },
+    "release1_set_device_play_lock_v2_4_119": {
+      "accepted_runtime_head": "49480b1612b014bbceee8cacebc108e4a85e4c97",
+      "card_pass_run": 1691,
+      "operation": "SET_DEVICE_PLAY_LOCK",
+      "frozen_consumers": [
+        {
+          "card_id": "volt-blackout-pulse",
+          "surface": "tactic_program",
+          "subtype": "Device"
+        }
+      ],
+      "owner": "supabase/functions/tcg-tactic-actions/runtime-v0-2-device-play-lock.ts",
+      "live_route": "supabase/functions/tcg-tactic-actions/index.ts",
+      "semantics": {
+        "controller_scoped": true,
+        "only_device_subtype_blocked": true,
+        "ally_relic_realm_unaffected": true,
+        "expires_on": "end_of_turn",
+        "expiry_authority": "state.turn_seq",
+        "explicit_unlock_supported": true,
+        "malformed_receipt_fails_closed": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-device-play-lock.test.ts"
+      ]
+    },
+    "release1_transfer_shield_v2_4_120": {
+      "accepted_runtime_head": "cbd17b462928d9c33e87b4048df4632a146caf9d",
+      "card_pass_run": 1694,
+      "operation": "TRANSFER_SHIELD",
+      "frozen_consumers": [
+        {
+          "card_id": "tide-abyssalume",
+          "ability_id": "lantern-shelter",
+          "surface": "active_ability"
+        }
+      ],
+      "active_ability_owner": "supabase/functions/_shared/tcg-match-active-ability-shield-transfer-v0-2.ts",
+      "mutation_owner": "supabase/functions/_shared/tcg-match-damage-engine-v0-2.ts",
+      "live_route": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
+      "semantics": {
+        "target_choice": "one friendly same-element Creature excluding source",
+        "amount_choice": {
+          "min": 0,
+          "max": 20
+        },
+        "amount_clamped_by": [
+          "source_shield",
+          "destination_capacity_60"
+        ],
+        "controller_turn_limit_owner_reused": true,
+        "reconnect_stable_anchors": true,
+        "stale_target_or_amount_fails_closed": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-shield-transfer.test.ts"
+      ]
+    },
+    "release1_source_in_play_storm_shepherd_v2_4_121": {
+      "accepted_runtime_head": "316dc56b2fa2c12a385b341bbc726a56e9b96f84",
+      "card_pass_run": 1698,
+      "predicate": "source_in_play",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-aeralith-storm-shepherd",
+          "ability_id": "storm-shepherd",
+          "surface": "active_ability"
+        }
+      ],
+      "shared_predicate_owner": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
+      "active_ability_owner": "supabase/functions/_shared/tcg-match-active-ability-switch-v0-2.ts",
+      "switch_owner": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+      "semantics": {
+        "source_must_exist_on_field": true,
+        "source_may_be_vanguard_or_reserve": true,
+        "legal_target": "friendly same-element Reserve Creature",
+        "source_may_select_self_when_source_is_reserve": true,
+        "once_per_turn_controller_receipt_reused": true,
+        "movement_listener_events": [
+          "moved_to_reserve",
+          "became_vanguard"
+        ],
+        "movement_and_heal_continuation_reused": true,
+        "stale_source_or_target_fails_closed": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": {
+        "initial_runtime_head": "620578a0f064093f04698f1a46df6a1f2a779ffa",
+        "initial_card_pass": 1697,
+        "initial_result": "failure_release_control_tactic_closure_only",
+        "corrected_runtime_head": "316dc56b2fa2c12a385b341bbc726a56e9b96f84",
+        "corrected_card_pass": 1698
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-switch.test.ts"
+      ]
+    },
+    "release1_event_count_at_least_deck_reordered_v2_4_122": {
+      "accepted_runtime_head": "9dbd93775935ac197553a70cb8f2c357b9cd84a7",
+      "card_pass_run": 1704,
+      "predicate": "event_count_at_least",
+      "event": "deck_reordered",
+      "frozen_consumers": [
+        {
+          "card_id": "astral-nova-essence",
+          "listener_id": "nova-essence-reorder-burst",
+          "surface": "essence_listener"
+        }
+      ],
+      "producer_surfaces": [
+        "tactic_deck_reorder",
+        "active_ability_deck_planning",
+        "active_ability_deck_reading",
+        "event_listener_move_zone_position"
+      ],
+      "occurrence_owner": "supabase/functions/_shared/tcg-match-deck-reorder-event-v0-2.ts",
+      "event_listener_owner": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+      "card_zone_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+      "semantics": {
+        "event_count_means": "current canonical reorder receipt count",
+        "historical_frequency_semantics": false,
+        "affected_deck_controller_preserved": true,
+        "source_controller_preserved_separately": true,
+        "reordered_card_identities_not_recorded": true,
+        "attachment_limit_reused": true,
+        "attack_modifier_owner_reused": true,
+        "active_ability_event_choice_resume_reused": true,
+        "tactic_event_choice_resume_reused": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": [
+        {
+          "head": "e052451934c287a4d227a15d4b4f9c5ffa4b63d6",
+          "card_pass": 1701,
+          "result": "failure_static_tactic_ownership_guards_only",
+          "runtime_job": "success"
+        },
+        {
+          "head": "e0350cc24304cea7ad0c6d9cb1775d259b8e74b7",
+          "card_pass": 1702,
+          "result": "success_foundation"
+        },
+        {
+          "head": "29764c1eeb3ec12a8f73c3f0cadf253d738b3ee1",
+          "card_pass": 1703,
+          "result": "failure_static_active_ability_ownership_guards_only",
+          "runtime_job": "success"
+        },
+        {
+          "head": "9dbd93775935ac197553a70cb8f2c357b9cd84a7",
+          "card_pass": 1704,
+          "result": "success_full_runtime"
+        }
+      ],
+      "edge_closures": {
+        "match": {
+          "file_count": 123,
+          "sha256": "9c3a02d3bfbdd0c4740e02785f36d089de8a20819b5d55072f10ed032d841f1d"
+        },
+        "tactic": {
+          "file_count": 55,
+          "sha256": "413bc6cc782d951b949f1f02c333ba4053e59e6c0a782a770083c237a2de26e2"
+        }
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-deck-reorder-event-listener.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-deck-planning.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-deck-reading.test.ts"
+      ]
+    },
+    "release1_faultstone_after_attack_damage_v2_4_123": {
+      "accepted_runtime_head": "b49388e182729dcb7dee975120a6d6b4f542a517",
+      "card_pass_run": 1708,
+      "card_id": "stone-faultstone",
+      "listener_id": "faultstone-crush",
+      "event": "after_attack_damage",
+      "predicates": [
+        "attack_source_is_attached_creature",
+        "attack_target_is_opponent_vanguard",
+        "attack_actual_damage_at_least"
+      ],
+      "existing_dependency": {
+        "target_remains_in_play_after_damage": "implemented"
+      },
+      "owners": {
+        "attack_damage_packet": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "condition_state": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts"
+      },
+      "semantics": {
+        "preserves_after_damage_packet": true,
+        "after_attack_damage_is_metadata_view_of_resolved_packet": true,
+        "source_must_be_attached_creature": true,
+        "target_must_be_opponent_vanguard": true,
+        "actual_hp_damage_threshold": 100,
+        "target_must_remain_in_play": true,
+        "effect": "apply Crushed to exact $attack_target with apply_if_empty",
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": {
+        "implementation_head": "ff11da019191b41c06cd13f46789e95b787d830c",
+        "implementation_card_pass": 1707,
+        "implementation_result": "failure_static_attack_recoil_order_guard_only",
+        "runtime_and_all_typechecks_green_on_1707": true,
+        "corrected_runtime_head": "b49388e182729dcb7dee975120a6d6b4f542a517",
+        "corrected_card_pass": 1708
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-after-attack-damage-event-listener.test.ts"
+      ]
+    },
+    "release1_condition_applied_wind_coil_v2_4_124": {
+      "accepted_runtime_head": "0c7f50997517dc699dd5e7dee84cdd1f2b7d5959",
+      "card_pass_run": 1712,
+      "predicates": [
+        "event_condition_is",
+        "event_target_controller_is_opponent"
+      ],
+      "frozen_consumer": {
+        "card_id": "gale-pinionserpent",
+        "ability_id": "wind-coil",
+        "event": "condition_applied"
+      },
+      "frozen_blinded_producers": [
+        {
+          "card_id": "gale-pinionserpent",
+          "attack_id": "blindside-spiral",
+          "phase": "after_damage"
+        },
+        {
+          "card_id": "gale-aeralith-storm-shepherd",
+          "attack_id": "eye-of-the-storm",
+          "phase": "after_attack_finished"
+        }
+      ],
+      "owners": {
+        "condition_mutation": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "match_route": "supabase/functions/tcg-match-actions/index.ts",
+        "withdrawal_modifier": "supabase/functions/_shared/tcg-match-withdrawal-modifier-v0-2.ts"
+      },
+      "semantics": {
+        "event_controller_is_applying_controller": true,
+        "target_controller_is_affected_controller": true,
+        "exact_condition_name": true,
+        "condition_slot_metadata_reserved_for_future_predicate": true,
+        "only_successful_condition_applications_emit": true,
+        "wind_coil_wrong_condition_rejected": true,
+        "wind_coil_friendly_target_rejected": true,
+        "wind_coil_non_active_controller_rejected": true,
+        "wind_coil_card_instance_turn_limit_preserved": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": {
+        "initial_runtime_head": "f8236020740da81880bbe256d173d36dfa5912a1",
+        "initial_card_pass": 1711,
+        "initial_result": "failure_type_narrowing_only",
+        "corrected_runtime_head": "0c7f50997517dc699dd5e7dee84cdd1f2b7d5959",
+        "corrected_card_pass": 1712
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-condition-applied-event-listener.test.ts"
+      ]
+    },
+    "release1_shield_gained_compact_shell_v2_4_125": {
+      "accepted_runtime_head": "b266d1444af11db2e3f05de9fc44a5ba95ca4737",
+      "card_pass_run": 1716,
+      "predicates": [
+        "shield_target_is_self",
+        "shield_source_is_card_effect",
+        "shield_actual_gain_at_least",
+        "event_source_action_is"
+      ],
+      "frozen_consumers": [
+        {
+          "card_id": "stone-boulderbug",
+          "ability_id": "compact-shell",
+          "event": "shield_gained"
+        }
+      ],
+      "mutation_owner": "supabase/functions/_shared/tcg-match-damage-engine-v0-2.ts",
+      "event_listener_owner": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+      "producer_routes": [
+        "tactic ADD_SHIELD / ADD_SHIELD_EACH",
+        "attack after-damage source Shield",
+        "attack selected ADD_SHIELD_EACH",
+        "active Ability Shield transfer",
+        "Event Listener nested ADD_SHIELD"
+      ],
+      "semantics": {
+        "actual_gain_only": true,
+        "card_effect_metadata_required": true,
+        "target_self_bound_to_listener_source": true,
+        "source_action_exact_match": true,
+        "compact_shell_nested_source_action": "ability:compact-shell",
+        "compact_shell_no_recursion": true,
+        "compact_shell_once_per_turn_card_instance": true,
+        "shield_cap_owner_preserved": true,
+        "compatibility_facade_preserved": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": {
+        "initial_head": "e81906ee031b3b5eb33dca10aca90b49538f23b2",
+        "initial_card_pass": 1715,
+        "initial_result": "runtime_success_structure_privacy_failure",
+        "corrected_head": "b266d1444af11db2e3f05de9fc44a5ba95ca4737",
+        "corrected_card_pass": 1716,
+        "correction": "preserved public Ability privacy and accepted Tactic/Shield ownership source fences without changing Shield semantics"
+      },
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-shield-gained-event-listener.test.ts"
+      ]
+    }
   }
 }

@@ -1,42 +1,64 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 import {
+  runtimeV02EvaluatePredicateTree,
+  type RuntimeV02PredicateLeaf,
+} from "./tcg-match-predicate-tree-v0-2.ts";
+import {
   runtimeV02ApplyAtomicSwitch,
   type RuntimeV02SwitchMovementEvent,
 } from "./tcg-match-switch-context-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
-import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
+import {
+  recordRuntimeV02HiddenInformationView,
+  runtimeV02TakeHiddenInformationOccurrences,
+  type RuntimeV02HiddenInformationOccurrence,
+} from "./tcg-match-hidden-information-v0-2.ts";
+import {
+  runtimeV02ApplyDeckReorderWithOccurrence,
+  runtimeV02TakeDeckReorderOccurrences,
+  type RuntimeV02DeckReorderOccurrence,
+} from "./tcg-match-deck-reorder-event-v0-2.ts";
+import { runtimeV02RandomSampleHiddenZone } from "./tcg-match-hidden-zone-sample-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
-import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02InstallWithdrawalModifier } from "./tcg-match-withdrawal-modifier-v0-2.ts";
+import { runtimeV02QuoteVoluntaryWithdrawal } from "./tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "./tcg-match-withdrawal-transaction-v0-2.ts";
 import { applyRuntimeV02AttachmentAttackDamageModifier } from "./tcg-match-surge-lifecycle-v0-2.ts";
 import type { RuntimeV02EssenceAttachedListenerEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
 import { runtimeV02ApplyEssenceAttachmentTransaction } from "./tcg-match-essence-attachment-engine-v0-2.ts";
+import { runtimeV02NormalizeEffectAttachmentState } from "./tcg-match-essence-attachment-state-v0-2.ts";
 import {
   runtimeV02BuildEssenceAttachedTriggerPlan,
   type RuntimeV02EssenceAttachedCandidateDescriptor,
   type RuntimeV02FrozenEssenceAttachedWorkItem,
 } from "./tcg-match-essence-attachment-work-v0-2.ts";
 import {
-  applyRuntimeCondition,
+  applyRuntimeConditionWithContext,
   clearRuntimeCondition,
   hasRuntimeCondition,
   runtimeConditions,
+  runtimeV02ConditionSlot,
   type ApplyConditionMode,
 } from "./tcg-match-condition-engine-v0-2.ts";
 import {
   addRuntimeShield,
-  dealRuntimeEffectDamage,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { runtimeV02ApplyDirectDamage } from "./tcg-match-direct-damage-v0-2.ts";
 import {
   evaluateRuntimeV02DamageHistoryCountRequirement,
   normalizeRuntimeV02DamageHistoryCountRequirement,
 } from "./tcg-match-requirement-evaluator-v0-2.ts";
-import type { RuntimeV02CardZoneInstance } from "./tcg-match-card-zone-engine-v0-2.ts";
+import {
+  runtimeV02ApplyCardZoneTransfer,
+  type RuntimeV02CardZoneInstance,
+} from "./tcg-match-card-zone-engine-v0-2.ts";
 import type {
   RuntimeV02DamageProgramCreatureRef,
   RuntimeV02DamageProgramState,
 } from "./tcg-match-damage-program-v0-2.ts";
 import { runtimeV02ApplyEventListenerMoveDamage } from "./tcg-match-event-listener-move-damage-v0-2.ts";
 import { runtimeV02AdaptDefeatEventsForListener } from "./tcg-match-event-listener-defeat-event-v0-2.ts";
+import { runtimeV02ScheduleAction } from "./tcg-match-scheduled-action-v0-2.ts";
 
 type Inst = {
   uid: string;
@@ -88,6 +110,8 @@ export type RuntimeV02EventListenerEvent = {
   source_card_uid: string | null;
   action_kind: string;
   turn_seq: number;
+  zone?: "deck_top" | "deck";
+  count?: number;
   attachment_target_uid?: string;
   attachment_kind?: string;
   attack_id?: string;
@@ -95,7 +119,413 @@ export type RuntimeV02EventListenerEvent = {
   target_creature_uid?: string;
   target_controller_seat?: 1 | 2;
   target_zone?: "vanguard" | "reserve";
+  prevention_kind?: "ability" | "relic" | "shield";
+  prevention_amount?: number;
+  packet_id?: string;
+  damage_class?: "attack" | "effect" | "recoil" | "condition";
+  requested_amount?: number;
+  final_packet_amount?: number;
+  shield_prevented?: number;
+  actual_hp_damage?: number;
+  source_card_id?: string;
+  target_remains_in_play_after_damage?: boolean;
+  condition?: string;
+  condition_slot?: "scorched" | "venomed" | "control" | "modifier";
+  change_kind?: "apply" | "replace";
+  actual_shield_gained?: number;
+  card_effect?: boolean;
 };
+
+export type RuntimeV02ConditionAppliedEventInput = {
+  event_id: string;
+  source_controller_seat: 1 | 2;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  condition: string;
+  source_action_id: string;
+  source_card_uid: string | null;
+  source_card_id?: string | null;
+  source_creature_uid?: string | null;
+  action_kind: string;
+  phase: string;
+};
+
+export function runtimeV02CreateConditionAppliedEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ConditionAppliedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const sourceController = normalizedSeat(
+    input.source_controller_seat,
+    "tcg_v0_2_condition_applied_source_controller_invalid",
+  );
+  const targetController = normalizedSeat(
+    input.target_controller_seat,
+    "tcg_v0_2_condition_applied_target_controller_invalid",
+  );
+  const eventId = requiredString(
+    input.event_id,
+    "tcg_v0_2_condition_applied_event_id_required",
+  );
+  const targetUid = requiredString(
+    input.target_creature_uid,
+    "tcg_v0_2_condition_applied_target_uid_required",
+  );
+  const condition = requiredString(
+    input.condition,
+    "tcg_v0_2_condition_applied_condition_required",
+  );
+  const sourceActionId = requiredString(
+    input.source_action_id,
+    "tcg_v0_2_condition_applied_source_action_required",
+  );
+  const actionKind = requiredString(
+    input.action_kind,
+    "tcg_v0_2_condition_applied_action_kind_required",
+  );
+  const phase = requiredString(
+    input.phase,
+    "tcg_v0_2_condition_applied_phase_required",
+  );
+  if (input.target_zone !== "vanguard" && input.target_zone !== "reserve") {
+    throw new Error("tcg_v0_2_condition_applied_target_zone_invalid");
+  }
+  let targetIndex: number | null = null;
+  if (input.target_zone === "reserve") {
+    const reserveIndex = Number(input.target_index);
+    if (
+      !Number.isInteger(reserveIndex) ||
+      reserveIndex < 0 ||
+      reserveIndex > 3
+    ) {
+      throw new Error("tcg_v0_2_condition_applied_target_index_invalid");
+    }
+    targetIndex = reserveIndex;
+  }
+  const sourceCardUid = input.source_card_uid == null
+    ? null
+    : requiredString(
+      input.source_card_uid,
+      "tcg_v0_2_condition_applied_source_card_uid_invalid",
+    );
+  const sourceCardId = input.source_card_id == null
+    ? undefined
+    : requiredString(
+      input.source_card_id,
+      "tcg_v0_2_condition_applied_source_card_id_invalid",
+    );
+  const sourceCreatureUid = input.source_creature_uid == null
+    ? undefined
+    : requiredString(
+      input.source_creature_uid,
+      "tcg_v0_2_condition_applied_source_creature_uid_invalid",
+    );
+  const event: RuntimeV02EventListenerEvent = {
+    event_id: eventId,
+    event: "condition_applied",
+    subject_uid: targetUid,
+    controller_seat: sourceController,
+    source_controller_seat: sourceController,
+    origin_zone: input.target_zone,
+    destination_zone: input.target_zone,
+    destination_index: targetIndex,
+    phase,
+    source_action_id: sourceActionId,
+    source_card_uid: sourceCardUid,
+    action_kind: actionKind,
+    turn_seq: turn,
+    source_creature_uid: sourceCreatureUid,
+    target_creature_uid: targetUid,
+    target_controller_seat: targetController,
+    target_zone: input.target_zone,
+    condition,
+    condition_slot: runtimeV02ConditionSlot(condition),
+    ...(sourceCardId ? { source_card_id: sourceCardId } : {}),
+  };
+  recordEvent(state, event);
+  return event;
+}
+
+export type RuntimeV02ConditionChangedEventInput = {
+  event_id: string;
+  source_controller_seat: 1 | 2;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  condition: string;
+  condition_slot: "scorched" | "venomed" | "control" | "modifier";
+  change_kind: "apply" | "replace";
+  source_action_id: string;
+  source_card_uid: string | null;
+  source_card_id?: string | null;
+  source_creature_uid?: string | null;
+  action_kind: string;
+  phase: string;
+};
+
+export function runtimeV02CreateConditionChangedEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ConditionChangedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const sourceController = normalizedSeat(
+    input.source_controller_seat,
+    "tcg_v0_2_condition_changed_source_controller_invalid",
+  );
+  const targetController = normalizedSeat(
+    input.target_controller_seat,
+    "tcg_v0_2_condition_changed_target_controller_invalid",
+  );
+  const eventId = requiredString(
+    input.event_id,
+    "tcg_v0_2_condition_changed_event_id_required",
+  );
+  const targetUid = requiredString(
+    input.target_creature_uid,
+    "tcg_v0_2_condition_changed_target_uid_required",
+  );
+  const conditionName = requiredString(
+    input.condition,
+    "tcg_v0_2_condition_changed_condition_required",
+  );
+  const canonicalSlot = runtimeV02ConditionSlot(conditionName);
+  if (input.condition_slot !== canonicalSlot) {
+    throw new Error("tcg_v0_2_condition_changed_slot_mismatch");
+  }
+  if (input.change_kind !== "apply" && input.change_kind !== "replace") {
+    throw new Error("tcg_v0_2_condition_changed_kind_invalid");
+  }
+  const sourceActionId = requiredString(
+    input.source_action_id,
+    "tcg_v0_2_condition_changed_source_action_required",
+  );
+  const actionKind = requiredString(
+    input.action_kind,
+    "tcg_v0_2_condition_changed_action_kind_required",
+  );
+  const phase = requiredString(
+    input.phase,
+    "tcg_v0_2_condition_changed_phase_required",
+  );
+  if (input.target_zone !== "vanguard" && input.target_zone !== "reserve") {
+    throw new Error("tcg_v0_2_condition_changed_target_zone_invalid");
+  }
+  let targetIndex: number | null = null;
+  if (input.target_zone === "reserve") {
+    const reserveIndex = Number(input.target_index);
+    if (!Number.isInteger(reserveIndex) || reserveIndex < 0 || reserveIndex > 3) {
+      throw new Error("tcg_v0_2_condition_changed_target_index_invalid");
+    }
+    targetIndex = reserveIndex;
+  }
+  const sourceCardUid = input.source_card_uid == null
+    ? null
+    : requiredString(
+      input.source_card_uid,
+      "tcg_v0_2_condition_changed_source_card_uid_invalid",
+    );
+  const sourceCardId = input.source_card_id == null
+    ? undefined
+    : requiredString(
+      input.source_card_id,
+      "tcg_v0_2_condition_changed_source_card_id_invalid",
+    );
+  const sourceCreatureUid = input.source_creature_uid == null
+    ? undefined
+    : requiredString(
+      input.source_creature_uid,
+      "tcg_v0_2_condition_changed_source_creature_uid_invalid",
+    );
+  const changedEvent: RuntimeV02EventListenerEvent = {
+    event_id: eventId,
+    event: "condition_changed",
+    subject_uid: targetUid,
+    controller_seat: targetController,
+    source_controller_seat: sourceController,
+    origin_zone: input.target_zone,
+    destination_zone: input.target_zone,
+    destination_index: targetIndex,
+    phase,
+    source_action_id: sourceActionId,
+    source_card_uid: sourceCardUid,
+    action_kind: actionKind,
+    turn_seq: turn,
+    source_creature_uid: sourceCreatureUid,
+    target_creature_uid: targetUid,
+    target_controller_seat: targetController,
+    target_zone: input.target_zone,
+    condition: conditionName,
+    condition_slot: input.condition_slot,
+    change_kind: input.change_kind,
+    ...(sourceCardId ? { source_card_id: sourceCardId } : {}),
+  };
+  recordEvent(state, changedEvent);
+  return changedEvent;
+}
+
+export type RuntimeV02ShieldGainedEventInput = {
+  event_id: string;
+  source_controller_seat: 1 | 2;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  requested_amount: number;
+  actual_shield_gained: number;
+  source_action_id: string;
+  source_card_uid: string | null;
+  source_card_id?: string | null;
+  source_creature_uid?: string | null;
+  action_kind: string;
+  phase: string;
+  card_effect: boolean;
+};
+
+export function runtimeV02CreateShieldGainedEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ShieldGainedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const sourceController = normalizedSeat(
+    input.source_controller_seat,
+    "tcg_v0_2_shield_gained_source_controller_invalid",
+  );
+  const targetController = normalizedSeat(
+    input.target_controller_seat,
+    "tcg_v0_2_shield_gained_target_controller_invalid",
+  );
+  const eventId = requiredString(input.event_id, "tcg_v0_2_shield_gained_event_id_required");
+  const targetUid = requiredString(input.target_creature_uid, "tcg_v0_2_shield_gained_target_uid_required");
+  const sourceActionId = requiredString(input.source_action_id, "tcg_v0_2_shield_gained_source_action_required");
+  const actionKind = requiredString(input.action_kind, "tcg_v0_2_shield_gained_action_kind_required");
+  const phase = requiredString(input.phase, "tcg_v0_2_shield_gained_phase_required");
+  const requested = Number(input.requested_amount);
+  const actual = Number(input.actual_shield_gained);
+  if (!Number.isFinite(requested) || requested <= 0) {
+    throw new Error("tcg_v0_2_shield_gained_requested_amount_invalid");
+  }
+  if (!Number.isFinite(actual) || actual <= 0 || actual > requested) {
+    throw new Error("tcg_v0_2_shield_gained_actual_amount_invalid");
+  }
+  if (typeof input.card_effect !== "boolean") {
+    throw new Error("tcg_v0_2_shield_gained_card_effect_invalid");
+  }
+  if (input.target_zone !== "vanguard" && input.target_zone !== "reserve") {
+    throw new Error("tcg_v0_2_shield_gained_target_zone_invalid");
+  }
+  let targetIndex: number | null = null;
+  if (input.target_zone === "reserve") {
+    const reserveIndex = Number(input.target_index);
+    if (!Number.isInteger(reserveIndex) || reserveIndex < 0 || reserveIndex > 3) {
+      throw new Error("tcg_v0_2_shield_gained_target_index_invalid");
+    }
+    targetIndex = reserveIndex;
+  }
+  const sourceCardUid = input.source_card_uid == null
+    ? null
+    : requiredString(input.source_card_uid, "tcg_v0_2_shield_gained_source_card_uid_invalid");
+  if (input.card_effect && sourceCardUid == null) {
+    throw new Error("tcg_v0_2_shield_gained_card_effect_source_required");
+  }
+  const sourceCardId = input.source_card_id == null
+    ? undefined
+    : requiredString(input.source_card_id, "tcg_v0_2_shield_gained_source_card_id_invalid");
+  const sourceCreatureUid = input.source_creature_uid == null
+    ? undefined
+    : requiredString(input.source_creature_uid, "tcg_v0_2_shield_gained_source_creature_uid_invalid");
+  const shieldEvent: RuntimeV02EventListenerEvent = {
+    event_id: eventId,
+    event: "shield_gained",
+    subject_uid: targetUid,
+    controller_seat: sourceController,
+    source_controller_seat: sourceController,
+    origin_zone: input.target_zone,
+    destination_zone: input.target_zone,
+    destination_index: targetIndex,
+    phase,
+    source_action_id: sourceActionId,
+    source_card_uid: sourceCardUid,
+    action_kind: actionKind,
+    turn_seq: turn,
+    source_creature_uid: sourceCreatureUid,
+    target_creature_uid: targetUid,
+    target_controller_seat: targetController,
+    target_zone: input.target_zone,
+    requested_amount: requested,
+    actual_shield_gained: actual,
+    card_effect: input.card_effect,
+    ...(sourceCardId ? { source_card_id: sourceCardId } : {}),
+  };
+  recordEvent(state, shieldEvent);
+  return shieldEvent;
+}
+
+export type RuntimeV02DamagePreventedEventInput = {
+  turn_seq: number;
+  action_id: string;
+  packet_id: string;
+  prevention_kind: "ability" | "relic" | "shield";
+  amount: number;
+  source_uid: string | null;
+  source_controller_seat: 1 | 2 | null;
+  target_creature_uid: string;
+  target_controller_seat: 1 | 2;
+};
+
+export function runtimeV02CreateDamagePreventedEvent(
+  input: RuntimeV02DamagePreventedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = Number(input.turn_seq);
+  if (!Number.isInteger(turn) || turn < 0) {
+    throw new Error("tcg_v0_2_damage_prevented_event_turn_invalid");
+  }
+  const actionId = requiredString(input.action_id, "tcg_v0_2_damage_prevented_event_action_required");
+  const packetId = requiredString(input.packet_id, "tcg_v0_2_damage_prevented_event_packet_required");
+  const targetUid = requiredString(input.target_creature_uid, "tcg_v0_2_damage_prevented_event_target_required");
+  const amount = Number(input.amount);
+  if (!Number.isFinite(amount) || !(amount > 0)) {
+    throw new Error("tcg_v0_2_damage_prevented_event_amount_invalid");
+  }
+  if (!["ability", "relic", "shield"].includes(input.prevention_kind)) {
+    throw new Error("tcg_v0_2_damage_prevented_event_kind_invalid");
+  }
+  if (input.target_controller_seat !== 1 && input.target_controller_seat !== 2) {
+    throw new Error("tcg_v0_2_damage_prevented_event_target_seat_invalid");
+  }
+  if (
+    input.source_controller_seat != null &&
+    input.source_controller_seat !== 1 &&
+    input.source_controller_seat !== 2
+  ) {
+    throw new Error("tcg_v0_2_damage_prevented_event_source_seat_invalid");
+  }
+  const sourceUid = input.source_uid == null ? null : requiredString(
+    input.source_uid,
+    "tcg_v0_2_damage_prevented_event_source_uid_invalid",
+  );
+  return {
+    event_id: `damage-prevented:${packetId}:${input.prevention_kind}:${sourceUid || "rule"}`,
+    event: "damage_prevented",
+    subject_uid: targetUid,
+    controller_seat: input.target_controller_seat,
+    source_controller_seat: input.source_controller_seat ?? undefined,
+    origin_zone: "field",
+    destination_zone: "field",
+    destination_index: null,
+    phase: "attack_damage",
+    source_action_id: actionId,
+    source_card_uid: sourceUid,
+    action_kind: "attack",
+    turn_seq: turn,
+    target_creature_uid: targetUid,
+    target_controller_seat: input.target_controller_seat,
+    prevention_kind: input.prevention_kind,
+    prevention_amount: amount,
+  };
+}
 
 export type RuntimeV02AttackDeclaredDamageInput = {
   action_id: string;
@@ -123,6 +553,32 @@ export type RuntimeV02AttackDeclaredDamageResult = {
   damage_delta: number;
   damage: number;
   applications: RuntimeV02AttackDeclaredDamageApplication[];
+};
+
+export type RuntimeV02VoluntaryWithdrawalCostInput = {
+  controller_seat: 1 | 2;
+  source_creature_uid: string;
+  base_cost: number;
+  action_id?: string;
+};
+
+export type RuntimeV02VoluntaryWithdrawalCostApplication = {
+  source_uid: string;
+  listener_id: string;
+  before_cost: number;
+  requested_delta: number;
+  applied_delta: number;
+  after_cost: number;
+  limit_consumed: boolean;
+  replayed: boolean;
+};
+
+export type RuntimeV02VoluntaryWithdrawalCostResult = {
+  schema: "sb-tcg-voluntary-withdrawal-cost-v0.2";
+  event: RuntimeV02EventListenerEvent;
+  base_cost: number;
+  cost: number;
+  applications: RuntimeV02VoluntaryWithdrawalCostApplication[];
 };
 
 type WorkItem = {
@@ -169,10 +625,12 @@ export type RuntimeV02PendingEventListenerChoice = {
     | "choose_from_set"
     | "select_creature"
     | "select_cards"
+    | "discard_from_hand"
     | "inspect_rewards"
     | "clear_condition"
     | "order_cards"
-    | "attach_essence";
+    | "attach_essence"
+    | "withdrawal_payment";
   prompt: string;
   min: number;
   max: number;
@@ -504,15 +962,59 @@ function essenceAttachedEvent(
   } as RuntimeV02EssenceAttachedListenerEvent);
 }
 
+function requirementContainsPredicate(raw: unknown, wanted: string): boolean {
+  if (Array.isArray(raw)) {
+    return raw.some((item) => requirementContainsPredicate(item, wanted));
+  }
+  const value = objectRecord(raw);
+  if (!value) return false;
+  if (String(value.predicate || "") === wanted) return true;
+  return Object.values(value).some((item) =>
+    requirementContainsPredicate(item, wanted)
+  );
+}
+
 function essenceAttachedWorkItems(
   state: Record<string, unknown>,
   event: RuntimeV02EventListenerEvent,
 ): WorkItem[] {
   const attachmentEvent = essenceAttachedEvent(event);
+  const candidates = collectCandidates(state, attachmentEvent.event);
+  const descriptors = candidates.map(attachmentCandidateDescriptor);
+  const needsWithdrawalQuote = candidates.some((candidate) =>
+    requirementContainsPredicate(
+      candidate.listener.requirements,
+      "voluntary_withdrawal_legal_with_incoming",
+    )
+  );
+  let withdrawalLegal: boolean | undefined;
+  if (needsWithdrawalQuote) {
+    const incoming = fieldByUid(state, attachmentEvent.attachment_target_uid);
+    if (
+      !incoming || incoming.seat !== attachmentEvent.controller_seat ||
+      incoming.where !== "reserve" || incoming.index == null
+    ) {
+      withdrawalLegal = false;
+    } else {
+      const quote = runtimeV02QuoteVoluntaryWithdrawal(state, {
+        controller_seat: attachmentEvent.controller_seat,
+        reserve_index: incoming.index,
+        incoming_target_uid: incoming.top.uid,
+        require_target: true,
+        consume_cost_listeners: false,
+        action_id: "withdraw",
+        resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+      });
+      withdrawalLegal = quote.ok;
+    }
+  }
   const plan = runtimeV02BuildEssenceAttachedTriggerPlan(
     state,
     attachmentEvent,
-    collectCandidates(state, attachmentEvent.event).map(attachmentCandidateDescriptor),
+    descriptors,
+    withdrawalLegal == null
+      ? {}
+      : { voluntary_withdrawal_legal_with_incoming: withdrawalLegal },
   );
   return plan.work.map((frozen) => ({
     event: structuredClone(plan.snapshot.event),
@@ -606,10 +1108,20 @@ function player(
 function playerForToken(
   candidate: Candidate,
   token: unknown,
+  event?: RuntimeV02EventListenerEvent,
 ): 1 | 2 {
   const value = String(token || "self");
   if (value === "self") return candidate.seat;
   if (value === "opponent") return candidate.seat === 1 ? 2 : 1;
+  if (value === "$event_controller") {
+    if (!event) {
+      throw new Error("tcg_v0_2_event_listener_event_controller_context_required");
+    }
+    return normalizedSeat(
+      event.controller_seat,
+      "tcg_v0_2_event_listener_event_controller_invalid",
+    );
+  }
   throw new Error(`tcg_v0_2_event_listener_player_unsupported:${value}`);
 }
 
@@ -721,6 +1233,27 @@ function targetField(
     candidate.field
   ) return candidate.field;
   if (token === "$event_subject") return eventSubject(state, event);
+  if (token === "$damage_packet_source_creature") {
+    const uid = String(event.source_creature_uid || "").trim();
+    if (!uid) {
+      throw new Error("tcg_v0_2_event_listener_damage_packet_source_creature_required");
+    }
+    const found = fieldByUid(state, uid);
+    if (found) return found;
+    throw new Error("tcg_v0_2_event_listener_damage_packet_source_creature_missing");
+  }
+  if (token === "$attack_target") {
+    if (event.event !== "after_attack_damage") {
+      throw new Error("tcg_v0_2_event_listener_attack_target_event_invalid");
+    }
+    const uid = String(event.target_creature_uid || "").trim();
+    if (!uid) {
+      throw new Error("tcg_v0_2_event_listener_attack_target_required");
+    }
+    const found = fieldByUid(state, uid);
+    if (found) return found;
+    throw new Error("tcg_v0_2_event_listener_attack_target_missing");
+  }
   if (token === "$current_friendly_vanguard") {
     const found = allFields(state).find((field) =>
       field.seat === candidate.seat && field.where === "vanguard"
@@ -783,40 +1316,83 @@ function eventCount(
   return Math.max(recorded, compatibility);
 }
 
-function requirement(
-  state: Record<string, unknown>,
-  continuation: Continuation,
-  raw: unknown,
-  candidate: Candidate,
-  event: RuntimeV02EventListenerEvent,
-): boolean {
-  const value = objectRecord(raw);
-  if (!value) throw new Error("tcg_v0_2_event_listener_requirement_invalid");
-  if (Object.hasOwn(value, "all")) {
-    if (Object.keys(value).length !== 1) {
-      throw new Error("tcg_v0_2_event_listener_all_invalid");
-    }
-    return list(value.all, "tcg_v0_2_event_listener_all_invalid").every((
-      item,
-    ) => requirement(state, continuation, item, candidate, event));
-  }
-  if (Object.hasOwn(value, "any")) {
-    if (Object.keys(value).length !== 1) {
-      throw new Error("tcg_v0_2_event_listener_any_invalid");
-    }
-    const items = list(value.any, "tcg_v0_2_event_listener_any_invalid");
-    if (!items.length) throw new Error("tcg_v0_2_event_listener_any_empty");
-    return items.some((item) =>
-      requirement(state, continuation, item, candidate, event)
-    );
-  }
-  if (Object.hasOwn(value, "not")) {
-    if (Object.keys(value).length !== 1) {
-      throw new Error("tcg_v0_2_event_listener_not_invalid");
-    }
-    return !requirement(state, continuation, value.not, candidate, event);
-  }
+type RuntimeV02EventListenerRequirementContext = {
+  state: Record<string, unknown>;
+  continuation: Continuation;
+  candidate: Candidate;
+  event: RuntimeV02EventListenerEvent;
+};
 
+const CARD_COUNTER_KEY = "runtime_v0_2_card_instance_counters";
+const ATTACHMENT_LIMIT_KEY = "runtime_v0_2_attachment_listener_limits";
+
+function sourceCounterSpec(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  rawCounterId: unknown,
+): { id: string; initial: number; max: number | null } {
+  const counterId = requiredString(rawCounterId, "tcg_v0_2_event_listener_source_counter_id_required");
+  const definition = runtimeV02Definition(state, candidate.source);
+  const tactic = objectRecord(definition?.tactic);
+  const counters = Array.isArray(tactic?.counters) ? tactic.counters : [];
+  const raw = counters.map(objectRecord).find((counter) => counter?.id === counterId) || null;
+  if (!raw) throw new Error("tcg_v0_2_event_listener_source_counter_definition_missing");
+  if (String(raw.owner || "") !== "card_instance") {
+    throw new Error("tcg_v0_2_event_listener_source_counter_owner_unsupported");
+  }
+  const initial = Number(raw.initial ?? 0);
+  if (!Number.isInteger(initial) || initial < 0) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_initial_invalid");
+  }
+  const max = raw.max == null ? null : Number(raw.max);
+  if (max != null && (!Number.isInteger(max) || max < initial)) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_max_invalid");
+  }
+  return { id: counterId, initial, max };
+}
+
+function sourceCounterValue(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  rawCounterId: unknown,
+): number {
+  const spec = sourceCounterSpec(state, candidate, rawCounterId);
+  const flags = candidate.source.effect_flags || {};
+  const ledger = objectRecord(flags[CARD_COUNTER_KEY]) || {};
+  const raw = ledger[spec.id];
+  if (raw == null) return spec.initial;
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 0 || (spec.max != null && value > spec.max)) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_state_invalid");
+  }
+  return value;
+}
+
+function incrementSourceCounter(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  rawCounterId: unknown,
+  rawAmount: unknown,
+): number {
+  const spec = sourceCounterSpec(state, candidate, rawCounterId);
+  const amount = Number(rawAmount);
+  if (!Number.isInteger(amount) || amount < 1) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_increment_invalid");
+  }
+  const current = sourceCounterValue(state, candidate, spec.id);
+  const next = spec.max == null ? current + amount : Math.min(spec.max, current + amount);
+  candidate.source.effect_flags ||= {};
+  const ledger = objectRecord(candidate.source.effect_flags[CARD_COUNTER_KEY]) || {};
+  ledger[spec.id] = next;
+  candidate.source.effect_flags[CARD_COUNTER_KEY] = ledger;
+  return next;
+}
+
+function requirementLeaf(
+  value: RuntimeV02PredicateLeaf,
+  context: RuntimeV02EventListenerRequirementContext,
+): boolean {
+  const { state, continuation, candidate, event } = context;
   const predicate = requiredString(
     value.predicate,
     "tcg_v0_2_event_listener_predicate_required",
@@ -838,14 +1414,240 @@ function requirement(
       return event.phase === String(value.phase || "");
     case "event_action_kind_is":
       return event.action_kind === String(value.action_kind || "");
+    case "event_zone_is":
+      return String(event.zone || "") === String(value.zone || "");
+    case "source_is_attached_creature":
+      return (candidate.kind === "relic" || candidate.kind === "essence") &&
+        !!candidate.field &&
+        String(event.source_creature_uid || "") === candidate.field.top.uid;
+    case "event_attachment_target_is_source":
+      return !!candidate.field &&
+        String(event.attachment_target_uid || "") === candidate.field.top.uid;
     case "event_controller_is_self":
       return event.controller_seat === candidate.seat;
+    case "event_count_at_least": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "count"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_event_count_field_unsupported:${unsupported}`,
+        );
+      }
+      const minimum = Number(value.count);
+      if (!Number.isInteger(minimum) || minimum < 1) {
+        throw new Error("tcg_v0_2_event_listener_event_count_threshold_invalid");
+      }
+      const actual = Number(event.count);
+      return Number.isInteger(actual) && actual >= minimum;
+    }
     case "event_controller_is_opponent":
       return event.controller_seat === (candidate.seat === 1 ? 2 : 1);
     case "source_controller_is_self":
       return event.source_controller_seat === candidate.seat;
+    case "event_condition_is": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "condition"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_event_condition_field_unsupported:${unsupported}`,
+        );
+      }
+      const condition = requiredString(
+        value.condition,
+        "tcg_v0_2_event_listener_event_condition_required",
+      );
+      return event.event === "condition_applied" &&
+        String(event.condition || "") === condition;
+    }
+    case "event_target_controller_is_opponent": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_event_target_controller_field_unsupported:${unsupported}`,
+        );
+      }
+      return event.target_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    }
+    case "event_condition_slot_is": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "slot"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_condition_slot_field_unsupported:${unsupported}`,
+        );
+      }
+      const slot = requiredString(
+        value.slot,
+        "tcg_v0_2_event_listener_condition_slot_required",
+      );
+      if (!["scorched", "venomed", "control", "modifier"].includes(slot)) {
+        throw new Error("tcg_v0_2_event_listener_condition_slot_invalid");
+      }
+      return event.event === "condition_changed" &&
+        event.condition_slot === slot;
+    }
+    case "event_change_kind_in": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "values"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_condition_change_kind_field_unsupported:${unsupported}`,
+        );
+      }
+      if (!Array.isArray(value.values) || value.values.length < 1) {
+        throw new Error("tcg_v0_2_event_listener_condition_change_kind_values_required");
+      }
+      const values = value.values.map((entry) => String(entry));
+      if (
+        new Set(values).size !== values.length ||
+        values.some((entry) => entry !== "apply" && entry !== "replace")
+      ) {
+        throw new Error("tcg_v0_2_event_listener_condition_change_kind_values_invalid");
+      }
+      return event.event === "condition_changed" &&
+        values.includes(String(event.change_kind || ""));
+    }
+    case "shield_target_is_self": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_shield_target_self_field_unsupported:${unsupported}`);
+      return event.event === "shield_gained" &&
+        !!candidate.field &&
+        candidate.field.top.uid === String(event.target_creature_uid || event.subject_uid || "");
+    }
+    case "shield_source_is_card_effect": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_shield_card_effect_field_unsupported:${unsupported}`);
+      return event.event === "shield_gained" && event.card_effect === true;
+    }
+    case "shield_actual_gain_at_least": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "value"
+      );
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_shield_gain_field_unsupported:${unsupported}`);
+      const minimum = Number(value.value);
+      if (!Number.isFinite(minimum) || minimum < 1) {
+        throw new Error("tcg_v0_2_event_listener_shield_gain_threshold_invalid");
+      }
+      const actual = Number(event.actual_shield_gained);
+      return event.event === "shield_gained" && Number.isFinite(actual) && actual >= minimum;
+    }
+    case "event_source_action_is": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "action_id"
+      );
+      if (unsupported) throw new Error(`tcg_v0_2_event_listener_source_action_field_unsupported:${unsupported}`);
+      const actionId = requiredString(value.action_id, "tcg_v0_2_event_listener_source_action_required");
+      return String(event.source_action_id || "") === actionId;
+    }
+    case "source_element_is": {
+      const sourceUid = String(event.source_creature_uid || "").trim();
+      if (!sourceUid) return false;
+      const source = fieldByUid(state, sourceUid);
+      if (!source) return false;
+      const element = requiredString(
+        value.element,
+        "tcg_v0_2_event_listener_source_element_required",
+      );
+      return String(source.def.element || "") === element;
+    }
+    case "prevention_target_is_attached_creature":
+      return !!candidate.field &&
+        candidate.field.top.uid === event.subject_uid;
+    case "prevention_source_is_attached_card":
+      return event.source_card_uid != null &&
+        candidate.source.uid === event.source_card_uid;
+    case "prevention_amount_at_least": {
+      const minimum = Number(value.value);
+      if (!Number.isFinite(minimum) || minimum < 0) {
+        throw new Error("tcg_v0_2_event_listener_prevention_amount_invalid");
+      }
+      const amount = Number(event.prevention_amount);
+      return Number.isFinite(amount) && amount >= minimum;
+    }
+    case "damage_packet_class_is":
+      return String(event.damage_class || "") === String(value.damage_class || "");
+    case "damage_packet_target_is_attached_creature":
+      return !!candidate.field &&
+        candidate.field.top.uid === String(event.target_creature_uid || event.subject_uid || "");
+    case "damage_packet_target_zone_is":
+      return String(event.target_zone || "") === String(value.zone || "");
+    case "damage_packet_source_controller_is_opponent":
+      return event.source_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    case "damage_packet_amount_at_least": {
+      const minimum = Number(value.value);
+      if (!Number.isFinite(minimum) || minimum < 0) {
+        throw new Error("tcg_v0_2_event_listener_damage_packet_amount_invalid");
+      }
+      const amount = Number(event.final_packet_amount);
+      return Number.isFinite(amount) && amount >= minimum;
+    }
+    case "attack_source_is_attached_creature": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_source_attached_field_unsupported:${unsupported}`,
+        );
+      }
+      if (event.event !== "after_attack_damage") return false;
+      return (candidate.kind === "relic" || candidate.kind === "essence") &&
+        !!candidate.field &&
+        candidate.field.top.uid === String(event.source_creature_uid || "");
+    }
+    case "attack_target_is_opponent_vanguard": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_target_vanguard_field_unsupported:${unsupported}`,
+        );
+      }
+      if (event.event !== "after_attack_damage") return false;
+      return event.target_zone === "vanguard" &&
+        event.target_controller_seat === (candidate.seat === 1 ? 2 : 1);
+    }
+    case "attack_actual_damage_at_least": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "value"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_actual_damage_field_unsupported:${unsupported}`,
+        );
+      }
+      if (event.event !== "after_attack_damage") return false;
+      const minimum = Number(value.value);
+      if (!Number.isInteger(minimum) || minimum < 0) {
+        throw new Error(
+          "tcg_v0_2_event_listener_attack_actual_damage_threshold_invalid",
+        );
+      }
+      const amount = Number(event.actual_hp_damage);
+      return Number.isInteger(amount) && amount >= minimum;
+    }
+    case "target_remains_in_play_after_damage": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_event_listener_attack_target_survival_field_unsupported:${unsupported}`,
+        );
+      }
+      return event.event === "after_attack_damage" &&
+        event.target_remains_in_play_after_damage === true;
+    }
+    case "source_counter_at_least": {
+      const minimum = Number(value.value);
+      if (!Number.isInteger(minimum) || minimum < 0) {
+        throw new Error("tcg_v0_2_event_listener_source_counter_threshold_invalid");
+      }
+      return sourceCounterValue(state, candidate, value.counter_id) >= minimum;
+    }
     case "event_controller_is_active_seat":
       return event.controller_seat === Number(state.active_seat);
+    case "event_active_seat_is_controller":
+      return Number(state.active_seat) === event.controller_seat;
     case "event_subject_matches":
       return filtersMatch(eventSubject(state, event).def, value.filters);
     case "reserve_count_at_least": {
@@ -888,7 +1690,7 @@ function requirement(
       return Number(target.cr.damage || 0) > 0;
     }
     case "hand_count_at_least": {
-      const seat = playerForToken(candidate, value.controller);
+      const seat = playerForToken(candidate, value.controller, event);
       return (player(state, seat).hand as Inst[]).length >= Number(value.count || 0);
     }
     case "control_condition_slot_empty": {
@@ -900,7 +1702,7 @@ function requirement(
         throw new Error("tcg_v0_2_event_listener_event_window_unsupported");
       }
       const name = requiredString(value.event, "tcg_v0_2_event_listener_event_name_required");
-      const controller = playerForToken(candidate, value.controller);
+      const controller = playerForToken(candidate, value.controller, event);
       const minCount = Number(value.min_count ?? 1);
       if (!Number.isInteger(minCount) || minCount < 1) {
         throw new Error("tcg_v0_2_event_listener_event_min_count_invalid");
@@ -912,6 +1714,20 @@ function requirement(
         `tcg_v0_2_event_listener_predicate_unsupported:${predicate}`,
       );
   }
+}
+
+function requirement(
+  state: Record<string, unknown>,
+  continuation: Continuation,
+  raw: unknown,
+  candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
+): boolean {
+  return runtimeV02EvaluatePredicateTree(
+    raw,
+    { state, continuation, candidate, event },
+    requirementLeaf,
+  );
 }
 
 function matches(
@@ -927,7 +1743,7 @@ function matches(
     return false;
   }
   if (timing === "build" && event.phase !== "build") return false;
-  if (!["own_turn", "build", "any", "passive"].includes(timing)) {
+  if (!["own_turn", "any_turn", "build", "any", "passive"].includes(timing)) {
     throw new Error(
       `tcg_v0_2_event_listener_timing_unsupported:${timing}`,
     );
@@ -1012,41 +1828,71 @@ function markResolved(
   };
 }
 
+type RuntimeV02EventListenerLimitInfo = {
+  key: string;
+  count: number;
+  scope: "turn" | "attachment";
+  source: Inst | null;
+};
+
 function limitInfo(
   state: Record<string, unknown>,
   candidate: Candidate,
   event: RuntimeV02EventListenerEvent,
-): { key: string; count: number } | null {
+): RuntimeV02EventListenerLimitInfo | null {
   const limit = objectRecord(candidate.listener.limit);
   if (!limit) return null;
   const count = Number(limit.count);
   if (!Number.isInteger(count) || count < 1) {
     throw new Error("tcg_v0_2_event_listener_limit_count_invalid");
   }
-  if (String(limit.scope || "") !== "turn") {
-    throw new Error("tcg_v0_2_event_listener_limit_scope_unsupported");
-  }
+  const scope = String(limit.scope || "");
   const owner = String(limit.owner || "");
-  const ownerKey = owner === "card_instance"
-    ? `card:${candidate.source.uid}`
-    : owner === "controller"
-    ? `controller:${candidate.seat}`
-    : owner === "event_controller"
-    ? `event-controller:${event.controller_seat}`
-    : null;
-  if (!ownerKey) {
-    throw new Error(
-      `tcg_v0_2_event_listener_limit_owner_unsupported:${owner}`,
-    );
+  if (scope === "turn") {
+    const ownerKey = owner === "card_instance"
+      ? `card:${candidate.source.uid}`
+      : owner === "attachment"
+      ? `attachment:${candidate.source.uid}`
+      : owner === "controller"
+      ? `controller:${candidate.seat}`
+      : owner === "event_controller"
+      ? `event-controller:${event.controller_seat}`
+      : null;
+    if (!ownerKey) {
+      throw new Error(`tcg_v0_2_event_listener_limit_owner_unsupported:${owner}`);
+    }
+    return { key: `${listenerId(candidate)}:${ownerKey}`, count, scope: "turn", source: null };
   }
-  return { key: `${listenerId(candidate)}:${ownerKey}`, count };
+  if (scope === "attachment" && owner === "attachment") {
+    if (!candidate.field || (candidate.kind !== "relic" && candidate.kind !== "essence")) {
+      throw new Error("tcg_v0_2_event_listener_attachment_limit_source_invalid");
+    }
+    return {
+      key: `${listenerId(candidate)}:attachment:${candidate.source.uid}:target:${candidate.field.top.uid}`,
+      count,
+      scope: "attachment",
+      source: candidate.source,
+    };
+  }
+  throw new Error("tcg_v0_2_event_listener_limit_scope_unsupported");
 }
 
 function usedLimit(
   state: Record<string, unknown>,
-  info: { key: string; count: number } | null,
+  info: RuntimeV02EventListenerLimitInfo | null,
 ): number {
   if (!info) return 0;
+  if (info.scope === "attachment") {
+    const flags = info.source?.effect_flags || {};
+    const limits = objectRecord(flags[ATTACHMENT_LIMIT_KEY]) || {};
+    const raw = limits[info.key];
+    if (raw == null) return 0;
+    const count = Number(raw);
+    if (!Number.isInteger(count) || count < 0) {
+      throw new Error("tcg_v0_2_event_listener_limit_state_invalid");
+    }
+    return count;
+  }
   const raw = objectRecord(listenerState(state).limits[info.key]);
   if (!raw || Number(raw.turn_seq) !== currentTurn(state)) return 0;
   const count = Number(raw.count);
@@ -1058,12 +1904,20 @@ function usedLimit(
 
 function consumeLimit(
   state: Record<string, unknown>,
-  info: { key: string; count: number } | null,
+  info: RuntimeV02EventListenerLimitInfo | null,
 ): void {
   if (!info) return;
   const used = usedLimit(state, info);
   if (used >= info.count) {
     throw new Error("tcg_v0_2_event_listener_limit_already_consumed");
+  }
+  if (info.scope === "attachment") {
+    if (!info.source) throw new Error("tcg_v0_2_event_listener_attachment_limit_source_invalid");
+    info.source.effect_flags ||= {};
+    const limits = objectRecord(info.source.effect_flags[ATTACHMENT_LIMIT_KEY]) || {};
+    limits[info.key] = used + 1;
+    info.source.effect_flags[ATTACHMENT_LIMIT_KEY] = limits;
+    return;
   }
   listenerState(state).limits[info.key] = {
     count: used + 1,
@@ -1137,6 +1991,7 @@ function setPrivateInspection(
 function inspectDeckTop(
   state: Record<string, unknown>,
   candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
   ownerSeat: 1 | 2,
   count: number,
   exactMinimum: number,
@@ -1163,6 +2018,38 @@ function inspectDeckTop(
       state,
       candidate.seat,
       "deck_top",
+      {
+        action_kind: requiredString(
+          event.action_kind,
+          "tcg_v0_2_event_listener_hidden_view_action_kind_required",
+        ),
+        source_controller_seat: event.source_controller_seat == null
+          ? candidate.seat
+          : normalizedSeat(
+            event.source_controller_seat,
+            "tcg_v0_2_event_listener_hidden_view_source_controller_invalid",
+          ),
+        source_action_id: requiredString(
+          event.source_action_id,
+          "tcg_v0_2_event_listener_hidden_view_source_action_required",
+        ),
+        source_card_uid: event.source_card_uid == null
+          ? candidate.source.uid
+          : requiredString(
+            event.source_card_uid,
+            "tcg_v0_2_event_listener_hidden_view_source_card_required",
+          ),
+        source_creature_uid: event.source_creature_uid == null
+          ? candidate.field?.top.uid || null
+          : requiredString(
+            event.source_creature_uid,
+            "tcg_v0_2_event_listener_hidden_view_source_creature_invalid",
+          ),
+        phase: requiredString(
+          event.phase,
+          "tcg_v0_2_event_listener_hidden_view_phase_required",
+        ),
+      },
     );
     setPrivateInspection(state, candidate.seat, ownerSeat, "deck_top", cards);
   }
@@ -1172,9 +2059,10 @@ function inspectDeckTop(
 function randomSampleHiddenZone(
   state: Record<string, unknown>,
   candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
   step: Record<string, unknown>,
 ): CardRef[] {
-  const ownerSeat = playerForToken(candidate, step.player);
+  const ownerSeat = playerForToken(candidate, step.player, event);
   if (String(step.zone || "") !== "hand") {
     throw new Error("tcg_v0_2_event_listener_hidden_sample_zone_unsupported");
   }
@@ -1190,19 +2078,18 @@ function randomSampleHiddenZone(
     throw new Error("tcg_v0_2_event_listener_hidden_sample_unavailable");
   }
   const count = Math.min(wanted.max, hand.length);
-  const pool = hand.map((card) => ({
-    uid: requiredString(card.uid, "tcg_v0_2_event_listener_hidden_sample_uid_invalid"),
-    card_id: requiredString(card.card_id, "tcg_v0_2_event_listener_hidden_sample_card_id_invalid"),
+  const sampled = runtimeV02RandomSampleHiddenZone(hand, count).map((card) => ({
+    uid: requiredString(
+      card.uid,
+      "tcg_v0_2_event_listener_hidden_sample_uid_invalid",
+    ),
+    card_id: requiredString(
+      card.card_id,
+      "tcg_v0_2_event_listener_hidden_sample_card_id_invalid",
+    ),
     zone_owner_seat: ownerSeat,
     zone: "hand" as const,
   }));
-  const sampled: CardRef[] = [];
-  while (sampled.length < count && pool.length) {
-    const random = new Uint32Array(1);
-    crypto.getRandomValues(random);
-    const index = random[0] % pool.length;
-    sampled.push(pool.splice(index, 1)[0]);
-  }
   if (sampled.length) {
     setPrivateInspection(state, candidate.seat, ownerSeat, "hand", sampled);
   }
@@ -1307,13 +2194,14 @@ function zoneCards(
 function cardOptions(
   state: Record<string, unknown>,
   candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
   step: Record<string, unknown>,
 ): Array<{
   id: string;
   label: string;
   data: Record<string, unknown>;
 }> {
-  const ownerSeat = playerForToken(candidate, step.player);
+  const ownerSeat = playerForToken(candidate, step.player, event);
   const zone = String(step.zone || "") as CardRef["zone"];
   if (zone !== "discard" && zone !== "hand") {
     throw new Error("tcg_v0_2_event_listener_card_zone_unsupported");
@@ -1335,92 +2223,6 @@ function cardOptions(
         } satisfies CardRef,
       },
     }));
-}
-
-function validateDuration(
-  step: Record<string, unknown>,
-): void {
-  const duration = objectRecord(step.duration);
-  if (
-    !duration || !Array.isArray(duration.expires_on) ||
-    !duration.expires_on.map(String).includes("end_of_turn")
-  ) {
-    throw new Error(
-      "tcg_v0_2_event_listener_withdrawal_modifier_expiry_unsupported",
-    );
-  }
-  if (
-    duration.max_uses != null &&
-    (!Number.isInteger(Number(duration.max_uses)) ||
-      Number(duration.max_uses) < 1)
-  ) {
-    throw new Error(
-      "tcg_v0_2_event_listener_withdrawal_modifier_max_uses_invalid",
-    );
-  }
-}
-
-function baseWithdrawalCost(
-  state: Record<string, unknown>,
-  target: Field,
-): number {
-  const creature = objectRecord(target.def.creature);
-  const printed = Number(
-    creature?.withdrawal ?? target.def.withdrawal ?? target.def.withdraw ?? 0,
-  );
-  if (!Number.isFinite(printed) || printed < 0) {
-    throw new Error(
-      "tcg_v0_2_event_listener_withdrawal_printed_invalid",
-    );
-  }
-  const conditions = runtimeConditions(target.cr);
-  const structured = structuredRuntimeWithdrawalBaseCost(
-    state,
-    target.cr,
-    printed,
-    String(target.def.element || ""),
-    conditions.modifier === "Crushed",
-  );
-  return structured == null ? printed : structured;
-}
-
-function setWithdrawalModifier(
-  state: Record<string, unknown>,
-  target: Field,
-  step: Record<string, unknown>,
-): void {
-  validateDuration(step);
-  target.cr.flags ||= {};
-  const flags = target.cr.flags as Record<string, unknown>;
-  const prior = objectRecord(flags.lifecycle_withdrawal_cost);
-  let value = prior && Number(prior.turn_seq) === currentTurn(state)
-    ? Number(prior.value)
-    : baseWithdrawalCost(state, target);
-  const mode = String(step.mode || "delta");
-  if (mode === "set") {
-    value = numberValue(
-      step.amount,
-      "tcg_v0_2_event_listener_withdrawal_modifier_amount_invalid",
-    );
-  } else if (mode === "delta") {
-    value += numberValue(
-      step.amount ?? step.delta,
-      "tcg_v0_2_event_listener_withdrawal_modifier_delta_invalid",
-    );
-  } else {
-    throw new Error(
-      `tcg_v0_2_event_listener_withdrawal_modifier_mode_unsupported:${mode}`,
-    );
-  }
-  const minimum = step.minimum == null ? 0 : numberValue(
-    step.minimum,
-    "tcg_v0_2_event_listener_withdrawal_modifier_minimum_invalid",
-  );
-  flags.lifecycle_withdrawal_cost = {
-    turn_seq: currentTurn(state),
-    value: Math.max(minimum, value, 0),
-    expires: "end_of_turn",
-  };
 }
 
 function removeCardRef(
@@ -1501,6 +2303,92 @@ function reorderDeckTop(
   deck.splice(0, deck.length, ...ordered, ...rest);
 }
 
+function quoteEventListenerWithdrawal(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  incoming: Field,
+  consumeCostListeners: boolean,
+) {
+  if (
+    incoming.seat !== candidate.seat || incoming.where !== "reserve" ||
+    incoming.index == null
+  ) {
+    throw new Error("tcg_v0_2_event_listener_withdrawal_target_invalid");
+  }
+  return runtimeV02QuoteVoluntaryWithdrawal(state, {
+    controller_seat: candidate.seat,
+    reserve_index: incoming.index,
+    incoming_target_uid: incoming.top.uid,
+    require_target: true,
+    consume_cost_listeners: consumeCostListeners,
+    action_id: "withdraw",
+    resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+  });
+}
+
+function markEventListenerWithdrawalUsed(
+  state: Record<string, unknown>,
+  seat: 1 | 2,
+): void {
+  const turn = currentTurn(state);
+  const rawRoot = state.turn_flags;
+  if (rawRoot != null && !objectRecord(rawRoot)) {
+    throw new Error("tcg_v0_2_event_listener_turn_flags_invalid");
+  }
+  const root = objectRecord(rawRoot) || {};
+  const rawSeat = root[String(seat)];
+  if (rawSeat != null && !objectRecord(rawSeat)) {
+    throw new Error("tcg_v0_2_event_listener_turn_seat_flags_invalid");
+  }
+  const flags = objectRecord(rawSeat) || {};
+  flags.withdraw_turn = turn;
+  root[String(seat)] = flags;
+  state.turn_flags = root;
+}
+
+function applyEventListenerVoluntaryWithdrawal(
+  state: Record<string, unknown>,
+  continuation: Continuation,
+  candidate: Candidate,
+  incoming: Field,
+  paymentUids: string[],
+  expectedCost: number,
+): void {
+  const quote = quoteEventListenerWithdrawal(
+    state,
+    candidate,
+    incoming,
+    true,
+  );
+  if (!quote.ok || quote.reserve_index == null || quote.cost == null) {
+    throw new Error(
+      `tcg_v0_2_event_listener_withdrawal_no_longer_legal:${String(quote.error || "unknown")}`,
+    );
+  }
+  if (quote.cost !== expectedCost) {
+    throw new Error("tcg_v0_2_event_listener_withdrawal_cost_stale");
+  }
+  const owner = player(state, candidate.seat);
+  const vanguard = allFields(state).find((field) =>
+    field.seat === candidate.seat && field.where === "vanguard"
+  );
+  if (!vanguard) {
+    throw new Error("tcg_v0_2_event_listener_withdrawal_vanguard_missing");
+  }
+  const transaction = runtimeV02ApplyWithdrawalPaymentAndSwitch(
+    state,
+    candidate.seat,
+    quote.reserve_index,
+    vanguard.cr.essence,
+    owner.discard as Inst[],
+    paymentUids,
+    quote.cost,
+  );
+  markEventListenerWithdrawalUsed(state, candidate.seat);
+  continuation.emitted_movement_events.push(...transaction.switched.events);
+  continuation.step_cursor++;
+}
+
 function executeStep(
   state: Record<string, unknown>,
   continuation: Continuation,
@@ -1509,6 +2397,39 @@ function executeStep(
   step: Record<string, unknown>,
 ): "continue" | "choice" {
   const op = String(step.op || "");
+
+  if (op === "INCREMENT_SOURCE_COUNTER") {
+    incrementSourceCounter(state, candidate, step.counter_id, step.amount);
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "SCHEDULE_SOURCE_DISCARD") {
+    if (
+      String(step.timing || "") !== "after_attack_finished" ||
+      String(step.source || "") !== "$listener_source"
+    ) {
+      throw new Error("tcg_v0_2_event_listener_source_discard_shape_unsupported");
+    }
+    if (candidate.kind !== "relic" || !candidate.field) {
+      throw new Error("tcg_v0_2_event_listener_source_discard_relic_required");
+    }
+    const id = `event-listener-source-discard:${event.event_id}:${candidate.source.uid}:${listenerId(candidate)}`;
+    runtimeV02ScheduleAction(
+      state as any,
+      {
+        owner_seat: candidate.seat,
+        source_action_id: listenerId(candidate),
+        source_card_uid: candidate.source.uid,
+        trigger: "after_attack_finished",
+        match_must_be_active: true,
+        steps: [{ op: "DISCARD_SOURCE", source_zone: "attached_relic" }],
+      },
+      id,
+    );
+    continuation.step_cursor++;
+    return "continue";
+  }
 
   if (op === "IF") {
     const branch = requirement(
@@ -1526,7 +2447,7 @@ function executeStep(
 
   if (op === "OPTIONAL") {
     installChoice(state, continuation, candidate, event, {
-      seat: playerForToken(candidate, step.player),
+      seat: playerForToken(candidate, step.player, event),
       kind: "optional",
       prompt: "Use optional effect?",
       min: 1,
@@ -1542,11 +2463,12 @@ function executeStep(
   }
 
   if (op === "LOOK_TOP") {
-    const owner = playerForToken(candidate, step.player);
+    const owner = playerForToken(candidate, step.player, event);
     const count = Math.max(0, Number(step.count || 0));
     continuation.vars[String(step.as || "looked")] = inspectDeckTop(
       state,
       candidate,
+      event,
       owner,
       count,
       0,
@@ -1556,7 +2478,7 @@ function executeStep(
   }
 
   if (op === "INSPECT_ZONE") {
-    const owner = playerForToken(candidate, step.player);
+    const owner = playerForToken(candidate, step.player, event);
     const wanted = range(step.selection);
     if (
       String(step.visibility || "") !== "controller_private" ||
@@ -1570,6 +2492,7 @@ function executeStep(
       continuation.vars[String(step.as || "inspected")] = inspectDeckTop(
         state,
         candidate,
+        event,
         owner,
         wanted.max,
         wanted.min,
@@ -1612,7 +2535,7 @@ function executeStep(
   }
 
   if (op === "RANDOM_SAMPLE_HIDDEN_ZONE") {
-    continuation.vars[String(step.as || "sampled")] = randomSampleHiddenZone(state, candidate, step);
+    continuation.vars[String(step.as || "sampled")] = randomSampleHiddenZone(state, candidate, event, step);
     continuation.step_cursor++;
     return "continue";
   }
@@ -1679,7 +2602,7 @@ function executeStep(
   }
 
   if (op === "SELECT_CARDS") {
-    const options = cardOptions(state, candidate, step);
+    const options = cardOptions(state, candidate, event, step);
     const wanted = range(objectRecord(step.selection) || {});
     if (options.length < wanted.min) {
       throw new Error("tcg_v0_2_event_listener_card_choice_unavailable");
@@ -1730,7 +2653,7 @@ function executeStep(
       data: { ref: card },
     }));
     installChoice(state, continuation, candidate, event, {
-      seat: playerForToken(candidate, step.player),
+      seat: playerForToken(candidate, step.player, event),
       kind: "order_cards",
       prompt: "Choose card order",
       min: options.length,
@@ -1743,12 +2666,98 @@ function executeStep(
   }
 
   if (op === "DRAW") {
-    const seat = playerForToken(candidate, step.player);
+    const seat = playerForToken(candidate, step.player, event);
     const owner = player(state, seat);
     const deck = owner.deck as Inst[];
     const hand = owner.hand as Inst[];
     const count = Math.max(0, Number(step.count || 0));
     hand.push(...deck.splice(0, Math.min(count, deck.length)));
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "CHOOSE_HAND_TO_DISCARD") {
+    const seat = playerForToken(candidate, step.player, event);
+    const count = Number(step.count);
+    if (!Number.isInteger(count) || count < 0) {
+      throw new Error("tcg_v0_2_event_listener_hand_discard_count_invalid");
+    }
+    const owner = player(state, seat);
+    const hand = owner.hand as Inst[];
+    if (hand.length < count) {
+      throw new Error("tcg_v0_2_event_listener_hand_discard_unavailable");
+    }
+    if (count === 0) {
+      continuation.step_cursor++;
+      return "continue";
+    }
+    const options = hand.map((card) => ({
+      id: `card:${card.uid}`,
+      label: cardName(state, card),
+      data: {
+        ref: {
+          uid: card.uid,
+          card_id: card.card_id,
+          zone_owner_seat: seat,
+          zone: "hand",
+        } satisfies CardRef,
+      },
+    }));
+    installChoice(state, continuation, candidate, event, {
+      seat,
+      kind: "discard_from_hand",
+      prompt: "Choose card to discard",
+      min: count,
+      max: count,
+      mode: "select",
+      options,
+      context: { zone_owner_seat: seat },
+    });
+    return "choice";
+  }
+
+  if (op === "MOVE_ZONE_POSITION") {
+    const seat = playerForToken(candidate, step.player, event);
+    if (
+      String(step.zone || "") !== "deck" ||
+      String(step.from || "") !== "top" ||
+      String(step.to || "") !== "bottom" ||
+      Number(step.count) !== 1 ||
+      String(step.visibility || "") !== "no_additional_reveal"
+    ) {
+      throw new Error("tcg_v0_2_event_listener_move_zone_position_shape_unsupported");
+    }
+    const owner = player(state, seat);
+    const deck = owner.deck as Inst[];
+    if (deck.length > 0) {
+      const top = deck[0];
+      runtimeV02ApplyDeckReorderWithOccurrence(
+        state,
+        deck,
+        {
+          cause: "effect",
+          action_kind: "event_listener",
+          source_action_id: `listener:${listenerId(candidate)}`,
+          source_card_uid: candidate.source.uid,
+          zone: {
+            controller_seat: seat,
+            zone: "deck",
+            owner_card_uid: null,
+          },
+          card_uids: [
+            requiredString(
+              top.uid,
+              "tcg_v0_2_event_listener_move_zone_position_top_uid_required",
+            ),
+          ],
+          destination_position: "bottom",
+        },
+        {
+          source_controller_seat: candidate.seat,
+          phase: event.phase,
+        },
+      );
+    }
     continuation.step_cursor++;
     return "continue";
   }
@@ -1874,17 +2883,72 @@ function executeStep(
 
   if (op === "ADD_SHIELD") {
     const target = targetField(state, continuation, candidate, event, step.target);
-    addRuntimeShield(target.cr, Math.max(0, numberValue(step.amount, "tcg_v0_2_event_listener_shield_amount_invalid")));
+    const requestedAmount = Math.max(
+      0,
+      numberValue(step.amount, "tcg_v0_2_event_listener_shield_amount_invalid"),
+    );
+    const stepIndex = continuation.step_cursor;
+    const actualShieldGained = addRuntimeShield(target.cr, requestedAmount);
     continuation.step_cursor++;
+    if (actualShieldGained > 0) {
+      const sourceActionId = step.source_key == null
+        ? `${candidate.kind}:${listenerId(candidate)}`
+        : requiredString(step.source_key, "tcg_v0_2_event_listener_shield_source_key_invalid");
+      const nestedEvent = runtimeV02CreateShieldGainedEvent(state, {
+        event_id:
+          `shield-gained:${currentTurn(state)}:${event.event_id}:${candidate.source.uid}:${listenerId(candidate)}:${stepIndex}:${target.top.uid}`,
+        source_controller_seat: candidate.seat,
+        target_controller_seat: target.seat,
+        target_creature_uid: target.top.uid,
+        target_zone: target.where,
+        target_index: target.index,
+        requested_amount: requestedAmount,
+        actual_shield_gained: actualShieldGained,
+        source_action_id: sourceActionId,
+        source_card_uid: candidate.source.uid,
+        source_card_id: candidate.source.card_id,
+        source_creature_uid: candidate.field?.top.uid ?? null,
+        action_kind: candidate.kind,
+        phase: String(event.phase || "effect_resolution"),
+        card_effect: true,
+      });
+      continuation.work.splice(
+        continuation.work_index + 1,
+        0,
+        ...eventWorkItems(state, nestedEvent),
+      );
+    }
     return "continue";
   }
 
   if (op === "DIRECT_DAMAGE") {
-    if (step.damage_class != null && String(step.damage_class) !== "effect") {
-      throw new Error("tcg_v0_2_event_listener_direct_damage_class_unsupported");
-    }
     const target = targetField(state, continuation, candidate, event, step.target);
-    dealRuntimeEffectDamage(target.cr, Math.max(0, numberValue(step.amount, "tcg_v0_2_event_listener_direct_damage_amount_invalid")));
+    const actionId =
+      `event-listener:${event.event_id}:${listenerId(candidate)}:${continuation.step_cursor}`;
+    const packetId = `${actionId}:direct:${target.top.uid}`;
+    const result = runtimeV02ApplyDirectDamage(
+      state,
+      target.cr,
+      step,
+      {
+        packet_id: packetId,
+        damage_class: String(step.damage_class || "") as "effect" | "recoil",
+        source_controller_seat: candidate.seat,
+        source_kind: candidate.kind,
+        source_action_id: actionId,
+        source_card_uid: candidate.source.uid,
+        source_card_id: candidate.source.card_id,
+        source_creature_uid: candidate.field?.top.uid ?? null,
+        target_controller_seat: target.seat,
+        target_creature_uid: target.top.uid,
+        target_zone: target.where,
+        target_index: target.index,
+      },
+      String(step.target || ""),
+      null,
+    );
+    const packetEvent = result.after_damage_event as RuntimeV02EventListenerEvent;
+    continuation.work.push(...eventWorkItems(state, packetEvent));
     continuation.step_cursor++;
     return "continue";
   }
@@ -1896,8 +2960,53 @@ function executeStep(
     if (!["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"].includes(rawMode)) {
       throw new Error("tcg_v0_2_event_listener_condition_mode_unsupported");
     }
-    applyRuntimeCondition(target.cr, condition, currentTurn(state), rawMode as ApplyConditionMode);
+    const turn = currentTurn(state);
+    const activeSeat = normalizedSeat(
+      state.active_seat,
+      "tcg_v0_2_event_listener_condition_active_seat_invalid",
+    );
+    const stepIndex = continuation.step_cursor;
+    const conditionResult = applyRuntimeConditionWithContext(
+      target.cr,
+      condition,
+      turn,
+      rawMode as ApplyConditionMode,
+      {
+        turn_seq: turn,
+        active_seat: activeSeat,
+        source_controller_seat: candidate.seat,
+        target_controller_seat: target.seat,
+        card_effect: true,
+        source_action_id: `event-listener:${event.event_id}:${listenerId(candidate)}:${stepIndex}`,
+      },
+    );
     continuation.step_cursor++;
+    if (conditionResult.change_kind) {
+      const nestedEvent = runtimeV02CreateConditionChangedEvent(state, {
+        event_id:
+          `condition-changed:${turn}:${event.event_id}:${candidate.source.uid}:${listenerId(candidate)}:${stepIndex}:${target.top.uid}`,
+        source_controller_seat: candidate.seat,
+        target_controller_seat: target.seat,
+        target_creature_uid: target.top.uid,
+        target_zone: target.where,
+        target_index: target.index,
+        condition,
+        condition_slot: conditionResult.condition_slot,
+        change_kind: conditionResult.change_kind,
+        source_action_id:
+          `event-listener:${event.event_id}:${listenerId(candidate)}:${stepIndex}`,
+        source_card_uid: candidate.source.uid,
+        source_card_id: candidate.source.card_id,
+        source_creature_uid: candidate.field?.top.uid ?? null,
+        action_kind: candidate.kind,
+        phase: String(event.phase || "effect_resolution"),
+      });
+      continuation.work.splice(
+        continuation.work_index + 1,
+        0,
+        ...eventWorkItems(state, nestedEvent),
+      );
+    }
     return "continue";
   }
 
@@ -1922,7 +3031,7 @@ function executeStep(
     if (zone !== "hand" && zone !== "discard") {
       throw new Error("tcg_v0_2_event_listener_attachment_zone_unsupported");
     }
-    const options = cardOptions(state, candidate, step);
+    const options = cardOptions(state, candidate, event, step);
     const wanted = range(objectRecord(step.selection) || {});
     if (options.length < wanted.min) {
       throw new Error("tcg_v0_2_event_listener_attachment_choice_unavailable");
@@ -1948,18 +3057,85 @@ function executeStep(
     return "choice";
   }
 
-  if (op === "SET_WITHDRAWAL_MODIFIER") {
-    setWithdrawalModifier(
+  if (op === "PERFORM_VOLUNTARY_WITHDRAWAL") {
+    const unsupported = Object.keys(step).find((field) =>
+      !["op", "player", "incoming_target"].includes(field)
+    );
+    if (unsupported) {
+      throw new Error(
+        `tcg_v0_2_event_listener_withdrawal_step_field_unsupported:${unsupported}`,
+      );
+    }
+    if (
+      String(step.player || "") !== "self" ||
+      String(step.incoming_target || "") !== "$attached_creature"
+    ) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_shape_unsupported");
+    }
+    const incoming = targetField(
       state,
-      targetField(
+      continuation,
+      candidate,
+      event,
+      step.incoming_target,
+    );
+    const quote = quoteEventListenerWithdrawal(
+      state,
+      candidate,
+      incoming,
+      false,
+    );
+    if (!quote.ok || quote.cost == null || quote.reserve_index == null) {
+      throw new Error(
+        `tcg_v0_2_event_listener_withdrawal_no_longer_legal:${String(quote.error || "unknown")}`,
+      );
+    }
+    if (quote.cost === 0) {
+      applyEventListenerVoluntaryWithdrawal(
         state,
         continuation,
         candidate,
-        event,
-        step.target,
-      ),
-      step,
+        incoming,
+        [],
+        0,
+      );
+      return "continue";
+    }
+    installChoice(state, continuation, candidate, event, {
+      seat: candidate.seat,
+      kind: "withdrawal_payment",
+      prompt: `Choose exactly ${quote.cost} attached Essence to pay for Withdrawal.`,
+      min: quote.cost,
+      max: quote.cost,
+      mode: "select",
+      options: quote.payment_options.map((option) => ({
+        id: `essence:${option.uid}`,
+        label: option.label,
+        data: { uid: option.uid, card_id: option.card_id },
+      })),
+      context: {
+        reserve_index: quote.reserve_index,
+        incoming_target_uid: incoming.top.uid,
+        required_cost: quote.cost,
+      },
+    });
+    return "choice";
+  }
+
+  if (op === "SET_WITHDRAWAL_MODIFIER") {
+    const target = targetField(
+      state,
+      continuation,
+      candidate,
+      event,
+      step.target,
     );
+    runtimeV02InstallWithdrawalModifier(state, target.cr, step, {
+      source_controller_seat: candidate.seat,
+      target_controller_seat: target.seat,
+      source_card_uid: candidate.source.uid,
+      source_action_id: listenerId(candidate),
+    });
     continuation.step_cursor++;
     return "continue";
   }
@@ -2119,6 +3295,38 @@ function continueFlow(
     continuation.processed_listener_keys.push(
       receiptKey(candidate, work.event),
     );
+    const hiddenOccurrences =
+      runtimeV02TakeHiddenInformationOccurrences(state);
+    const deckReorderOccurrences =
+      runtimeV02TakeDeckReorderOccurrences(state);
+    const insertedWork: WorkItem[] = [];
+    if (hiddenOccurrences.length) {
+      const hiddenEvents =
+        runtimeV02AdaptHiddenInformationOccurrencesForListener(
+          state,
+          hiddenOccurrences,
+        );
+      insertedWork.push(...hiddenEvents.flatMap((event) =>
+        eventWorkItems(state, event)
+      ));
+    }
+    if (deckReorderOccurrences.length) {
+      const deckEvents =
+        runtimeV02AdaptDeckReorderOccurrencesForListener(
+          state,
+          deckReorderOccurrences,
+        );
+      insertedWork.push(...deckEvents.flatMap((event) =>
+        eventWorkItems(state, event)
+      ));
+    }
+    if (insertedWork.length) {
+      continuation.work.splice(
+        continuation.work_index + 1,
+        0,
+        ...insertedWork,
+      );
+    }
     continuation.work_index++;
     continuation.program_loaded = false;
     continuation.program = [];
@@ -2142,6 +3350,302 @@ function recordEvent(
   if (!events.some((entry) => entry.event_id === event.event_id)) {
     events.push({ ...event });
   }
+}
+
+export function runtimeV02AdaptHiddenInformationOccurrencesForListener(
+  state: Record<string, unknown>,
+  occurrences: RuntimeV02HiddenInformationOccurrence[],
+): RuntimeV02EventListenerEvent[] {
+  if (!Array.isArray(occurrences)) {
+    throw new Error("tcg_v0_2_hidden_information_listener_occurrences_required");
+  }
+  const turn = currentTurn(state);
+  return occurrences.map((occurrence, index) => {
+    if (Number(occurrence.turn_seq) !== turn) {
+      throw new Error(
+        `tcg_v0_2_hidden_information_listener_occurrence_turn_stale:${index}`,
+      );
+    }
+    const controller = normalizedSeat(
+      occurrence.controller_seat,
+      `tcg_v0_2_hidden_information_listener_controller_invalid:${index}`,
+    );
+    const sourceController = normalizedSeat(
+      occurrence.source_controller_seat,
+      `tcg_v0_2_hidden_information_listener_source_controller_invalid:${index}`,
+    );
+    const viewedZone = String(occurrence.zone || "");
+    if (viewedZone !== "deck_top" && viewedZone !== "deck") {
+      throw new Error(
+        `tcg_v0_2_hidden_information_listener_zone_invalid:${index}`,
+      );
+    }
+    const sourceCardUid = requiredString(
+      occurrence.source_card_uid,
+      `tcg_v0_2_hidden_information_listener_source_card_invalid:${index}`,
+    );
+    const event: RuntimeV02EventListenerEvent = {
+      event_id: requiredString(
+        occurrence.occurrence_id,
+        `tcg_v0_2_hidden_information_listener_occurrence_id_invalid:${index}`,
+      ),
+      event: "hidden_information_viewed",
+      subject_uid: sourceCardUid,
+      controller_seat: controller,
+      source_controller_seat: sourceController,
+      origin_zone: viewedZone,
+      destination_zone: viewedZone,
+      destination_index: null,
+      phase: requiredString(
+        occurrence.phase,
+        `tcg_v0_2_hidden_information_listener_phase_invalid:${index}`,
+      ),
+      source_action_id: requiredString(
+        occurrence.source_action_id,
+        `tcg_v0_2_hidden_information_listener_source_action_invalid:${index}`,
+      ),
+      source_card_uid: sourceCardUid,
+      action_kind: requiredString(
+        occurrence.action_kind,
+        `tcg_v0_2_hidden_information_listener_action_kind_invalid:${index}`,
+      ),
+      turn_seq: turn,
+      zone: viewedZone,
+      source_creature_uid: occurrence.source_creature_uid == null
+        ? undefined
+        : requiredString(
+          occurrence.source_creature_uid,
+          `tcg_v0_2_hidden_information_listener_source_creature_invalid:${index}`,
+        ),
+    };
+    recordEvent(state, event);
+    return { ...event };
+  });
+}
+
+export function runtimeV02AdaptDeckReorderOccurrencesForListener(
+  state: Record<string, unknown>,
+  occurrences: RuntimeV02DeckReorderOccurrence[],
+): RuntimeV02EventListenerEvent[] {
+  if (!Array.isArray(occurrences)) {
+    throw new Error("tcg_v0_2_deck_reorder_listener_occurrences_required");
+  }
+  const turn = currentTurn(state);
+  return occurrences.map((occurrence, index) => {
+    if (Number(occurrence.turn_seq) !== turn) {
+      throw new Error(
+        `tcg_v0_2_deck_reorder_listener_occurrence_turn_stale:${index}`,
+      );
+    }
+    const controller = normalizedSeat(
+      occurrence.controller_seat,
+      `tcg_v0_2_deck_reorder_listener_controller_invalid:${index}`,
+    );
+    const sourceController = normalizedSeat(
+      occurrence.source_controller_seat,
+      `tcg_v0_2_deck_reorder_listener_source_controller_invalid:${index}`,
+    );
+    const count = Number(occurrence.count);
+    if (!Number.isInteger(count) || count < 1) {
+      throw new Error(
+        `tcg_v0_2_deck_reorder_listener_count_invalid:${index}`,
+      );
+    }
+    const event: RuntimeV02EventListenerEvent = {
+      event_id: requiredString(
+        occurrence.occurrence_id,
+        `tcg_v0_2_deck_reorder_listener_occurrence_id_invalid:${index}`,
+      ),
+      event: "deck_reordered",
+      subject_uid: `deck:${controller}`,
+      controller_seat: controller,
+      source_controller_seat: sourceController,
+      origin_zone: "deck",
+      destination_zone: "deck",
+      destination_index: null,
+      phase: requiredString(
+        occurrence.phase,
+        `tcg_v0_2_deck_reorder_listener_phase_invalid:${index}`,
+      ),
+      source_action_id: requiredString(
+        occurrence.source_action_id,
+        `tcg_v0_2_deck_reorder_listener_source_action_invalid:${index}`,
+      ),
+      source_card_uid: occurrence.source_card_uid == null
+        ? null
+        : requiredString(
+          occurrence.source_card_uid,
+          `tcg_v0_2_deck_reorder_listener_source_card_invalid:${index}`,
+        ),
+      action_kind: requiredString(
+        occurrence.action_kind,
+        `tcg_v0_2_deck_reorder_listener_action_kind_invalid:${index}`,
+      ),
+      turn_seq: turn,
+      zone: "deck",
+      count,
+    };
+    recordEvent(state, event);
+    return { ...event };
+  });
+}
+
+export type RuntimeV02ResolvedAttackDamageEventInput = {
+  action_id: string;
+  packet_id: string;
+  attack_id: string;
+  source_controller_seat: 1 | 2;
+  source_creature_uid: string;
+  source_card_uid: string;
+  source_card_id: string;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  target_index: number | null;
+  requested_amount: number;
+  final_packet_amount: number;
+  shield_prevented: number;
+  actual_hp_damage: number;
+};
+
+export function runtimeV02CreateResolvedAttackDamageEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02ResolvedAttackDamageEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = currentTurn(state);
+  const source = fieldByUid(
+    state,
+    requiredString(
+      input.source_creature_uid,
+      "tcg_v0_2_attack_damage_packet_source_required",
+    ),
+  );
+  if (!source || source.seat !== input.source_controller_seat) {
+    throw new Error("tcg_v0_2_attack_damage_packet_source_changed");
+  }
+  const target = fieldByUid(
+    state,
+    requiredString(
+      input.target_creature_uid,
+      "tcg_v0_2_attack_damage_packet_target_required",
+    ),
+  );
+  if (
+    !target ||
+    target.seat !== input.target_controller_seat ||
+    target.where !== input.target_zone ||
+    target.index !== input.target_index
+  ) {
+    throw new Error("tcg_v0_2_attack_damage_packet_target_changed");
+  }
+  const requested = Number(input.requested_amount);
+  const finalAmount = Number(input.final_packet_amount);
+  const shieldPrevented = Number(input.shield_prevented);
+  const actualHpDamage = Number(input.actual_hp_damage);
+  if (
+    !Number.isFinite(requested) || requested < 0 ||
+    !Number.isFinite(finalAmount) || finalAmount < 0 ||
+    !Number.isFinite(shieldPrevented) || shieldPrevented < 0 ||
+    !Number.isFinite(actualHpDamage) || actualHpDamage < 0
+  ) {
+    throw new Error("tcg_v0_2_attack_damage_packet_amount_invalid");
+  }
+  const packetId = requiredString(
+    input.packet_id,
+    "tcg_v0_2_attack_damage_packet_id_required",
+  );
+  const event: RuntimeV02EventListenerEvent = {
+    event_id: `after-damage:${packetId}`,
+    event: "after_damage_packet",
+    subject_uid: target.top.uid,
+    subject_card_id: target.top.card_id,
+    controller_seat: target.seat,
+    source_controller_seat: source.seat,
+    origin_zone: target.where,
+    destination_zone: target.where,
+    destination_index: target.index,
+    phase: "damage_packet",
+    source_action_id: requiredString(
+      input.action_id,
+      "tcg_v0_2_attack_damage_packet_action_required",
+    ),
+    source_card_uid: requiredString(
+      input.source_card_uid,
+      "tcg_v0_2_attack_damage_packet_source_card_uid_required",
+    ),
+    source_card_id: requiredString(
+      input.source_card_id,
+      "tcg_v0_2_attack_damage_packet_source_card_id_required",
+    ),
+    action_kind: "attack",
+    turn_seq: turn,
+    packet_id: packetId,
+    damage_class: "attack",
+    attack_id: requiredString(
+      input.attack_id,
+      "tcg_v0_2_attack_damage_packet_attack_id_required",
+    ),
+    source_creature_uid: source.top.uid,
+    target_creature_uid: target.top.uid,
+    target_controller_seat: target.seat,
+    target_zone: target.where,
+    requested_amount: requested,
+    final_packet_amount: finalAmount,
+    shield_prevented: shieldPrevented,
+    actual_hp_damage: actualHpDamage,
+  };
+  recordEvent(state, event);
+  return { ...event };
+}
+
+export function runtimeV02CreateAfterAttackDamageEvent(
+  state: Record<string, unknown>,
+  packetEvent: RuntimeV02EventListenerEvent,
+  targetRemainsInPlayAfterDamage: boolean,
+): RuntimeV02EventListenerEvent {
+  if (
+    packetEvent.event !== "after_damage_packet" ||
+    packetEvent.damage_class !== "attack" ||
+    packetEvent.action_kind !== "attack"
+  ) {
+    throw new Error("tcg_v0_2_after_attack_damage_packet_invalid");
+  }
+  if (typeof targetRemainsInPlayAfterDamage !== "boolean") {
+    throw new Error("tcg_v0_2_after_attack_damage_target_survival_invalid");
+  }
+  const packetId = requiredString(
+    packetEvent.packet_id,
+    "tcg_v0_2_after_attack_damage_packet_id_required",
+  );
+  const sourceUid = requiredString(
+    packetEvent.source_creature_uid,
+    "tcg_v0_2_after_attack_damage_source_required",
+  );
+  const targetUid = requiredString(
+    packetEvent.target_creature_uid,
+    "tcg_v0_2_after_attack_damage_target_required",
+  );
+  const source = fieldByUid(state, sourceUid);
+  const target = fieldByUid(state, targetUid);
+  if (!source || source.seat !== packetEvent.source_controller_seat) {
+    throw new Error("tcg_v0_2_after_attack_damage_source_changed");
+  }
+  if (
+    !target ||
+    target.seat !== packetEvent.target_controller_seat ||
+    target.where !== packetEvent.target_zone
+  ) {
+    throw new Error("tcg_v0_2_after_attack_damage_target_changed");
+  }
+  const event: RuntimeV02EventListenerEvent = {
+    ...packetEvent,
+    event_id: `after-attack-damage:${packetId}`,
+    event: "after_attack_damage",
+    phase: "after_attack_damage",
+    target_remains_in_play_after_damage: targetRemainsInPlayAfterDamage,
+  };
+  recordEvent(state, event);
+  return { ...event };
 }
 
 export function runtimeV02CreateCreatureEnteredPlayEvent(
@@ -2397,6 +3901,51 @@ export function runtimeV02ResolveEventListenerChoice(
     }
     continuation.vars[String(pending.context.as || "selected_cards")] = refs;
     continuation.step_cursor++;
+  } else if (pending.kind === "discard_from_hand") {
+    const seat = normalizedSeat(
+      pending.context.zone_owner_seat,
+      "tcg_v0_2_event_listener_hand_discard_owner_invalid",
+    );
+    const refs = selected.map((option) => option.data.ref as CardRef);
+    if (
+      refs.some((ref) =>
+        ref.zone_owner_seat !== seat ||
+        ref.zone !== "hand"
+      )
+    ) {
+      throw new Error("tcg_v0_2_event_listener_hand_discard_ref_invalid");
+    }
+    const owner = player(state, seat);
+    const hand = owner.hand as Inst[];
+    const discard = owner.discard as Inst[];
+    for (const ref of refs) {
+      if (!hand.some((card) =>
+        card.uid === ref.uid && card.card_id === ref.card_id
+      )) {
+        throw new Error("tcg_v0_2_event_listener_hand_discard_stale");
+      }
+    }
+    if (refs.length > 0) {
+      runtimeV02ApplyCardZoneTransfer(hand, discard, {
+        cause: "effect",
+        action_kind: "event_listener",
+        source_action_id: `listener:${listenerId(candidate)}`,
+        source_card_uid: candidate.source.uid,
+        source: {
+          controller_seat: seat,
+          zone: "hand",
+          owner_card_uid: null,
+        },
+        destination: {
+          controller_seat: seat,
+          zone: "discard",
+          owner_card_uid: null,
+        },
+        card_uids: refs.map((ref) => ref.uid),
+        destination_position: "bottom",
+      });
+    }
+    continuation.step_cursor++;
   } else if (pending.kind === "order_cards") {
     const refs = selected.map((option) => option.data.ref as CardRef);
     const source = cardRefsFromVar(continuation, pending.context.source);
@@ -2409,16 +3958,9 @@ export function runtimeV02ResolveEventListenerChoice(
   } else if (pending.kind === "attach_essence") {
     const target = fieldFromRef(state, pending.context.target as CreatureRef);
     if (!target) throw new Error("tcg_v0_2_event_listener_attachment_target_stale");
-    const attachmentState = objectRecord(pending.context.attachment_state);
-    if (attachmentState) {
-      if (
-        String(attachmentState.kind || "") !== "temporary" ||
-        String(attachmentState.expires || "") !== "controller_aftermath" ||
-        String(attachmentState.destination_on_expire || "") !== "discard"
-      ) {
-        throw new Error("tcg_v0_2_event_listener_attachment_state_unsupported");
-      }
-    }
+    const attachmentState = runtimeV02NormalizeEffectAttachmentState(
+      pending.context.attachment_state,
+    );
     for (const option of selected) {
       const ref = option.data.ref as CardRef;
       if (ref.zone !== "hand" && ref.zone !== "discard") {
@@ -2432,20 +3974,65 @@ export function runtimeV02ResolveEventListenerChoice(
         ref.zone,
         listenerId(candidate),
         {
-          attachment_kind: attachmentState ? String(attachmentState.kind) : "normal",
+          attachment_kind: attachmentState.transaction.attachment_kind,
           phase: work.event.phase,
           action_kind: "effect_driven",
           destination_index: target.where === "reserve" ? target.index : null,
           source_owner_seat: ref.zone_owner_seat,
           source_card_id: ref.card_id,
-          effect_flags: attachmentState
-            ? { discard_during_target_aftermath: true }
-            : undefined,
+          effect_flags: attachmentState.transaction.effect_flags,
         },
       );
       continuation.work.push(...essenceAttachedWorkItems(state, transaction.listener_event));
     }
     continuation.step_cursor++;
+  } else if (pending.kind === "withdrawal_payment") {
+    const reserveIndex = Number(pending.context.reserve_index);
+    const incomingUid = requiredString(
+      pending.context.incoming_target_uid,
+      "tcg_v0_2_event_listener_withdrawal_pending_target_invalid",
+    );
+    const expectedCost = Number(pending.context.required_cost);
+    if (!Number.isInteger(expectedCost) || expectedCost < 1) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_pending_cost_invalid");
+    }
+    const incoming = fieldByUid(state, incomingUid);
+    if (
+      !incoming || incoming.seat !== candidate.seat ||
+      incoming.where !== "reserve" || incoming.index !== reserveIndex
+    ) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_target_stale");
+    }
+    const preview = quoteEventListenerWithdrawal(
+      state,
+      candidate,
+      incoming,
+      false,
+    );
+    if (
+      !preview.ok || preview.cost !== expectedCost ||
+      preview.reserve_index !== reserveIndex
+    ) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_quote_stale");
+    }
+    const allowed = new Set(preview.payment_options.map((option) => option.uid));
+    const paymentUids = selected.map((option) =>
+      requiredString(
+        option.data.uid,
+        "tcg_v0_2_event_listener_withdrawal_payment_uid_invalid",
+      )
+    );
+    if (paymentUids.some((uid) => !allowed.has(uid))) {
+      throw new Error("tcg_v0_2_event_listener_withdrawal_payment_stale");
+    }
+    applyEventListenerVoluntaryWithdrawal(
+      state,
+      continuation,
+      candidate,
+      incoming,
+      paymentUids,
+      expectedCost,
+    );
   } else if (pending.kind === "inspect_rewards") {
     const positions = selected.map((option) => Number(option.data.position));
     const inspected = runtimeV02InspectRewardPositions(
@@ -2622,6 +4209,34 @@ function attackDeclaredRequirement(
     return candidate.seat === input.source_controller_seat &&
       candidate.field?.top.uid === input.source_creature_uid;
   }
+  if (predicate === "event_attack_id_is") {
+    const unsupported = Object.keys(value).find((key) => key !== "predicate" && key !== "attack_id");
+    if (unsupported) {
+      throw new Error(`tcg_v0_2_attack_declared_listener_attack_id_field_unsupported:${unsupported}`);
+    }
+    const attackId = requiredString(
+      value.attack_id,
+      "tcg_v0_2_attack_declared_listener_attack_id_predicate_required",
+    );
+    return input.attack_id === attackId;
+  }
+  if (predicate === "event_attack_target_zone_is") {
+    const unsupported = Object.keys(value).find((key) => key !== "predicate" && key !== "zone");
+    if (unsupported) {
+      throw new Error(`tcg_v0_2_attack_declared_listener_target_zone_field_unsupported:${unsupported}`);
+    }
+    const zone = String(value.zone || "");
+    if (zone !== "vanguard" && zone !== "reserve") {
+      throw new Error("tcg_v0_2_attack_declared_listener_target_zone_predicate_invalid");
+    }
+    return input.target_zone === zone;
+  }
+  if (predicate === "event_attack_target_controller_is_opponent") {
+    if (Object.keys(value).some((key) => key !== "predicate")) {
+      throw new Error("tcg_v0_2_attack_declared_listener_target_controller_predicate_field_unsupported");
+    }
+    return input.target_controller_seat !== candidate.seat;
+  }
   if (predicate === "damage_history_count_at_least") {
     if (!candidate.field) {
       throw new Error(
@@ -2673,23 +4288,74 @@ function attackDeclaredListenerMatches(
     );
 }
 
-function attackDeclaredDamageDelta(candidate: Candidate): number | null {
-  if (!containsCurrentAttackDamageModifier(candidate.listener.steps)) return null;
-  const costs = records(
-    candidate.listener.costs,
-    "tcg_v0_2_attack_declared_listener_costs_required",
+type RuntimeV02AttackDeclaredIfContext = {
+  state: Record<string, unknown>;
+  candidate: Candidate;
+  input: RuntimeV02AttackDeclaredDamageInput;
+};
+
+function attackDeclaredIfLeaf(
+  value: RuntimeV02PredicateLeaf,
+  context: RuntimeV02AttackDeclaredIfContext,
+): boolean {
+  const { state, candidate, input } = context;
+  const predicate = requiredString(
+    value.predicate,
+    "tcg_v0_2_attack_declared_if_predicate_required",
   );
-  if (costs.length !== 0) {
-    throw new Error("tcg_v0_2_attack_declared_listener_costs_unsupported");
+  const target = fieldByUid(state, input.target_creature_uid);
+  if (!target) throw new Error("tcg_v0_2_attack_declared_if_target_missing");
+
+  switch (predicate) {
+    case "source_damaged":
+      if (Object.keys(value).some((key) => key !== "predicate")) {
+        throw new Error("tcg_v0_2_attack_declared_if_source_damaged_field_unsupported");
+      }
+      if (!candidate.field) {
+        throw new Error("tcg_v0_2_attack_declared_if_source_required");
+      }
+      return Number(candidate.field.cr.damage || 0) > 0;
+    case "event_attack_target_damaged":
+      if (Object.keys(value).some((key) => key !== "predicate")) {
+        throw new Error("tcg_v0_2_attack_declared_if_target_damaged_field_unsupported");
+      }
+      return Number(target.cr.damage || 0) > 0;
+    case "event_attack_target_has_condition": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "condition"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_attack_declared_if_target_condition_field_unsupported:${unsupported}`,
+        );
+      }
+      const condition = requiredString(
+        value.condition,
+        "tcg_v0_2_attack_declared_if_target_condition_required",
+      );
+      return hasRuntimeCondition(target.cr, condition);
+    }
+    default:
+      throw new Error(
+        `tcg_v0_2_attack_declared_if_predicate_unsupported:${predicate}`,
+      );
   }
-  const steps = records(
-    candidate.listener.steps,
-    "tcg_v0_2_attack_declared_listener_steps_required",
+}
+
+function attackDeclaredIfMatches(
+  state: Record<string, unknown>,
+  raw: unknown,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+): boolean {
+  return runtimeV02EvaluatePredicateTree(
+    raw,
+    { state, candidate, input },
+    attackDeclaredIfLeaf,
   );
-  if (steps.length !== 1 || steps[0].op !== "MODIFY_CURRENT_ATTACK_DAMAGE") {
-    throw new Error("tcg_v0_2_attack_declared_listener_program_unsupported");
-  }
-  const step = steps[0];
+}
+
+function directAttackDeclaredModifierDelta(step: Record<string, unknown>): number {
   const unsupported = Object.keys(step).find((key) =>
     key !== "op" && key !== "delta"
   );
@@ -2703,6 +4369,63 @@ function attackDeclaredDamageDelta(candidate: Candidate): number | null {
     throw new Error("tcg_v0_2_attack_declared_listener_delta_invalid");
   }
   return delta;
+}
+
+function attackDeclaredProgramDelta(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+  rawSteps: unknown,
+): number | null {
+  const steps = records(
+    rawSteps,
+    "tcg_v0_2_attack_declared_listener_steps_required",
+  );
+  if (steps.length === 0) return null;
+  if (steps.length !== 1) {
+    throw new Error("tcg_v0_2_attack_declared_listener_program_unsupported");
+  }
+  const step = steps[0];
+  if (step.op === "MODIFY_CURRENT_ATTACK_DAMAGE") {
+    return directAttackDeclaredModifierDelta(step);
+  }
+  if (step.op !== "IF") {
+    throw new Error("tcg_v0_2_attack_declared_listener_program_unsupported");
+  }
+
+  const unsupported = Object.keys(step).find((key) =>
+    key !== "op" && key !== "when" && key !== "then" && key !== "else"
+  );
+  if (unsupported) {
+    throw new Error(
+      `tcg_v0_2_attack_declared_listener_if_field_unsupported:${unsupported}`,
+    );
+  }
+  const branch = attackDeclaredIfMatches(state, step.when, candidate, input)
+    ? step.then ?? []
+    : step.else ?? [];
+  return attackDeclaredProgramDelta(state, candidate, input, branch);
+}
+
+function attackDeclaredDamageDelta(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+): number | null {
+  if (!containsCurrentAttackDamageModifier(candidate.listener.steps)) return null;
+  const costs = records(
+    candidate.listener.costs,
+    "tcg_v0_2_attack_declared_listener_costs_required",
+  );
+  if (costs.length !== 0) {
+    throw new Error("tcg_v0_2_attack_declared_listener_costs_unsupported");
+  }
+  return attackDeclaredProgramDelta(
+    state,
+    candidate,
+    input,
+    candidate.listener.steps,
+  );
 }
 
 function normalizedAttackDeclaredInput(
@@ -2820,21 +4543,30 @@ export function runtimeV02ResolveAttackDeclaredDamageListeners(
     if (alreadyResolved(state, candidate, event)) {
       const prior = objectRecord(listenerState(state).receipts[key]);
       const priorDelta = Number(prior?.attack_damage_delta);
-      if (!Number.isInteger(priorDelta) || priorDelta === 0) {
+      if (!Number.isInteger(priorDelta)) {
         throw new Error("tcg_v0_2_attack_declared_listener_receipt_invalid");
       }
-      damageDelta += priorDelta;
-      applications.push({
-        source_uid: candidate.source.uid,
-        listener_id: listenerId(candidate),
-        delta: priorDelta,
-        limit_consumed: false,
-        replayed: true,
-      });
+      if (priorDelta !== 0) {
+        damageDelta += priorDelta;
+        applications.push({
+          source_uid: candidate.source.uid,
+          listener_id: listenerId(candidate),
+          delta: priorDelta,
+          limit_consumed: false,
+          replayed: true,
+        });
+      }
       continue;
     }
     if (!attackDeclaredListenerMatches(state, candidate, input)) continue;
-    const delta = attackDeclaredDamageDelta(candidate)!;
+    const delta = attackDeclaredDamageDelta(state, candidate, input);
+    if (delta == null) {
+      markResolved(state, candidate, event, {
+        resolution_kind: "attack_declared_damage",
+        attack_damage_delta: 0,
+      });
+      continue;
+    }
 
     const limit = limitInfo(state, candidate, event);
     if (limit && usedLimit(state, limit) >= limit.count) continue;
@@ -2862,3 +4594,217 @@ export function runtimeV02ResolveAttackDeclaredDamageListeners(
     applications,
   };
 }
+
+function synchronousEventListenerContinuation(
+  state: Record<string, unknown>,
+): Continuation {
+  return {
+    turn_seq: currentTurn(state),
+    work: [],
+    work_index: 0,
+    program_loaded: false,
+    program: [],
+    step_cursor: 0,
+    vars: {},
+    processed_listener_keys: [],
+    emitted_heal_packet_ids: [],
+    emitted_movement_events: [],
+  };
+}
+
+function normalizedVoluntaryWithdrawalCostInput(
+  state: Record<string, unknown>,
+  raw: RuntimeV02VoluntaryWithdrawalCostInput,
+): RuntimeV02VoluntaryWithdrawalCostInput {
+  if (!raw || typeof raw !== "object") {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_input_required");
+  }
+  const controllerSeat = normalizedSeat(
+    raw.controller_seat,
+    "tcg_v0_2_withdrawal_cost_listener_controller_invalid",
+  );
+  const sourceCreatureUid = requiredString(
+    raw.source_creature_uid,
+    "tcg_v0_2_withdrawal_cost_listener_source_required",
+  );
+  const source = fieldByUid(state, sourceCreatureUid);
+  if (
+    !source || source.seat !== controllerSeat || source.where !== "vanguard"
+  ) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_source_mismatch");
+  }
+  const baseCost = Number(raw.base_cost);
+  if (!Number.isInteger(baseCost) || baseCost < 0) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_base_cost_invalid");
+  }
+  const actionId = raw.action_id == null
+    ? "withdraw"
+    : requiredString(
+      raw.action_id,
+      "tcg_v0_2_withdrawal_cost_listener_action_invalid",
+    );
+  return {
+    controller_seat: controllerSeat,
+    source_creature_uid: sourceCreatureUid,
+    base_cost: baseCost,
+    action_id: actionId,
+  };
+}
+
+function voluntaryWithdrawalCostModifier(
+  raw: unknown,
+): {
+  delta: number;
+  minimum: number;
+} | null {
+  const steps = records(
+    raw,
+    "tcg_v0_2_withdrawal_cost_listener_steps_required",
+  );
+  if (steps.length === 0) return null;
+  if (
+    !steps.some((step) =>
+      String(step.op || "") === "MODIFY_CURRENT_WITHDRAWAL_COST"
+    )
+  ) return null;
+  if (steps.length !== 1) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_program_unsupported");
+  }
+  const step = steps[0];
+  if (String(step.op || "") !== "MODIFY_CURRENT_WITHDRAWAL_COST") {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_program_unsupported");
+  }
+  const unsupported = Object.keys(step).find((key) =>
+    !["op", "delta", "minimum"].includes(key)
+  );
+  if (unsupported) {
+    throw new Error(
+      `tcg_v0_2_withdrawal_cost_listener_step_field_unsupported:${unsupported}`,
+    );
+  }
+  const delta = Number(step.delta);
+  if (!Number.isInteger(delta) || delta === 0) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_delta_invalid");
+  }
+  const minimum = step.minimum == null ? 0 : Number(step.minimum);
+  if (!Number.isInteger(minimum) || minimum < 0) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_minimum_invalid");
+  }
+  return { delta, minimum };
+}
+
+/**
+ * Resolves synchronous before_voluntary_withdrawal_cost listeners after the
+ * canonical Withdrawal base cost is known and before Payment validates the
+ * attached-Essence payment. Match may run this against a cloned state for
+ * read-only field-action projection; only the authoritative withdraw command
+ * persists the listener receipt/turn-limit consumption.
+ */
+export function runtimeV02ResolveVoluntaryWithdrawalCostListeners(
+  state: Record<string, unknown>,
+  rawInput: RuntimeV02VoluntaryWithdrawalCostInput,
+): RuntimeV02VoluntaryWithdrawalCostResult | null {
+  if (!structuredEnabled(state)) return null;
+  const input = normalizedVoluntaryWithdrawalCostInput(state, rawInput);
+  const source = fieldByUid(state, input.source_creature_uid)!;
+  const event: RuntimeV02EventListenerEvent = {
+    event_id:
+      `withdrawal-cost:${currentTurn(state)}:${input.controller_seat}:${input.source_creature_uid}`,
+    event: "before_voluntary_withdrawal_cost",
+    subject_uid: input.source_creature_uid,
+    subject_card_id: source.top.card_id,
+    controller_seat: input.controller_seat,
+    source_controller_seat: input.controller_seat,
+    origin_zone: "vanguard",
+    destination_zone: "reserve",
+    destination_index: null,
+    phase: "play",
+    source_action_id: String(input.action_id || "withdraw"),
+    source_card_uid: source.top.uid,
+    action_kind: "voluntary_withdrawal",
+    turn_seq: currentTurn(state),
+    source_creature_uid: input.source_creature_uid,
+  };
+  recordEvent(state, event);
+
+  let cost = input.base_cost;
+  const applications: RuntimeV02VoluntaryWithdrawalCostApplication[] = [];
+  const continuation = synchronousEventListenerContinuation(state);
+
+  for (const candidate of collectCandidates(state, event.event)) {
+    const modifier = voluntaryWithdrawalCostModifier(candidate.listener.steps);
+    if (!modifier) continue;
+
+    const key = receiptKey(candidate, event);
+    if (alreadyResolved(state, candidate, event)) {
+      const prior = objectRecord(listenerState(state).receipts[key]);
+      const priorDelta = Number(prior?.withdrawal_cost_applied_delta);
+      const priorRequestedDelta = Number(prior?.withdrawal_cost_requested_delta);
+      if (
+        !Number.isInteger(priorDelta) ||
+        !Number.isInteger(priorRequestedDelta)
+      ) {
+        throw new Error("tcg_v0_2_withdrawal_cost_listener_receipt_invalid");
+      }
+      const before = cost;
+      cost = Math.max(0, before + priorDelta);
+      applications.push({
+        source_uid: candidate.source.uid,
+        listener_id: listenerId(candidate),
+        before_cost: before,
+        requested_delta: priorRequestedDelta,
+        applied_delta: priorDelta,
+        after_cost: cost,
+        limit_consumed: false,
+        replayed: true,
+      });
+      continue;
+    }
+
+    if (
+      !matches(
+        state,
+        continuation,
+        candidate,
+        event,
+      )
+    ) continue;
+
+    const limit = limitInfo(state, candidate, event);
+    if (limit && usedLimit(state, limit) >= limit.count) continue;
+
+    const before = cost;
+    const after = Math.max(modifier.minimum, before + modifier.delta, 0);
+    const appliedDelta = after - before;
+
+    consumeLimit(state, limit);
+    markResolved(state, candidate, event, {
+      resolution_kind: "voluntary_withdrawal_cost",
+      withdrawal_cost_requested_delta: modifier.delta,
+      withdrawal_cost_applied_delta: appliedDelta,
+      withdrawal_cost_before: before,
+      withdrawal_cost_after: after,
+    });
+
+    cost = after;
+    applications.push({
+      source_uid: candidate.source.uid,
+      listener_id: listenerId(candidate),
+      before_cost: before,
+      requested_delta: modifier.delta,
+      applied_delta: appliedDelta,
+      after_cost: after,
+      limit_consumed: limit != null,
+      replayed: false,
+    });
+  }
+
+  return {
+    schema: "sb-tcg-voluntary-withdrawal-cost-v0.2",
+    event: { ...event },
+    base_cost: input.base_cost,
+    cost,
+    applications,
+  };
+}
+

@@ -6,6 +6,10 @@ import {
   structuredRuntimeAfterDamageOverchargeDiscardCondition,
 } from "../_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts";
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
+import {
+  runtimeV02ConditionProtectionCount,
+  runtimeV02InstallConditionProtection,
+} from "../_shared/tcg-match-condition-protection-v0-2.ts";
 
 function assertEquals(actual: unknown, expected: unknown, message = "values differ") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
@@ -194,6 +198,24 @@ function targetBinding(state: Record<string, unknown>) {
   };
 }
 
+function attackIfContext(
+  state: Record<string, unknown>,
+  eventCount: number,
+  targetRemainedAfterDamage: boolean,
+) {
+  const players = state.players as any;
+  return {
+    source_creature: players["1"].vanguard,
+    attack_target: players["2"].vanguard,
+    self_reserve: players["1"].reserve,
+    opponent_reserve: players["2"].reserve,
+    variables: {},
+    current_action_events: { "charged-strike-ready": eventCount },
+    target_remains_in_play_after_damage: targetRemainedAfterDamage,
+    card_matches: () => false,
+  };
+}
+
 Deno.test("overcharge family is registry-driven and leaves the plain sibling attack outside its owner", () => {
   const state = stateWith();
   assertEquals(structuredRuntimeAfterDamageOverchargeDiscardCondition(state, { card_id: "test-overcharge-creature" }, 1), null);
@@ -204,6 +226,14 @@ Deno.test("overcharge family is registry-driven and leaves the plain sibling att
       phase: "after_damage",
       event: "charged-strike-ready",
       threshold: 4,
+      outer_when: {
+        predicate: "event_occurred",
+        event: "charged-strike-ready",
+        controller: "self",
+        window: "current_action",
+        min_count: 1,
+      },
+      survive_when: { predicate: "target_remains_in_play_after_damage" },
       discard: { min: 1, max: 1 },
       condition: { target: "$attack_target", condition: "Stunned", mode: "apply_if_empty" },
     },
@@ -213,7 +243,7 @@ Deno.test("overcharge family is registry-driven and leaves the plain sibling att
 Deno.test("declaration threshold is snapshotted before damage and creates a private attached-Essence choice", () => {
   let state = stateWith(3);
   let descriptor = structuredRuntimeAfterDamageOverchargeDiscardCondition(state, { card_id: "test-overcharge-creature" }, 2)!;
-  assertEquals(runtimeV02AttackOverchargeTriggered(descriptor, sourceCreature(state) as any), false);
+  assertEquals(runtimeV02AttackOverchargeTriggered(descriptor, attackIfContext(state, 0, true)), false);
   assertEquals(
     runtimeV02CreateAttackOverchargeDiscardChoice(
       state,
@@ -221,8 +251,7 @@ Deno.test("declaration threshold is snapshotted before damage and creates a priv
       descriptor,
       card("source-1", "test-overcharge-creature"),
       targetBinding(state),
-      true,
-      false,
+      attackIfContext(state, 0, true),
       "choice-low",
     ),
     null,
@@ -230,16 +259,15 @@ Deno.test("declaration threshold is snapshotted before damage and creates a priv
 
   state = stateWith(4);
   descriptor = structuredRuntimeAfterDamageOverchargeDiscardCondition(state, { card_id: "test-overcharge-creature" }, 2)!;
-  assertEquals(runtimeV02AttackOverchargeTriggered(descriptor, sourceCreature(state) as any), true);
+  assertEquals(runtimeV02AttackOverchargeTriggered(descriptor, attackIfContext(state, 1, true)), true);
   const pending = runtimeV02CreateAttackOverchargeDiscardChoice(
     state,
     1,
     descriptor,
     card("source-1", "test-overcharge-creature"),
     targetBinding(state),
-    true,
-    true,
-    "choice-1",
+      attackIfContext(state, 1, true),
+      "choice-1",
   )!;
   assertEquals(pending.options.map((option) => option.id), ["essence:ess-1", "essence:ess-2", "essence:ess-3", "essence:ess-4"]);
   assertEquals(runtimeV02PendingAttackChoiceView(pending, 2), {
@@ -274,9 +302,8 @@ Deno.test("resolution discards exactly the selected attached Essence then applie
     descriptor,
     card("source-1", "test-overcharge-creature"),
     targetBinding(state),
-    true,
-    true,
-    "choice-1",
+      attackIfContext(state, 1, true),
+      "choice-1",
   )!;
   const resolved = runtimeV02ResolveAttackOverchargeDiscardChoice(pending, 1, "choice-1", ["essence:ess-2"], state);
   assertEquals(resolved, {
@@ -305,9 +332,8 @@ Deno.test("survival and occupied control-slot semantics stay exact", () => {
     descriptor,
     card("source-1", "test-overcharge-creature"),
     targetBinding(state),
-    true,
-    true,
-    "choice-occupied",
+      attackIfContext(state, 1, true),
+      "choice-occupied",
   )!;
   let resolved = runtimeV02ResolveAttackOverchargeDiscardChoice(pending, 1, "choice-occupied", ["essence:ess-1"], state);
   assertEquals(resolved.condition_applied, false);
@@ -322,9 +348,8 @@ Deno.test("survival and occupied control-slot semantics stay exact", () => {
     descriptor,
     card("source-1", "test-overcharge-creature"),
     targetBinding(state),
-    false,
-    true,
-    "choice-lethal",
+      attackIfContext(state, 1, false),
+      "choice-lethal",
   )!;
   resolved = runtimeV02ResolveAttackOverchargeDiscardChoice(pending, 1, "choice-lethal", ["essence:ess-1"], state);
   assertEquals(resolved.target_remained_after_damage, false);
@@ -343,8 +368,7 @@ Deno.test("pending choice rejects wrong seat, stale id, turn, source, target and
       descriptor,
       card("source-1", "test-overcharge-creature"),
       targetBinding(state),
-      true,
-      true,
+      attackIfContext(state, 1, true),
       "choice-1",
     )!;
     return { state, pending };
@@ -407,4 +431,52 @@ Deno.test("malformed near-family programs fail closed while unrelated and legacy
     structuredRuntimeAfterDamageOverchargeDiscardCondition(legacy, { card_id: "test-overcharge-creature" }, 2),
     null,
   );
+});
+
+
+Deno.test("overcharge discard remains committed while matching opponent-card condition protection blocks Stunned", () => {
+  const state = stateWith(4);
+  const target = (state.players as any)["2"].vanguard;
+  runtimeV02InstallConditionProtection(target, {
+    protection_id: "overcharge-condition-protection",
+    source_action_id: "protection-source",
+    source_uid: "protection-source-uid",
+    source_card_id: "protection-source-card",
+    source_controller_seat: 2,
+    target_controller_seat: 2,
+    installed_turn_seq: 9,
+    condition_names: [],
+    condition_slot: "control",
+    source_controller: "opponent",
+    card_effect_only: true,
+    max_uses: 1,
+    expires_on: "start_of_controller_next_turn",
+  });
+  const descriptor = structuredRuntimeAfterDamageOverchargeDiscardCondition(
+    state,
+    { card_id: "test-overcharge-creature" },
+    2,
+  )!;
+  const pending = runtimeV02CreateAttackOverchargeDiscardChoice(
+    state,
+    1,
+    descriptor,
+    card("source-1", "test-overcharge-creature"),
+    targetBinding(state),
+    attackIfContext(state, 1, true),
+    "choice-protected",
+  )!;
+  const resolved = runtimeV02ResolveAttackOverchargeDiscardChoice(
+    pending,
+    1,
+    pending.id,
+    ["essence:ess-1"],
+    state,
+  );
+  assertEquals(resolved.condition_applied, false);
+  assertEquals(resolved.condition_prevented, true);
+  assertEquals(resolved.condition_reason, "condition_protection");
+  assertEquals(target.conditions.control, null);
+  assertEquals((state.players as any)["1"].discard.map((item: any) => item.uid), ["ess-1"]);
+  assertEquals(runtimeV02ConditionProtectionCount(target), 0);
 });

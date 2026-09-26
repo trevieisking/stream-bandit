@@ -1,4 +1,13 @@
 import {
+  runtimeV02ExecuteActiveAbilityConditionReplacement,
+  type RuntimeV02ActiveAbilityConditionReplacementResolution,
+  type RuntimeV02ActiveAbilityConditionReplacementState,
+} from "./tcg-match-active-ability-condition-replacement-v0-2.ts";
+import {
+  runtimeV02ExecuteActiveAbilityHiddenSample,
+  type RuntimeV02ActiveAbilityHiddenSampleResolution,
+} from "./tcg-match-active-ability-hidden-sample-v0-2.ts";
+import {
   runtimeV02CreateActiveAbilityLiveChoice,
   type RuntimeV02PendingActiveAbilityLiveChoice,
 } from "./tcg-match-active-ability-live-v0-2.ts";
@@ -7,6 +16,9 @@ import {
   type RuntimeV02ImmediateActiveAbilityLiveRouteResult,
 } from "./tcg-match-active-ability-immediate-live-v0-2.ts";
 import type { RuntimeV02ActiveAbilityProgramSource, RuntimeV02ActiveAbilityProgramState } from "./tcg-match-active-ability-program-v0-2.ts";
+import {
+  runtimeV02BeginPaidSelfAttachmentActiveAbilityLiveRoute,
+} from "./tcg-match-active-ability-paid-attachment-v0-2.ts";
 import {
   runtimeV02BeginTargetedDrainActiveAbilityLiveRoute,
   type RuntimeV02TargetedDrainActiveAbilityLiveBegin,
@@ -17,6 +29,14 @@ import type { RuntimeV02DefeatDescribe } from "./tcg-match-defeat-engine-v0-2.ts
 export type RuntimeV02ActiveAbilityLiveRouteResult<
   T extends RuntimeV02CardZoneInstance,
 > =
+  | {
+    kind: "hidden_sample";
+    hidden_sample: RuntimeV02ActiveAbilityHiddenSampleResolution;
+  }
+  | {
+    kind: "condition_replacement";
+    condition_replacement: RuntimeV02ActiveAbilityConditionReplacementResolution<T>;
+  }
   | {
     kind: "immediate";
     immediate: RuntimeV02ImmediateActiveAbilityLiveRouteResult<T>;
@@ -38,8 +58,10 @@ export type RuntimeV02ActiveAbilityLiveRouteResult<
  *    choice merely to fit an older dispatcher contract;
  * 2. the targeted-drain family gets its dedicated already-paid opposing-Creature
  *    choice boundary before the older generic private-choice facade is consulted;
- * 3. unrelated programs fall through to the already-live private-choice facade;
- * 4. completely unsupported families return null without mutation.
+ * 3. paid self-attachment performs effect preflight and canonical activation-cost
+ *    routing before entering the shared private-choice boundary;
+ * 4. unrelated programs fall through to the already-live private-choice facade;
+ * 5. completely unsupported families return null without mutation.
  *
  * A recognized family that is malformed fails inside its own owner rather than
  * falling through to a different family. The router owns no Ability semantics,
@@ -55,6 +77,26 @@ export function runtimeV02BeginActiveAbilityLiveRoute<
   defeatDescribe: RuntimeV02DefeatDescribe<T>,
   choiceId: string = crypto.randomUUID(),
 ): RuntimeV02ActiveAbilityLiveRouteResult<T> | null {
+  const hiddenSample = runtimeV02ExecuteActiveAbilityHiddenSample(
+    state as Record<string, unknown>,
+    controllerSeat,
+    source,
+  );
+  if (hiddenSample) return { kind: "hidden_sample", hidden_sample: hiddenSample };
+
+  const conditionReplacement = runtimeV02ExecuteActiveAbilityConditionReplacement(
+    state as unknown as RuntimeV02ActiveAbilityConditionReplacementState<T>,
+    controllerSeat,
+    source,
+    defeatDescribe,
+  );
+  if (conditionReplacement) {
+    return {
+      kind: "condition_replacement",
+      condition_replacement: conditionReplacement,
+    };
+  }
+
   const immediate = runtimeV02BeginImmediateActiveAbilityLiveRoute(
     state,
     controllerSeat,
@@ -72,6 +114,23 @@ export function runtimeV02BeginActiveAbilityLiveRoute<
   );
   if (targetedDrain) {
     return { kind: "targeted_drain_choice", targeted_drain: targetedDrain };
+  }
+
+  const paidAttachment = runtimeV02BeginPaidSelfAttachmentActiveAbilityLiveRoute(
+    state,
+    controllerSeat,
+    source,
+    defeatDescribe,
+    choiceId,
+  );
+  if (paidAttachment) {
+    if (paidAttachment.status !== "player_choice_required") {
+      throw new Error("tcg_v0_2_paid_attachment_begin_status_invalid");
+    }
+    return {
+      kind: "private_choice",
+      choice: paidAttachment.pending_choice,
+    };
   }
 
   const choice = runtimeV02CreateActiveAbilityLiveChoice(

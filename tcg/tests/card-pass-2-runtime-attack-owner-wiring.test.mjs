@@ -60,7 +60,7 @@ after(() => {
 
 const reservePermission = { controller: "opponent", zone: "reserve", card_family: "Creature", selection: "one" };
 
-function fixture({ structured = true, control = null, permissions = [], cardId = "test-creature" } = {}) {
+function fixture({ structured = true, control = null, permissions = [], cardId = "test-creature", legacyAttack = true, structuredEffect = false, finishEffect = false } = {}) {
   const creature = (uid) => ({
     stack: [{ uid, card_id: cardId }], essence: [], relic: null, damage: 0, shield: 0,
     conditions: { scorched: false, venomed: 0, control: null, modifier: null }, flags: {},
@@ -94,6 +94,17 @@ function fixture({ structured = true, control = null, permissions = [], cardId =
       },
     },
   };
+  if (!legacyAttack) delete state.card_index[cardId].definition.attack_1;
+  if (structuredEffect) {
+    state.card_index[cardId].definition_v0_2.creature.attacks[0].after_damage = [
+      { op: "APPLY_CONDITION", target: "$current_opponent_vanguard", condition: "Silenced" },
+    ];
+  }
+  if (finishEffect) {
+    state.card_index[cardId].definition_v0_2.creature.attacks[0].after_damage_finished = [
+      { op: "MOVE_ATTACHED_ESSENCE", controller: "self", element: "Test", count: { min: 0, max: 1 } },
+    ];
+  }
   if (structured) state.runtime_registry_v0_2 = runtimeV02SnapshotMarker();
   state.players[1].vanguard.conditions.control = control;
   return state;
@@ -122,6 +133,162 @@ async function attack(state, { random = [], ...body } = {}) {
   assert.deepEqual(values, [], "expected RNG was not consumed");
   return { status: response.status, body: await response.json(), commits: current.commits };
 }
+
+async function concede(state) {
+  const original = structuredClone(state);
+  current = { state, commits: [] };
+  const response = await handler(new Request("http://local.test/tcg-match-actions", {
+    method: "POST", headers: { Authorization: "Bearer local-test", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "concede", match_id: "test-match", client_nonce: "concede-command", expected_revision: 5 }),
+  }));
+  assert.deepEqual(state, original, "concession must work on a private snapshot until atomic commit");
+  return { status: response.status, body: await response.json(), commits: current.commits };
+}
+
+async function fieldActions(state) {
+  const original = structuredClone(state);
+  current = { state, commits: [] };
+  const response = await handler(new Request("http://local.test/tcg-match-actions", {
+    method: "POST", headers: { Authorization: "Bearer local-test", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "field_actions", match_id: "test-match", client_nonce: "field-actions", expected_revision: 5 }),
+  }));
+  assert.deepEqual(state, original, "field action projection must not mutate the authoritative snapshot");
+  return { status: response.status, body: await response.json(), commits: current.commits };
+}
+
+async function useAbility(state, where = "vanguard", index = null) {
+  const original = structuredClone(state);
+  current = { state, commits: [] };
+  const response = await handler(new Request("http://local.test/tcg-match-actions", {
+    method: "POST", headers: { Authorization: "Bearer local-test", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "use_ability", match_id: "test-match", client_nonce: "ability-command", expected_revision: 5, where, index }),
+  }));
+  assert.deepEqual(state, original, "Ability handler must work on a private snapshot until atomic commit");
+  return { status: response.status, body: await response.json(), commits: current.commits };
+}
+
+test("structured: field_actions reports exact Attack readiness and enough Essence resolves the same Attack", async () => {
+  const state = fixture();
+  state.card_index["test-creature"].definition_v0_2.creature.attacks[0].cost = [{ element: "Astral", amount: 2 }];
+  state.card_index["test-astral-essence"] = {
+    card_id: "test-astral-essence",
+    definition: { id: "test-astral-essence", name: "Test Astral Essence", kind: "Essence", element: "Astral" },
+    definition_v0_2: {
+      schema: "sb-tcg-card-v0.2",
+      effect_schema: "sb-tcg-effects-v0.2",
+      id: "test-astral-essence",
+      name: "Test Astral Essence",
+      card_family: "Essence",
+      element: "Astral",
+      essence: { subtype: "Basic", provides: [{ element: "Astral", amount: 1 }], listeners: [] },
+    },
+  };
+
+  const insufficient = await fieldActions(state);
+  assert.equal(insufficient.status, 200, JSON.stringify(insufficient.body));
+  assert.equal(insufficient.commits.length, 0);
+  assert.deepEqual(insufficient.body.result.attacks.map(({ slot, eligible, reason }) => ({ slot, eligible, reason })), [
+    { slot: 1, eligible: false, reason: "attack_essence_cost_not_met" },
+  ]);
+
+  state.players[1].vanguard.essence.push(
+    { uid: "essence-1", card_id: "test-astral-essence" },
+    { uid: "essence-2", card_id: "test-astral-essence" },
+  );
+  const ready = await fieldActions(state);
+  assert.equal(ready.status, 200, JSON.stringify(ready.body));
+  assert.deepEqual(ready.body.result.attacks.map(({ slot, eligible, reason }) => ({ slot, eligible, reason })), [
+    { slot: 1, eligible: true, reason: null },
+  ]);
+
+  const result = await attack(state);
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  const next = result.commits[0].p_new_state;
+  assert.equal(next.players[2].vanguard.damage, 20, "Attack must place exact damage automatically");
+  assert.equal(next.active_seat, 2, "a completed Attack must end the attacking player's turn");
+  assert.equal(next.turn_seq, 5, "Attack Aftermath must advance the canonical turn sequence");
+  assert.equal(next.players[2].hand.length, 1, "the next player receives the canonical turn-start draw");
+  assert.equal(next.players[2].deck.length, 0);
+});
+
+test("structured: active Ability projection is usable, commits once, then disappears after turn-limit consumption", async () => {
+  const state = fixture();
+  const definition = state.card_index["test-creature"].definition_v0_2;
+  definition.element = "Shade";
+  definition.creature.ability = {
+    id: "test-drain",
+    name: "Test Drain",
+    mode: "active",
+    event: null,
+    timing: "own_turn",
+    limit: { scope: "turn", count: 1, owner: "controller" },
+    requirements: { all: [{ predicate: "source_damaged" }] },
+    costs: [],
+    steps: [{
+      op: "DRAIN_VITALITY",
+      target: "$current_opponent_vanguard",
+      amount: 10,
+      heal_target: "$source_creature",
+      heal_cap: 10,
+      as: "drained"
+    }]
+  };
+  state.players[1].vanguard.damage = 20;
+
+  const before = await fieldActions(state);
+  assert.equal(before.status, 200, JSON.stringify(before.body));
+  assert.deepEqual(before.body.result.ability_sources, [
+    { where: "vanguard", index: null, anchor_uid: "v1" },
+  ], "field_actions must expose exactly the currently usable active Ability");
+
+  const used = await useAbility(state);
+  assert.equal(used.status, 200, JSON.stringify(used.body));
+  assert.equal(used.commits.length, 1);
+  assert.equal(used.commits[0].p_event_type, "ability_resolved");
+  const next = used.commits[0].p_new_state;
+  assert.equal(next.phase, "play", "immediate Ability returns to play");
+  assert.equal(next.players[2].vanguard.damage, 10);
+  assert.equal(next.players[1].vanguard.damage, 10);
+
+  const after = await fieldActions(next);
+  assert.equal(after.status, 200, JSON.stringify(after.body));
+  assert.deepEqual(after.body.result.ability_sources, [], "once-per-turn Ability must disappear from server capability projection after use");
+});
+
+test("structured: lethal Attack removes the Creature and queues the opponent Reward before promotion", async () => {
+  const state = fixture();
+  state.players[2].vanguard.damage = 80;
+  const result = await attack(state);
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  const next = result.commits[0].p_new_state;
+  assert.equal(next.phase, "resolution");
+  assert.equal(next.players[2].vanguard, null, "lethal damage must remove the defeated Vanguard");
+  assert.deepEqual(next.pending_resolutions.map(({ kind, seat, count }) => ({ kind, seat, count: count ?? null })), [
+    { kind: "take_reward", seat: 1, count: 1 },
+    { kind: "promote", seat: 2, count: null },
+  ]);
+  assert.equal(next.active_seat, 1, "turn must not advance until Reward/promotion resolution completes");
+  assert.equal(next.resume_after_resolution, "aftermath");
+});
+
+test("explicit concession makes the quitter lose and the opponent win without pretending to play another action", async () => {
+  const state = fixture();
+  const beforeRewards = structuredClone(state.players[1].rewards);
+  const beforeDeck = structuredClone(state.players[1].deck);
+  const result = await concede(state);
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  const commit = result.commits[0];
+  const next = commit.p_new_state;
+  assert.equal(commit.p_event_type, "concede");
+  assert.equal(next.phase, "complete");
+  assert.deepEqual(next.result, { winner_seat: 2, reasons: ["opponent_conceded"] });
+  assert.deepEqual(next.players[1].rewards, beforeRewards);
+  assert.deepEqual(next.players[1].deck, beforeDeck);
+  assert.deepEqual(next.pending_resolutions, []);
+});
 
 for (const structured of [true, false]) {
   const mode = structured ? "structured" : "legacy";
@@ -207,6 +374,28 @@ for (const structured of [true, false]) {
     assert.equal(result.commits.length, 0);
   });
 }
+
+test("structured: vanilla attack executes from registry with no legacy printed-English attack", async () => {
+  const result = await attack(fixture({ legacyAttack: false }));
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  assert.equal(result.commits[0].p_new_state.players[2].vanguard.damage, 20);
+  assert.equal(result.commits[0].p_event_type, "attack");
+});
+
+test("structured: unsupported effect-bearing attack still fails closed when legacy compatibility is absent", async () => {
+  const result = await attack(fixture({ legacyAttack: false, structuredEffect: true }));
+  assert.notEqual(result.status, 200);
+  assert.equal(result.body.error, "tcg_v0_2_attack_legacy_compatibility_required:test-strike");
+  assert.equal(result.commits.length, 0);
+});
+
+test("structured: unfinished post-attack windows never masquerade as vanilla when legacy compatibility is absent", async () => {
+  const result = await attack(fixture({ legacyAttack: false, finishEffect: true }));
+  assert.notEqual(result.status, 200);
+  assert.equal(result.body.error, "tcg_v0_2_attack_legacy_compatibility_required:test-strike");
+  assert.equal(result.commits.length, 0);
+});
 
 test("structured: a new card uses registry Reserve permissions without a card-name dispatcher", async () => {
   const result = await attack(fixture({ cardId: "future-series-test", permissions: [reservePermission] }), { target_reserve_index: 0 });

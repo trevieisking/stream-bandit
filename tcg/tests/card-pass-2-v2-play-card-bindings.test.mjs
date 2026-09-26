@@ -10,20 +10,34 @@ const root = path.resolve(here, '..', '..');
 const battle = fs.readFileSync(path.join(root, 'tcg-battle-v2.html'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
 const matchActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'), 'utf8');
+const evolutionOwner = fs.readFileSync(path.join(root, 'supabase', 'functions', '_shared', 'tcg-match-evolution-legality-v0-2.ts'), 'utf8');
 const tacticActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle v0.8 keeps the accepted v0.7 layout and adds a separate play-binding marker', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-7"/);
-  assert.match(battle, /data-sb-tcg-play-bindings="v0-8"/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-8/);
-  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.8/);
+test('Battle keeps the tabletop zones while using bounded field geometry and inspect-drag hand-peek bindings', () => {
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-9-hand-peek"/);
+  assert.match(battle, /data-sb-tcg-play-bindings="v0-11-server-projected-actions"/);
+  assert.match(battle, /data-sb-tcg-card-face="v1"/);
+  assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-20-server-attack-choice-route/);
+  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.20-server-attack-choice-route/);
+  assert.match(controller, /mode: 'compact'/);
+  assert.match(controller, /data-inspect-hand-uid=/);
+  assert.match(controller, /data-inspect-field-owner=/);
+});
+
+test('hand card click reads the card while drag/drop remains the authoritative play transport', () => {
+  assert.match(controller, /state\.inspectedCard = \{ kind: 'hand', uid \}/);
+  assert.match(controller, /renderCardFace\(cardId, \{ mode: 'compact' \}\)/);
+  assert.match(controller, /state\.inspectedCard = null;[\s\S]*?card\.classList\.add\('is-dragging'/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?overflow-x:auto;overflow-y:hidden/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:152px[\s\S]*?margin-right:-14px/);
 });
 
 test('play-phase hand cards become selectable and desktop-draggable without changing setup binding', () => {
   assert.match(controller, /data-play-hand-uid=/);
   assert.match(controller, /data-play-intent=/);
-  assert.match(controller, /draggable="true"/);
+  assert.match(controller, /draggable="' \+ \(touchPrimaryInput\(\) \? 'false' : 'true'\) \+ '"/);
   assert.match(controller, /addEventListener\('dragstart'/);
   assert.match(controller, /addEventListener\('dragover'/);
   assert.match(controller, /addEventListener\('drop'/);
@@ -32,12 +46,12 @@ test('play-phase hand cards become selectable and desktop-draggable without chan
   assert.match(battle, /\.sb-play-destination\.is-play-legal/);
 });
 
-test('touch and click use the same selected-card to destination transport path', () => {
+test('touch and click use the same selected-card path without moving the one-viewport board', () => {
   assert.match(controller, /document\.querySelectorAll\('\[data-play-hand-uid\]'/);
   assert.match(controller, /document\.querySelectorAll\('\[data-play-where\]'/);
   assert.match(controller, /await runPlayHandTarget\(where, index\)/);
-  assert.match(controller, /window\.matchMedia\('\(max-width: 640px\), \(hover: none\) and \(pointer: coarse\)'\)\.matches/);
-  assert.match(controller, /scrollIntoView\(\{ behavior: 'smooth', block: 'center' \}\)/);
+  assert.doesNotMatch(controller, /scrollIntoView\(/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?overflow-x:auto;overflow-y:hidden/);
 });
 
 test('hand intents map only to existing authoritative server owners', () => {
@@ -45,7 +59,7 @@ test('hand intents map only to existing authoritative server owners', () => {
     assert.match(matchActions, new RegExp('action===["\\\']' + action + '["\\\']'));
     assert.match(controller, new RegExp("['\\\"]" + action + "['\\\"]"));
   }
-  assert.match(tacticActions, /\["play_tactic", "resolve_choice"\]/);
+  assert.match(tacticActions, /\["play_tactic", "play_tactic_preview", "resolve_choice"\]/);
   assert.match(controller, /const API_TACTIC = 'tcg-tactic-actions'/);
   assert.match(controller, /runPlayCommand\(\s*API_TACTIC,\s*'play_tactic'/);
 });
@@ -62,9 +76,11 @@ test('evolution selection is a UI candidate only and server validates predecesso
   assert.match(controller, /intent === 'evolve'/);
   assert.match(controller, /definition\.evolves_from_id/);
   assert.match(controller, /'evolve',[\s\S]*?\{ card_uid: cardUid, where \}/);
-  assert.match(matchActions, /evolution_predecessor_mismatch/);
-  assert.match(matchActions, /evolution_locked_on_first_personal_turn/);
-  assert.match(matchActions, /stack_entered_or_evolved_this_turn/);
+  assert.match(matchActions, /runtimeV02ValidateEvolutionDeclaration/);
+  assert.match(evolutionOwner, /evolution_predecessor_mismatch/);
+  assert.match(evolutionOwner, /evolution_locked_on_first_personal_turn/);
+  assert.match(evolutionOwner, /stack_entered_or_evolved_this_turn/);
+  assert.match(evolutionOwner, /one_evolution_per_stack_per_turn/);
 });
 
 test('Essence and Relic attach through existing match-action owners', () => {

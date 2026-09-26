@@ -94,3 +94,1361 @@ Second Sky is the reusable visual/layout baseline for later completed launch dec
 
 ## 048 — One-deck-per-day working cadence
 The working production target is one completed launch deck per working day. This is a cadence target, never a reason to skip the locked source preflight, canonical upload verification, desktop/mobile human review, exact-head CI, or promotion controller. The next starter identity in the current registry is **Ember — Ashrush** (`deck-ember-ashrush`).
+
+
+## 049 — Canonical global card-face priority
+Card readability and playability now take priority over the next deck-art batch. Ember/Ashrush generation is paused until one shared renderer makes every current Set One identity readable on its real card face, including identities whose artwork is still missing.
+
+## 050 — Canonical visual reference
+The accepted Orbitortoise reference is https://chatgpt.com/s/m_6aafc9a916c88191b0f63b164d1923cc . It is visual authority for frame/layout only. Structured card data remains the sole rules/stat authority and may not be overridden by numbers or text baked into concept art.
+
+## 051 — Creature card placement contract
+Creature cards place HP at the top-left beside the name, element/energy type at the top-right, large art in the upper window, Ability plus every canonical Attack in the rules area, Reward Cards at bottom-left, and rarity at bottom-right with Withdraw directly beneath rarity. The prior two-row visual restriction is superseded when a Creature canonically has an Ability plus two Attacks.
+
+## 052 — Missing-art cards are real playable cards
+Missing artwork never hides or delays gameplay identity. The same renderer must show the complete frame, stats, rules, Ability/Attack rows, footer and an element-themed Artwork Pending window. Missing art is presentation state only, not legality state.
+
+## 053 — One renderer / server-owned legality
+Battle, hand, Collection, Decks, Shop, pack/reward and Battle Pass card surfaces use one shared renderer with full/battle/hand/compact modes. Active Ability glow comes only from authoritative server capability projection; triggered Abilities are not manual buttons. Attack legality/damage/effects remain server-owned. No card-ID-specific renderer or browser rules engine is permitted.
+
+## 054 — Astral first proof set
+Astral is the first renderer acceptance set because its 24/24 Standard/base artworks already exist at canonical GitHub paths. Existing Astral image bytes are fitted/cropped into the canonical card window; they are not regenerated merely to embed frames or rule text.
+
+
+## 055 — Attack means damage plus automatic turn completion
+A legal Attack is not accepted merely because its control fires. The server must calculate and place damage automatically, resolve required Attack follow-up work, then end the attacking player's turn. Browser code displays readiness and submits intent only; it never owns damage or turn progression.
+
+## 056 — Defeat immediately owns Reward resolution
+A Creature reduced to zero remaining HP is processed by canonical Defeat. The opposing player receives the defeated Creature's Reward value through the existing Reward queue, followed by any required forced Vanguard promotion and Match Flow continuation. No browser shortcut or card-specific KO dispatcher is allowed.
+
+## 057 — Post-Attack human acceptance reopened
+No Trevor/Kay test has yet visibly completed a real Attack that placed damage. Therefore damage, KO/Reward flow and all later Battle lifecycle remain **human-test pending** even where automated runtime tests already exist.
+
+## 058 — Explicit Quit Match is concession
+The small Battle cog owns a single destructive action: **Quit Match**. It calls the existing server `concede` command. The quitter loses; the opponent wins. Closing/reloading the page is not automatically a loss because authoritative matches must remain resumable unless the user explicitly concedes.
+
+## 059 — Terminal result returns only to fresh matchmaking
+Victory/Defeat ends the match. The result action returns to `tcg-play.html` without a match id; no old match is resumed and the player must select **Find Opponent** for another opponent.
+
+## 060 — Interaction-state clarity
+The canonical card face is also the control surface. Active Abilities pulse/glow only while server capability projection says they are usable and stop after use. Attack rows show server-projected readiness/block reasons. On phones/tablets, card play and Essence attachment support finger drag/drop **and** the equal tap-select -> highlighted-destination fallback. Both paths reuse the same authoritative server actions.
+
+## 061 — Orbitortoise layout applies globally
+The Trevor-supplied Orbitortoise image remains the reference structure for all card types/surfaces: identity/HP/type header, large artwork window, readable Ability/Attack/effect area and lower metadata/footer. Missing art uses the same finished frame with an Artwork Pending window so every identity is game-ready before its final PNG arrives.
+
+
+## 062 — Attached Essence has a visible element-orb rail
+Every battlefield Creature exposes its authoritative attached Essence as tiny colored sphere/orb/pip markers attached visually to that Creature. The display exists so players can read resource availability without remembering a hidden count. It is derived from authoritative attached Essence plus structured `provides`; it does not create client-side resource authority.
+
+## 063 — Essence orbs represent effective payable units
+The resource rail represents effective Essence units available from attached sources. Element color/glyph comes from the canonical Stream Bandit element identity. Multi-unit providers produce the equivalent visible quantity. Individual unit orbs remain visible while the rail fits; only rendered overflow compresses the rail to one counted orb **per element**, with that element's current total inside the orb. The Attack's printed/canonical cost remains visible beside the Attack for direct visual comparison.
+
+## 064 — Essence removal removes its visual resource immediately
+Discard, expiry, movement, removal or any authoritative loss of attached Essence removes the corresponding orb contribution on the next authoritative Battle render. The browser may not keep stale attachment pips after the server state changes.
+
+## 065 — Element color never stands alone
+Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt use their canonical element palette, but every Essence orb also exposes the element glyph/mark and accessible text. Resource readability may not depend on color vision alone.
+
+## 066 — Phone/tablet drag and tap share one gameplay path
+Phone/tablet require finger drag/drop **and** retain tap-select -> highlighted destination. Both paths submit the same authoritative server command and legality remains server-owned; ledger 060 is synchronized to this current rule.
+
+## 067 — Touch drag requires pointer-safe transport
+The current coarse-touch Battle client sets playable hand cards to `draggable="false"`, which explains Kay's observed inability to drag on phone. Mobile parity must use a Pointer Events/touch-safe gesture path rather than depending exclusively on native HTML5 drag/drop. It must preserve page scrolling outside an active card drag and must not change the accepted board geometry.
+
+## 068 — Board decoration is a final presentation pass
+Trevor/Kay have accepted the Battle layout geometry. Realm/background/table decoration is deliberately deferred until the playable interaction chain has passed: card readability -> attachment -> Attack/damage -> defeat/Reward -> result/quit plus phone drag/drop. Decoration may not alter rules, slots, zones, touch targets or server ownership.
+
+
+## 069 — Essence overflow collapses to one counted orb per element
+When the rendered individual Essence rail would exceed its allocated card bounds, repeated units collapse to **one orb per element with that element's live numeric count inside it**. The count is always whatever authoritative state currently provides; no particular number triggers compression. If multiple elements are attached, each element keeps its own counted orb so type information is never lost.
+
+## 070 — Counted-orb compression is responsive presentation only
+The threshold for switching from individual tiny orbs to counted orbs is determined by available card space/responsive layout, not by gameplay rules. The underlying authoritative Essence instances and `provides` values remain unchanged. A counted orb is only a compact view of those units.
+
+## 071 — V2.4.53 does not displace the card/Attack priority
+Essence-orb compression, mobile drag parity and other micro-interactions are required polish within the current playable-card slice. They do not overtake the primary sequence: canonical card visuals/readability -> real Attack/damage/reward lifecycle -> cross-device interaction acceptance -> final board decoration.
+
+
+## 072 — Counted Essence activates only when the rail exceeds its card bounds
+The counted-orb presentation has **no fixed Essence-number trigger**. Individual orbs remain visible for as long as the rail fits within the card's allocated Essence area. Compression begins only when rendering the current authoritative units individually would breach those card parameters.
+
+## 073 — Compression counts each Essence type separately
+When compression is active, each element present receives its own orb and its own current numeric count. Different elements are never summed into one generic total. The displayed number is dynamic authoritative state, not a predetermined value or threshold. A prior use of `12` was an illustrative example only and is not a rule.
+
+
+## 074 — One shared element-orb primitive owns resource presentation
+Attached Essence and Attack cost presentation reuse the same generic element-orb renderer. Battle supplies authoritative attached-unit totals; the card renderer supplies only visual element identity and layout. No card-ID-specific Essence UI branch is permitted.
+
+## 075 — Essence compression is measured against rendered card width
+The implementation chooses expanded versus counted Essence presentation by comparing the expanded rail's rendered width with the rail's available card width. It does not use a gameplay count threshold. Every authoritative re-render recalculates the rail, so attachment removal can reduce the count or return the rail to individual-orb mode.
+
+
+## 076 — Phone drag is transport, never gameplay authority
+Touch drag only selects an existing hand-card UID, highlights existing destinations and delegates a legal drop to the same `runSetupPlace` / `runPlayHandTarget` functions used by tap mode. It may not define a separate mobile legality, payment, Creature, Essence, Relic or evolution engine.
+
+## 077 — Hold activation preserves phone scrolling
+Coarse-touch drag activates only after a deliberate short hold. Movement before activation cancels the drag gesture so the hand/page can still scroll normally. Once the hold has activated card dragging, the active gesture may prevent scrolling until drop/cancel.
+
+## 078 — Setup slots must be discoverable before touch selection
+Eligible empty setup locations expose their destination coordinates during the player's setup turn even before a hand card is selected. Their legal highlight remains conditional on a selected eligible Creature. This lets touch drag discover a destination without re-rendering away the held DOM card and does not change server setup legality.
+
+
+## 079 — Automated V2.4.53 proof does not replace device acceptance
+Regression tests may prove authoritative refresh behavior, layout-driven compression, per-element grouping and command transport parity. They do not mark Trevor desktop or Kay phone visual/gesture checks complete. Exact-head CI closes the automated slice only; human cross-device gates remain separately required.
+
+
+## 080 — Ability glow is a capability projection, not a card-side guess
+A manual active Ability may glow/pulse only when the authoritative `field_actions.ability_sources` projection contains that exact field source anchor. `use_ability` consumes/changes authoritative state; the next projection removes the glow when the Ability is no longer usable. Triggered Abilities remain non-manual.
+
+
+## 081 — Attack end-turn is a continuation, not a competing rule
+The Attack rule remains one lifecycle: a legal Attack resolves damage/effects, then the attacking player's turn ends **after the full required resolution chain**. If no Creature is defeated, the path proceeds directly to Aftermath/turn advance. If a Creature is defeated, the same end-turn continuation pauses for Defeat -> Reward Card taking -> any required Vanguard promotion, then resumes. Reward handling is therefore conditional on defeat, never on ordinary non-lethal damage.
+
+## 082 — Blocked Attack explanation is presentation-only
+When authoritative Attack capability says an Attack is blocked, the card may remain clickable only to explain that server-projected reason. Insufficient Essence must read clearly as **Needs more matching Essence** and may point the player back to the Attack cost orbs and attached Essence rail. A blocked explanatory click must not submit an Attack command or recreate legality in the browser.
+
+## 083 — Creature inspection must not relocate the battlefield source card
+Selecting the Vanguard may open a larger readable card context, but the original battlefield card remains anchored in its Vanguard slot. Desktop readability uses a separate inspector copy of the same canonical card face and the same card-owned Attack/Ability controls. Phone/coarse-touch layout remains on its accepted in-board presentation unless separately approved.
+
+
+## 084 — Client exceptions cannot masquerade as a server turn deadlock
+A paired Battle may legitimately show **Opponent turn** on one device and **Your turn** on the active player's device while both are on the same authoritative revision. If the active player then cannot act and the browser displays a JavaScript exception, treat that as a client-render/interaction failure unless server evidence proves otherwise. The Battle controller must define every helper used by card inspection/fallback rendering; the stable inspector's card-name lookup is now a local resolver backed by the shared renderer or authoritative `card_index`. No server engine, turn owner or match state may be altered to compensate for a client ReferenceError.
+
+
+## 085 — Successful turn advance always returns to play
+The canonical Match Flow Turn owner must set `phase = "play"` whenever an ordinary turn successfully advances after its Card-Zone draw. This is required both for ordinary End Turn and for a suspended lethal-Attack continuation. Terminal and deckout routes retain their own complete-state behavior. The dispatcher may not patch the phase separately.
+
+## 086 — Reward and forced promotion suspend one Attack end-turn continuation
+A lethal Attack does not create a second turn rule. Attack resolution pauses the same end-turn continuation for Defeat -> Reward Card taking -> required Vanguard promotion. Once that queue is empty, Aftermath and the canonical Turn owner advance the seat, draw and return the phase to `play`. Human evidence at revisions 26-28 proved Attack/Reward/promotion committed while the missing Turn phase transition left the match in `resolution`.
+
+## 087 — Full card readability belongs to inspection, not permanent battlefield scale
+The Battle board may use compact canonical card previews so the whole tabletop fits at normal browser zoom. Compact field cards retain artwork, identity and live status/Essence information; full Ability/Attack/rule text opens through the shared canonical card inspector. The original field card remains anchored in its zone while inspected.
+
+## 088 — Hand is a bottom horizontal interaction rail
+The player hand is a fixed bottom-edge horizontal tray that does not increase page height. Desktop and touch devices may scroll the tray left/right when the hand exceeds available width. A hand card can be clicked/tapped to read, while drag/drop uses the existing setup/play/evolve/Essence/Relic destinations and server commands. Tap-select -> destination remains an equal fallback.
+
+## 089 — External TCG footage is interaction reference only
+User-supplied footage of another TCG may establish interaction grammar such as whole-board viewport, compact field cards, click-to-read inspection, horizontal hand browsing and drag/drop. Stream Bandit must not copy the external game's artwork, branding, proprietary card designs, names or assets. Stream Bandit's existing card renderer, board identity and server-owned rules remain authoritative.
+
+
+## 090 — Battlefield cards are bounded previews
+In-play Creature cards are compact canonical previews whose size is bounded by the viewport and card slot, not stretched to fill the entire available row height. Vanguard may be visually emphasized over Reserve, but neither may dominate the tabletop. Full rules remain available through inspection.
+
+## 091 — Hand is a bottom-edge peek/fan rail
+The Battle hand deliberately behaves like a physical hand of cards rather than a grid of miniature complete cards. Cards may extend below the visible bottom hand mask so their upper identity/art area remains large enough to recognize. The rail scrolls horizontally on desktop and touch; selected/dragged cards may rise or scale slightly. This is presentation only and does not change card-zone ownership.
+
+## 092 — Inspect mode owns complete card readability
+The shared card renderer exposes one canonical `inspect` presentation mode for complete readable card context. Inspect mode preserves the same card identity, artwork and structured data while allocating more area to Ability/Attack/move rows than compact battlefield/hand previews. Battle may add authoritative live controls/status to this face; inspection itself never becomes a second rules engine.
+
+## 093 — Decks, Collection and Battle Pass share read-only card inspection
+Canonical card tiles in Decks and Collection and card-backed Battle Pass reward samples open the same shared inspect face. These non-Battle surfaces are read-only presentation: inspection does not infer or mutate deck ownership, collection ownership, season progression, entitlement, reward claiming or economy state.
+
+
+## 094 — Red legality codes are not proof of a server deadlock
+A visible server rejection must be correlated with authoritative command/state history before game rules are changed. The V2.4.56 paired recording contained repeated legality rejections while the same match continued to commit Realm, Essence, Attack, Reward and promotion actions. Browser UX must distinguish an unavailable action from a stalled server.
+
+## 095 — Hand action availability is server-projected
+Battle may classify a hand card for presentation, but legal destinations and current playability come from existing authoritative projections: `play_card_targets`, `evolve_targets`, `attach_essence_targets`, `attach_relic_targets`, and Tactic-owner `play_tactic_preview`. The real mutation command validates again. The browser may not become a competing legality engine.
+
+## 096 — Tactic preview and Tactic play share one legality helper
+`tcg-tactic-actions` owns both read-only Tactic playability projection and final Tactic execution. `play_tactic_preview` performs no mutation/commit and reuses the same generic playability helper as `play_tactic`, including first-player Ally restrictions, play requirements, required targets/resources and supported lifecycle opcodes.
+
+## 097 — One manual Essence per turn must be explained before mutation
+The existing manual-Essence rule remains unchanged. When the server projects `manual_essence_already_used_this_turn`, Battle explains that the player already used their one manual attachment and does not send a doomed attachment command. This is UX around an existing rule, not a new Essence rule.
+
+## 098 — Withdraw is a server-projected card action
+Withdraw belongs to the existing Match/Withdrawal/Payment/Switch owners. Battle reads `field_actions.withdraw` for eligibility, exact cost, attached-Essence payment options and legal Reserve targets. The browser submits only the chosen server-projected payment UIDs and Reserve index; it does not calculate cost or legality.
+
+## 099 — Realm state must remain visibly legible
+A successfully played Realm cannot disappear merely because the responsive tabletop hides decorative space. Battle keeps the authoritative active Realm visible by canonical card name and makes it inspectable. Realm placement/replacement remains entirely server-owned.
+
+## 100 — Player-facing errors and diagnostic codes are separate
+Known machine legality codes are translated into concise player guidance. The raw code remains available in diagnostic state/console evidence. A user should see what action is required, not an implementation identifier such as `required_tactic_target_unavailable`.
+
+
+## 101 — Full Release 1 runtime completion precedes the next full human Battle gate
+Human Battle remains essential acceptance evidence, but it is no longer the immediate next loop while the 193-card launch registry still consumes capabilities classified partial/missing. Automation and owner-level source work continue first. The next full Trevor/Kay two-device journey starts only after Release 1-used capability reconciliation is complete.
+
+## 102 — Release 1 capability scope is usage-driven
+A grammar operation/predicate becomes a Release 1 blocker only when the frozen 193-card launch registry actually uses it. Future-only grammar, Fairy, Underworld, Packs, Shop, Trading and Battle Pass capability must not expand the launch runtime-completion queue.
+
+## 103 — Capability labels require current owner evidence
+tcg-runtime-capabilities-v0.2.json is an inventory, not source authority. A missing or partial label may be stale after later owner work. Before coding, inspect current generic source/tests and the exact usage context. Reclassify only when the existing owner proves the full Release 1-used shape; otherwise repair that rightful owner.
+
+## 104 — Predicate-tree composition has one shared owner
+Boolean structure (all, any, not) belongs to tcg-match-predicate-tree-v0-2.ts. The tree owner never interprets gameplay semantics. Each mechanic supplies an authoritative leaf evaluator for its context. No Attack/Ability/Tactic/listener route may create another independent boolean composition grammar.
+
+## 105 — Generic IF is not complete until every Release 1 context is covered
+The shared predicate tree is foundation only. IF remains incomplete until all 29 frozen Release 1 IF instances can execute through structured owners across Attack, Ability and Tactic/listener contexts without printed-English or card-ID gameplay fallback.
+
+
+## 106 — Event Listener no longer owns boolean-tree syntax
+Event Listener keeps authoritative meanings for its event-context leaf predicates, but all / any / not composition is delegated to the shared predicate-tree owner. This migration is behavior-preserving and does not make Event Listener the global owner of those leaf predicates in Attack, Ability or Tactic contexts.
+
+
+## 107 — Shared leaf semantics are migrated one predicate at a time
+A shared predicate tree does not automatically create shared leaf semantics. Repeated leaf meanings are consolidated only when current contexts prove they are semantically identical. source_damaged is the first accepted case: Active Ability and Attack now reuse the same Requirement-evaluator meaning while retaining their separate orchestration.
+
+
+## 108 — Source Shield threshold is a shared state predicate
+source_has_shield_at_least means the source Creature's current Shield is at least the positive configured threshold. That semantic belongs to the shared Requirement evaluator; Attack, Ability and continuous owners may orchestrate it but must not redefine the comparison.
+
+
+## 109 — Tactic play requirements follow the frozen predicate grammar
+Release 1 structured Tactics use predicate records for play requirements. Compatibility-only uppercase operation names may be accepted as input, but they must translate into the same shared predicate semantics and may not remain a second rules path.
+
+
+## 110 — legal_card_available delegates selection, not card rules
+The shared requirement layer owns only the predicate envelope and candidate-count meaning. Zone traversal and card/Creature filter matching stay with the existing selector owners. A legal-card requirement is true only when those owners return at least one candidate; the requirement evaluator must not invent a parallel card-search engine.
+
+
+## 111 — Previous opponent turn is ownership-based, not arithmetic
+Any rule that refers to a previous opponent turn must resolve from canonical turn ownership history. It may not assume turn_seq - 1 because Release 1 includes TIMEFOLD and therefore same-seat extra turns. Match Flow is the only ordinary turn-history writer; future extra-turn owners must append through the same history owner.
+
+
+## 112 — Card-zone movement must be legible but never authoritative in the browser
+Deck shuffle, deal, draw, discard and Reward movement are rendered from authoritative state/events. RNG continues to own shuffle order and Card-Zone continues to own physical movement. Client animation may explain a transition but may not determine or replay the mutation.
+
+## 113 — Hidden zones have physical presence without identity leakage
+Opponent deck, opponent hand and face-down Rewards may be visually represented as card backs and counts. Their identities remain governed by Hidden Information. A face-down card back is presentation, not permission to inspect the card.
+
+## 114 — Public discard inspection follows Hidden Information
+Discard is a visible pile. Read-only inspection is allowed only for cards/zones that the authoritative visibility model exposes. The inspector cannot become a shortcut around private/hidden information.
+
+## 115 — Reward selection is a server-count-bound overlay
+When Defeat requires Reward taking, Battle presents a large face-down Reward-selection overlay. The required selection count and eligible positions come from the existing pending Reward owner. Reward values 1, 2 and 3 are generic data, not hard-coded Creature identities. Selection moves the chosen authoritative cards to hand, then resumes the same suspended resolution continuation.
+
+## 116 — Conditions and Abilities require visible state feedback
+An authoritative Condition application/clear/replace/prevention and an authoritative Ability usable/fired transition must be visible on the relevant card/field. Presentation may animate or highlight the event, but Condition/Event Listener/Ability owners remain the sole legality/state authority.
+
+## 117 — Interrupted animations never block state recovery
+Reconnect/refresh renders the latest authoritative snapshot immediately. A partially displayed shuffle/draw/discard/Reward animation has no gameplay receipt and may be abandoned without changing match state.
+
+
+## 118 — Previous-opponent event requirements use canonical turn ownership
+A Tactic/event requirement that names `previous_opponent_turn` delegates to shared event history plus canonical turn-owner history. Numeric previous-turn arithmetic is forbidden because Release 1 includes extra-turn capability. Stone — Reversal Seal is the current Release 1 consumer.
+
+## 119 — Tactic play requirements are structurally complete before program execution
+The frozen Release 1 registry contains 18 Tactics with explicit play requirements. Their current families — reserve count, legal card availability and event occurrence — now resolve through shared owners. This does not imply every Tactic program opcode is implemented; program execution remains the next independent gate.
+
+
+## 120 — Tactic IF is control flow, not effect authority
+The Tactic interpreter may evaluate a shared predicate tree and splice the chosen then/else steps into its existing effect cursor. IF itself does not own Shield, Condition, hidden sampling or Optional-choice mutation. Those downstream operations remain with their rightful owners and must fail closed until implemented.
+
+## 121 — A green IF does not imply every IF card is complete
+A Release 1 Tactic with a working IF predicate is still incomplete when its selected branch contains an unsupported opcode. Current post-IF blockers are Cyclone Route OPTIONAL and False Memory RANDOM_SAMPLE_HIDDEN_ZONE. Reversal Seal ADD_SHIELD_EACH and Blackout Pulse APPLY_CONDITION are now implemented generically. Surveyor Mina and Recovery Spray also have no remaining downstream IF-branch opcode gap.
+## 122 — Every meaningful authoritative resolution needs legible feedback
+Release 1 presentation must make important card movement, Attack, Ability and state-changing outcomes visible. A server-correct mutation can still fail the player-facing gate when the player cannot tell what moved, triggered, changed or resolved.
+
+## 123 — Special effects are a projection, never a gameplay owner
+The effects layer consumes authoritative state deltas, pending choices and event/result packets. It may animate source, target, movement and result, but it never chooses legality, amounts, targets, random order, payments or final state.
+
+## 124 — Effect choreography is generic and extensible
+Visual effects are keyed by reusable event/effect families — movement, search, shuffle, attach, attack, heal, damage, Shield, Condition, switch, evolve, defeat, Reward and listener/Ability activity — rather than card IDs. New cards and rules should plug into these families without creating per-card UI engines.
+
+## 125 — Deck search is a private server-count-bound choice surface
+A deck-search overlay receives its eligible options and selection limits from the authoritative search/pending-choice owner. The searching player may inspect only the cards they are authorized to inspect. A three-card effect displays 0/3 through 3/3 because that effect says three; the UI never treats three as a universal search constant.
+
+## 126 — Search attachment targets come from existing legality owners
+When searched Essence/Energy cards may attach to Adult Creature/Creature targets, the client highlights only server-projected legal destinations. Assigning a selected card to a target is choice transport; Attachment/Essence/Requirement owners remain authoritative.
+
+## 127 — Chosen searched cards attach before the visual shuffle
+For search -> attach -> shuffle effects, authoritative chosen cards are shown moving to their Creature attachment/Essence rails, inspected-but-unchosen cards return to the deck representation, and the visible shuffle follows the server's shuffle step. Presentation order mirrors the canonical effect sequence.
+
+## 128 — Shuffle visuals never expose or recreate permutation
+RNG/shuffle authority determines the resulting deck order. The animation may mix/fan/cut card backs, but it must not know, predict, preserve or reveal the actual hidden permutation beyond the authoritative state available to the viewer.
+
+## 129 — Public and private choreography are viewer-specific
+The searching player may receive private eligible card identities and assignment controls. The opponent receives only the public-safe representation of a search, attachment or shuffle unless a rule explicitly reveals identities. Hidden Information remains authoritative throughout animation.
+
+## 130 — Attack and Ability choreography preserves causal order
+Attack and Ability presentation follows the authoritative sequence: source activation -> legal target/choice -> payment/cost where applicable -> effect/impact -> state deltas -> listeners/Conditions/Defeat/Reward -> continuation. Visual timing may be shortened, but must not reorder gameplay semantics.
+
+## 131 — Animation interruption is never a gameplay fault
+Reduced-motion mode, dropped frames, navigation, refresh or reconnect may skip unfinished effects. The newest authoritative snapshot always wins immediately; no animation has a gameplay receipt or permission to replay mutations.
+## 132 — External TCG footage is interaction grammar, never Stream Bandit rules or assets
+Reference footage may teach viewport composition, physical-card motion, inspection, target highlighting, choice overlays and causal feedback. It may not import external artwork, branding, card frames, names, card identities, proprietary assets or gameplay rules.
+
+## 133 — One Battle Presentation / Choreography Engine owns visual sequencing
+Release 1 uses one generic presentation owner for movement, choices and effect feedback. Card IDs do not own bespoke gameplay presentation branches when the same event/effect family can be reused.
+
+## 134 — The tabletop remains spatially stable during inspection and resolution
+Vanguard, Reserve, Realm, Deck, Discard, Rewards and hand remain anchored to their canonical zones. Full-card inspection and effect overlays are separate presentation layers and do not physically relocate source cards.
+
+## 135 — Physical card movement should explain authoritative zone changes
+When a physical card changes an authorized visible zone, presentation should show the movement where practical: Deck -> hand, hand -> field, field -> Discard, Reward -> hand, return to Deck, evolution stack, switch/promotion and attachment changes.
+
+## 136 — Choice overlays are authoritative N-of-M surfaces
+Reward, search, optional and other multi-card choices use one generic overlay driven by server-authorized options, exact selection bounds, legal targets and continuation identity. Browser prompts and free-form debug choice controls are not Release 1 interaction UI.
+
+## 137 — Target highlighting is a projection of server legality
+A glowing/highlighted destination means the authoritative owner currently exposes that destination as legal. The browser may render that fact but may not independently infer or expand target legality.
+
+## 138 — Combat and Ability feedback follows source-to-result causality
+Presentation preserves the logical order source activation -> target/choice -> payment -> effect/impact -> state delta -> listeners/Conditions/Defeat/Reward -> continuation. Visual effects may be shortened but cannot reverse or fabricate this sequence.
+
+## 139 — Hidden zones remain physically present without identity leakage
+Deck, opponent hand and unrevealed Rewards remain visible as face-down physical objects/counts. Search and other private-choice presentation is viewer-specific and never leaks identities outside Hidden Information authority.
+
+## 140 — Desktop and touch have semantic parity
+Desktop drag/drop and phone hold-drag/tap fallback may differ as gestures, but both consume the same authoritative options, submit the same actions and receive the same presentation semantics.
+
+## 141 — Presentation pacing never outranks authoritative state
+Animation queues are disposable. Newer authoritative state, reconnect, refresh or reduced-motion mode may cancel/shorten queued cues. The rendered state must converge immediately on the server snapshot.
+
+## 142 — Player-facing completion includes comprehensibility
+A Release 1 mechanic is not visually accepted merely because the mutation succeeded. The player must be able to identify the important source, target/movement and resulting state change without relying on raw diagnostic text.
+## 143 — Authoritative visual receipts are preferred over client snapshot inference
+Complex presentation should be driven by a receipt projected by the authoritative action/continuation owner at commit time. Snapshot comparison may help render final state but must not guess hidden choices, RNG, target legality or listener ordering.
+
+## 144 — Presentation receipts are viewer-filtered before consumption
+A receipt may contain public cues and seat-private cues internally, but each persisted player view receives only the cues authorized for that viewer. The browser never becomes the Hidden Information filter.
+
+## 145 — Receipt identity makes presentation idempotent
+Each presentation receipt is bound to an authoritative revision and stable receipt ID. Polling the same match view must not replay the same effect. A newer authoritative revision invalidates older queued choreography.
+
+## 146 — Presentation intensity is pacing metadata only
+Micro, standard and hero tiers control emphasis/timing only. They never alter effect order, legality, amounts, random results or continuation.
+
+## 147 — Element FX skins are generic Stream Bandit presentation
+Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt may each apply a reusable visual skin to generic cue families. Element styling is keyed by public structured element metadata, never by individual card ID, and must remain understandable without colour alone.
+
+## 148 — Resolution breadcrumbs mirror authority instead of replacing it
+A temporary accessible resolution ribbon may summarize a complex authoritative cue chain such as Attack -> damage -> Condition -> Defeat -> Reward. It is generated from the same receipt and cannot create, delay or reorder gameplay.
+
+## 149 — Private choices may have a public-safe opponent mirror
+The opponent may be told that a search/choice is in progress only when that fact is public. Card identities, eligible options, assignments and other private details remain absent unless the authoritative visibility rule explicitly reveals them.
+
+## 150 — Stale animation backlog is disposable
+A newer authoritative revision, reconnect or refresh may cancel old presentation cues. Repeated low-importance cues may be coalesced for pacing in a later visual layer, but the latest committed match snapshot and all rule outcomes remain complete and immediate.
+## 151 — Presentation receipts are created at the canonical commit boundary
+A successful Match mutation projects presentation from the same committed event type, public payload and authoritative post-mutation state immediately before player views are persisted. This is the single server receipt-maker boundary for Match actions.
+
+## 152 — Persisted player views receive separately filtered presentation
+Player 1 and Player 2 views are not given one unfiltered receipt to interpret locally. The server filters the receipt for each viewer first, preserving Hidden Information before persistence and transport.
+
+## 153 — Presentation dependency closure is release-controlled
+The presentation envelope and receipt-maker modules are part of the exact `tcg-match-actions` Edge dependency closure. Any future receipt dependency must update the release-control closure rather than bypassing or weakening the fingerprint guard.
+
+## 154 — Reversal Seal ADD_SHIELD_EACH is generic runtime capability, not a card exception
+Release 1 `ADD_SHIELD_EACH` resolves one-or-many Creature refs then delegates each actual Shield mutation to the existing Shield owner. Reversal Seal is a registry consumer of that generic operation and must not own a card-specific runtime branch.
+## 155 — Tactic APPLY_CONDITION delegates to the shared Condition owner
+The Tactic interpreter may resolve a Creature reference and transport the structured condition request, but the actual Condition mutation belongs to `applyRuntimeCondition` in the shared Condition engine.
+
+## 156 — Condition application modes are shared grammar
+Tactic `APPLY_CONDITION` accepts the same generic modes already used by other runtime owners: `apply`, `apply_if_empty`, `apply_if_empty_or_same`, and `replace`. Tactics may not create alternate slot/replacement semantics.
+
+## 157 — Blackout Pulse is a consumer, not a runtime owner
+Volt — Blackout Pulse supplies structured IF + `APPLY_CONDITION` data. Its card identity must never appear in the generic Tactic condition adapter.
+## 158 — Tactic OPTIONAL reuses the existing pending-choice and effect-cursor owner
+OPTIONAL is a server-owned Yes/No choice. The selected branch is spliced into the same resumable Tactic cursor; OPTIONAL does not create a second interpreter or continuation model.
+
+## 159 — OPTIONAL else_steps are first-class generic branch semantics
+A No choice may execute structured `else_steps` when supplied. Absence of `else_steps` means an empty No branch. This behavior is data-driven and not tied to False Memory.
+
+## 160 — Control-condition choice compatibility aliases the generic condition-choice owner
+`CHOOSE_AND_CLEAR_CONTROL_CONDITION` is accepted as a compatibility spelling of the shared condition-choice operation with the control slot constrained. Quiet Step remains a consumer, never an owner.
+
+## 161 — Hidden-zone random sampling is non-destructive
+The shared hidden-zone sampler chooses distinct instances without reordering or removing the source zone. Later movement, if any, must be an independent authoritative Card-Zone operation.
+
+## 162 — Hidden-zone sampling RNG belongs to the shared match RNG owner
+Sampling delegates random index selection to the canonical v0.2 randomization engine. Browsers, presentation receipts and card identities never supply the random result.
+
+## 163 — Private hidden-sample provenance stays server-side until movement
+When a Tactic samples a hidden source, its source controller/zone provenance stays in private effect state. A later MOVE_CARDS may use that provenance to move exact sampled UIDs through Card-Zone; the provenance itself is never a player-view permission.
+
+## 164 — MOVE_CARDS honors the structured player controller
+Generic no-selection MOVE_CARDS resolves `step.player` before fallback ownership. Cross-controller effects must not silently move cards into the Tactic owner's zones.
+
+## 165 — False Memory is a consumer, not a random-sampling owner
+False Memory supplies structured opponent-hand sample + later public discard data. It owns no RNG, hidden-information or Card-Zone runtime branch.
+## 166 — Attack IF boolean composition has one shared read-only owner
+All Release 1 Attack IF trees must evaluate through the shared predicate-tree composition and the Attack IF leaf adapter. Effect mutation remains with existing mechanic owners.
+
+## 167 — Attack IF leaf semantics reuse existing shared state owners
+Source damage, source Shield and reserve count reuse the Requirement evaluator; target Condition state reuses the Condition engine. Attack IF may not redefine those meanings.
+
+## 168 — current_action event evidence is caller-owned
+The Attack IF evaluator may test supplied current-action event counts but does not record those events itself. Attack declaration/event ownership remains a separate authoritative phase.
+
+## 169 — card_matches remains a selection/filter boundary
+Attack IF resolves the structured variable reference but delegates card/filter matching to the caller's canonical card-definition/filter semantics. The IF owner does not become a card-search engine.
+
+## 170 — Attack IF foundation is not Attack effect parity
+A green predicate evaluator does not imply HEAL, Condition, switch, discard, MOVE_CARDS or other selected branches execute generically. The parent Attack IF gate remains open until branch effects are migrated and proven.
+## 171 — Attack declaration RECORD_EVENT has one action-local owner
+Release 1 Attack on_declare event production is evaluated once from structured declaration data and returns an in-memory current-action event-count map.
+
+## 172 — Attack declaration events do not create a second event-history system
+The action-local map exists only for the current Attack resolution. Persistent turn/history queries remain with the canonical event-history owner.
+
+## 173 — Storm Break and Chainstorm share declaration-event semantics
+Attached-Essence-count and attached-Essence-kind RECORD_EVENT predicates are generic declaration shapes. Storm Break and Chainstorm are registry consumers and must not own separate event booleans.
+
+## 174 — Specialized Attack flows migrate by consuming generic evidence
+A specialized effect owner may remain responsible for its mutation while its IF/event decision moves onto shared predicate/event evidence. Migration must not duplicate the mutation path.
+## 175 — Conditional Attack Condition programs have one generic IF-to-Condition owner
+Nested after-damage programs composed only of IF / APPLY_CONDITION / REPLACE_CONTROL_CONDITION use one generic owner. Mixed effect families remain with their own owners until migrated.
+
+## 176 — Attack Condition mutation is protection-aware
+Generic conditional Attack Conditions use applyRuntimeConditionWithContext, preserving Condition immunity/protection and source/controller context instead of bypassing the shared Condition lifecycle.
+
+## 177 — Direct and conditional Condition ownership are mutually exclusive
+The existing direct structured Condition owner has first claim. The conditional IF owner runs only when direct ownership returns null. Printed-English compatibility runs only when both structured owners return null.
+
+## 178 — Chainstorm consumes shared declaration evidence
+Chainstorm's event_occurred(current_action) predicate reads the action-local event map created by the generic declaration owner. Its card identity does not own event detection.
+
+## 179 — Bounded Attack effect owners must consume shared IF semantics
+A specialized Attack mutation owner may remain narrow, but its Release 1 IF decision must delegate to the shared Attack IF evaluator once that predicate family is supported. Owner-local copies of reserve-count, source-damage, source-Shield, target-Condition or card-match semantics are not authoritative.
+
+## 180 — Predicate migration does not transfer mutation ownership
+Moving an IF decision to the shared evaluator does not move Heal, HEAL_EACH, Deck-Discard, Card-Zone or listener authority. The established mutation/lifecycle owner remains responsible for the selected branch.
+
+## 181 — Deck-discard IF receives authoritative target state, not a caller boolean
+The Deck-Discard owner evaluates `target_has_any_condition` from the actual Attack target Creature through shared Attack IF/Condition state. Dispatchers must not precompute and pass an alternate boolean interpretation.
+
+## 182 — Server-only card inspection precedes shared card_matches and Card-Zone movement
+For bounded top-deck Attack flows, hidden inspection remains server-side, `card_matches` is evaluated through shared Attack IF with caller-owned card-filter semantics, and any resulting movement remains Card-Zone-owned.
+
+## 183 — Mandatory post-Attack switch choices are server-owned
+When a structured Attack requires selecting a friendly Reserve Creature and switching it with the Vanguard, the Match owner creates a private exact-one pending Attack choice. The browser must not preselect or invent the Reserve target in the original Attack request.
+
+## 184 — Attack switch mutation remains Atomic Switch-owned
+The bounded Attack switch-choice adapter owns recognition, validation and choice transport only. The actual Vanguard/Reserve mutation, condition clearing and movement-event emission remain with the canonical Atomic Switch owner.
+
+## 185 — Generic Battle choice UI must route Match Attack choices
+`pending_attack_choice` is a first-class server choice in the Battle client. It uses the same generic choice overlay/selection-count transport as other server-owned choices and returns only the authoritative option IDs to `resolve_attack_choice`.
+
+## 186 — Storm Break IF decisions use shared current-action evidence
+Storm Break's outer `event_occurred(current_action)` decision is evaluated by shared Attack IF from the declaration-event map. The dispatcher must not recreate the decision with a direct event-count boolean.
+
+## 187 — Post-damage target survival is an IF input, not a later mutation guess
+The target-survival result is computed from authoritative post-primary-damage state, supplied to shared Attack IF, and frozen into the suspended overcharge choice before player input. Later listeners or UI state must not redefine whether that nested IF matched.
+
+## 188 — Attack IF source parity and CI acceptance are separate gates
+All 13 frozen Release 1 Attack IF instances may be source-migrated before an exact-head workflow run exists. Source completion may be recorded, but the parent accepted/green gate remains open until Card Pass validates the post-repair head.
+
+## 189 — Release 1 IF inventory is 29 exact instances
+The frozen eight-element Set One definitions contain 29 structured IF nodes: 7 Tactic IF instances, 13 Attack IF instances and 9 Ability IF instances. Program count and IF-node count must not be conflated.
+
+## 190 — Generic Event Listener already owns build/evolution Ability IF execution
+Triggered Ability programs that enter the ordinary Event Listener continuation use the shared predicate tree for IF composition. Existing Cinderburrow, Briarback and Bloomhare IF programs therefore remain Event Listener-owned; no separate Ability IF engine should duplicate those mutations.
+
+## 191 — Attack-declared Ability IF wraps the existing modifier owner
+For synchronous `attack_declared` triggered Abilities, IF decides whether the existing current-Attack damage modifier is applied. The listener owner may recursively evaluate IF wrappers, but it must not create a second Attack/Damage mutation engine.
+
+## 192 — False triggered-Ability IF does not spend a once-per-turn use
+If the triggered Ability's requirements match but its nested IF branch does not select a current-Attack modifier, the event is resolved as a zero-delta no-op and the Ability's per-turn use is not consumed.
+
+## 193 — Ability IF leaves read authoritative source/target state
+`source_damaged`, `event_attack_target_damaged` and `event_attack_target_has_condition` are evaluated from the bound authoritative field source/target for the current attack declaration. Browser state and printed English never decide these leaves.
+
+## 194 — Same-zone card reorder belongs to Card-Zone
+Effects that move an exact card within one authoritative zone, including deck top -> deck bottom, use the Card-Zone reorder primitive. Effect adapters must not splice/reconstruct authoritative zone arrays themselves.
+
+## 195 — Active Ability IF uses the shared predicate-tree owner
+Active Ability conditional programs delegate boolean composition to the common predicate-tree engine. The Active Ability IF adapter owns only its authoritative leaf context and may not become a second generic predicate-composition implementation.
+
+## 196 — Scheduled actions are lifecycle records, not delayed browser commands
+A structured `SCHEDULE_ACTION` is stored server-side with owner, trigger, source identity and structured steps. The client neither schedules nor replays it.
+
+## 197 — controller_aftermath_finished resolves before ordinary turn advance
+Deferred actions with trigger `controller_aftermath_finished` resolve after the controller's Aftermath/resolution queue has finished and immediately before canonical Match Flow turn advance. Any resulting deckout is visible to Match Flow before seat rotation.
+
+## 198 — Night Reading hidden identity remains controller-private
+The inspected opponent deck-top identity may be shown only to the Ability controller. Opponent/public receipts expose structural counts and waiting state, never the inspected card UID/card ID unless another rule explicitly reveals it.
+
+## 199 — Night Reading optional selection controls scheduling through Ability IF
+Declining the optional inspected-card bottom move leaves the deck order unchanged and causes `selected_count_at_least` to fail, so no deferred draw is scheduled. Selecting exactly one card reorders it through Card-Zone and schedules the deferred draw.
+
+## 200 — Effect-driven discard Essence attachment remains Attachment Engine-owned
+An active Ability may select an eligible discard Essence, but physical removal, exact-instance attachment, attachment receipts and `essence_attached` listener creation remain with the canonical Essence Attachment route.
+
+## 201 — Active Ability continuation survives nested listener choices
+If an active Ability mutates state and that mutation opens Event, Movement or Heal listener choices before the Ability's remaining steps execute, the unfinished Ability is represented by a server-side continuation receipt. Browser choice state must never become the Ability program counter.
+
+## 202 — Nested Ability listener healing resumes the Ability, not ordinary Play
+The Heal Listener coordinator uses `resume_active_ability_effect` when packets originate from nested listeners inside an unfinished active Ability. Only after that listener queue clears may Match resume the active-Ability continuation.
+
+## 203 — Supply-family player choice preserves sequential structured semantics
+A combined private choice UI may present the optional Essence and mandatory target together, but server validation must preserve the original program constraints: exactly one legal target and zero or one eligible Essence.
+
+## 204 — Active Ability IF observes post-listener authoritative target state
+For supply-family effects, `target_damaged` is evaluated after the selected Essence attachment and all listener continuations have completed. It must not be frozen from pre-attachment browser state.
+
+## 205 — Supply-family public receipts do not reveal selected hidden-zone identities
+Public receipts may expose selected Essence count, target field slot and listener/heal audit. They do not expose the selected discard Essence UID/card ID unless another rule makes that identity public.
+
+## 206 — Attached-Essence redistribution remains Essence Movement-owned
+Active Ability orchestration may enumerate legal source/destination combinations, but exact attached-Essence transfer and movement receipts remain with `applyRuntimeV02EssenceTransfer`. Ability adapters must not splice attachment arrays directly.
+
+## 207 — Multi-move Ability transactions preflight before first mutation
+When one Ability selection contains multiple Essence moves, the complete selected sequence is executed against an isolated authoritative clone before any real move occurs. A stale or illegal later move must fail the whole selection without partially applying an earlier move.
+
+## 208 — One Essence instance cannot satisfy multiple moves in one resolution
+A single attached Essence UID may appear in at most one selected redistribution move for the same Ability resolution. Movement count is receipt count, not option count or browser intent.
+
+## 209 — participated_in_moves is receipt-derived
+A Creature satisfies `participated_in_moves` only when its authoritative anchor UID appears as the source or destination of a selected, successfully preflighted movement receipt for that Ability resolution.
+
+## 210 — Essence-move-count Ability IF consumes exact movement receipts
+`essence_move_count_at_least` receives the server-owned movement receipt set through the shared Active Ability IF context. The browser, printed English and aggregate current-turn movement history do not decide this local IF.
+
+## 211 — Redistribution healing remains Heal Packet-owned
+After the movement threshold is met and a legal participating damaged Creature is selected, the Ability adapter invokes the canonical Ability Heal packet owner. Before-heal modifiers and after-heal listeners remain unchanged.
+
+## 212 — Release 1 IF closeout is 29 / 29
+The frozen Set One contains 29 structured IF instances: 7 Tactic, 13 Attack and 9 Ability. All 29 now have executable structured paths through generic owners, with exact-head Card Pass evidence; printed-English/card-ID IF decision fallback is no longer required for Release 1.
+
+## 213 — Capability status follows executable owner evidence
+A capability may move to `implemented` only when a generic structured runtime path exists for the accepted Release 1 shape and is backed by source/tests. A stale historical test must be updated rather than forcing the capability ledger to remain false.
+
+## 214 — Bounded-owner narrowness does not imply global capability absence
+A specialized owner may remain intentionally narrow even after another shared owner establishes global structured parity for the same operation or predicate. Regression tests must distinguish owner scope from global capability status.
+
+## 215 — IF predicate classification is evidence-bound
+The 20 predicate families consumed by the accepted 29 Release 1 IF instances are classified implemented from their exact accepted Tactic/Attack/Ability owner evidence. This does not automatically promote unrelated predicates.
+
+## 216 — Capability-manifest changes are release-control fingerprinted
+Every capability-ledger classification change must refresh the release-control capability-manifest blob fingerprint and pass exact-head Card Pass before the reconciliation is accepted.
+
+## 217 — Hidden-zone random sampling has one Release 1 RNG owner
+Duskstalker, Thought Hunter and False Memory all delegate exact hidden-zone random sampling to the shared non-destructive Hidden-Zone sampler and canonical Match RNG owner. Event Listener, active Ability and Tactic remain orchestration/visibility consumers rather than independent RNG owners.
+
+## 218 — Hidden-sample visibility stays family-appropriate
+Triggered and active Ability hidden samples may expose controller-private inspection only through their existing private viewer boundary. False Memory's sample remains server-only until a later authoritative Card-Zone movement makes any resulting discard public. Capability parity never authorizes browser visibility.
+
+## 219 — Ownership regression tests assert semantics, not source formatting
+A regression guard may prove that a shared owner is still called and that privacy/error boundaries remain present, but it must not require obsolete minified/switch-case spelling when the same semantic owner is preserved.
+
+## 220 — Global predicate capability requires every Release 1 consumer family
+One working consumer does not promote a predicate globally. `control_condition_present` remains open until Thought Hunter, Murkmite and Hollowcrown are all proven through their rightful generic runtime owners.
+
+## 221 — Murkmite control-condition bonus belongs in the shared outgoing Attack-damage predicate adapter
+Murkmite's continuous Attack-damage bonus is data-driven and already reaches the shared outgoing Attack-damage modifier path. The missing work is only support for the structured `control_condition_present` leaf against authoritative opponent Vanguard Condition state; no Murkmite/card-ID branch or second Attack engine is permitted.
+
+## 222 — Rule 221 is corrected by the complete Creature-continuous audit
+Rule 221 correctly located Murkmite in the outgoing Attack-damage domain but overstated the pre-existing execution path. The accepted V2.4.78 audit proved that the shared outgoing owner collected attached-Essence continuous effects only. Creature-owned continuous `attack_damage` required a new generic lane inside the same Attack Damage owner.
+
+## 223 — Source-Creature continuous outgoing Attack damage has one generic owner
+Glowcub, Murkmite, Quartzram and future cards using the same structured Creature Ability continuous `attack_damage` family are discovered from metadata by the Attack Damage engine. Match and card IDs do not own per-card modifier logic.
+
+## 224 — Existing predicate owners must be reused inside continuous Attack damage
+`source_damaged` and `source_has_shield_at_least` are evaluated by the canonical Requirement evaluator. Attack Damage may adapt authoritative context but must not fork their semantics.
+
+## 225 — Current-opponent-Vanguard predicates are independent of the chosen attack target
+A predicate targeting `$current_opponent_vanguard` reads the opponent Vanguard's authoritative state even when the attack itself legally targets a Reserve. Attack-target context must never be substituted for explicit Vanguard context.
+
+## 226 — Creature continuous Attack filters bind to canonical attack IDs
+Structured `filters.attack_id` is evaluated against the resolved structured Attack ID supplied by Match. Card names, slots and English parsing are not alternate filter authority.
+
+## 227 — Hollow Command blocks global control-condition capability closeout
+Thought Hunter and Murkmite now have executable `control_condition_present` paths, but Hollowcrown / Hollow Command remains without a structured active-Ability `REPLACE_CONTROL_CONDITION` owner. Global predicate/operation capability classification must remain open until that family is implemented and exact-head validated.
+
+## 228 — Active Ability condition replacement is shape-owned, not card-owned
+Own-turn active Abilities whose structured program requires an existing opponent-Vanguard control condition and then performs `REPLACE_CONTROL_CONDITION` are recognized by one generic Active Ability condition-replacement owner. Card ID, printed English and browser logic are not dispatch authority.
+
+## 229 — Condition replacement preflights before once-per-turn mutation
+The complete legal activation is executed against an isolated authoritative clone before the real activation receipt is written. Requirement or source-state failure cannot partially consume the once-per-turn use.
+
+## 230 — Condition prevention occurs after legal Ability activation
+Once an active Ability has passed requirements and the canonical activation owner permits it, the Ability use is spent even if the canonical Condition owner later prevents the requested condition because of immunity/protection. Prevention does not rewind a legal activation receipt.
+
+## 231 — REPLACE_CONTROL_CONDITION has one Condition mutation owner across Ability and Attack
+Hollow Command and Mind Eclipse may be orchestrated by different runtime families, but both delegate the actual control-slot replacement/protection semantics to `applyRuntimeConditionWithContext(..., "replace", ...)`. No second replacement engine is permitted.
+
+## 232 — control_condition_present is globally implemented only after all three frozen consumers
+Release 1 `control_condition_present` is accepted only because Thought Hunter, Murkmite and Hollowcrown are each executable through their rightful generic owner. One consumer family alone is insufficient evidence.
+
+## 233 — Stormmane attached-Essence discard must leave legacy card-ID Match dispatch
+The frozen structured `DISCARD_ATTACHED_ESSENCE` operation has exactly one Release 1 consumer, Volt — Stormmane / Storm Break. Its mutation must remain Card-Zone-owned, but recognition/choice must move into a generic structured Attack operation owner so Match no longer dispatches gameplay by `volt-stormmane`.
+
+## 234 — Rule 233 is corrected by the Storm Break owner audit
+Rule 233 correctly requires v0.2 Stormmane gameplay to be generic, but it incorrectly implied that the structured discard still depended on the legacy card-ID Match branch. The accepted owner audit proves marked v0.2 Stormmane already routes through the card-ID-free overcharge-discard Attack owner; the remaining `volt-stormmane` branch is legacy-only compatibility.
+
+## 235 — DISCARD_ATTACHED_ESSENCE is implemented for the complete Release 1 shape
+The frozen Set One has exactly one `DISCARD_ATTACHED_ESSENCE` consumer. Storm Break's exact-one attached-Essence selection, validation and sequencing are owned by the generic overcharge-discard Attack family, while physical attachment -> discard movement remains Card-Zone-owned.
+
+## 236 — Legacy compatibility branches do not invalidate structured capability parity
+A card-specific branch that is explicitly gated to unmarked legacy snapshots does not make the corresponding marked v0.2 capability missing when all frozen structured consumers are already served by generic owners. Such compatibility code may remain until legacy support is deliberately retired.
+
+## 237 — Do not rewrite a green structured owner solely to remove legacy compatibility debt
+Capability reconciliation must prefer proven current ownership over unnecessary runtime churn. Legacy-only cleanup is a separate compatibility decision and must not be conflated with Release 1 structured engine completion.
+
+## 238 — Attack declaration RECORD_EVENT has one generic Release 1 owner
+Structured Attack `on_declare` `RECORD_EVENT` steps are evaluated by the Attack declaration-event owner from registry data. Match consumes the resulting action-local event counts; card IDs and printed English are not declaration-event authority.
+
+## 239 — Attack-source Essence declaration predicates read authoritative attachment state
+`event_attack_source_attached_essence_count_at_least` reads the current authoritative source Creature attachment count. `event_attack_source_has_attached_essence_kind` delegates attachment-kind classification to the shared Attack authority query. Browser state does not decide either predicate.
+
+## 240 — False declaration predicates emit no synthetic event
+When a structured declaration predicate does not match, the action-local event map remains unchanged. Unsupported declaration operations, predicate names, fields or Essence kinds fail closed rather than degrading to printed-English interpretation.
+
+## 241 — Action-local declaration events feed later shared Attack IF decisions
+Storm Break and Chainstorm may consume their declaration evidence later in the same Attack through shared `event_occurred(current_action)` IF evaluation. The declaration owner records evidence only; it does not duplicate Attack IF or downstream effect mutation.
+
+## 242 — Nightmaw deck-top discard is the next used-operation audit
+The frozen Set One has exactly one `DISCARD_DECK_TOP` consumer, Shade — Nightmaw / Dread Crush. Existing evidence indicates the structured Attack Deck-Discard owner already delegates its physical deck -> discard movement to Card-Zone and emits the canonical deck-discard event; capability status must be reconciled only after exact owner/test evidence is confirmed.
+
+## 243 — Attack deck-top discard is a structured owner family, not a card rule
+Release 1 `DISCARD_DECK_TOP` is owned by the generic Attack Deck-Discard family. Nightmaw is the sole frozen consumer but is not runtime dispatch authority.
+
+## 244 — Attack deck discard delegates physical mutation to Card-Zone
+The Deck-Discard owner decides structured eligibility/count/reveal semantics only. Exact opponent deck -> discard movement, card identity and ordering are Card-Zone-owned.
+
+## 245 — Deck-discard effect exhaustion is not draw-deckout
+Moving all remaining cards from a deck to discard because of an effect does not itself assign a deckout loser. Deckout remains with the rules that explicitly require an incomplete draw/deckout result.
+
+## 246 — deck_cards_discarded is a continuation handoff
+A successful structured Attack deck discard emits the canonical `deck_cards_discarded` event handoff. Event Listener, Movement Listener and Heal Listener remain separate downstream owners and must preserve their accepted ordering.
+
+## 247 — Noctivane SCHEDULE_ACTION is the next used-operation audit
+Night Reading is the sole frozen `SCHEDULE_ACTION` consumer. Existing V2.4.73 evidence indicates the deferred action is server-owned, resolves at `controller_aftermath_finished`, delegates physical draw movement to Card-Zone, and runs before canonical turn advance; capability classification must be reconciled against that accepted owner.
+
+## 248 — Scheduled actions are server lifecycle records
+A structured `SCHEDULE_ACTION` does not execute in the browser and does not rely on a client timer. It records an authoritative deferred action with owner seat, source action/card identity, trigger, turn and exact nested steps.
+
+## 249 — Scheduled action trigger matching is exact
+A scheduled action resolves only for its recorded controller, recorded turn and supported trigger. A different controller's Aftermath leaves it queued; a terminal match may consume a match-active-only schedule without mutation.
+
+## 250 — Scheduled fixed draws keep Card-Zone and deckout ownership
+When a scheduled action executes `DRAW_FIXED`, Card-Zone owns exact deck -> hand movement. The scheduled-action owner only decides the requested count and incomplete-draw deckout result.
+
+## 251 — Controller-AFTERMATH schedules resolve before turn advance
+Match must resolve due `controller_aftermath_finished` actions after the controller's Aftermath work and before canonical turn advance. The deferred lifecycle must never be replayed or reordered by presentation code.
+
+## 252 — Archivist Sol hand-to-deck shuffle is the next real runtime gap
+Archive Reset is the sole frozen `SHUFFLE_ZONE_INTO_DECK` family. Tactic already has canonical Card-Zone and Randomization dependencies but does not yet parse this opcode. The repair must generically move all exact requested hand cards into that same player's deck through Card-Zone, then shuffle the resulting deck through Randomization, with owner-private semantics and no Archivist Sol branch.
+
+## 253 — SHUFFLE_ZONE_INTO_DECK is Tactic orchestration over Card-Zone + Randomization
+The Tactic interpreter owns recognition/sequencing of the structured operation only. Exact hand -> deck movement remains Card-Zone-owned and resulting deck permutation remains Randomization-owned. No third shuffle or zone owner is permitted.
+
+## 254 — Frozen hand-to-deck shuffle visibility is owner-private
+Release 1 `SHUFFLE_ZONE_INTO_DECK` accepts only `zone: "hand"` with `visibility: "owner_private"`. The operation must not expose opponent hand identities in public receipts or browser-owned state.
+
+## 255 — Empty hand does not suppress the deck shuffle
+A legal structured hand-to-deck shuffle with zero cards in hand performs no Card-Zone transfer but still runs the canonical deck shuffle. Empty source-zone state is not an error for this family.
+
+## 256 — Archivist Sol is a consumer, never shuffle authority
+Archive Reset is the sole frozen Release 1 consumer, but runtime recognition is shape-driven by operation/player/zone/visibility. Card ID and printed English are not dispatch authority.
+
+## 257 — Quiet Step control-condition clear is the next used-operation reconciliation
+The frozen Set One has exactly one `CHOOSE_AND_CLEAR_CONTROL_CONDITION` consumer, Shade — Quiet Step. Existing Tactic runtime aliases this structured operation to the generic condition-choice flow and filters legal options to the control slot before canonical clear mutation; capability status should be reconciled only after exact-head evidence confirms that accepted path.
+
+## 258 — Control-condition clearing is a specialization of generic Condition choice
+`CHOOSE_AND_CLEAR_CONTROL_CONDITION` shares the ordinary server-owned condition-choice transport but constrains legal options to the target Creature's control slot. It does not require a separate card or condition engine.
+
+## 259 — Selected control-condition clearing remains canonical Condition-owned
+Tactic may select the condition and preserve choice authority, but physical Condition-state mutation delegates through `clearRuntimeCondition` to the shared Condition engine. The Tactic compatibility facade is not a second mutation owner.
+
+## 260 — Quiet Step is a consumer, not control-clear dispatch authority
+Quiet Step is the sole frozen Release 1 consumer, but runtime recognition is operation/target/slot-driven and contains no Quiet Step/card-ID/name branch.
+
+## 261 — Bastion Plate source-counter increment is the next real runtime gap
+The frozen Set One has exactly one `INCREMENT_SOURCE_COUNTER` consumer, Stone — Bastion Plate. A generic counter primitive exists, but the Event Listener dispatcher has no opcode branch. The repair must bind listener-source identity generically and preserve the subsequent `source_counter_at_least` IF and source-discard lifecycle.
+
+## 262 — attached-Relic incoming attack reduction belongs to Attack Damage
+Structured Relic `continuous` entries with `kind: "incoming_attack_damage"` and `target: "$attached_creature"` are evaluated by the canonical Attack Damage owner. Relic/card identity is data, never dispatch authority. Existing Essence/Creature/temporary-protection ownership remains intact.
+
+## 263 — exact damage prevention and historical prevention are separate evidence forms
+Attack Damage may emit exact prevention details for live listener dispatch while preserving the existing aggregate prevention-history marker used by prior-turn event formulas. Adding exact listener evidence must not delete or redefine historical query evidence.
+
+## 264 — attachment-scoped one-use Relic effects live on the Relic instance
+A frozen continuous effect whose limit is `scope: attachment / owner: attachment` stores consumption on the exact attached Relic instance and consumes only after the effect actually prevents damage. It is not a turn flag and must not be recreated as a Match helper.
+
+## 265 — Relic card-instance counters live on the source card instance
+A Tactic counter declared with `owner: "card_instance"` is read and mutated on that exact Tactic/Relic instance. Creature flags are not a valid substitute for attached-card counter ownership.
+
+## 266 — Event Listener owns damage-prevented listener orchestration
+The generic Event Listener owns `damage_prevented` predicate evaluation, listener limits, card-instance counter steps, IF branching and the act of scheduling later work. It does not own physical Relic removal or attack-damage arithmetic.
+
+## 267 — after_attack_finished timing belongs to Scheduled Action
+`SCHEDULE_SOURCE_DISCARD` creates server-owned lifecycle work in the existing Scheduled Action owner. Event Listener does not create an ad-hoc timing queue, and Match does not encode a card-specific delayed-discard flag.
+
+## 268 — physical attached-Relic removal belongs to Relic
+The scalar `attached_relic` slot is specialist Relic state. Exact attached Relic -> discard mutation, uniqueness checks and destination collision preflight belong to the Relic owner rather than forcing Card-Zone to manufacture an array facade for the scalar slot.
+
+## 269 — Match only orchestrates the attack-finished boundary
+Match converts Attack Damage prevention details into Event Listener events and invokes due Scheduled Action work at the existing attack-completion boundary before defeat scan. It delegates both timing semantics and physical Relic mutation to their owners.
+
+## 270 — Sapstone Charm is the next used-operation reconciliation
+The frozen Set One has exactly one `MODIFY_CURRENT_HEAL` consumer, Grove — Sapstone Charm. Heal owner #21 already owns the before-heal predicates, turn-scoped attachment limit, modifier validation/application and pre-HP-mutation packet boundary; capability status may move only after the exact reconciled head remains green.
+
+## 271 — before-heal mutation belongs to Heal #21
+`before_heal_packet` amount modification is owned by the canonical Before-Heal / Heal Packet chain. The modifier phase validates listener authority before mutation, applies requested-heal changes before HP mutation, and persists the modified requested amount in the canonical packet. Tactic/Attack/Ability owners emit heal intent; they do not reimplement Sapstone math.
+
+## 272 — capability predicates are accepted only after every frozen consumer is proved
+A predicate may be shared across multiple event owners. `heal_packet_source_action_kind_is` is therefore classified implemented only after both Sapstone's before-heal use and Symbiote Essence's after-heal use are proven through their canonical owners. One passing consumer is not sufficient capability evidence.
+
+## 273 — ADD_SHIELD_EACH requires Attack/Tactic parity
+Frozen `ADD_SHIELD_EACH` has exactly two Release 1 consumers: Crowncrag's Attack `after_damage` program and Reversal Seal's Tactic IF branch. The Tactic interpreter already executes the operation generically. Capability must remain missing until the Attack consumer is proven through the canonical Attack/Shield owners or repaired without card-ID dispatch.
+
+## 274 — mixed Attack choice programs remain whole-program specialist ownership
+A mixed structured Attack program must not be partially executed by a narrow owner. The Crowncrag family is owned as one operation-shaped sequence — source Shield, bounded Creature selection, then Shield-each — while the existing pure `ADD_SHIELD` owner remains whole-program-only and returns compatibility authority for unrelated mixed shapes.
+
+## 275 — optional multi-target Attack choices preflight every selected target before mutation
+For a private Attack choice with min/max selection bounds, the resolver must rebind the exact source, current turn, every selected field position and current top-card identity, then re-evaluate declared filters for the complete selected set before mutating any selected target. A stale later selection must not leave an earlier selected target partially mutated.
+
+## 276 — ADD_SHIELD_EACH parity shares one Shield mutation owner
+Release 1 `ADD_SHIELD_EACH` is implemented only when both frozen consumers are proven: Crowncrag through the Attack shield-choice specialist and Reversal Seal through the Tactic interpreter. Both paths delegate actual Shield mutation and the 60-Shield cap to `addRuntimeShield`; neither path owns an alternate cap or card-specific Shield rule.
+
+## 277 — damage-packet operation truth is narrower than shared predicate truth
+Heatguard Bracer's `MODIFY_CURRENT_DAMAGE_PACKET` may be reconciled from Damage owner #20 once its exact before-damage contract is proven. Shared `damage_packet_*` predicates must not be promoted from Heatguard evidence alone when other frozen consumers, including after-damage listeners such as Thorn Crown, still require separate owner evidence.
+
+## 278 — current damage-packet mutation belongs to Damage owner #20
+`MODIFY_CURRENT_DAMAGE_PACKET` is packet-local mutation owned by the canonical Damage Packet Listener before HP/Shield application. It validates the current packet listener, applies bounded delta semantics, records modification evidence and consumes the declared listener limit. Match/Tactic/Attack owners must not independently subtract Heatguard values.
+
+## 279 — operation capability and predicate capability may close independently
+A used operation can be accepted while predicates that happen to appear in the same consumer remain missing. Shared predicates must be proven across every frozen consumer and event timing before they move to implemented; operation evidence must not be stretched into unrelated predicate acceptance.
+
+## 280 — voluntary Withdrawal cost listeners must sit before Payment
+A `before_voluntary_withdrawal_cost` listener, if implemented, must modify the canonical payable Withdrawal cost before exact attached-Essence payment preflight/commit. It must not alter Payment Engine semantics, bypass the once-per-turn Withdrawal gate or create a second Atomic Switch/transaction owner.
+
+## 281 — voluntary Withdrawal current-cost listeners sit between Withdrawal and Payment
+Withdrawal computes the canonical base cost first. A synchronous `before_voluntary_withdrawal_cost` Event Listener may then modify only the packet-local payable cost. Payment receives that resolved integer and keeps exact attached-Essence ownership. Atomic Switch remains downstream and unchanged.
+
+## 282 — action projection may execute mutable listener logic only on cloned match state
+If authoritative UI projection needs the same once-per-turn listener semantics as a command, the projection must run the canonical resolver against `structuredClone(state)` or an equivalently isolated copy. Read-only projection must never consume receipts, listener limits, event history or card-instance state in the authoritative match.
+
+## 283 — current-cost opcode grammar must not grow beyond frozen data
+`MODIFY_CURRENT_WITHDRAWAL_COST` currently owns only `delta` and `minimum` in Release 1. Runtime validation must fail closed on undeclared fields rather than silently inventing future semantics. Future card grammar may extend this through an explicit master-plan revision, not accidental permissiveness.
+
+## 284 — Pilot Sera is the next partial-operation reconciliation target
+The frozen Release 1 has exactly one `SET_ATTACK_ELIGIBILITY` consumer: Gale — Pilot Sera. Existing Tactic runtime writes a turn-scoped final-Vanguard anchor and Match already checks that anchor before Attack. V2.4.91 may move the capability from partial only after exact `controller_turn / only_final_vanguard_may_attack` grammar, repeated-switch final-anchor behavior and turn expiry/reset are proven end-to-end.
+
+
+
+## 285 — Attack Eligibility is a shared Attack owner, not Tactic or Match policy
+`SET_ATTACK_ELIGIBILITY` grammar, final-Vanguard anchoring, turn validity and declaration block reasons belong to one shared Attack Eligibility owner. Tactic may install the frozen rule and Match may query it, but neither owns a second interpretation of the lifecycle state.
+
+## 286 — final-Vanguard eligibility binds Creature identity rather than one card face
+Pilot Sera's final-Vanguard rule follows the current Vanguard Creature stack identity. Evolving that Creature in place must not invalidate the rule, while switching to a different Creature in the same controller turn must block Attack.
+
+## 287 — controller-turn Attack Eligibility expires by turn authority
+A `controller_turn` Attack Eligibility receipt is valid only for its recorded controller and `turn_seq`. Turn advancement expires it semantically; browser projection must not recreate or extend it.
+
+## 288 — SET_WITHDRAWAL_MODIFIER must have one lifecycle owner
+Release 1 uses `SET_WITHDRAWAL_MODIFIER` from multiple producer families. Event Listener, Tactic and Ability code must not each mutate `lifecycle_withdrawal_cost` independently. V2.4.92 must centralize installation/evaluation under Withdrawal lifecycle ownership while preserving the existing Payment and Atomic Switch owners.
+
+## 289 — Withdrawal modifier duration and source semantics are gameplay state
+Frozen withdrawal modifiers include end-of-turn, controller-aftermath and target-controller-aftermath boundaries, one-use declarations, source-aware caps and formula amounts. These semantics cannot be reduced to a same-turn scalar or presentation helper; they must be represented and consumed by the canonical server-side lifecycle owner.
+
+
+## 290 — Withdrawal modifier producers delegate; they do not own lifecycle state
+Triggered Event Listener programs and Tactic programs may request `SET_WITHDRAWAL_MODIFIER`, but one shared Withdrawal-modifier owner validates and stores the structured lifecycle record. Producer families must not create parallel scalar flag semantics for v0.2 cards.
+
+## 291 — one-use Withdrawal modifiers are consumed by legal declaration authority
+A `max_uses` modifier with `consume_on: legal_voluntary_withdrawal_declared` is consumed only by the authoritative legal Withdrawal declaration path. Presentation projection uses cloned state. A later Payment or Atomic Switch failure cannot persist that request-local consumption.
+
+## 292 — Withdrawal increases respect canonical source immunity
+A structured modifier that would increase a target's Withdrawal cost must pass the existing continuous `withdrawal_increase_immunity` owner. Source category is evaluated from the target's perspective; an opposing card effect cannot bypass Granite-style immunity by entering through a new producer route.
+
+## 293 — target-controller aftermath expiry happens at Aftermath start
+A modifier declared to expire on `target_controller_aftermath_started` remains valid through the target controller's playable turn and is removed when that controller's Aftermath begins. Match projection and turn-number heuristics must not expire it earlier.
+
+## 294 — HEAL_EACH capability requires all four frozen execution surfaces
+`HEAL_EACH` remains partial until Verdantusk Attack, Elderbloom active Ability, Marevault after-damage-finished Attack and Reef Medic Olan Tactic all execute through canonical Heal/Heal Packet/listener ownership. Existing Attack/Tactic success cannot be stretched into Ability or after-damage-finished acceptance.
+
+
+## 295 — HEAL_EACH is Heal Packet/listener semantics, not a second Heal engine
+Attack, active Ability, mixed Attack programs and Tactic may each orchestrate `HEAL_EACH`, but every physical heal mutation must pass through the canonical Heal Packet owner and every emitted packet must preserve the canonical after-heal listener boundary.
+
+## 296 — multi-target HEAL_EACH preflights the complete selected set
+Before a multi-target HEAL_EACH mutates the first target, the resolver must rebind every selected Creature against current field position, current top-card identity and declared filters. A stale later target must fail the choice before any earlier selected target is healed.
+
+## 297 — mixed after-damage-finished Attack programs preserve operation order across listeners
+A mixed program such as Essence movement -> HEAL_EACH -> optional switch may pause for player choice and nested listeners, but its declared operation order is authoritative. Movement Listener completes before heal selection; Heal Listener completes before later switch; resume receipts are server-owned.
+
+## 298 — mixed Attack choices reuse the generic private server choice transport
+A new structured Attack program may emit the existing server-owned `pending_attack_choice` shape with min/max/options. The Battle client renders and submits that generic choice state; it does not identify Marevault or decide program rules.
+
+## 299 — after-damage-finished specialists cannot compete with ordinary after_damage owners
+The V2.4.93 mixed Attack owner claims only its exact frozen `after_damage_finished` operation family and returns null when ordinary `after_damage` is non-empty. Future cards with both families require an explicit master-plan ownership revision rather than accidental double execution.
+
+## 300 — SELECT_CARDS is the next cross-surface selection-unblocker
+Frozen Release 1 has seven `SELECT_CARDS` consumers across Event Listener, Attack, active Ability and Tactic surfaces. Event Listener and the Myceliarch Attack specialist already own their families; V2.4.94 must close missing active-Ability/Tactic selection transport generically before dependent Essence-attachment programs can be completed.
+
+## 301 — SELECT_CARDS selection authority is not Card-Zone mutation authority
+`SELECT_CARDS` owns server-private legal option generation, min/max validation, selected identity/zone revalidation and variable binding. Any later physical zone mutation remains with Card-Zone or the specialist owner invoked by the following operation.
+
+## 302 — active-Ability SELECT_CARDS may be a staged private continuation
+A sequential active Ability may pause first for a private card selection and then for a later Creature selection. Each stage must have its own current server choice identity so reconnect/stale submissions cannot reuse a prior stage. Browser code renders the server choice; it does not own legality or variable binding.
+
+## 303 — selected hidden card identity is server-private across continuation boundaries
+A `SELECT_CARDS` result may bind a hidden card instance for a later operation, but public match receipts may expose only structural outcome such as selected count and already-public field position. Selected hidden-zone UID/card ID and private anchor identities must stay inside server state/private views.
+
+## 304 — effect attachment state has one normalization owner
+When an Event Listener, Ability or later Tactic attaches Essence with effect-defined attachment disposition/lifecycle metadata, producers must delegate normalization to the shared attachment-state owner and physical attachment to the canonical Essence Attachment route/engine. Producer families must not invent parallel borrowed/temporary attachment semantics.
+
+## 305 — SELECT_CARDS capability cannot close on active-Ability evidence alone
+The V2.4.94 active-Ability sub-slice is accepted on exact head `d88af8f3a1047c38a8935974709c6a6389f43be4` with Card Pass #1496 SUCCESS, but `SELECT_CARDS` remains missing until the frozen Tactic consumers Forager Nia and Quickcharge Cell also have canonical private selection/resume ownership. Event Listener and Attack evidence remains preserved rather than reimplemented.
+
+## 306 — Tactic SELECT_CARDS owns selection and binding, not later mutation
+The remaining V2.4.94 Tactic route must own legal option construction, min/max choice validation, current-zone/card revalidation and variable binding. Any following `MOVE_CARDS`, `ATTACH_ESSENCE_FROM_ZONE` or other physical mutation remains delegated to its canonical engine/specialist. Completing selection transport must not create a second Card-Zone or Essence Attachment owner.
+
+## 307 — optional SELECT_CARDS binds an empty set, not a fake card
+When declared minimum is zero and no legal option exists—or the controller legally chooses zero—the selection owner binds an empty server-side set and advances. It must not fabricate an identity, perform a zone mutation or manufacture an attachment.
+
+## 308 — player-chosen card order is a separate private continuation
+A later `MOVE_CARDS ... order: player_choice` over a selected hidden set receives a fresh server choice identity. The order choice validates the exact same selected instances and then delegates physical movement to Card-Zone. Selection ownership must not become ordering/movement ownership.
+
+## 309 — cards-bound Essence attachment consumes the selected ref without a second selection prompt
+When `ATTACH_ESSENCE_FROM_ZONE` references a prior `SELECT_CARDS` variable, the Tactic/Ability orchestrator rebinds that exact current card ref and sends it to canonical Essence Attachment ownership. It must not ask the player to select the same Essence again or move the card itself.
+
+## 310 — SELECT_CARDS closes only as one all-surface operation contract
+V2.4.94 is accepted only because Event Listener, Attack, active Ability and Tactic together cover all seven frozen Release 1 consumers. The shared Card Selection module owns legality/revalidation/binding only and is a submodule of existing owner families; canonical owner-family count remains 40.
+
+## 311 — APPLY_CONDITION is the next Release 1 condition closeout target
+The frozen 193-card inventory contains exactly 20 `APPLY_CONDITION` operation uses, the largest remaining used missing opcode after V2.4.94. V2.4.95 must freeze every exact condition/target/mode/timing shape before source changes, then route application through Condition owner #19. Producers may sequence the operation but must not create a second condition-state owner or owner #41.
+
+## 312 — V2.4.94 exact acceptance
+All-surface source/runtime + release-control accepted at `795a9e94da7e5eadedf41c653fed3cc44be8c8e5` with Card Pass #1502 SUCCESS; capability/control accepted at `ff6af2fde6029158eb63c74df01b4232412f94e3` with Card Pass #1503 SUCCESS. Match closure is 108 / `26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286`; Tactic closure is 45 / `ea17df9e55af4e18d80585113fe73045321d70d60b2d6c6160880a9c18bfb5d6`; `SELECT_CARDS` is implemented; production was not changed.
+
+## 313 — APPLY_CONDITION stays inside Condition owner #19
+The frozen Release 1 `APPLY_CONDITION` gap is producer-routing parity, not missing condition-state semantics. Condition owner #19 remains the sole authority for names, slot legality, immunity, temporary protection, application mode and lifecycle state. Event Listener, Attack and Tactic may sequence an application but must not own parallel condition mutation.
+
+## 314 — triggered Ability condition producers are Event Listener consumers
+Cindercrest, Veiljaw, Umbraspider and Sparkmoth use triggered Ability events and therefore execute through the generic Event Listener family. V2.4.95 must not invent an Active Ability route for them.
+
+## 315 — source-aware condition protection is part of structured APPLY_CONDITION
+A structured card-effect condition application with known source/controller/target context must use the context-aware Condition owner so temporary card-effect protection can be consumed correctly. The legacy context-free adapter remains only for compatibility callers whose source context is genuinely unavailable.
+
+## 316 — after_attack_finished condition timing is distinct from after_damage
+Aeralith — Storm Shepherd applies Blinded to the current opposing Vanguard only after the Attack's optional switch sequence is finished. The runtime must preserve this declared phase; ordinary after_damage condition ownership cannot execute it early.
+
+## 317 — after-attack-finished specialists remain disjoint
+The Marevault four-step `after_damage_finished` specialist remains exact to its Essence-move / HEAL_EACH / optional-switch family. Aeralith condition timing requires a separate operation-shaped subroute under Attack owner #14, not a permissive widening of the Marevault parser.
+
+## 318 — structured condition producers must carry source identity when it exists
+Event Listener, Attack and Tactic structured producers now supply controller, target, active-seat and source-action context to Condition owner #19. The context exists to evaluate protection and provenance; it does not transfer condition-state ownership to the producer.
+
+## 319 — after_attack_finished Condition application targets live battlefield state
+Aeralith's Blinded effect resolves against the current opposing Vanguard after its optional switch sequence and all emitted Movement/Heal listener work has completed. The target is rebound at that declared timing boundary rather than captured early during primary damage.
+
+## 320 — APPLY_CONDITION Release 1 parity is accepted
+All 20 frozen uses are covered across 6 Event Listener, 12 Attack after_damage, 1 Attack after_attack_finished and 1 Tactic consumer. `APPLY_CONDITION` is implemented at capability blob `702e41f5f72ead9cc17abb4290bfec11f0aa664c`. Final exact-head Card Pass #1513 is green at `2b09549535ab7df9dd25a57e5e139400fd8dd48f`.
+
+## 321 — OPTIONAL is consent/resume ownership, not nested-effect ownership
+V2.4.96 targets the 19 frozen Release 1 `OPTIONAL` uses. OPTIONAL may own whether the player accepts/declines and the deterministic resume point. Every accepted nested step must still execute through its existing semantic owner (Switch, Card-Zone, Condition, Withdrawal, Movement, Tactic destination, or other relevant engine).
+
+## 322 — V2.4.95 release-control state
+Match closure is 109 / `0eab3c83084c2ee60230be602cf22e1e5b451b713ad9655838008b9300c105c0`; Tactic closure is 45 / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`; owner-family count remains 40; no production deployment or main merge occurred.
+
+## 323 — OPTIONAL owns consent and resume only
+The Release 1 OPTIONAL operation owns whether the declared player accepts or declines and where the structured program resumes. It does not absorb the semantic owner of nested steps. Accepted Switch, Card-Zone, Damage, Draw/discard, Condition, Withdrawal and destination operations continue to use their existing owners.
+
+## 324 — ordinary Attack OPTIONAL switches must use server-owned choice state
+The six frozen ordinary Attack OPTIONAL switch programs must not depend on browser-supplied `switch_reserve_index` or effect-text parsing. The server creates the legal current Reserve options, records source/turn anchors and resolves accept/decline through the canonical pending Attack choice transport.
+
+## 325 — OPTIONAL decline is a first-class legal result
+For a bounded optional Attack switch, declining performs no Atomic Switch and emits no movement events. The Attack then completes through the same defeat/Aftermath continuation as any other resolved post-damage choice.
+
+## 326 — accepted OPTIONAL switch still belongs to Atomic Switch
+OPTIONAL/Attack-choice code may select and revalidate the Reserve target, but the battlefield mutation remains Atomic Switch. Movement Listener and any resulting Heal Listener work must finish before Attack completion.
+
+## 327 — OPTIONAL Attack filters remain data
+The generic Attack OPTIONAL switch route must honor the nested SELECT_CREATURE filters from frozen card data, including element filters such as Aeralith's Gale-only Reserve selection, without card-ID/name dispatch.
+
+## 328 — legacy Attack switch compatibility is not structured authority
+Legacy effect-text / caller-supplied switch-index handling may remain for legacy snapshots, but once a structured OPTIONAL switch program is claimed by the canonical Attack choice owner, that structured attack must not also execute the legacy switch path.
+
+## 329 — OPTIONAL ordinary Attack consent is a server choice, not a request parameter
+The six frozen ordinary Attack OPTIONAL switches now use the same authoritative pending Attack choice transport as other structured Attack choices. Browser-provided legacy switch indexes are compatibility-only and cannot be structured authority.
+
+## 330 — optional Attack switch filters are rebound at choice creation and resolution
+Declared Reserve filters, including element filters, are evaluated from current structured card data. The selected Reserve anchor is rebound before Atomic Switch; no frozen card identity may determine filter behavior.
+
+## 331 — OPTIONAL decline emits no semantic side effect
+A legal zero-selection decline advances the Attack completion path without Atomic Switch, movement events or invented listener packets. Consent itself is the entire semantic outcome of the declined OPTIONAL node.
+
+## 332 — OPTIONAL Release 1 parity is accepted
+All 19 frozen OPTIONAL uses are covered across 9 Event Listener, 6 ordinary Attack, 3 Tactic and 1 mixed Attack consumer. `OPTIONAL` is implemented at capability blob `0e3dad5932f8511637d36fcd342c7e645944d506`. Final exact-head Card Pass #1520 is green at `3f247763c86a03eb3c8986f409acd5ecc4d8eb16`.
+
+## 333 — OPTIONAL release-control state
+Match closure is 109 / `8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6`; Tactic closure remains 45 / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`. Owner-family count remains 40 and production was not changed.
+
+## 334 — INSPECT_ZONE is the next largest remaining used operation gap
+After V2.4.96, the frozen 193-card scan contains exactly 13 `INSPECT_ZONE` uses, ahead of CHOOSE_FROM_SET 10, DIRECT_DAMAGE 8 and ATTACH_ESSENCE_FROM_ZONE 7. V2.4.97 must freeze all inspection shapes before source changes.
+
+## 335 — inspection authority is not downstream choice/move authority
+`INSPECT_ZONE` may own authoritative sample identity, visibility, ordering and private-view state. A following `CHOOSE_FROM_SET`, `MOVE_CARDS`, search, reward or zone mutation remains delegated to its own canonical owner.
+
+## 336 — INSPECT_ZONE belongs to existing owner #31
+Release 1 inspection parity is a closeout of Card Search / Filter / Inspection owner #31, not a new engine family. Specialized Attack/Ability/Reward/Event routes may orchestrate their declared families, but inspection identity/set semantics remain under owner #31 and no owner #41 is created.
+
+## 337 — inspection never implies physical movement
+An inspected card stays in its declared zone unless a later operation explicitly moves or reorders it. Later movement/order belongs to Card-Zone #30; Reward inspection ledger/privacy belongs to Reward #32; visibility belongs to Hidden Information #33.
+
+## 338 — effect-owned-set inspection binds exact provenance
+For a controller-private `effect_owned_set` inspection such as Seer Nyx, the server binds exact current card refs plus source zone/owner provenance. A later CHOOSE_FROM_SET may select from that set, but downstream mutation must rebind the exact current cards before Card-Zone movement.
+
+## 339 — Tactic INSPECT_ZONE is the only proven V2.4.97 execution gap
+Eleven of the thirteen frozen nodes already execute through bounded Attack, Ability, Reward or generic Event Listener ownership. The current Tactic interpreter has no INSPECT_ZONE branch, leaving only Parallax Window and Seer Nyx to close.
+
+## 340 — Reward and deck-top inspection use different privacy ledgers but one capability
+Reward inspection may reuse the existing Reward inspection ledger/private view. Deck-top inspection uses hidden-information/private inspection state. Capability parity is accepted only when both source-zone families obey the same declared selection/visibility/return-policy contract without leaking identities publicly.
+
+## 341 — INSPECT_ZONE Release 1 parity is accepted
+All 13 frozen inspection nodes are covered. Owner #31 owns inspection identity/set semantics; Reward #32 owns Reward inspection ledger/private Reward view; Hidden Information #33 owns visibility; Card-Zone #30 owns later physical move/order. `INSPECT_ZONE` is implemented at capability blob `b3ed5b6640a8213491479bf7c7fb4fdb63e0d30f`. Final Card Pass #1528 is green at `369917d9ccca815a3857f3c38f9a88d932eb97a5`.
+
+## 342 — effect-owned inspection sets are provenance, not detached card copies
+An effect-owned inspected set records exact current zone owner, ordered identities and removed identities while cards stay authoritative in their zone. Downstream mutation rebinds that provenance and delegates to Card-Zone; it never copies detached card objects into another zone.
+
+## 343 — Reward inspection privacy remains Reward-owner state
+A Tactic may request Reward inspection through owner #31 orchestration, but Reward identity, current-turn ledger and controller-private Reward view remain owner #32 state. Public/opponent views receive no inspected Reward identity.
+
+## 344 — CHOOSE_FROM_SET is the next largest remaining used operation gap
+After V2.4.97, the frozen 193-card inventory contains exactly 10 `CHOOSE_FROM_SET` nodes, ahead of DIRECT_DAMAGE 8 and ATTACH_ESSENCE_FROM_ZONE 7. V2.4.98 must audit all ten before source changes.
+
+## 345 — CHOOSE_FROM_SET selects from an already-bound set
+Owner #31 may validate bound-set identity, filter legal members, enforce min/max and bind the chosen subset. It must not resample hidden information or physically move cards. Visibility remains owner #33 and later move/order remains Card-Zone #30.
+
+## 346 — CHOOSE_FROM_SET has two frozen grammar families
+Nine Release 1 nodes use `source + min/max` with optional filters. Scout Zeph alone uses `set + selection` with Gale-Creature filtering and range 0..2. Runtime parity must be operation-shaped across both grammars rather than card-ID-shaped.
+
+## 347 — V2.4.98 preserves six accepted choice routes
+Stardot, Star Essence and Orbit Ring already use Event Listener private CHOOSE_FROM_SET state; Noctivane uses the active deck-reading specialist; Celestyr Dream Ray uses the Attack top-deck choice specialist; Seer Nyx uses the inspection-provenance Tactic route. V2.4.98 does not replace these accepted routes.
+
+## 348 — V2.4.98 repair target is four consumers
+The proven gaps are Celestyr — Dream Cartographer active Ability plus Tactics Future Draw, Circuit Scanner and Scout Zeph. Celestyr has no live family. Circuit Scanner needs frozen `filters.any`; Scout Zeph needs `set + selection` plus downstream field aliases; all three affected Tactic LOOK_TOP families must hand physical movement/order to Card-Zone before acceptance.
+
+## 349 — bound-set choice ownership is smaller than deck mutation ownership
+Owner #31 validates the already-bound set, filters options, enforces min/max, keeps the choice private, revalidates selected identity and binds the result. Owner #30 alone performs later physical deck/hand movement or reorder. Closing CHOOSE_FROM_SET must not turn owner #31 into a Card-Zone writer.
+
+## 350 — active deck planning is a bounded Ability family, not a generic interpreter
+Celestyr's active `LOOK_TOP -> CHOOSE_FROM_SET -> MOVE_CARDS -> RETURN_REMAINDER_TO_DECK_TOP` sequence may have a dedicated operation-shaped active-Ability route using shared owner-#31 choice semantics and owner-#30 mutation. It must remain card-ID-free and must not absorb unrelated active Abilities.
+
+## 351 — CHOOSE_FROM_SET Release 1 parity is accepted
+All 10 frozen nodes are covered across Event Listener, active Ability, Attack and Tactic surfaces. Owner #31 owns bound-set choice semantics; Hidden Information #33 owns visibility; Card-Zone #30 owns all later physical movement/reorder. `CHOOSE_FROM_SET` is implemented at capability blob `f6d4ba6118a60dc44d7b63794724295423f1b77e`. Card Pass #1542 is green at `f4dc9db69e741718abe3f7ed136a824334037fb1`.
+
+## 352 — two CHOOSE_FROM_SET grammars share one bound-set contract
+The nine `source + min/max` nodes and Scout Zeph's `set + selection` node normalize into one owner-#31 descriptor. Frozen `filters.any` is part of that same filter grammar, not a card-specific exception.
+
+## 353 — bound-set inspection stays authoritative until Card-Zone mutation
+LOOK_TOP/INSPECT_ZONE may bind exact top-window provenance without detaching cards. A later CHOOSE_FROM_SET only chooses refs. Transfer/reorder happens through Card-Zone and stale deck-top identity fails closed before mutation.
+
+## 354 — active deck planning is a bounded owner-#31/#30 composition
+Celestyr's active deck-planning family uses owner #31 for private bound-set choice and owner #30 for selected deck-bottom movement + remainder reorder. The route is operation-shaped and cannot become a generic active-Ability interpreter.
+
+## 355 — V2.4.98 exact release-control state
+Match closure is 111 / `e1035dbc68dae15d980843b8a7a3d8a11fc076ba9fab72100ccc4f78e7fe09bc`; Tactic closure is 47 / `5fe799462c53855691f0901fba11740c79d99d691d40bc2173ee6c1a40ae70ac`. Owner-family count remains 40 and production was not changed.
+
+## 356 — DIRECT_DAMAGE is the next largest used operation gap
+After V2.4.98 the frozen 193-card inventory contains exactly 8 DIRECT_DAMAGE nodes, ahead of 7 ATTACH_ESSENCE_FROM_ZONE nodes. V2.4.99 must audit all eight before source changes.
+
+## 357 — DIRECT_DAMAGE targets are already bound
+All eight frozen DIRECT_DAMAGE operations receive an already-bound Creature target. DIRECT_DAMAGE ownership therefore begins at damage request validation/context, not target selection. Selection belongs to the producer's existing owner.
+
+## 358 — DIRECT_DAMAGE must not bypass Damage Packet ownership
+Effect/recoil damage must preserve canonical protection/prevention, packet identity/history, after-damage listeners, defeat sequencing and source/action/controller context. Producers may request the damage; canonical Damage owners perform the mutation and packet lifecycle.
+
+## 359 — DIRECT_DAMAGE ownership begins after target binding
+All eight frozen DIRECT_DAMAGE nodes receive an already-bound Creature target. Selection/target discovery remains with the producer's existing owner. The DIRECT_DAMAGE submodule validates damage request/context and delegates mutation to Damage Packet / Damage Engine ownership.
+
+## 360 — ordinary Tactic DIRECT_DAMAGE must preserve packet and defeat lifecycles
+Ashen Gamble proves that Tactic effect damage cannot be accepted as a raw HP mutation. The canonical order is damage packet/protection -> after-damage listener continuation -> Defeat #34 scan/queue -> remaining Tactic steps. Reward taking and forced promotion remain queued canonical resolutions.
+
+## 361 — Tactic completion must not erase pending defeat resolution
+When a completed Tactic has queued Reward/promotion work, its endpoint leaves the match in `resolution`. Returning directly to `play` would bypass canonical Defeat consequences and is prohibited.
+
+## 362 — defeat events cross into Event Listener through the canonical adapter
+Defeat owner #34 emits defeat records in its own schema. Event Listener owner #28 consumes them only after `runtimeV02AdaptDefeatEventsForListener`; producers must not cast or reconstruct the envelope ad hoc.
+
+## 363 — DIRECT_DAMAGE Release 1 parity is accepted
+All eight frozen uses are covered across triggered Event Listener, active Ability, Attack recoil, Attack modifier rider and Tactic surfaces. `DIRECT_DAMAGE` is implemented at capability blob `aa3d9e4d719d4cb2596abd1b811d7b8613453974`. Source/runtime + release-control accepted at `27b3cb2b5a041fae1bc8e7c389d7319cb55ff121` / Card Pass #1558; capability/control accepted at `f6f9d23cd22f890786e653bb760b68d9e41feeb6` / Card Pass #1559.
+
+## 364 — V2.4.99 exact release-control state
+Match closure is 116 / `383ab7bf0eefafb1a41a767cb5f41374d50e76922f03f4c0432ed786851a0c02`; Tactic closure is 53 / `9698a8aa2aeb63d7d10b3e4aa224a90f0d27bc1d492f949c3bb28aaa6048409f`. Owner-family count remains 40; production was not changed.
+
+## 365 — ATTACH_ESSENCE_FROM_ZONE is the next largest used capability gap
+After V2.4.99, the frozen 193-card inventory contains exactly 7 `ATTACH_ESSENCE_FROM_ZONE` nodes. Every other currently used missing opcode is a one-consumer slice. V2.4.100 must therefore close the seven attachment consumers before dropping to singleton mechanics.
+
+## 366 — attachment selection and attachment mutation remain separate ownership
+Inline hand/discard selection or prior SELECT_CARDS refs may identify the Essence instance, but physical attachment remains Essence Attachment owner #22. Card selection, hidden visibility, attachment-state normalization, Event Listener, Movement Listener and Heal Listener keep their existing ownership boundaries.
+
+## 367 — temporary and borrowed attachment disposition is structured state
+Release 1 ATTACH_ESSENCE_FROM_ZONE includes default/permanent, temporary and borrowed states. Temporary/borrowed attachments expire at controller Aftermath to discard as declared. Producer routes must use shared attachment-state normalization rather than invent local flag conventions.
+
+## 368 — V2.4.100 all-seven attachment audit found one live parity gap
+The frozen seven ATTACH_ESSENCE_FROM_ZONE consumers split 4 active Ability / 2 triggered Ability Event Listener / 1 Tactic. Magmagecko, Surgefin, Living Circuit, Arcprowler, Coilclank and Quickcharge Cell already used canonical selection, attachment-state and owner-#22 mutation paths. Dynamozer alone had an isolated paid self-attachment owner that was not yet reachable through the single live active-Ability router / Match continuation.
+
+## 369 — paid self-attachment is an orchestration family, not a new attachment owner
+Dynamozer's repaired path delegates Device discard payment to the existing active-Ability Payment/cost gate, makes a fresh private eligible-discard Essence choice, then delegates physical attachment to Essence Attachment owner #22. The Match layer reuses the established Event / Movement / Heal post-attachment continuation. The route is operation-shaped and card-ID-free; owner-family count remains 40.
+
+## 370 — V2.4.100 source/runtime and Release 1 capability coverage are accepted
+All seven frozen ATTACH_ESSENCE_FROM_ZONE consumers are covered at source/runtime + release-control head `d0d37294f7cd9e81196691d6e91bf117923862de`, Card Pass #1576 SUCCESS. Match closure is 118 / `ec0c2f31fca865d652d822ade620df9377aa2fcab570e4068a4c362ef8e7f1f1`; Tactic closure is 53 / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`. ATTACH_ESSENCE_FROM_ZONE moved partial -> implemented at capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`. Production/main/live were not changed; final synchronized capability/control exact-head validation remains required before V2.4.100 is fully closed.
+
+## 371 — ATTACH_ESSENCE_FROM_ZONE Release 1 parity is accepted
+All seven frozen Release 1 consumers are covered across active Ability, triggered Ability/Event Listener and Tactic surfaces. Selection remains with the established private/card-selection owners; physical attachment remains Essence Attachment owner #22; temporary and borrowed disposition remains shared structured attachment state. The sole execution gap was Dynamozer's missing paid self-attachment live route, repaired generically without card-ID dispatch or a new owner family. `ATTACH_ESSENCE_FROM_ZONE` is implemented at capability blob `1bb0014f731cc3d2baf7329e04df2a6f148d8ea1`. Synchronized capability/control head `6fa819d30ddb952b437b7b77318dfe2d0feb11fe` passed Card Pass #1581. Production/main/live remain unchanged and promotion stays HOLD while remaining Release 1 singleton operation debt is closed.
+
+## 372 — ATTACH_ESSENCE_FROM_SELECTION is the next used singleton
+After V2.4.100, every remaining currently used missing operation is a one-consumer slice. Capability-order tie-breaking selects `ATTACH_ESSENCE_FROM_SELECTION` first. Its sole Release 1 consumer is Prismatic Founder / Bandit's Current.
+
+## 373 — effect_owned_selection is provenance, not a source zone
+Founder's `SEARCH_DECK` leaves the chosen card physically in deck while binding it into `$founder_new_essence`. `effect_owned_selection` therefore names logical effect-owned provenance only. Essence Attachment owner #22 must receive the selected card's true physical origin (`deck`) and exact UID/card identity; no fake effect-owned zone may be introduced.
+
+## 374 — Founder requires a bounded active-Ability composition
+The current active-Ability router has no `SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK` family. V2.4.101 may add that exact operation-shaped composition, including the dependent active-Ability SEARCH_DECK surface required to reach the missing attachment opcode. Search/hidden-information ownership, attachment owner #22, listener continuation and Randomization ownership remain separate. No generic catch-all Ability interpreter and no card-ID dispatch.
+
+## 375 — V2.4.101 implements the Founder search-selection attachment family
+The sole frozen `ATTACH_ESSENCE_FROM_SELECTION` consumer is Prismatic Founder / Bandit's Current. A bounded active-Ability submodule of existing owner #31 now owns only the declared `SEARCH_DECK -> ATTACH_ESSENCE_FROM_SELECTION -> SHUFFLE_DECK` composition. It is operation-shaped and contains no Founder/card-ID/name dispatch.
+
+## 376 — effect_owned_selection remains logical provenance
+Founder's selected Essence remains physically in the deck while the server binds the private selected identity. Before mutation the route revalidates current turn, active seat, source Vanguard identity, once-per-turn receipt, exact selected deck card and the dynamic rule that its element is not already attached. The selected card is then passed to Essence Attachment owner #22 with true physical origin `deck`; no fake effect-owned zone exists.
+
+## 377 — attachment listeners finish before Founder shuffles
+After owner #22 attaches the chosen Essence, the existing Event / Movement / Heal active-Ability continuation remains authoritative. Only after that nested listener pipeline completes does the shared Randomization engine shuffle the remaining deck. The legal zero-selection path skips attachment and shuffles immediately.
+
+## 378 — ATTACH_ESSENCE_FROM_SELECTION Release 1 parity is accepted at source/runtime
+Exact source/runtime + release-control head `8cadb7ce31e98548c868aa1817fe2ab59f5abcac` passed Card Pass #1595. Match closure is 119 / `96455602ed13a5acfb37e2cca7a4b267398d49db739a60371569cac122fb005d`; Tactic closure remains 53 / `ac815498f6ed48b2e233703d1664c6e0165eb040c77568d68467a4702758f50e`. The operation moved missing -> implemented at capability blob `bca64acae1cb4cb7370e4b8fd2a03bedfa7f8a8f`. Owner-family count remains 40. Production/main/live were not changed; final synchronized documentation/control exact-head validation remains required before V2.4.101 is fully closed.
+
+## 379 — ATTACH_ESSENCE_FROM_SELECTION Release 1 parity is accepted
+Prismatic Founder / Bandit's Current is the sole frozen Release 1 consumer and is now covered through owner #31 private search/choice orchestration, Hidden Information #33, canonical Essence Attachment owner #22, the existing Event / Movement / Heal continuation and the shared Randomization engine. `effect_owned_selection` remains logical provenance only; the chosen Essence stays physically in deck until owner #22 attaches it from the true deck origin. `ATTACH_ESSENCE_FROM_SELECTION` is implemented at capability blob `bca64acae1cb4cb7370e4b8fd2a03bedfa7f8a8f`. Synchronized head `220f9875884ff08e169980c8a72ca17950b9c8ef` passed Card Pass #1600. Owner-family count remains 40; production/main/live remain unchanged.
+
+## 380 — MOVE_ZONE_POSITION is the next used singleton
+After V2.4.101, the remaining currently used missing operations are six one-consumer slices. Capability-order tie-breaking selects `MOVE_ZONE_POSITION` first. Its sole frozen consumer is Astral Celestial Observatory: on `hidden_information_viewed` for `deck_top`, once per turn per event controller, that controller may optionally move exactly the top card of their deck to the bottom with `no_additional_reveal`. V2.4.102 must audit existing Event Listener OPTIONAL and Card-Zone reorder ownership before any source change.
+
+
+## 381 — V2.4.102 hidden-view family is shared infrastructure debt
+The accepted Astral structured set contains five `hidden_information_viewed` listeners: Orbitortoise / Forecast Shell, Prismowl / Wide Eyes, Starwhale / Star Current, Celestial Observatory / Observatory Topshift, and Dreamglass / Foresight Heal. Their trigger event is not currently emitted into the generic Event Listener engine. This is one shared owner gap, not five card-specific fixes.
+
+## 382 — hidden-view history and trigger occurrence are different records
+Hidden Information owner #33 keeps its current de-duplicated controller/zone/turn history for current-turn checks. V2.4.102 additionally requires one canonical trigger occurrence for every actual view. Repeated same-zone views must not be collapsed before Event Listener receipts/limits evaluate them. Trigger occurrences contain provenance only — controller, viewed zone and action/source context — never hidden card identity or ordering.
+
+## 383 — grammar seams required by the hidden-view listener family
+The accepted grammar declares `event_zone_is`, `source_is_attached_creature`, `$event_controller` and `MOVE_ZONE_POSITION`. Current Event Listener lacks all four semantics. Dreamglass fixes the meaning of `source_is_attached_creature`: the event's source Creature UID must equal the Creature to which the Relic is attached. Celestial Observatory fixes the meaning of `$event_controller`: the affected/viewing controller from the current hidden-view event, not the listener controller.
+
+## 384 — MOVE_ZONE_POSITION remains Card-Zone #30 mutation
+Celestial Observatory's accepted branch is exactly deck top -> deck bottom, count 1, no additional reveal, for the current event controller. Event Listener may validate and bind that operation, but must re-read the exact current top UID at resolution and delegate same-zone mutation to `runtimeV02ApplyCardZoneReorder`. It must not move a stale previously viewed UID, inspect/reveal the card, clone it, or create a new zone. Owner-family count remains 40.
+
+## 385 — V2.4.102 freeze checkpoint is green
+Head `1e3a1254740830eb9ca5192f6b679715b7d4f08d` passed Card Pass #1604 with both Set One/effect-grammar/release-control validation and deterministic runtime/type-check validation green. GitHub combined status returned no external statuses. Production/main/live remain unchanged and promotion remains HOLD while V2.4.102 source parity is implemented and proven.
+
+
+## 386 — V2.4.102 implementation accepted
+Implementation head `d91e1ec293a29991f03519bba3092599758333e1` passed Card Pass #1636. Both Set One/effect-grammar/release-control validation and deterministic runtime/type-check validation completed successfully. Combined external commit statuses contained no additional statuses.
+
+## 387 — Hidden Information #33 now has history plus trigger occurrences
+The existing de-duplicated current-turn hidden-view ledger remains authoritative for turn-history checks. A separate private per-occurrence queue now records one provenance-only trigger occurrence for every actual hidden-information view. The queue never stores the viewed card UID/ID, deck ordering or private choice options. Match/Tactic orchestration consumes the queue into generic Event Listener work.
+
+## 388 — five accepted Astral hidden-view listeners are proven generically
+Deterministic runtime coverage proves Orbitortoise / Forecast Shell, Prismowl / Wide Eyes, Starwhale / Star Current, Celestial Observatory / Observatory Topshift and Dreamglass / Foresight Heal. The same coverage proves event-controller ownership, resumable private discard/optional choices, repeat-occurrence limits, Dreamglass source-Creature matching and no hidden-card leakage.
+
+## 389 — MOVE_ZONE_POSITION remains Card-Zone owner #30
+Event Listener supports only the accepted bounded deck top -> bottom / count 1 / no-additional-reveal shape. It rebinds the exact current top at resolution and delegates the physical same-zone reorder to `runtimeV02ApplyCardZoneReorder`. Celestial Observatory therefore cannot move a stale inspected UID. Owner-family count remains 40.
+
+## 390 — capability and release-control reconciliation complete
+`tcg-runtime-capabilities-v0.2.json` now classifies `MOVE_ZONE_POSITION`, `event_controller_is_self`, `event_zone_is` and `source_is_attached_creature` as implemented. Release Control v1 now fingerprints the exact accepted Edge closures: Match 119 files / `dd577d4492b6753a8f7ac5563ce3d133867e12499fb1cf4bd4551ff3ed457263`; Tactic 53 files / `09067b17567483869def6e55204e45b25ee77d0a8161fb1dfd41367a13920461`; Private Alpha unchanged at 8 files. Production/main/live remain unchanged.
+
+
+## 391 — V2.4.103 freezes the shared Damage-Packet predicate capability family
+The Release 1 structured audit finds exactly two consumers: Ember Heatguard Bracer before `before_damage_packet` and Grove Thorn Crown after `after_damage_packet`. Their union uses six capability predicates: `damage_packet_target_is_attached_creature`, `damage_packet_class_is`, `damage_packet_condition_is`, `damage_packet_source_controller_is_opponent`, `damage_packet_target_zone_is`, and `damage_packet_amount_at_least`.
+
+## 392 — current owners already implement the accepted semantics
+Before-Damage Packet owner `tcg-match-damage-packet-listener-v0-2.ts` evaluates all six against normalized packet context, including condition identity. `tcg-match-damage-packet-context-v0-2.ts` already carries optional normalized condition provenance. Event Listener already evaluates the five after-packet predicates used by Thorn Crown. No gameplay engine repair is justified.
+
+## 393 — only missing evidence is the Heatguard Scorched branch
+Existing tests prove Heatguard recoil and Thorn-style after-packet reflect/rejection. V2.4.103 requires one additional deterministic proof that a condition-class Scorched packet matches Heatguard's accepted predicate branch, a different condition does not match, and normal attachment-limit behavior is preserved. Capability status remains unchanged until that proof and exact-head validation pass.
+
+
+## 394 — V2.4.103 proof closes Heatguard's condition branch
+Proof head `cfb91e4c866df8cdebed684441e8c274eab80fba` passed Card Pass #1639. The added deterministic test uses Heatguard's full accepted predicate tree and proves Scorched reduces the current packet by 10, a second same-turn occurrence is blocked by the attachment limit, and Venomed does not match.
+
+## 395 — six Damage-Packet predicates are capability-complete for Release 1
+Accepted head `6d37f636b806a6701eab45ef7b0c2e92ba38b9ae` passed Card Pass #1640. Exactly six predicates moved missing -> implemented: `damage_packet_target_is_attached_creature`, `damage_packet_class_is`, `damage_packet_condition_is`, `damage_packet_source_controller_is_opponent`, `damage_packet_target_zone_is`, and `damage_packet_amount_at_least`. Release Control is synchronized to capability blob `6c01e3298efb9c21e5d040b8db3940eb76147187`. No gameplay-runtime source or Edge closure changed in the reconciliation commit.
+
+
+## 396 — V2.4.104 freezes eight stale core Event Listener predicates
+The Release 1 audit identifies eight capability entries that remain marked missing despite generic Event Listener cases: `event_subject_is_source`, `event_origin_zone_is`, `event_controller_is_active_seat`, `event_destination_zone_is`, `source_is_self`, `event_phase_is`, `event_subject_matches`, and `event_subject_is_attached_creature`. Their accepted consumers are triggered Ability/Essence/Tactic listener requirement trees only.
+
+## 397 — five predicates already have broad runtime proof; three need direct assertions
+Existing deterministic Event Listener tests exercise source identity, origin/destination zones, phase and source/self across multiple listener families. Direct proof is still required for active-seat controller comparison, event-subject definition filters and attached-Creature subject identity before capability promotion. V2.4.104 is therefore proof-only unless those tests expose a real runtime defect.
+
+
+## 398 — V2.4.104 direct predicate proof is green
+Proof head `5b68a60ff79a4eea0829da0deb596d63f5b6852a` passed Card Pass #1643. Runtime tests directly prove active-seat controller match/non-match, event-subject definition filter match/non-match, and attached-Creature subject match/non-match. The proof commit changes tests only.
+
+## 399 — eight core Event Listener predicates are capability-complete for Release 1
+Accepted head `445759beccccde2c60afaf93905c0f074ce093cc` passed Card Pass #1644. Exactly eight predicates moved missing -> implemented: `event_subject_is_source`, `event_origin_zone_is`, `event_controller_is_active_seat`, `event_destination_zone_is`, `source_is_self`, `event_phase_is`, `event_subject_matches`, and `event_subject_is_attached_creature`. Release Control is synchronized to capability blob `73d94115359b28379301c50a38fee4556f4a8ac4`. No Edge runtime source or closure changed.
+
+
+## 400 — V2.4.105 freezes the Release 1 Heal predicate family
+The exact structured consumers are Symbiote Essence, Shellip and Moonlit Reef. Their union uses eight predicates currently misclassified as missing: `heal_packet_source_is_attached_creature`, `heal_packet_target_controller_is_self`, `heal_packet_target_is_not_source`, `heal_packet_target_is_self`, `heal_actual_amount_at_least`, `heal_source_is_card_effect`, `heal_controller_is_active_seat`, and `heal_target_element_is`.
+
+## 401 — canonical Heal Listener ownership and proof already exist
+`tcg-match-heal-listener-dispatch-v0-2.ts` implements all eight generically from persisted Heal Packet/source/attachment context. The deterministic dispatcher test resolves Symbiote and Shellip while deferring Moonlit, thereby exercising all eight accepted predicates in the real listener dispatch path. Companion tests prove limits, turn reset, packet idempotency, nested non-recursion and fail-closed behavior. No gameplay implementation change is justified.
+
+
+## 402 — V2.4.105 Heal capability reconciliation accepted
+Freeze head `395a88b63cc4f61ef75245878feb2c62919b9958` passed Card Pass #1646. Accepted capability head `ebece9cef2872d205bfa2e4dfc080e4ff2e02071` passed Card Pass #1647. Exactly eight Heal predicates moved missing -> implemented: `heal_packet_source_is_attached_creature`, `heal_packet_target_controller_is_self`, `heal_packet_target_is_not_source`, `heal_packet_target_is_self`, `heal_actual_amount_at_least`, `heal_source_is_card_effect`, `heal_controller_is_active_seat`, and `heal_target_element_is`. Release Control is synchronized to capability blob `c7d8c34be26d54c804e6bc70f9f243be838cbc8d`. No gameplay runtime, tests or Edge closures changed.
+
+
+## 403 — V2.4.106 freezes the Release 1 Essence Movement predicate family
+The exact consumers are Tide Rillrunner, Reefshell and Tidal Lens. Their union uses four predicates still classified missing: `essence_move_destination_is_self`, `essence_move_element_is`, `essence_move_source_is_attached_creature`, and `essence_move_source_is_self`.
+
+## 404 — Movement Listener ownership and direct proof already exist
+`tcg-match-movement-listener-v0-2.ts` generically evaluates all four against canonical `essence_moved` events. The deterministic movement-listener suite directly proves Reefshell, Rillrunner and Tidal Lens, including same-turn limits, wrong-element rejection, wrong-controller rejection and legacy no-op. No gameplay implementation or proof addition is justified.
+
+
+## 405 — V2.4.106 Essence Movement capability reconciliation accepted
+Freeze head `2c91679ce009e452369ba31cfebff9a6cd4d620d` passed Card Pass #1649. Accepted capability head `921ff4d0e26efc2f619a7daaaefc8cc17688cb9e` passed Card Pass #1650. Exactly four predicates moved missing -> implemented: `essence_move_destination_is_self`, `essence_move_element_is`, `essence_move_source_is_attached_creature`, and `essence_move_source_is_self`. Release Control is synchronized to capability blob `ce8ed09b5a6623a483504427d43a238ff604e5c2`. No gameplay runtime, tests or Edge closures changed.
+
+## 406 — V2.4.107 freezes the Release 1 source_has_relic family
+The exact consumers are Stone Rampartusk twice (Rampart Plating continuous incoming-Attack reduction and Wall Break conditional_add) plus Stone Citadelhorn once (Fortress Heart continuous incoming-Attack reduction). No other Release 1 structured consumer uses `source_has_relic`.
+
+## 407 — generic Relic-state ownership and deterministic proof already exist
+`tcg-match-attack-damage-v0-2.ts` evaluates the continuous-Ability shape from the live Creature Relic slot. `tcg-match-attack-conditional-add-evaluator-v0-2.ts` evaluates the Attack-formula shape, and Match constructs its declaration context from `!!p.vanguard.relic`. Existing tests prove Wall Break-style true/false evaluation and Fortress Heart with/without a Relic. Rampart Plating shares the same continuous predicate owner. No gameplay implementation change is justified.
+
+## 408 — V2.4.107 source_has_relic capability reconciliation accepted
+Freeze head `146cf553704447e79a7979d638074de32f6ddfda` passed Card Pass #1651. Accepted capability head `830ac7dbec6614500b9135f0b2f800bcd3ae77ec` passed Card Pass #1652. Exactly `source_has_relic` moved missing -> implemented. Release Control is synchronized to capability blob `e6763c176e840b757d3886cde050b4c2ed30ae77`. No gameplay runtime, tests or Edge closures changed. Owner-family count remains 40.
+
+## 409 — V2.4.108 freezes the Release 1 became-Vanguard predicate family
+The exact structured consumers are Gale Gustfox / Tailwind Strike and Gale Zephyrhare / Zephyr Kick. Both are Attack conditional_add formulas using `source_became_vanguard_this_turn`; there are no other Release 1 structured consumers.
+
+## 410 — Atomic Switch already owns the lifecycle marker
+`tcg-match-switch-context-v0-2.ts` writes `incoming.became_vanguard_turn = turn_seq` when a Creature becomes Vanguard, including the forced post-defeat Reserve promotion path. Match converts that canonical lifecycle marker into a declaration-time boolean and the generic conditional_add evaluator owns true/false evaluation. Existing deterministic tests prove both branches. No new state or identity dispatch is justified.
+
+## 411 — V2.4.108 predicate reconciliation accepted
+Freeze head `84d7b824fde3a6e2f4e5e6922b88cc2d4311dbad` passed Card Pass #1653. Accepted capability head `d99ce641ba85a1eeb922337af67eafc5e34237eb` passed Card Pass #1654. Exactly `source_became_vanguard_this_turn` moved missing -> implemented. Release Control is synchronized to capability blob `9661f21edda0bb8dfc7d710cdf94ae54fc6496db`. No runtime, tests or Edge closures changed; owner-family count remains 40.
+
+## 412 — V2.4.109 freezes the current-friendly-Vanguard requirement
+The sole Release 1 consumer of `source_is_current_friendly_vanguard` is Prismatic Founder / Bandit's Current. It is part of the already-accepted owner-#31 active-Ability search/private-choice composition.
+
+## 413 — active-Ability ownership already enforces the requirement
+The search-selection attachment owner requires the exact predicate in the descriptor, rejects every source location except current Vanguard, and rebinds source identity to the live Vanguard before any private choice or use receipt. V2.4.109 adds explicit negative proof that a Reserve source fails before the once-per-turn receipt is consumed. No gameplay-runtime implementation change is required.
+
+## 414 — V2.4.109 current-Vanguard predicate reconciliation accepted
+Proof head `1364263b1fe85828d84d2072416a927a43dfa5a0` passed Card Pass #1656. Accepted capability head `e2c48ab21b0dfa351c4dc282050c38215dcbbfb6` passed Card Pass #1657. Exactly `source_is_current_friendly_vanguard` moved missing -> implemented. Release Control is synchronized to capability blob `ae2a92997fca04a47f25b77283a45f330794a805`. Runtime source and Edge closures are unchanged; owner-family count remains 40.
+
+## 415 — V2.4.110 freezes the Release 1 hand_contains requirement
+The sole Release 1 consumer of `hand_contains` is Volt Dynamozer / Overcharge Engine. Its Device filters are identical to its mandatory `CHOOSE_HAND_TO_DISCARD` activation-cost filters, while Basic Volt Essence availability is a separate discard-zone requirement.
+
+## 416 — Card-Cost ownership already evaluates the hand requirement semantically
+The paid active-Ability owner binds the requirement and cost filters, then canonical Card-Cost choice enumerates the live private hand and applies structured card-selection filters. If fewer than the mandatory count exist it fails closed before Ability use is recorded. V2.4.110 adds explicit no-Device proof with eligible Volt Essence still available, isolating the hand predicate without changing gameplay runtime.
+
+## 417 — V2.4.110 hand_contains capability reconciliation accepted
+Proof head `8722b23477354adf417ab51ac2be2cba519b9976` passed Card Pass #1659. Accepted capability head `c93625b3456ae7a3cc8f177a84665071fd8912dd` passed Card Pass #1660. Exactly `hand_contains` moved missing -> implemented. Release Control is synchronized to capability blob `d0e78fbd34f748da52c4443859edb6dd8b22ecb9`. Runtime source and Edge closures are unchanged; owner-family count remains 40.
+
+## 418 — V2.4.111 freezes four attachment-target consumers
+`event_attachment_target_is_source` has four Release 1 consumers: Stone Gravibble / Pebble Guard, Stone Flintkin / Layered Hide, Tide Puddlepip / Freshwater Coat and Volt Railhorn / Power Rail. Gravibble, Puddlepip and Railhorn were already evaluated through immutable Essence Attachment trigger snapshots. Flintkin was the sole Relic-attachment parity exception.
+
+## 419 — Relic Attachment now enters generic event ownership
+A Relic Attachment route adapts the canonical Relic owner receipt into `relic_attached` with exact `attachment_target_uid`, then enters existing Event Listener, Movement Listener and Heal Listener ownership. Marked v0.2 Match runtime no longer heals Flintkin by card ID. Unmarked legacy compatibility remains isolated.
+
+## 420 — any_turn schema parity is generic
+Card Pass #1663 exposed that the frozen schema allows triggered Ability timing `any_turn` while Event Listener rejected it. V2.4.111 adds `any_turn` to generic unrestricted timing semantics and a direct regression with a non-active source controller. No Flintkin-specific timing branch exists.
+
+## 421 — V2.4.111 validation history is fail-closed
+Initial runtime head `ac9cf0d6eaa9942127aa6081799e881cfc53075c` failed #1662 due validation-binding drift. Binding-repair head `159e018ead3e2024f83104bed3383cae1c12ce64` failed #1663 with 983 existing runtime tests passing and only the two new Relic-route tests exposing `any_turn` parity. Neither failed head is acceptance evidence.
+
+## 422 — V2.4.111 attachment-target predicate accepted
+Runtime head `42e871cb63ca34c43207ef4bceee8c2dcbbf4553` passed Card Pass #1664. Capability head `59a6e4afdd524ded1f57054184b7781ace2c12ee` passed Card Pass #1665. Exactly `event_attachment_target_is_source` moved missing -> implemented; capability blob `8546a44b79fd9de595a4279557221997b9cea562`. Owner-family count remains 40 and production is unchanged.
+
+## 423 — V2.4.112 freezes two target_stage_in consumers
+The Release 1 `target_stage_in` consumers are Grove Bloom Essence / Bloom Attach Heal and Grove Symbiote Essence / Symbiote Reciprocal Heal. They intentionally live on different event owners: `essence_attached` and `after_heal_packet`.
+
+## 424 — both existing owners already implement structured stage membership
+Essence Attachment eligibility snapshots printed target stage at trigger time and evaluates declared stage membership. Heal Listener dispatch evaluates the attached Creature's structured definition stage for the same predicate. Neither implementation depends on card identity.
+
+## 425 — V2.4.112 proof was expanded after exact consumer audit
+Head `90b9a24192824eb5e4d76d1dd2e0b12406dd24c0` / #1667 proved positive/negative attachment-snapshot semantics. Before metadata reconciliation, exact consumer audit caught Symbiote's Heal Listener surface. Head `64cb430b1aa6067d97d18f5c7e2d11dd1d744a16` / #1668 then proved a Baby attached source rejects Symbiote while unrelated listener behaviour remains intact.
+
+## 426 — V2.4.112 target_stage_in accepted
+Capability head `80b74c688042ae90cc9d2aa94f6905e6b21e51cd` passed Card Pass #1669. Exactly `target_stage_in` moved missing -> implemented. Capability blob is `a4a515fc213a1a0d86704ed0dd2a9e63505436bd`. Runtime source, production Edge functions and owner-family count remain unchanged.
+
+## 427 — V2.4.113 freezes one target_zone_is consumer
+Release 1 uses `target_zone_is` exactly once: Gale Draft Essence / Draft Attach Withdrawal requires its just-attached Creature to occupy Reserve.
+
+## 428 — target_zone_is is immutable attachment-snapshot truth
+The Essence Attachment eligibility owner freezes the target battlefield zone at trigger time and evaluates `target_zone_is` without card identity. Head `9ce5d45ecddc6a13d52b4dda053ccc84290c05ee` adds an explicit negative proof that a frozen Reserve target fails a Vanguard requirement; Card Pass #1671 succeeded.
+
+## 429 — Draft withdrawal legality and execution remain separate HOLD items
+Draft Essence also uses `voluntary_withdrawal_legal_with_incoming` and `PERFORM_VOLUNTARY_WITHDRAWAL`. Audit found its current snapshot legality only proves a subset of authoritative Withdrawal cost semantics. Normal Withdrawal additionally applies structured lifecycle modifiers and the synchronous `before_voluntary_withdrawal_cost` listener before exact Payment and Atomic Switch. Those capabilities must not inherit V2.4.113 acceptance.
+
+## 430 — V2.4.113 target_zone_is accepted
+Capability head `a632fa67be0024e5ca64b98d8965fa00399f5f67` passed Card Pass #1672. Exactly `target_zone_is` moved missing -> implemented. Capability blob is `f1361fca48abfebdbdc5525d768a88f48fec51c7`. Runtime source, production Edge functions and owner-family count remain unchanged.
+
+## 431 — V2.4.114 target_element_is spans four owner surfaces
+Release 1 has 13 structured card consumers across Essence Attachment snapshot, Heal Listener, Withdrawal continuous and outgoing Relic Attack Damage. Shared predicate acceptance therefore requires all four surfaces; an Essence-only proof would be insufficient.
+
+## 432 — Cinder Charm exposed outgoing Relic Attack Damage parity
+Cinder Charm is an attached Relic continuous `attack_damage` producer gated by `target_element_is` and a printed-HP amount case. Damage/Shield owner #20 previously handled outgoing Essence continuous and Creature continuous Ability modifiers, but not outgoing Relic modifiers. V2.4.114 adds that generic Relic surface without card identity or owner-family expansion.
+
+## 433 — target_printed_hp_at_least numeric comparison is shared Requirement ownership
+Cinder's 200+ printed-HP case and the existing Tactic IF predicate now use one shared Requirement evaluator. Tactic and Attack Damage provide target binding; the numeric predicate meaning is no longer duplicated.
+
+## 434 — V2.4.114 first runtime head failed closed
+Head `da93fa4684ba8b09e9c39c7001487ee3615a8a70` / #1674 passed the new Cinder proof but failed five pre-existing prevention tests, with 985 runtime tests passing. The cause was broadening the structured-runtime probe to Relic identity, which made legacy-compatible attached-Relic test states return `null`.
+
+## 435 — probe compatibility restored without removing Cinder parity
+Head `821362b42b853e70067bafd0ef204ac555936cd3` restores the prior probe boundary and keeps generic outgoing Relic Attack Damage. Card Pass #1675 succeeded, proving both the new Cinder route and prior prevention authority.
+
+## 436 — V2.4.114 target_element_is accepted
+Capability head `21237c037b1e1668d3fba16ad7b47c112855b1b3` passed Card Pass #1676. Exactly `target_element_is` moved missing -> implemented. Capability blob `195391418a8490a16e7e0b61b141e5f262522e29`. Owner-family count remains 40; production remains unchanged.
+
+
+## 437 — V2.4.115 source_element_is has one frozen Release 1 consumer
+The exact structured-card sweep across Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt and Founder finds one use only: Astral Orbit Ring / `orbit-ring-after-attack` on `attack_finished`.
+
+## 438 — Event Listener owns source_element_is generically
+The existing Event Listener now resolves `event.source_creature_uid` to the current source Creature and compares its structured definition element with the declared listener element. Missing/unresolved source identity fails closed. No Orbit Ring/card-name dispatch or owner-family expansion is used.
+
+## 439 — V2.4.115 runtime proof passed
+Head `4d141b15f3393cd07048727457b2616fba0340f6` passed Card Pass #1678. The deterministic Orbit Ring regression accepts an Astral attack source and rejects the same source after its element is changed to Gale.
+
+## 440 — V2.4.115 source_element_is accepted
+Capability head `39eb324e1ca57f372693a263589240998659f5e5` passed Card Pass #1679. Exactly `source_element_is` moved missing -> implemented. Capability blob is `230f0eb0b01333b4885c5134e39bfed1dda515cd`. Owner-family count remains 40; production remains unchanged.
+
+## 441 — V2.4.116 source_has_condition has two frozen Release 1 consumers
+The frozen structured-card sweep finds exactly two uses: Ember Cinderburrow / Burrow Burst conditional-add and Ember Kilnback / Furnace Hide incoming Attack-damage reduction.
+
+## 442 — Cinderburrow was already generic; Kilnback exposed the missing seam
+Attack conditional-add already evaluates `source_has_condition` from current source-condition state. The remaining gap was the incoming self-Ability matcher in the existing Damage/Shield owner.
+
+## 443 — V2.4.116 delegates to canonical Condition ownership
+Kilnback incoming Attack-damage matching now calls canonical Condition Engine `hasRuntimeCondition`. Head `ff88bf0a4b05414d051d5eae45ee4e476175fa60` passed Card Pass #1681, proving Scorched 80 -> 70 and non-Scorched 80 -> 80 with no card-specific dispatch or owner expansion.
+
+## 444 — V2.4.116 source_has_condition accepted
+Capability head `0001fdca5b9f7d063f2496fff8b5e5f88128f5b9` passed Card Pass #1682. Exactly `source_has_condition` moved missing -> implemented. Capability blob is `6993a45b193e482d29be63cd05c7cbd83031a6ae`. Owner-family count remains 40; production remains unchanged.
+
+## 445 — V2.4.117 target_became_vanguard_this_turn has one frozen Release 1 consumer
+The exact frozen structured-card sweep finds one use only: Gale Wingclip Charm / `wingclip-vanguard-pressure`, an outgoing attached-Relic Attack-damage modifier.
+
+## 446 — Wingclip target filters bind to the attached Creature
+Wingclip's continuous target is `$attached_creature`. Therefore its `filters.target_element = "Gale"` describes the attached Creature, not the opposing Attack target. V2.4.117 corrects the generic outgoing Relic filter context accordingly.
+
+## 447 — V2.4.117 reuses canonical Vanguard transition state
+The existing Atomic Switch / forced-promotion owner writes `became_vanguard_turn`. Head `ca6bc8967064788178ba55ed8538c7b7d7f783af` passed Card Pass #1684, proving current-turn Gale +20, prior-turn Gale +0, and current-turn non-Gale +0 while attacking a Stone target.
+
+## 448 — V2.4.117 target_became_vanguard_this_turn accepted
+Capability head `9a07306ae6fd312b00ce0ef511228a277a440794` passed Card Pass #1685. Exactly `target_became_vanguard_this_turn` moved missing -> implemented. Capability blob is `1890db166b4dceb38a3ea6a02e28596f7307941f`. Owner-family count remains 40; production remains unchanged.
+
+## 449 — V2.4.118 Skyrend owns three one-consumer metadata predicates
+The frozen Release 1 sweep finds exactly one consumer each for `event_attack_id_is`, `event_attack_target_zone_is`, and `event_attack_target_controller_is_opponent`: Gale Skyrend / Open Sky Hunter on `attack_declared`.
+
+## 450 — Attack-declared Event Listener evaluates Skyrend metadata generically
+The existing Event Listener owner reads exact attack id, target zone and target controller from the authoritative attack input. It reuses existing `event_attack_source_is_self` and `MODIFY_CURRENT_ATTACK_DAMAGE` ownership and adds no card-specific dispatch or owner family.
+
+## 451 — V2.4.118 closure correction was evidence-driven
+Runtime commit `0f4e1e68f22d945f2796c52951610a9741dde288` had green deterministic runtime/type checks, while Card Pass #1687 failed the structure gate because the changed shared Event Listener file also invalidated the Tactic Edge closure fingerprint. Head `10936bfb16c8e4dff5f2490ea94b4e8b0b9f761f` synchronized that closure and passed Card Pass #1688.
+
+## 452 — V2.4.118 Skyrend metadata predicates accepted
+Capability head `9ede8792b2f03b3a996c0018586eba624acfd7d1` passed Card Pass #1689. Exactly `event_attack_id_is`, `event_attack_target_zone_is`, and `event_attack_target_controller_is_opponent` moved missing -> implemented. Capability blob is `f6bbb7ff69357da5a284db77ecf806cc079d9915`. Owner-family count remains 40; production remains unchanged.
+
+## 453 — V2.4.119 SET_DEVICE_PLAY_LOCK has one frozen Release 1 consumer
+The frozen structured-card sweep finds one use only: Volt Blackout Pulse. The operation applies after that Device resolves and prevents its controller from playing another Device until end of turn.
+
+## 454 — Device play lock belongs to existing Tactic Runtime ownership
+The Tactic Runtime now owns strict Device-lock grammar, a controller-scoped turn receipt, and the playability gate. Only subtype Device is blocked; Ally, Relic and Realm remain unaffected. End-of-turn expiry is derived from canonical Match Flow `turn_seq`, so no duplicate cleanup owner is introduced.
+
+## 455 — V2.4.119 runtime proof passed
+Head `49480b1612b014bbceee8cacebc108e4a85e4c97` passed Card Pass #1691. Deterministic proof covers exact grammar, controller isolation, non-Device preservation, next-turn expiry, explicit unlock and malformed-receipt failure. Tactic Edge closure expanded from 53 to 54 files and passed release-control validation.
+
+## 456 — V2.4.119 SET_DEVICE_PLAY_LOCK accepted
+Capability head `0fb50bc4830d540c8c7656a487219b19c5dcbf28` passed Card Pass #1692. Exactly `SET_DEVICE_PLAY_LOCK` moved missing -> implemented. Capability blob is `32d7a738e3b82751a7010acce867d2b5b5ff1fd4`. Owner-family count remains 40; production remains unchanged.
+
+## 457 — V2.4.120 TRANSFER_SHIELD has one frozen Release 1 consumer
+The frozen structured-card sweep finds one use only: Tide Abyssalume / Lantern Shelter. The Ability selects one other friendly Tide Creature and transfers a player-selected amount from 0 through 20 Shield.
+
+## 458 — Active Ability owns Shield-transfer choice; Damage/Shield owns mutation
+The new family stays inside Active Ability owner #15 for structured recognition, reconnect-stable target/amount choice and once-per-turn receipt orchestration. Physical Shield movement delegates exactly once to existing Damage/Shield owner #20 `runtimeV02TransferShield`. No second Shield mutation path or owner family is introduced.
+
+## 459 — V2.4.120 runtime proof passed
+Head `cbd17b462928d9c33e87b4048df4632a146caf9d` passed Card Pass #1694. Deterministic proof covers target selection, 0..20 amount selection, source/capacity clamping, canonical mutation receipt, receipt-safe preflight and stale amount failure. Match Edge closure expanded from 120 to 121 files and passed.
+
+## 460 — V2.4.120 TRANSFER_SHIELD accepted; TIMEFOLD remains parked
+Capability head `e814e547cfe60256f7068a8ff2a4783986c42857` passed Card Pass #1695. Exactly `TRANSFER_SHIELD` moved missing -> implemented; capability blob is `97467a79747bd144902671c8dbd217af9d50e49d`. TIMEFOLD remains unimplemented because correct support requires a same-seat Match Flow transition, canonical turn-history write, selective Condition-Aftermath skip and correctly scoped anti-chain state. Owner-family count remains 40; production is unchanged.
+
+## 461 — V2.4.121 source_in_play has one frozen Release 1 consumer
+The frozen structured-card sweep finds exactly one `source_in_play` use: Gale Aeralith / Storm Shepherd. Its other requirements and switch operation were already implemented, but Active Ability lacked the live Reserve-selection switch route, so predicate-only reconciliation was forbidden.
+
+## 462 — Storm Shepherd reuses shared Requirement and Atomic Switch ownership
+The shared Requirement evaluator owns strict `source_in_play` state semantics. Active Ability #15 owns the reconnect-stable Reserve choice and once-per-turn receipt. Physical switching remains with canonical Atomic Switch ownership, whose `moved_to_reserve` and `became_vanguard` events continue through Movement Listener and nested Heal Listener owners. No card-ID branch or new owner family is introduced.
+
+## 463 — V2.4.121 #1697 failure was release-control evidence only
+Runtime head `620578a0f064093f04698f1a46df6a1f2a779ffa` passed deterministic runtime tests and every type-check, but Card Pass #1697 failed because the shared Requirement evaluator also belongs to the Tactic Edge closure. The manifest digest `600ce673ba7295eb22d74096401634a6249b1df3e52b4f4d91712c38179b8938` was stale; CI measured `324d7a11c3d889f6227da104dc081bb718dfd0ab06a3e7d8548e7cd9ca5729bd`. Release-control-only head `316dc56b2fa2c12a385b341bbc726a56e9b96f84` synchronized that exact closure and passed Card Pass #1698.
+
+## 464 — V2.4.121 source_in_play accepted
+Capability head `e59857271b18438281dbeade3ac6e03abc11d89e` passed Card Pass #1699. Exactly `source_in_play` moved missing -> implemented; `SWITCH_WITH_VANGUARD` remained implemented. Capability blob is `89ac252c8a800eff1b91e2a671cd9e3cc928c325`. Capability coverage is 142/180 (78.9%), frozen used-missing falls to 21, owner-family count remains 40 and production remains unchanged.
+
+## 465 — V2.4.122 event_count_at_least has one frozen Release 1 consumer
+The frozen sweep finds exactly one use: Astral Nova Essence / `nova-essence-reorder-burst` on `deck_reordered`, requiring the affected deck to be self-controlled and the current canonical reorder receipt count to be at least 2. The listener remains once per attachment and reuses existing Attack-modifier ownership.
+
+## 466 — Deck reorder events bridge Card-Zone #30 to Event Listener #28 without duplicating mutation ownership
+`tcg-match-deck-reorder-event-v0-2.ts` delegates physical same-zone deck mutation to `runtimeV02ApplyCardZoneReorder`, then records metadata-only occurrence state. Reordered card identities are not recorded. Tactic, Event Listener MOVE_ZONE_POSITION, Active Ability deck-planning and Active Ability deck-reading reorder surfaces all route through this adapter and feed the existing Event Listener continuation.
+
+## 467 — V2.4.122 static ownership guards were corrected without runtime repair
+Head `e052451934c287a4d227a15d4b4f9c5ffa4b63d6` had deterministic runtime/type checks green while #1701 failed only two stale Tactic static guards that expected direct Card-Zone reorder markers; `e0350cc24304cea7ad0c6d9cb1775d259b8e74b7` updated those guards and #1702 passed. Head `29764c1eeb3ec12a8f73c3f0cadf253d738b3ee1` likewise had runtime/type checks green while #1703 failed only two stale Active Ability ownership guards; `9dbd93775935ac197553a70cb8f2c357b9cd84a7` updated them and #1704 passed.
+
+## 468 — V2.4.122 event_count_at_least accepted
+Capability head `276521d0ac1b2d453b79ce08cad972d994f997f6` passed Card Pass #1705. Exactly `event_count_at_least` moved missing -> implemented. Capability blob is `e89d7333449697568ed69212bedb5f4c9ec5a0b8`. Coverage is 143/180 (79.4%), frozen used-missing falls to 20, owner-family count remains 40 and production remains unchanged.
+
+## 469 — V2.4.123 Faultstone owns three one-consumer post-Attack predicates
+The frozen Release 1 sweep finds exactly one consumer each for `attack_source_is_attached_creature`, `attack_target_is_opponent_vanguard` and `attack_actual_damage_at_least`: Stone Faultstone / `faultstone-crush`. Its `target_remains_in_play_after_damage` dependency was already implemented.
+
+## 470 — after_attack_damage is a metadata view of the canonical resolved Attack packet
+Grove Thorn Crown's existing `after_damage_packet` remains unchanged. Event Listener #28 now derives a second `after_attack_damage` view from the same resolved Attack packet after Match computes target survival. The new view carries no second damage mutation path and binds `$attack_target` to the exact packet target for canonical Condition Engine mutation.
+
+## 471 — V2.4.123 runtime proof passed after one stale static guard correction
+Head `ff11da019191b41c06cd13f46789e95b787d830c` had deterministic runtime, all type-checks and release-control closure checks green while #1707 failed only a static recoil-order assertion that still expected the old single-event packet listener call. Guard-only head `b49388e182729dcb7dee975120a6d6b4f542a517` updated that assertion and passed #1708 end-to-end. Dedicated proof covers positive 100+ actual HP damage plus sub-100, Reserve, wrong-source and lethal-target rejection while preserving `after_damage_packet`.
+
+## 472 — V2.4.123 Faultstone predicates accepted
+Capability head `cff6c3ade3d7195c8017bee164e4153b70aa5251` passed Card Pass #1709. Exactly the three Faultstone predicates moved missing -> implemented; `target_remains_in_play_after_damage` stayed implemented. Capability blob is `4616f466fa17ed4579ab2ce17b670c9b0767d3c4`. Coverage is 146/180 (81.1%), frozen used-missing falls to 17, owner-family count remains 40 and production remains unchanged.
+
+## 473 — V2.4.124 Pinionserpent owns two frozen condition-applied predicates
+The frozen Release 1 sweep finds exactly one consumer each for `event_condition_is` and `event_target_controller_is_opponent`: Gale Pinionserpent / Wind Coil. Release 1 has two Blinded producers relevant to this event family, Blindside Spiral after damage and Aeralith Eye of the Storm after attack finished.
+
+## 474 — Condition mutation stays canonical; Event Listener receives metadata only
+V2.4.124 does not duplicate Condition mutation. Successful canonical Condition Engine results are adapted into metadata-only `condition_applied` events carrying applying controller, affected controller, target identity, exact condition and canonical Condition slot. Event Listener #28 owns the two new predicate leaves and Wind Coil continues to delegate its modifier to the Withdrawal Modifier owner.
+
+## 475 — V2.4.124 runtime proof passed after a type-only repair
+Head `f8236020740da81880bbe256d173d36dfa5912a1` / Card Pass #1711 stopped on two TS18047 nullable Reserve-index errors after structure/closure validation had passed; no gameplay assertion failed. Head `0c7f50997517dc699dd5e7dee84cdd1f2b7d5959` narrowed the Reserve index safely, refreshed Match/Tactic fingerprints and passed Card Pass #1712 end-to-end.
+
+## 476 — V2.4.124 condition event predicates accepted
+Capability head `67e82cbb7c9622150a99f7d9862cd66e8b8e6d4d` passed Card Pass #1713. Exactly `event_condition_is` and `event_target_controller_is_opponent` moved missing -> implemented. `event_condition_slot_is` remains missing while its producer metadata is already reserved. Capability blob is `a16df58b0e6d1636eb4feb519b246d46487bdc24`; coverage is 148/180 (82.2%), frozen used-missing is 15, owner-family count remains 40 and production is unchanged.
+
+## 477 — V2.4.125 Boulderbug owns four frozen Shield-gained predicates
+The frozen Release 1 sweep finds exactly one consumer each for `shield_target_is_self`, `shield_source_is_card_effect`, `shield_actual_gain_at_least` and `event_source_action_is`: Stone Boulderbug / Compact Shell.
+
+## 478 — Shield mutation stays canonical; Event Listener receives actual-gain metadata
+V2.4.125 does not duplicate Shield mutation. Damage/Shield owner #20 remains authoritative, while Event Listener #28 receives metadata-only `shield_gained` events after positive actual gain. Current Tactic, Attack, active-Ability Shield-transfer and nested Event Listener Shield producers feed the same event shape. Compact Shell's nested source action is `ability:compact-shell`, preventing recursive self-triggering.
+
+## 479 — V2.4.125 runtime proof passed after ownership/privacy fence correction
+Head `e81906ee031b3b5eb33dca10aca90b49538f23b2` had deterministic Shield-gained runtime proof green while Card Pass #1715 failed structure/privacy ownership guards. No Shield-semantic repair was required. Head `b266d1444af11db2e3f05de9fc44a5ba95ca4737` preserved public Ability privacy and the accepted Tactic/Shield compatibility ownership fences and passed Card Pass #1716 end-to-end.
+
+## 480 — V2.4.125 Shield-gained predicates accepted
+Capability head `ddd8a5af15e7d9c6b9a6fdb57efefab617469ad4` passed Card Pass #1717. Exactly `shield_target_is_self`, `shield_source_is_card_effect`, `shield_actual_gain_at_least` and `event_source_action_is` moved missing -> implemented. Capability blob is `c7679c45facfab4849f991387e1806dd03aaa3f3`. Coverage is 152/180 (84.4%), frozen used-missing falls to 11, owner-family count remains 40 and production is unchanged.
+
+
+## 481 — V2.4.126 Shade condition_changed has two frozen predicate leaves
+The frozen Release 1 sweep finds exactly one `event_condition_slot_is` consumer, Shade Mirror Fang / `mirror-fang-reflection`, and exactly two `event_change_kind_in` consumers, Mirror Fang plus Shade Eclipse Essence / `eclipse-condition-heal`.
+
+## 482 — Condition Engine remains the sole mutation owner
+V2.4.126 derives canonical slot and apply/replace metadata only from successful source-aware Condition Engine results. Tactic, Attack after-damage, conditional Attack, delayed after-attack-finished, active-Ability replacement and nested Event Listener condition routes adapt those results into metadata-only `condition_changed` events. Event Listener #28 owns strict slot/change-kind predicates; no second Condition mutation path or new owner family is introduced.
+
+## 483 — V2.4.126 runtime proof passed
+Runtime head `68e8446e0946c1aaf5fbabb0816db8e6c214fc71` passed Card Pass #1721 end-to-end. Dedicated proof covers canonical apply/replace/no-op classification, Mirror Fang control-slot reflection, nested Eclipse Essence Heal chaining, fail-closed predicate grammar and preserved active-Ability receipt privacy. Accepted Match/Tactic closures are `46cc092cf16c02c8c8b6d136ea9e3374205d303f18e9c5d970e4c589e3e2ce67` / `08e2bd33ff3307218603a6c8179e51250b6ae8286b2712ae25ecc4f3a1afca8a`.
+
+## 484 — Capability reconciliation exposed one stale static fingerprint only
+Capability head `95891e24e8ea6e097444f7c0b00846d342300451` moved exactly `event_condition_slot_is` and `event_change_kind_in` missing -> implemented. Card Pass #1722 had deterministic runtime/type-check evidence green and 564/565 structural tests passing; its sole failure was release-control still naming old capability blob `c7679c45facfab4849f991387e1806dd03aaa3f3` instead of new blob `552c25286b02140124220b45d03797cd4dba4ccc`.
+
+## 485 — V2.4.126 condition_changed predicates accepted
+Release-control-only head `7053ca758f2fb5e9f6cfa2eed3d980cde757ce88` synchronized the exact capability fingerprint and passed Card Pass #1723 **SUCCESS** with both jobs green. Capability coverage is now **61/72 operations + 93/108 predicates = 154/180 (85.6%)** and frozen Release 1 used-missing falls from **11 to 9**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3; no database migration, Edge deployment, main merge or live promotion occurred.
+
+
+## 486 — V2.4.127 Stone threshold inventory is exactly two cards
+The frozen eight-element sweep finds exactly two `current_attack_damage_at_least` consumers: Shalejaw / Tough Bite at 100 and Obsidianox / Glass Armour at 120. Both are `before_shield` incoming self-Ability reductions with card-instance limits; no other Release 1 card uses the predicate.
+
+## 487 — Attack Damage owner now owns limited continuous Ability receipts
+The pre-existing Attack Damage owner already handled unlimited incoming continuous Abilities but excluded effects carrying `limit` / `consume_when`. V2.4.127 extends that same owner generically: current threshold evaluation uses the canonical packet value at the Ability stage, turn/match card-instance receipts live on the source Creature card instance, and usage is consumed only after positive prevention. Existing unlimited Ability and Relic paths remain separate and preserved.
+
+## 488 — V2.4.127 runtime proof passed
+Runtime head `197420a274eefd7ffe2b6d34beaeccaf82752ead` passed Card Pass #1725 **SUCCESS**. Proof covers Shalejaw below/equal threshold, same-turn consumption and later-turn reset; Obsidianox below/equal threshold and match persistence; Anchor Essence reducing a 100 packet below Tough Bite's current threshold; and fail-closed unsupported stage/owner grammar. Match closure is now `9eb91319e59a57f1e2c7e11f99e9192745706c3051a3b4e4341cf59a7b92c171`.
+
+## 489 — current_attack_damage_at_least capability reconciliation accepted
+Capability head `05bfd980364c54bf073ef7466c3c338ac4c3cb8e` passed Card Pass #1726 **SUCCESS**. Exactly `current_attack_damage_at_least` moved missing -> implemented and release control was synchronized to capability blob `bd709ecd6f32db979df0087b1f573b339b38a3cd`.
+
+## 490 — V2.4.127 closes one more frozen Release 1 capability
+Capability coverage is now **61/72 operations + 94/108 predicates = 155/180 (86.1%)** and frozen Release 1 used-missing falls from **9 to 8**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3; no database migration, Edge deployment, main merge or live promotion occurred.

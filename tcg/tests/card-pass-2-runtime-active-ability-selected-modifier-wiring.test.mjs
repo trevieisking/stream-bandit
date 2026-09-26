@@ -128,7 +128,11 @@ test('Match Actions remains orchestration-only for the selected-modifier family'
   const useStart = match.indexOf('if(action==="use_ability")');
   const useEnd = match.indexOf('if(action==="play_creature")', useStart);
   const useBlock = match.slice(useStart, useEnd);
-  assert.ok(useBlock.includes('runtimeV02BeginActiveAbilityLiveRoute('));
+  const helperStart = match.indexOf('const beginActiveAbilityRoute=');
+  const helperEnd = match.indexOf('const projectAbilitySources', helperStart);
+  const helperBlock = match.slice(helperStart, helperEnd);
+  assert.ok(helperBlock.includes('runtimeV02BeginActiveAbilityLiveRoute('));
+  assert.ok(useBlock.includes('beginActiveAbilityRoute('));
   assert.ok(useBlock.includes('runtimeV02PendingActiveAbilityLiveChoiceView('));
   assert.equal(useBlock.includes('runtimeV02InstallAttackDamageModifier'), false);
   assert.equal(useBlock.includes('runtimeV02InstallDamageProtection'), false);

@@ -91,6 +91,32 @@ button{font:inherit}
   border:1px solid #ffffff22;border-radius:999px;background:#020b12c9;
   color:#a9bdce;padding:4px 8px;font-size:9px;font-weight:900;letter-spacing:.03em
 }
+.sb-battle-settings{position:relative}
+.sb-battle-settings>summary{
+  list-style:none;width:29px;height:29px;display:grid;place-items:center;cursor:pointer;
+  border:1px solid #ffffff2e;border-radius:50%;background:#020b12e6;color:#dff8ff;
+  font-size:15px;line-height:1;box-shadow:0 4px 12px #0006
+}
+.sb-battle-settings>summary::-webkit-details-marker{display:none}
+.sb-battle-settings>summary:hover,.sb-battle-settings>summary:focus-visible{
+  outline:none;border-color:#55e7ff88;box-shadow:0 0 0 2px #55e7ff1d,0 5px 14px #0008
+}
+.sb-battle-settings[open]>summary{border-color:#55e7ffaa;color:#fff}
+.sb-battle-settings-menu{
+  position:absolute;z-index:80;right:0;top:35px;width:min(230px,80vw);
+  display:grid;gap:7px;padding:9px;border:1px solid #55e7ff42;border-radius:12px;
+  background:#031019f7;box-shadow:0 16px 38px #000c
+}
+.sb-battle-settings-menu strong{font-size:11px}
+.sb-battle-settings-menu small{font-size:8px;line-height:1.35;color:#91aabd}
+.sb-quit-match{
+  min-height:36px;border:1px solid #ff668077;border-radius:9px;padding:7px 10px;
+  background:linear-gradient(145deg,#581522,#8a1d31);color:#fff;font-weight:950;
+  font-size:9px;cursor:pointer
+}
+.sb-quit-match:hover,.sb-quit-match:focus-visible{outline:none;border-color:#ff9bad;box-shadow:0 0 14px #ff66802c}
+.sb-quit-match:disabled{opacity:.42;cursor:not-allowed}
+
 .sb-half{
   position:relative;z-index:2;min-height:0;
   display:grid;
@@ -137,7 +163,7 @@ button{font:inherit}
   transition:border-color .15s ease,box-shadow .15s ease,background .15s ease
 }
 .sb-half-opponent .sb-vanguard-slot{border-color:#ff6f9270;background:radial-gradient(circle at center,#ff4e9c10,transparent 65%)}
-.sb-setup-destination.is-legal{
+.sb-setup-destination.is-legal,.sb-resolution-destination.is-legal{
   cursor:pointer;
   border-color:#ffd56aaa;
   box-shadow:0 0 0 2px #ffd56a22,0 0 24px #ffd56a25;
@@ -163,6 +189,10 @@ button{font:inherit}
   box-shadow:0 2px 5px #0009
 }
 .sb-reward-card.is-empty{opacity:.14}
+button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:pointer}
+.sb-reward-card.is-selectable{border-color:#ffd56aaa;box-shadow:0 0 0 1px #ffd56a22,0 2px 7px #0009}
+.sb-reward-card.is-selectable:hover,.sb-reward-card.is-selectable:focus-visible{outline:none;border-color:#ffe69b;box-shadow:0 0 0 2px #ffd56a38,0 0 12px #ffd56a2b}
+.sb-reward-card.is-selected{transform:translateY(-3px);border-color:#35e2ad;box-shadow:0 0 0 2px #35e2ad40,0 0 12px #35e2ad35}
 .sb-center-band{
   position:relative;z-index:5;
   display:grid;
@@ -302,7 +332,13 @@ button{font:inherit}
   transform:translateY(-5px)
 }
 .sb-hand-card.is-dragging{opacity:.72;transform:translateY(-7px) scale(1.02)}
+.sb-hand-card.is-touch-dragging{opacity:.84;box-shadow:0 0 0 2px #55e7ff55,0 0 26px #55e7ff35,0 12px 28px #0009}
 .sb-play-destination{transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+.sb-play-destination.is-touch-drag-over,.sb-setup-destination.is-touch-drag-over{
+  border-color:#55e7ffff!important;
+  box-shadow:inset 0 0 0 2px #55e7ff42,0 0 34px #55e7ff52!important;
+  background:#0b53612e!important
+}
 .sb-play-destination.is-play-legal{
   cursor:pointer;
   border-color:#ffd56ab8!important;
@@ -341,9 +377,10 @@ button{font:inherit}
   .sb-zone-pile{min-height:52px}.sb-zone-pile b{font-size:14px}
   .sb-center-band{grid-template-columns:1fr 1.6fr 1fr}
 }
-@media(min-width:641px) and (hover:hover) and (pointer:fine){
+/* Wide battle surfaces must fit full 5:7 cards even on hybrid/touch-capable desktop hardware. Phone/coarse layout below remains the later override. */
+@media(min-width:641px){
   .sb-board{
-    grid-template-rows:auto minmax(0,1fr) minmax(68px,auto) minmax(0,1fr) clamp(132px,17.2dvh,166px)
+    grid-template-rows:auto minmax(0,1fr) minmax(68px,auto) minmax(0,1fr) clamp(88px,10.8dvh,108px)
   }
   .sb-half{overflow:hidden}
   .sb-field-core{
@@ -379,11 +416,20 @@ button{font:inherit}
     min-height:0;
     place-items:center
   }
-  .sb-reserve-slot .sb-card-control,
-  .sb-vanguard-slot .sb-card-control{
-    height:calc(100% - 8px);
-    width:auto;
+  /* V2.4.55: field cards remain physical-card previews but are bounded by viewport height.
+     The previous height-fill rule made Vanguard cards dominate the table. */
+  .sb-reserve-slot .sb-card-control{
+    width:min(var(--card-w),10.36dvh);
+    height:auto;
     max-width:calc(100% - 8px);
+    max-height:calc(100% - 8px);
+    flex:0 0 auto
+  }
+  .sb-vanguard-slot .sb-card-control{
+    width:min(var(--active-w),11.79dvh);
+    height:auto;
+    max-width:calc(100% - 8px);
+    max-height:calc(100% - 8px);
     flex:0 0 auto
   }
   .sb-card-wrap.is-selected .sb-card-actions{
@@ -408,15 +454,54 @@ button{font:inherit}
     transform:translateX(-50%);
     width:min(120px,calc(100% - 10px))
   }
+  /* Bottom-edge hand behaves as a peek/fan rail: larger cards continue below the rail,
+     while horizontal scrolling exposes the rest of the hand. */
+  .sb-hand{align-items:flex-start;padding-bottom:0}
   .sb-hand-card{
-    height:100%;
-    max-height:100%;
+    height:clamp(138px,17.2dvh,172px);
     width:auto;
-    flex:0 0 auto
+    max-height:none;
+    flex:0 0 auto;
+    margin-right:-14px;
+    transform-origin:top center
+  }
+  .sb-hand-card:hover{z-index:12;transform:scale(1.018)}
+  .sb-hand-card.is-play-selected,.sb-hand-card.is-setup-selected{z-index:20;transform:scale(1.025)}
+  .sb-hand-card.is-dragging,.sb-hand-card.is-touch-dragging{z-index:24;transform:scale(1.03)}
+
+  /* The original Vanguard remains anchored in its battlefield slot.
+     Readable card context is rendered in a separate stable inspector below. */
+  .sb-card-control-shell.is-selected{
+    position:relative;
+    z-index:8
   }
 }
+.sb-card-inspector[hidden]{display:none}
+.sb-card-inspector{
+  position:fixed;inset:0;z-index:140;display:grid;place-items:center;padding:18px;
+  pointer-events:none
+}
+.sb-card-inspector-backdrop{
+  position:absolute;inset:0;border:0;margin:0;padding:0;background:#010711b8;
+  backdrop-filter:blur(2px);pointer-events:auto;cursor:default
+}
+.sb-card-inspector-panel{
+  position:relative;z-index:2;width:min(390px,36vw,48dvh);max-width:90vw;max-height:86dvh;
+  pointer-events:auto;filter:drop-shadow(0 24px 50px #000d)
+}
+.sb-card-inspector-card{position:relative;width:100%}
+.sb-card-inspector-card>.sb-card-face{width:100%;height:auto;aspect-ratio:5/7}
+.sb-card-inspector-card>.sb-card-live-status{top:44%}
+.sb-card-inspector-close{
+  position:absolute;z-index:12;right:-10px;top:-10px;width:32px;height:32px;border-radius:50%;
+  border:1px solid #8de9ff88;background:#061522;color:#fff;font-size:20px;font-weight:900;
+  display:grid;place-items:center;cursor:pointer;box-shadow:0 5px 18px #000a
+}
+.sb-card-inspector-close:hover,.sb-card-inspector-close:focus-visible{outline:none;border-color:#c8f6ff;box-shadow:0 0 0 2px #55e7ff38,0 5px 18px #000a}
+
 @media(max-width:640px), (hover:none) and (pointer:coarse){
   :root{--card-w:min(27vw,112px);--active-w:min(42vw,160px)}
+  .sb-card-inspector{display:grid!important}
   html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .sb-battle{height:auto;min-height:100dvh;padding:0;background-attachment:scroll}
   .sb-board{
@@ -505,9 +590,223 @@ button{font:inherit}
   .sb-hand{min-height:118px}
   .sb-hand-card{flex-basis:96px}
 }
+
+/* V0.17 compact tabletop: reference-informed interaction grammar.
+   Keep the whole battlefield visible at normal zoom; the hand is a larger bottom-edge peek/fan rail.
+   Stream Bandit art, rules, names and styling remain original. */
+@media(max-width:640px), (hover:none) and (pointer:coarse){
+  html,body{height:100%;min-height:0;overflow:hidden}
+  .sb-battle{height:100dvh;min-height:0;padding:0;overflow:hidden;background-attachment:scroll}
+  .sb-board{
+    height:100dvh;min-height:0;overflow:hidden;border-radius:0;border-left:0;border-right:0;
+    display:grid;grid-template-rows:44px minmax(0,1fr) 64px minmax(0,1fr) 94px;gap:2px
+  }
+  .sb-player-strip{min-height:0;height:44px;padding:4px 6px;position:relative;top:auto}
+  .sb-player-avatar{width:30px;height:30px;min-width:30px}
+  .sb-player-copy strong{font-size:10px}.sb-player-copy small{font-size:7px}
+  .sb-match-meta{max-width:62%;gap:2px}.sb-pill{font-size:6px;padding:2px 4px}
+  .sb-battle-settings>summary{width:25px;height:25px;font-size:12px}
+
+  .sb-half{
+    min-height:0;overflow:hidden;
+    display:grid;grid-template-columns:42px minmax(0,1fr) 42px;
+    grid-template-areas:"rail-left field rail-right";
+    gap:2px;padding:2px
+  }
+  .sb-half>.sb-side-rail:first-child{grid-area:rail-left}
+  .sb-half>.sb-field-core{grid-area:field}
+  .sb-half>.sb-side-rail:last-child{grid-area:rail-right}
+  .sb-side-rail{min-height:0;min-width:0;display:flex;flex-direction:column;justify-content:stretch;gap:2px}
+  .sb-zone-pile{
+    min-height:0;min-width:0;flex:1 1 0;padding:2px;border-radius:7px;
+    font-size:5px;line-height:1.05;overflow:hidden
+  }
+  .sb-zone-pile b{font-size:9px;margin-top:1px}
+  .sb-reward-stack{max-width:34px;gap:1px}.sb-reward-card{width:9px;border-radius:2px}
+
+  .sb-field-core{
+    width:100%;height:100%;min-height:0;display:grid;
+    grid-template-rows:minmax(0,.84fr) minmax(0,1.16fr);gap:2px
+  }
+  .sb-half-you .sb-field-core{grid-template-rows:minmax(0,1.16fr) minmax(0,.84fr)}
+  .sb-reserve{height:100%;min-height:0;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;align-items:stretch}
+  .sb-reserve-slot{height:100%;min-height:0;padding:2px;border-radius:7px;overflow:hidden}
+  .sb-vanguard-line{height:100%;min-height:0;align-items:stretch}
+  .sb-vanguard-slot{height:100%;min-height:0;width:min(100%,150px);padding:2px;border-radius:9px;overflow:hidden}
+  .sb-reserve-slot>span,.sb-vanguard-slot>span{top:2px;left:3px;font-size:4.5px}
+  #oppVanguard,#youVanguard,.sb-reserve-slot .sb-card-wrap,.sb-vanguard-slot .sb-card-wrap{
+    width:100%;height:100%;min-height:0;display:grid;place-items:center
+  }
+  .sb-reserve-slot .sb-card-control{
+    width:min(var(--card-w),11.5dvh);height:auto;max-height:calc(100% - 4px);max-width:calc(100% - 4px)
+  }
+  .sb-vanguard-slot .sb-card-control{
+    width:min(var(--active-w),14dvh);height:auto;max-height:calc(100% - 4px);max-width:calc(100% - 4px)
+  }
+
+  .sb-center-band{
+    height:64px;min-height:0;overflow:hidden;display:grid;grid-template-columns:1fr;gap:1px;
+    padding:2px 4px;position:relative
+  }
+  .sb-realm{display:none}
+  .sb-phase-panel{min-height:0;overflow:hidden}
+  .sb-phase-card{
+    min-height:0;width:100%;padding:3px 5px;gap:3px;border-radius:8px;
+    flex-wrap:nowrap;text-align:left;overflow:hidden
+  }
+  .sb-phase-copy{min-width:0;flex:1 1 auto}.sb-phase-copy strong{font-size:8px}.sb-phase-copy small{font-size:5.5px;line-height:1.15}
+  .sb-phase-actions{flex:0 0 auto;margin-left:auto}.sb-phase-action{min-height:28px;padding:4px 7px;font-size:7px}
+  .sb-status{min-height:0;padding:1px 3px;font-size:5.5px;line-height:1.1;border:0}
+
+  .sb-hand-wrap{
+    height:94px;min-height:0;overflow:hidden;padding:2px 4px 0;position:relative;bottom:auto;
+    background:linear-gradient(180deg,#020c13e8,#02090ff5);box-shadow:0 -6px 18px #0008
+  }
+  .sb-hand-bar{height:15px;margin:0 0 1px;gap:4px}.sb-hand-title{font-size:6px}.sb-hand-help{font-size:5.5px;max-width:62%}
+  .sb-hand{
+    height:76px;min-height:0;display:flex;flex-wrap:nowrap;gap:0;align-items:flex-start;
+    overflow-x:auto;overflow-y:hidden;padding:1px 8px 0 2px;scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain
+  }
+  .sb-hand-card{
+    height:152px;width:auto;max-height:none;flex:0 0 auto;margin-right:-14px;
+    scroll-snap-align:center;transform-origin:top center
+  }
+  .sb-hand-card.is-play-selected,.sb-hand-card.is-setup-selected{z-index:20;transform:scale(1.025)}
+  .sb-hand-card.is-dragging,.sb-hand-card.is-touch-dragging{z-index:24;transform:scale(1.03)}
+
+  .sb-card-inspector{display:grid!important;padding:8px}
+  .sb-card-inspector[hidden]{display:none!important}
+  .sb-card-inspector-panel{
+    width:min(350px,90vw,46dvh);max-width:92vw;max-height:92dvh;overflow:visible
+  }
+  .sb-card-inspector-card{max-height:92dvh;overflow:visible;border-radius:12px}
+  .sb-card-inspector-close{right:-6px;top:-6px;width:29px;height:29px;font-size:18px}
+}
+
+.sb-choreography-layer{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  pointer-events:none;
+  display:grid;
+  place-items:center;
+  padding:18px;
+  font-weight:900;
+  text-align:center
+}
+.sb-choreography-layer[hidden]{display:none}
+.sb-choreography-layer:not([hidden]){
+  background:radial-gradient(circle at center,rgba(8,18,30,.08),rgba(2,8,15,0) 55%)
+}
+</style>
+<link rel="stylesheet" href="stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-55">
+<style>
+/* V0.10 shared card-face bridge: preserve accepted board geometry while the real card face owns presentation/actions. */
+.sb-card-control-shell,.sb-hand-card-shell{
+  background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;
+}
+.sb-card-control-shell>.sb-card-face,.sb-hand-card-shell>.sb-card-face{width:100%;height:100%}
+.sb-card-control-shell.is-selected>.sb-card-face,
+.sb-hand-card-shell.is-play-selected>.sb-card-face,
+.sb-hand-card-shell.is-setup-selected>.sb-card-face{
+  box-shadow:0 0 0 2px #35e2ad66,0 0 24px #35e2ad2f,0 10px 28px #0008;
+}
+.sb-hand-card-shell.is-play-selected>.sb-card-face,
+.sb-hand-card-shell.is-setup-selected>.sb-card-face{box-shadow:0 0 0 2px #ffd56a66,0 0 24px #ffd56a35,0 10px 28px #0008}
+.sb-card-live-status{
+  position:absolute;z-index:10;left:6px;right:6px;top:44%;
+  display:flex;justify-content:center;gap:4px;pointer-events:none;
+}
+.sb-card-live-status span{padding:2px 4px;border-radius:999px;background:#020712d9;border:1px solid #9fddff44;color:#dff7ff;font-size:5.5px;line-height:1}
+.sb-card-live-status strong{font-size:6px}
+.sb-card-control-shell .sb-card-rule[data-card-intent],
+.sb-card-control-shell [data-card-intent]{pointer-events:auto}
+.sb-hand-card-shell{padding:0}
+.sb-hand-card-shell>.sb-card-face{pointer-events:none}
+.sb-hand-card-shell.is-play-candidate>.sb-card-face,.sb-hand-card-shell.is-setup-candidate>.sb-card-face{pointer-events:none}
+@media(max-width:720px),(hover:none) and (pointer:coarse){
+  .sb-card-live-status{left:3px;right:3px;gap:2px}
+  .sb-card-live-status span{font-size:5px;padding:2px 3px}
+  .sb-card-live-status strong{font-size:5.4px}
+}
+
+/* V0.18 authoritative-action UX: visible Realm + server-owned Withdraw controls. */
+.sb-realm{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.sb-realm.is-active{
+  color:#c8f8ff;
+  cursor:pointer;
+  text-shadow:0 0 10px rgba(85,231,255,.34);
+}
+.sb-realm.is-active:hover,.sb-realm.is-active:focus-visible{
+  outline:none;
+  color:#fff;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+.sb-withdraw-panel{
+  margin-top:7px;
+  padding:8px;
+  border:1px solid #55e7ff3d;
+  border-radius:12px;
+  background:#031019f2;
+  color:#e9fbff;
+  box-shadow:0 10px 28px #0008;
+}
+.sb-withdraw-panel.is-disabled{opacity:.82}
+.sb-withdraw-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sb-withdraw-head strong{font-size:12px}
+.sb-withdraw-head span{font-size:8px;color:#a9d9e8}
+.sb-withdraw-panel>small,.sb-withdraw-note{display:block;margin-top:4px;color:#a9c3d0;font-size:8px;line-height:1.25}
+.sb-withdraw-payments,.sb-withdraw-targets{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.sb-withdraw-chip,.sb-withdraw-target{
+  border:1px solid #55e7ff55;
+  border-radius:9px;
+  padding:6px 7px;
+  background:#071a24;
+  color:#e9fbff;
+  font-size:8px;
+  font-weight:850;
+  cursor:pointer
+}
+.sb-withdraw-chip.is-selected{
+  border-color:#ffd56a;
+  background:#3a2b08;
+  box-shadow:0 0 0 1px #ffd56a33,0 0 12px #ffd56a22
+}
+.sb-withdraw-target{
+  border-color:#35e2ad77;
+  background:linear-gradient(145deg,#0c5b48,#118d68)
+}
+.sb-withdraw-target:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:640px),(hover:none) and (pointer:coarse){
+  .sb-center-band .sb-realm{
+    display:block;
+    position:absolute;
+    z-index:8;
+    left:4px;
+    top:2px;
+    max-width:25%;
+    padding:2px 3px;
+    border-radius:5px;
+    background:#020b12cc;
+    font-size:4.8px;
+    letter-spacing:.04em;
+    pointer-events:auto
+  }
+  .sb-withdraw-panel{padding:6px;margin-top:4px}
+  .sb-withdraw-payments,.sb-withdraw-targets{gap:3px;margin-top:4px}
+  .sb-withdraw-chip,.sb-withdraw-target{padding:4px 5px;font-size:7px}
+  .sb-withdraw-panel>small,.sb-withdraw-note{font-size:7px}
+}
 </style>
 </head>
-<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-7" data-sb-tcg-play-bindings="v0-8">
+<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-9-hand-peek" data-sb-tcg-play-bindings="v0-11-server-projected-actions" data-sb-tcg-card-face="v1">
 <main class="sb-battle">
   <section class="sb-board" aria-label="One-screen battlefield">
     <header class="sb-player-strip" aria-label="Opponent">
@@ -520,6 +819,14 @@ button{font:inherit}
         <span class="sb-pill" id="turnPill">Loading…</span>
         <span class="sb-pill" id="phasePill">—</span>
         <span class="sb-pill" id="revisionPill">Revision —</span>
+        <details class="sb-battle-settings" id="battleSettings">
+          <summary aria-label="Match settings" title="Match settings">⚙</summary>
+          <div class="sb-battle-settings-menu">
+            <strong>Match Settings</strong>
+            <small>Quit Match is a concession. You lose this match and your opponent wins.</small>
+            <button class="sb-quit-match" id="quitMatchButton" type="button" data-concede="1">Quit Match</button>
+          </div>
+        </details>
       </div>
     </header>
 
@@ -573,9 +880,14 @@ button{font:inherit}
   </section>
 </main>
 
+<div class="sb-card-inspector" id="cardInspector" hidden></div>
+<div class="sb-choreography-layer" id="battleChoreography" hidden aria-live="polite"></div>
+
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-8"></script>
+<script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-55"></script>
+<script src="stream-bandit-tcg-battle-presentation-v1.js?v=1-0-choreography-foundation"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-20-server-attack-choice-route"></script>
 </body>
 </html>

@@ -63,6 +63,23 @@ Deno.test("Match Flow advances Seat 1 to Seat 2 and delegates exactly one draw",
   assert(s.marker === "untouched", "unrelated turn state changed");
 });
 
+Deno.test("Match Flow exits resolution when a completed Reward/promotion chain advances the turn", () => {
+  const s = state({
+    phase: "resolution",
+    active_seat: 2,
+    turn_seq: 12,
+    personal_turns: { "1": 6, "2": 6 },
+  });
+  let drawSeat = 0;
+  const result = runtimeV02AdvanceTurn(s, (plan) => {
+    drawSeat = plan.controller_seat;
+  });
+  assert(result.status === "advanced", "resolved lethal Attack did not advance");
+  assert(drawSeat === 1, "resolved lethal Attack drew for the wrong next player");
+  assert(s.active_seat === 1 && s.turn_seq === 13, "resolved lethal Attack did not rotate the turn");
+  assert(s.phase === "play", "resolved lethal Attack left the match stuck in resolution");
+});
+
 Deno.test("Match Flow advances Seat 2 back to Seat 1", () => {
   const s = state({ active_seat: 2, turn_seq: 9, personal_turns: { "1": 4, "2": 5 } });
   let drawSeat = 0;

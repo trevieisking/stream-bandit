@@ -1,17 +1,62 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02ApplyCardZonePartitionTransfer, runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02ApplyDeckReorderWithOccurrence, runtimeV02TakeDeckReorderOccurrences } from "../_shared/tcg-match-deck-reorder-event-v0-2.ts";
 import { runtimeV02ShuffleInPlace } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
+import { runtimeV02RandomSampleHiddenZone } from "../_shared/tcg-match-hidden-zone-sample-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
-import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
+import {
+  recordRuntimeV02HiddenInformationView,
+  runtimeV02TakeHiddenInformationOccurrences,
+} from "../_shared/tcg-match-hidden-information-v0-2.ts";
+import { runtimeV02PrivateRewardInspectionView } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
+import { runtimeV02InstallAttackEligibilityRule, runtimeV02NormalizeAttackEligibilityRule } from "../_shared/tcg-match-attack-eligibility-v0-2.ts";
+import { runtimeV02InstallWithdrawalModifier } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMovedEvent, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
+import { runtimeV02NormalizeEffectAttachmentState } from "../_shared/tcg-match-essence-attachment-state-v0-2.ts";
+import { runtimeV02CardSelectionOptions, runtimeV02NormalizeSelectCardsStep, runtimeV02RebindSelectedCards, runtimeV02ResolveSelectCards, type RuntimeV02SelectCardsDescriptor, type RuntimeV02SelectedCardRef } from "../_shared/tcg-match-card-selection-v0-2.ts";
+import { runtimeV02BindDeckTopSet, runtimeV02BoundDeckSetAfterRemoval, runtimeV02BoundSetChoiceOptions, runtimeV02NormalizeChooseFromSetStep, runtimeV02RebindBoundDeckSet, runtimeV02ResolveBoundSetChoice, type RuntimeV02BoundDeckSetProvenance, type RuntimeV02ChooseFromSetDescriptor } from "../_shared/tcg-match-bound-set-choice-v0-2.ts";
+import { runtimeV02InspectDeckTopEffectOwnedSet, runtimeV02InspectionProvenanceAfterRemoval, runtimeV02NormalizeInspectZoneStep, runtimeV02NormalizeInspectionProvenance, runtimeV02RebindInspectionRemainder, runtimeV02ResolveRewardInspectionChoice, runtimeV02RewardInspectionChoiceOptions, type RuntimeV02InspectZoneDescriptor, type RuntimeV02InspectionProvenance, type RuntimeV02RewardInspectionChoiceOption } from "../_shared/tcg-match-inspection-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
-import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
+import { runtimeV02ApplyDirectDamage, runtimeV02NormalizeDirectDamageStep } from "../_shared/tcg-match-direct-damage-v0-2.ts";
+import {
+  runtimeV02AdaptDeckReorderOccurrencesForListener,
+  runtimeV02AdaptHiddenInformationOccurrencesForListener,
+  runtimeV02BeginEventListenerContinuation,
+  runtimeV02CreateConditionChangedEvent,
+  runtimeV02CreateShieldGainedEvent,
+  runtimeV02PendingEventListenerChoiceView,
+  runtimeV02PrivateEventInspectionView,
+  runtimeV02ResolveEventListenerChoice,
+  type RuntimeV02PendingEventListenerChoice,
+} from "../_shared/tcg-match-event-listener-v0-2.ts";
+import { runtimeV02AdaptDefeatEventsForListener } from "../_shared/tcg-match-event-listener-defeat-event-v0-2.ts";
+import { runtimeV02PreflightDefeatScan, runtimeV02ScanAndQueueDefeats } from "../_shared/tcg-match-defeat-engine-v0-2.ts";
+import {
+  evaluateRuntimeV02LegalCardAvailableRequirement,
+  evaluateRuntimeV02ReserveCountAtLeastRequirement,
+  evaluateRuntimeV02TargetPrintedHpAtLeastRequirement,
+  normalizeRuntimeV02LegalCardAvailableRequirement,
+  normalizeRuntimeV02ReserveCountAtLeastRequirement,
+  normalizeRuntimeV02TargetPrintedHpAtLeastRequirement,
+} from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
+import {
+  runtimeV02EvaluatePredicateTree,
+  type RuntimeV02PredicateLeaf,
+} from "../_shared/tcg-match-predicate-tree-v0-2.ts";
+import { evaluateRuntimeV02EventOccurredRequirement } from "../_shared/tcg-match-event-history-query-v0-2.ts";
+import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions, type ApplyConditionMode } from "./runtime-v0-2-core.ts";
+import {
+  runtimeV02ApplyDevicePlayLock,
+  runtimeV02NormalizeDevicePlayLockStep,
+  runtimeV02TacticPlayBlockReason,
+} from "./runtime-v0-2-device-play-lock.ts";
+import { applyRuntimeConditionWithContext } from "../_shared/tcg-match-condition-engine-v0-2.ts";
 
-const VERSION = "Stream Bandit TCG tactic actions v0.3";
+const VERSION = "Stream Bandit TCG tactic actions v0.4";
 const EFFECT_SCHEMA = "sb-tcg-effects-v0.1";
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -131,6 +176,29 @@ function findCreature(state: any, ref: CreatureRef | null | undefined) {
   }
   return null;
 }
+function tacticDefeatDescribe(state: any) {
+  return (creature: { stack: Inst[] }) => {
+    const top = Array.isArray(creature.stack) && creature.stack.length
+      ? creature.stack[creature.stack.length - 1]
+      : null;
+    if (!top) throw new Error("tcg_v0_2_tactic_defeat_top_required");
+    const d = runtimeV02Definition(state, top);
+    if (!d) throw new Error("tcg_v0_2_tactic_defeat_definition_required");
+    const creatureDefinition = d.creature && typeof d.creature === "object" && !Array.isArray(d.creature)
+      ? d.creature as Record<string, unknown>
+      : null;
+    if (!creatureDefinition) throw new Error("tcg_v0_2_tactic_defeat_creature_definition_required");
+    const maxHp = Number(creatureDefinition.hp);
+    const rewardValue = Number(creatureDefinition.reward_value);
+    if (!Number.isFinite(maxHp) || maxHp <= 0) throw new Error("tcg_v0_2_tactic_defeat_hp_invalid");
+    if (!Number.isInteger(rewardValue) || rewardValue < 1) throw new Error("tcg_v0_2_tactic_defeat_reward_invalid");
+    return {
+      max_hp: maxHp,
+      reward_value: rewardValue,
+      label: String(d.name || top.card_id),
+    };
+  };
+}
 function applyTacticHeal(state: any, effect: EffectState, found: NonNullable<ReturnType<typeof findCreature>>, amount: number) {
   if (state.runtime_registry_v0_2 == null) {
     return { actual_heal: healRuntimeDamage(found.cr, amount), packet_id: null as string | null };
@@ -217,6 +285,131 @@ function playerSeat(ownerSeat: number, token: unknown, vars: Record<string, unkn
 function resolveVar(vars: Record<string, unknown>, token: unknown) {
   return typeof token === "string" && token.startsWith("$") ? vars[token.slice(1)] : token;
 }
+function selectCardsDescriptorMap(vars: Record<string, unknown>) {
+  const current = vars.__select_cards_descriptors;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, RuntimeV02SelectCardsDescriptor>;
+  }
+  const created: Record<string, RuntimeV02SelectCardsDescriptor> = {};
+  vars.__select_cards_descriptors = created;
+  return created;
+}
+function inspectionProvenanceMap(vars: Record<string, unknown>) {
+  const current = vars.__inspection_sources;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, RuntimeV02InspectionProvenance>;
+  }
+  const created: Record<string, RuntimeV02InspectionProvenance> = {};
+  vars.__inspection_sources = created;
+  return created;
+}
+function inspectionParentTokenMap(vars: Record<string, unknown>) {
+  const current = vars.__inspection_parent_tokens;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, string>;
+  }
+  const created: Record<string, string> = {};
+  vars.__inspection_parent_tokens = created;
+  return created;
+}
+function boundDeckSetProvenanceMap(vars: Record<string, unknown>) {
+  const current = vars.__bound_deck_sets;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, RuntimeV02BoundDeckSetProvenance>;
+  }
+  const created: Record<string, RuntimeV02BoundDeckSetProvenance> = {};
+  vars.__bound_deck_sets = created;
+  return created;
+}
+function boundSetParentTokenMap(vars: Record<string, unknown>) {
+  const current = vars.__bound_set_parent_tokens;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, string>;
+  }
+  const created: Record<string, string> = {};
+  vars.__bound_set_parent_tokens = created;
+  return created;
+}
+function selectedCardRefs(value: unknown): RuntimeV02SelectedCardRef[] {
+  if (!Array.isArray(value)) throw new Error("tcg_v0_2_tactic_selected_cards_variable_invalid");
+  return value.map((raw, index) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      throw new Error(`tcg_v0_2_tactic_selected_card_ref_invalid:${index}`);
+    }
+    const row = raw as Record<string, unknown>;
+    return {
+      uid: String(row.uid || ""),
+      card_id: String(row.card_id || ""),
+      zone_owner_seat: Number(row.zone_owner_seat) as 1 | 2,
+      zone: String(row.zone || "") as RuntimeV02SelectedCardRef["zone"],
+    };
+  });
+}
+function selectedCardMoveDestination(
+  player: any,
+  destination: string,
+): {
+  zone: Inst[];
+  zone_name: "hand" | "discard" | "deck";
+  position: "top" | "bottom";
+} {
+  if (destination === "hand") return { zone: player.hand as Inst[], zone_name: "hand", position: "bottom" };
+  if (destination === "discard") return { zone: player.discard as Inst[], zone_name: "discard", position: "bottom" };
+  if (destination === "deck_bottom") return { zone: player.deck as Inst[], zone_name: "deck", position: "bottom" };
+  if (destination === "deck_top") return { zone: player.deck as Inst[], zone_name: "deck", position: "top" };
+  throw new Error(`unsupported_card_destination:${destination}`);
+}
+function commitSelectedCardMove(
+  state: any,
+  effect: EffectState,
+  refs: RuntimeV02SelectedCardRef[],
+  destinationSeat: number,
+  destination: string,
+) {
+  const rebound = runtimeV02RebindSelectedCards(state, refs);
+  if (!rebound.length) return;
+  const sourceSeat = rebound[0].zone_owner_seat;
+  const sourceZone = rebound[0].zone;
+  if (
+    rebound.some((ref) =>
+      ref.zone_owner_seat !== sourceSeat || ref.zone !== sourceZone
+    )
+  ) throw new Error("tcg_v0_2_tactic_selected_cards_mixed_source");
+  if (sourceSeat !== destinationSeat || sourceZone !== "discard") {
+    throw new Error("tcg_v0_2_tactic_selected_cards_move_source_unsupported");
+  }
+  const player = state.players[String(sourceSeat)];
+  const target = selectedCardMoveDestination(player, destination);
+  const preflight = runtimeV02PreflightCardZoneTransfer(
+    player.discard as Inst[],
+    target.zone,
+    {
+      cause: "effect",
+      action_kind: "tactic",
+      source_action_id: effect.id,
+      source_card_uid: effect.source_card.uid,
+      source: {
+        controller_seat: sourceSeat,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      destination: {
+        controller_seat: destinationSeat,
+        zone: target.zone_name,
+        owner_card_uid: null,
+      },
+      card_uids: rebound.map((ref) => ref.uid),
+      destination_position: target.position,
+    },
+  );
+  for (let index = 0; index < rebound.length; index += 1) {
+    if (
+      preflight.cards[index]?.uid !== rebound[index].uid ||
+      preflight.cards[index]?.card_id !== rebound[index].card_id
+    ) throw new Error("tcg_v0_2_tactic_selected_card_changed");
+  }
+  runtimeV02CommitCardZoneTransfer(player.discard as Inst[], target.zone, preflight);
+}
 function reserveCount(player: any) {
   return (player.reserve || []).filter(Boolean).length;
 }
@@ -253,9 +446,19 @@ function matchesCardFilters(state: any, inst: Inst, filters: any, ownerSeat: num
 function matchesCreatureFilters(state: any, item: { cr: Cr }, filters: any) {
   if (!filters || typeof filters !== "object") return true;
   const d = topDef(item.cr, state) || {};
+  if (filters.card_family && String(filters.card_family) !== "Creature") return false;
   if (filters.element && String(d.element || "") !== String(filters.element)) return false;
   if (filters.damaged === true && Number(item.cr.damage || 0) <= 0) return false;
-  if (Array.isArray(filters.has_any_condition) && !filters.has_any_condition.some((c: string) => hasCondition(item.cr, c))) return false;
+
+  const conditionList = Array.isArray(filters.has_any_condition)
+    ? filters.has_any_condition
+    : Array.isArray(filters.conditions_any)
+    ? filters.conditions_any
+    : Array.isArray(filters.condition_any_of)
+    ? filters.condition_any_of
+    : null;
+  if (conditionList && !conditionList.some((condition: string) => hasCondition(item.cr, condition))) return false;
+  if (filters.has_any_condition === true && activeConditions(item.cr).length < 1) return false;
   return true;
 }
 function creatureOptions(state: any, ownerSeat: number, controller: unknown, zone: unknown, filters: any) {
@@ -300,11 +503,55 @@ function unsupportedOps(steps: any[]): string[] {
     for (const step of items || []) {
       const op = String(step?.op || "");
       if (op === "ADD_ATTACK_DAMAGE_MODIFIER" && String(step.expires || "end_of_turn") !== "end_of_turn") unsupported.add("ADD_ATTACK_DAMAGE_MODIFIER_EXPIRY");
-      if (op === "SET_ATTACK_ELIGIBILITY" && String(step.expires || "end_of_turn") !== "end_of_turn") unsupported.add("SET_ATTACK_ELIGIBILITY_EXPIRY");
+      if (op === "SET_ATTACK_ELIGIBILITY") {
+        try {
+          runtimeV02NormalizeAttackEligibilityRule(step);
+        } catch {
+          unsupported.add("SET_ATTACK_ELIGIBILITY_GRAMMAR");
+        }
+      }
+      if (op === "SET_DEVICE_PLAY_LOCK") {
+        try {
+          runtimeV02NormalizeDevicePlayLockStep(step);
+        } catch {
+          unsupported.add("SET_DEVICE_PLAY_LOCK_GRAMMAR");
+        }
+      }
       if (op === "SET_WITHDRAWAL_COST" && !["end_of_turn", "aftermath"].includes(String(step.expires || "end_of_turn"))) unsupported.add("SET_WITHDRAWAL_COST_EXPIRY");
       if (op === "ADD_CONDITION_IMMUNITY" && !["end_of_turn", "aftermath"].includes(String(step.expires || "aftermath"))) unsupported.add("ADD_CONDITION_IMMUNITY_EXPIRY");
-      if (op === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") !== "discard") unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SOURCE");
+      if (op === "SELECT_CARDS") {
+        try { runtimeV02NormalizeSelectCardsStep(step); }
+        catch { unsupported.add("SELECT_CARDS_GRAMMAR"); }
+      }
+      if (op === "CHOOSE_FROM_SET") {
+        try { runtimeV02NormalizeChooseFromSetStep(step); }
+        catch { unsupported.add("CHOOSE_FROM_SET_GRAMMAR"); }
+      }
+      if (op === "INSPECT_ZONE") {
+        try { runtimeV02NormalizeInspectZoneStep(step); }
+        catch { unsupported.add("INSPECT_ZONE_GRAMMAR"); }
+      }
+      if (op === "DIRECT_DAMAGE") {
+        try {
+          const descriptor = runtimeV02NormalizeDirectDamageStep(step);
+          if (descriptor.damage_class !== "effect") unsupported.add("DIRECT_DAMAGE_CLASS");
+        } catch {
+          unsupported.add("DIRECT_DAMAGE_GRAMMAR");
+        }
+      }
+      if (op === "ATTACH_ESSENCE_FROM_ZONE") {
+        if (step.cards != null) {
+          if (String(step.zone || "") !== "discard" || step.manual_attachment !== false) {
+            unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SELECTED_SOURCE");
+          }
+          try { runtimeV02NormalizeEffectAttachmentState(step.attachment_state); }
+          catch { unsupported.add("ATTACH_ESSENCE_FROM_ZONE_ATTACHMENT_STATE"); }
+        } else if (String(step.from || "") !== "discard") {
+          unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SOURCE");
+        }
+      }
       if (Array.isArray(step?.steps)) walk(step.steps);
+      if (Array.isArray(step?.else_steps)) walk(step.else_steps);
       if (Array.isArray(step?.then)) walk(step.then);
       if (Array.isArray(step?.else)) walk(step.else);
     }
@@ -316,13 +563,27 @@ function requiredEffectResourcesAvailable(state: any, ownerSeat: number, steps: 
   let ok = true;
   const walk = (items: any[]) => {
     for (const step of items || []) {
-      if (String(step?.op || "") === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") === "discard") {
+      if (String(step?.op || "") === "SELECT_CARDS") {
+        const descriptor = runtimeV02NormalizeSelectCardsStep(step);
+        if (runtimeV02CardSelectionOptions(state, ownerSeat, descriptor).length < descriptor.min) ok = false;
+      }
+      if (String(step?.op || "") === "INSPECT_ZONE") {
+        const descriptor = runtimeV02NormalizeInspectZoneStep(step);
+        const zoneSeat = playerSeat(ownerSeat, descriptor.player, {});
+        const zoneOwner = state.players[String(zoneSeat)];
+        const available = descriptor.zone === "rewards"
+          ? Number(zoneOwner?.rewards?.length || 0)
+          : Number(zoneOwner?.deck?.length || 0);
+        if (available < descriptor.min) ok = false;
+      }
+      if (String(step?.op || "") === "ATTACH_ESSENCE_FROM_ZONE" && step.cards == null && String(step.from || "") === "discard") {
         const seat = playerSeat(ownerSeat, step.player || "self", {});
         const zone = state.players[String(seat)]?.discard || [];
         const range = countRange(step.selection);
         if (cardOptions(state, zone, step.selection?.filters, ownerSeat).length < range.min) ok = false;
       }
       if (Array.isArray(step?.steps)) walk(step.steps);
+      if (Array.isArray(step?.else_steps)) walk(step.else_steps);
       if (Array.isArray(step?.then)) walk(step.then);
       if (Array.isArray(step?.else)) walk(step.else);
     }
@@ -381,8 +642,11 @@ function makeView(state: any, viewerSeat: number, revision: number) {
     } : null,
     pending_choice: choiceView(state.pending_choice || null, viewerSeat),
     pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, viewerSeat as 1 | 2),
+    pending_event_listener_choice: runtimeV02PendingEventListenerChoiceView(state.pending_event_listener_choice || null, viewerSeat as 1 | 2),
     pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, viewerSeat as 1 | 2),
+    private_event_inspection: runtimeV02PrivateEventInspectionView(state, viewerSeat as 1 | 2),
     private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, viewerSeat as 1 | 2),
+    private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, viewerSeat as 1 | 2),
     result: state.result || null,
     log: (state.log || []).slice(-20),
     you: {
@@ -475,6 +739,14 @@ function movementListenerAudit(flow: any) {
     emitted_heal_packet_ids: flow.emitted_heal_packet_ids || [],
   };
 }
+function eventListenerAudit(flow: any) {
+  return {
+    status: flow.status,
+    processed_listener_keys: flow.processed_listener_keys || [],
+    emitted_heal_packet_ids: flow.emitted_heal_packet_ids || [],
+    emitted_movement_event_count: flow.emitted_movement_events?.length || 0,
+  };
+}
 function setTacticMovementResume(state: any, effect: EffectState) {
   state.pending_tactic_movement_resume = {
     effect_id: effect.id,
@@ -508,6 +780,271 @@ function readTacticHealResume(state: any, effect: EffectState) {
   if (Number(raw.cursor) !== effect.cursor) throw new Error("tcg_v0_2_tactic_heal_resume_cursor_changed");
   return raw;
 }
+function setTacticEventResume(state: any, effect: EffectState) {
+  if (state.pending_tactic_event_resume != null) throw new Error("tcg_v0_2_tactic_event_resume_already_pending");
+  state.pending_tactic_event_resume = {
+    effect_id: effect.id,
+    owner_seat: effect.owner_seat,
+    cursor: effect.cursor,
+    turn_seq: Number(state.turn_seq || 0),
+  };
+}
+function readTacticEventResume(state: any, effect: EffectState) {
+  const raw = state.pending_tactic_event_resume;
+  if (!raw || typeof raw !== "object") throw new Error("tcg_v0_2_tactic_event_resume_required");
+  if (String(raw.effect_id || "") !== effect.id) throw new Error("tcg_v0_2_tactic_event_resume_stale_effect");
+  if (Number(raw.owner_seat) !== effect.owner_seat) throw new Error("tcg_v0_2_tactic_event_resume_owner_changed");
+  if (Number(raw.turn_seq) !== Number(state.turn_seq || 0)) throw new Error("tcg_v0_2_tactic_event_resume_turn_stale");
+  if (Number(raw.cursor) !== effect.cursor) throw new Error("tcg_v0_2_tactic_event_resume_cursor_changed");
+  return raw;
+}
+function drainTacticHiddenInformationEvents(state: any, effect: EffectState): boolean {
+  let guard = 0;
+  while (true) {
+    if (++guard > 20) throw new Error("tcg_v0_2_tactic_hidden_event_guard");
+    if (state.pending_event_listener_choice != null) return true;
+    const hiddenOccurrences = runtimeV02TakeHiddenInformationOccurrences(state);
+    const deckReorderOccurrences = runtimeV02TakeDeckReorderOccurrences(state);
+    if (!hiddenOccurrences.length && !deckReorderOccurrences.length) return false;
+    const events = [
+      ...runtimeV02AdaptHiddenInformationOccurrencesForListener(
+        state,
+        hiddenOccurrences,
+      ),
+      ...runtimeV02AdaptDeckReorderOccurrencesForListener(
+        state,
+        deckReorderOccurrences,
+      ),
+    ];
+    const flow = runtimeV02BeginEventListenerContinuation(state, events);
+    if ((flow.emitted_movement_events || []).length) {
+      throw new Error("tcg_v0_2_tactic_hidden_event_movement_output_not_yet_supported");
+    }
+    if (flow.status === "player_choice_required") {
+      setTacticEventResume(state, effect);
+      return true;
+    }
+    if ((flow.emitted_heal_packet_ids || []).length) {
+      const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+        state,
+        flow.emitted_heal_packet_ids,
+        effect.owner_seat as 1 | 2,
+      );
+      if (healFlow.status === "player_choice_required") {
+        setTacticHealResume(state, effect);
+        return true;
+      }
+    }
+  }
+}
+function applyTacticDeckReorder(
+  state: any,
+  effect: EffectState,
+  deck: Inst[],
+  request: any,
+) {
+  return runtimeV02ApplyDeckReorderWithOccurrence(
+    state,
+    deck,
+    request,
+    {
+      source_controller_seat: effect.owner_seat as 1 | 2,
+      phase: String(state.phase || "effect_resolution"),
+    },
+  );
+}
+function beginTacticEffectEventFlow(
+  state: any,
+  effect: EffectState,
+  events: any[],
+): boolean {
+  if (!events.length) return false;
+  const flow = runtimeV02BeginEventListenerContinuation(state, events);
+  if ((flow.emitted_movement_events || []).length) {
+    throw new Error("tcg_v0_2_tactic_shield_event_movement_output_not_yet_supported");
+  }
+  if (flow.status === "player_choice_required") {
+    setTacticEventResume(state, effect);
+    return true;
+  }
+  if ((flow.emitted_heal_packet_ids || []).length) {
+    const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+      state,
+      flow.emitted_heal_packet_ids,
+      effect.owner_seat as 1 | 2,
+    );
+    if (healFlow.status === "player_choice_required") {
+      setTacticHealResume(state, effect);
+      return true;
+    }
+  }
+  return false;
+}
+
+function createTacticShieldEvent(
+  state: any,
+  effect: EffectState,
+  step: any,
+  found: any,
+  requestedAmount: number,
+  actualShieldGained: number,
+  ordinal: number,
+) {
+  if (actualShieldGained <= 0) return null;
+  const target = topInst(found.cr);
+  if (!target) throw new Error("tcg_v0_2_tactic_shield_target_top_required");
+  const sourceSeat = Number(effect.owner_seat);
+  const targetSeat = Number(found.seat);
+  if (sourceSeat !== 1 && sourceSeat !== 2) {
+    throw new Error("tcg_v0_2_tactic_shield_source_seat_invalid");
+  }
+  if (targetSeat !== 1 && targetSeat !== 2) {
+    throw new Error("tcg_v0_2_tactic_shield_target_seat_invalid");
+  }
+  const sourceKey = String(step.source_key || "").trim() || effect.id;
+  return runtimeV02CreateShieldGainedEvent(state, {
+    event_id:
+      `shield-gained:${Number(state.turn_seq || 0)}:${effect.id}:${effect.cursor}:${ordinal}:${target.uid}`,
+    source_controller_seat: sourceSeat as 1 | 2,
+    target_controller_seat: targetSeat as 1 | 2,
+    target_creature_uid: target.uid,
+    target_zone: found.where,
+    target_index: found.index,
+    requested_amount: requestedAmount,
+    actual_shield_gained: actualShieldGained,
+    source_action_id: sourceKey,
+    source_card_uid: effect.source_card.uid,
+    source_card_id: effect.source_card_id,
+    source_creature_uid: null,
+    action_kind: "tactic",
+    phase: String(state.phase || "effect_resolution"),
+    card_effect: true,
+  });
+}
+
+function tacticCreatureTarget(
+  state: any,
+  ownerSeat: number,
+  vars: Record<string, unknown>,
+  token: unknown,
+) {
+  if (token === "$current_friendly_vanguard") {
+    const cr = state.players?.[String(ownerSeat)]?.vanguard as Cr | null | undefined;
+    return cr ? { seat: ownerSeat, where: "vanguard" as const, index: null, cr } : null;
+  }
+  if (token === "$current_opponent_vanguard") {
+    const seat = ownerSeat === 1 ? 2 : 1;
+    const cr = state.players?.[String(seat)]?.vanguard as Cr | null | undefined;
+    return cr ? { seat, where: "vanguard" as const, index: null, cr } : null;
+  }
+  const resolved = resolveVar(vars, token) as CreatureRef | null | undefined;
+  return findCreature(state, resolved);
+}
+
+function legalCardCandidateCount(
+  state: any,
+  ownerSeat: number,
+  requirement: ReturnType<typeof normalizeRuntimeV02LegalCardAvailableRequirement>,
+) {
+  const seat = playerSeat(ownerSeat, requirement.controller, {});
+  const player = state.players[String(seat)];
+  if (!player) return 0;
+  if (["field", "vanguard", "reserve"].includes(requirement.zone)) {
+    return creatureOptions(
+      state,
+      ownerSeat,
+      requirement.controller,
+      requirement.zone,
+      requirement.filters,
+    ).length;
+  }
+  const zone = player[requirement.zone];
+  if (!Array.isArray(zone)) return 0;
+  return cardOptions(state, zone as Inst[], requirement.filters, ownerSeat).length;
+}
+
+type TacticPredicateContext = {
+  state: any;
+  ownerSeat: number;
+  vars: Record<string, unknown>;
+};
+
+function tacticPredicateLeaf(
+  leaf: RuntimeV02PredicateLeaf,
+  context: TacticPredicateContext,
+): boolean {
+  const { state, ownerSeat, vars } = context;
+  const predicate = String(leaf.predicate || "");
+
+  if (predicate === "reserve_count_at_least") {
+    const normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement(leaf);
+    const seat = playerSeat(ownerSeat, normalized.controller, vars);
+    return evaluateRuntimeV02ReserveCountAtLeastRequirement(
+      state.players[String(seat)]?.reserve,
+      normalized,
+    ).matched;
+  }
+
+  if (predicate === "hand_count_at_least") {
+    const seat = playerSeat(
+      ownerSeat,
+      leaf.player ?? leaf.controller ?? "self",
+      vars,
+    );
+    const hand = state.players[String(seat)]?.hand;
+    const count = Number(leaf.count);
+    if (!Array.isArray(hand)) throw new Error("tcg_v0_2_tactic_if_hand_missing");
+    if (!Number.isInteger(count) || count < 1) throw new Error("tcg_v0_2_tactic_if_hand_count_invalid");
+    return hand.length >= count;
+  }
+
+  if (predicate === "legal_card_available") {
+    const normalized = normalizeRuntimeV02LegalCardAvailableRequirement(leaf);
+    return evaluateRuntimeV02LegalCardAvailableRequirement(
+      legalCardCandidateCount(state, ownerSeat, normalized),
+      normalized,
+    ).matched;
+  }
+
+  if (predicate === "target_printed_hp_at_least") {
+    const requirement = normalizeRuntimeV02TargetPrintedHpAtLeastRequirement(leaf);
+    const target = tacticCreatureTarget(state, ownerSeat, vars, requirement.target);
+    if (!target) return false;
+    const def = topDef(target.cr, state) || {};
+    const hp = Number(def.creature?.hp ?? def.hp ?? 0);
+    return evaluateRuntimeV02TargetPrintedHpAtLeastRequirement(hp, requirement).matched;
+  }
+
+  if (predicate === "target_has_condition") {
+    const target = tacticCreatureTarget(state, ownerSeat, vars, leaf.target);
+    if (!target) return false;
+    const condition = String(leaf.condition || "").trim();
+    if (!condition) throw new Error("tcg_v0_2_tactic_if_condition_required");
+    return hasCondition(target.cr, condition);
+  }
+
+  if (predicate === "modifier_condition_slot_empty") {
+    const target = tacticCreatureTarget(state, ownerSeat, vars, leaf.target);
+    if (!target) return false;
+    return conditions(target.cr).modifier == null;
+  }
+
+  throw new Error(`tcg_v0_2_tactic_if_predicate_unsupported:${predicate}`);
+}
+
+function evaluateTacticIf(
+  state: any,
+  ownerSeat: number,
+  vars: Record<string, unknown>,
+  raw: unknown,
+): boolean {
+  return runtimeV02EvaluatePredicateTree(
+    raw,
+    { state, ownerSeat, vars },
+    tacticPredicateLeaf,
+  );
+}
+
 function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, steps: any[]) {
   const first = (steps || []).find((step: any) => String(step?.op || "") !== "");
   if (!first || first.op !== "SELECT_CREATURE") return true;
@@ -517,15 +1054,117 @@ function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, ste
 }
 function checkPlayRequirements(state: any, ownerSeat: number, requirements: any[]) {
   for (const requirement of requirements || []) {
-    if (requirement?.op === "RESERVE_COUNT_AT_LEAST") {
-      const seat = playerSeat(ownerSeat, requirement.player || "self", {});
-      if (reserveCount(state.players[String(seat)]) < Number(requirement.count || 0)) return false;
+    if (requirement?.predicate === "event_occurred") {
+      const eventControllerSeat = playerSeat(ownerSeat, requirement.controller || "self", {});
+      if (!evaluateRuntimeV02EventOccurredRequirement(
+        state,
+        ownerSeat,
+        eventControllerSeat,
+        requirement,
+      ).matched) return false;
+      continue;
+    }
+
+    if (requirement?.predicate === "legal_card_available") {
+      const normalized = normalizeRuntimeV02LegalCardAvailableRequirement(requirement);
+      const candidateCount = legalCardCandidateCount(state, ownerSeat, normalized);
+      if (!evaluateRuntimeV02LegalCardAvailableRequirement(candidateCount, normalized).matched) return false;
+      continue;
+    }
+
+    let normalized;
+    if (requirement?.predicate === "reserve_count_at_least") {
+      normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement(requirement);
+    } else if (requirement?.op === "RESERVE_COUNT_AT_LEAST") {
+      normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement({
+        predicate: "reserve_count_at_least",
+        controller: requirement.player || "self",
+        count: requirement.count,
+      });
     } else {
       return false;
     }
+    const seat = playerSeat(ownerSeat, normalized.controller, {});
+    const reserve = state.players[String(seat)]?.reserve;
+    if (!evaluateRuntimeV02ReserveCountAtLeastRequirement(reserve, normalized).matched) return false;
   }
   return true;
 }
+type TacticPlayability =
+  | {
+      eligible: true;
+      reason: null;
+      index: number;
+      source: Inst;
+      definition: any;
+      engine: any;
+      subtype: string;
+      unsupported_ops: string[];
+    }
+  | {
+      eligible: false;
+      reason: string;
+      index: number;
+      source: Inst | null;
+      definition: any;
+      engine: any;
+      subtype: string;
+      unsupported_ops: string[];
+    };
+
+function tacticPlayability(state: any, seat: number, uidValue: unknown): TacticPlayability {
+  const uid = String(uidValue || "").trim();
+  if (state.phase !== "play" || Number(state.active_seat) !== seat) {
+    return { eligible: false, reason: "not_active_player", index: -1, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
+  }
+  if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_event_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_event_resume || state.pending_tactic_movement_resume) {
+    return { eligible: false, reason: "effect_resolution_already_pending", index: -1, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
+  }
+
+  const player = state.players[String(seat)];
+  const index = player.hand.findIndex((inst: Inst) => inst.uid === uid);
+  if (index < 0) {
+    return { eligible: false, reason: "tactic_not_in_hand", index, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
+  }
+
+  const source = player.hand[index] as Inst;
+  const d = definition(state, source) || {};
+  const engine = d.engine_effects || null;
+  const subtype = String(d.tactic_subtype || d.family || engine?.subtype || "");
+  if (String(d.card_family || d.kind || "") !== "Tactic" || engine?.schema !== EFFECT_SCHEMA) {
+    return { eligible: false, reason: "structured_tactic_required", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  const lifecycleBlock = runtimeV02TacticPlayBlockReason(
+    state,
+    seat as 1 | 2,
+    subtype,
+  );
+  if (lifecycleBlock) {
+    return { eligible: false, reason: lifecycleBlock, index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (
+    subtype === "Ally" &&
+    Number(state.first_player_seat) === seat &&
+    Number(state.personal_turns?.[String(seat)] || 0) === 1
+  ) {
+    return { eligible: false, reason: "first_player_cannot_play_ally_on_first_turn", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (!checkPlayRequirements(state, seat, engine.play_requirements || [])) {
+    return { eligible: false, reason: "tactic_play_requirement_not_met", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (!firstRequiredCreatureTargetAvailable(state, seat, engine.steps || [])) {
+    return { eligible: false, reason: "required_tactic_target_unavailable", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (!requiredEffectResourcesAvailable(state, seat, engine.steps || [])) {
+    return { eligible: false, reason: "required_tactic_resource_unavailable", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  const unsupported = unsupportedOps(engine.steps || []);
+  if (unsupported.length) {
+    return { eligible: false, reason: "tactic_lifecycle_contract_unsupported", index, source, definition: d, engine, subtype, unsupported_ops: unsupported };
+  }
+  return { eligible: true, reason: null, index, source, definition: d, engine, subtype, unsupported_ops: [] };
+}
+
 function log(state: any, message: string) {
   state.log ||= [];
   state.log.push(message);
@@ -539,7 +1178,13 @@ function finishEffect(state: any, effect: EffectState) {
   log(state, `Seat ${effect.owner_seat} resolved ${effect.source_name}.`);
   delete state.effect_resolution;
   delete state.pending_choice;
-  if (state.phase !== "complete" && state.phase !== "overtime_pending") state.phase = "play";
+  if (state.pending_resolutions != null && !Array.isArray(state.pending_resolutions)) {
+    throw new Error("tcg_v0_2_tactic_resolution_queue_invalid");
+  }
+  const pendingResolution = Array.isArray(state.pending_resolutions) && state.pending_resolutions.length > 0;
+  if (state.phase !== "complete" && state.phase !== "overtime_pending") {
+    state.phase = pendingResolution ? "resolution" : "play";
+  }
   evaluateWinner(state);
 }
 
@@ -547,12 +1192,25 @@ function executeUntilChoice(state: any) {
   const effect = state.effect_resolution as EffectState;
   if (!effect) throw new Error("effect_resolution_missing");
   let guard = 0;
-  while (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_movement_listener_choice && effect.cursor < effect.steps.length) {
+  while (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_event_listener_choice && !state.pending_movement_listener_choice && effect.cursor < effect.steps.length) {
     if (++guard > 200) throw new Error("effect_resolution_guard");
+    if (drainTacticHiddenInformationEvents(state, effect)) return;
     const step = effect.steps[effect.cursor] || {};
     const op = String(step.op || "");
     const ownerSeat = effect.owner_seat;
     const vars = effect.vars;
+
+    if (op === "SET_DEVICE_PLAY_LOCK") {
+      const descriptor = runtimeV02NormalizeDevicePlayLockStep(step);
+      const lockSeat = playerSeat(ownerSeat, descriptor.player, vars);
+      runtimeV02ApplyDevicePlayLock(
+        state,
+        lockSeat as 1 | 2,
+        descriptor.locked,
+      );
+      effect.cursor++;
+      continue;
+    }
 
     if (op === "DRAW" || op === "DRAW_FIXED") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
@@ -595,14 +1253,166 @@ function executeUntilChoice(state: any) {
       effect.cursor++;
       continue;
     }
+    if (op === "RANDOM_SAMPLE_HIDDEN_ZONE") {
+      const targetSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      const targetPlayer = state.players[String(targetSeat)];
+      if (!targetPlayer) throw new Error("tcg_v0_2_tactic_hidden_sample_player_missing");
+      if (String(step.rng_owner || "match") !== "match") {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_rng_owner_unsupported");
+      }
+      if (String(step.visibility || "") !== "server_only") {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_visibility_unsupported");
+      }
+      if (String(step.zone || "") !== "hand") {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_zone_unsupported");
+      }
+      const range = countRange(step.count);
+      if (range.min !== range.max) {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_count_range_unsupported");
+      }
+      const varName = String(step.as || "sampled").trim();
+      if (!varName) throw new Error("tcg_v0_2_tactic_hidden_sample_var_required");
+      const sampled = runtimeV02RandomSampleHiddenZone(targetPlayer.hand as Inst[], range.min);
+      vars[varName] = sampled;
+      const provenance = (
+        vars.__hidden_sample_sources && typeof vars.__hidden_sample_sources === "object"
+          ? vars.__hidden_sample_sources
+          : {}
+      ) as Record<string, { seat: number; zone: string }>;
+      provenance[varName] = { seat: targetSeat, zone: "hand" };
+      vars.__hidden_sample_sources = provenance;
+      effect.cursor++;
+      continue;
+    }
+    if (op === "INSPECT_ZONE") {
+      const descriptor = runtimeV02NormalizeInspectZoneStep(step);
+      const zoneSeat = playerSeat(ownerSeat, descriptor.player, vars);
+      if (descriptor.zone === "rewards") {
+        const options = runtimeV02RewardInspectionChoiceOptions(
+          state,
+          ownerSeat,
+          zoneSeat,
+          descriptor,
+        );
+        setPending(state, effect, {
+          seat: ownerSeat,
+          kind: "inspect_rewards",
+          prompt: "Choose Reward Card to inspect",
+          min: descriptor.min,
+          max: Math.min(descriptor.max, options.length),
+          mode: "select",
+          options: options.map((option) => ({
+            id: option.id,
+            label: option.label,
+            data: { option },
+          })),
+          context: {
+            apply: "inspect_reward",
+            descriptor: structuredClone(descriptor),
+            zone_owner_seat: zoneSeat,
+          },
+        });
+        return;
+      }
+      const inspected = runtimeV02InspectDeckTopEffectOwnedSet(
+        state,
+        ownerSeat,
+        zoneSeat,
+        descriptor,
+        {
+          action_kind: "tactic",
+          source_controller_seat: ownerSeat as 1 | 2,
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_creature_uid: null,
+          phase: String(state.phase || "effect_resolution"),
+        },
+      );
+      vars[descriptor.as] = inspected.cards.map((card) => ({ ...card }));
+      inspectionProvenanceMap(vars)[descriptor.as] = structuredClone(
+        inspected.provenance,
+      );
+      effect.cursor++;
+      continue;
+    }
     if (op === "LOOK_TOP") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
       const player = state.players[String(seat)];
       const count = Math.min(Math.max(0, Number(step.count || 0)), player.deck.length);
-      vars[String(step.as || "looked")] = player.deck.splice(0, count);
-      if (count > 0) recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck_top");
+      const variable = String(step.as || "looked");
+      const nextStep = effect.steps[effect.cursor + 1] || {};
+      if (String(nextStep.op || "") === "CHOOSE_FROM_SET") {
+        const chooseDescriptor = runtimeV02NormalizeChooseFromSetStep(nextStep);
+        if (chooseDescriptor.source_token === variable) {
+          const bound = runtimeV02BindDeckTopSet(
+            state,
+            ownerSeat,
+            seat,
+            count,
+            {
+          action_kind: "tactic",
+          source_controller_seat: ownerSeat as 1 | 2,
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_creature_uid: null,
+          phase: String(state.phase || "effect_resolution"),
+        },
+          );
+          vars[variable] = bound.cards.map((card) => ({ ...card }));
+          boundDeckSetProvenanceMap(vars)[variable] = structuredClone(
+            bound.provenance,
+          );
+          effect.cursor++;
+          continue;
+        }
+      }
+      vars[variable] = player.deck.splice(0, count);
+      if (count > 0) {
+        recordRuntimeV02HiddenInformationView(
+          state,
+          seat as 1 | 2,
+          "deck_top",
+          {
+            action_kind: "tactic",
+            source_controller_seat: ownerSeat as 1 | 2,
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            source_creature_uid: null,
+            phase: String(state.phase || "effect_resolution"),
+          },
+        );
+      }
       effect.cursor++;
       continue;
+    }
+    if (op === "SELECT_CARDS") {
+      const descriptor = runtimeV02NormalizeSelectCardsStep(step);
+      const options = runtimeV02CardSelectionOptions(state, ownerSeat, descriptor);
+      if (options.length < descriptor.min) throw new Error("required_effect_choice_unavailable");
+      selectCardsDescriptorMap(vars)[descriptor.as] = structuredClone(descriptor);
+      if (!options.length && descriptor.min === 0) {
+        vars[descriptor.as] = [];
+        effect.cursor++;
+        continue;
+      }
+      setPending(state, effect, {
+        seat: ownerSeat,
+        kind: "select_cards",
+        prompt: "Choose card",
+        min: descriptor.min,
+        max: Math.min(descriptor.max, options.length),
+        mode: "select",
+        options: options.map((option) => ({
+          id: option.id,
+          label: option.label,
+          data: { ref: option.ref },
+        })),
+        context: {
+          apply: "select_cards",
+          descriptor: structuredClone(descriptor),
+        },
+      });
+      return;
     }
     if (op === "SELECT_CREATURE") {
       const options = creatureOptions(state, ownerSeat, step.controller || "self", step.zone, step.filters);
@@ -620,9 +1430,65 @@ function executeUntilChoice(state: any) {
       return;
     }
     if (op === "CHOOSE_FROM_SET") {
-      const source = (resolveVar(vars, step.source) || []) as Inst[];
+      const descriptor = runtimeV02NormalizeChooseFromSetStep(step);
+      const boundProvenance = boundDeckSetProvenanceMap(vars)[
+        descriptor.source_token
+      ];
+      if (boundProvenance) {
+        const source = runtimeV02RebindBoundDeckSet(state, boundProvenance);
+        vars[descriptor.source_token] = source.map((card) => ({ ...card }));
+        const options = runtimeV02BoundSetChoiceOptions(
+          state,
+          descriptor,
+          source,
+        );
+        if (options.length < descriptor.min) {
+          throw new Error("required_effect_choice_unavailable");
+        }
+        if (!options.length && descriptor.min === 0) {
+          vars[descriptor.as] = [];
+          boundSetParentTokenMap(vars)[descriptor.as] =
+            descriptor.source_token;
+          effect.cursor++;
+          continue;
+        }
+        setPending(state, effect, {
+          seat: ownerSeat,
+          kind: "choose_bound_set",
+          prompt: "Choose card",
+          min: descriptor.min,
+          max: Math.min(descriptor.max, options.length),
+          mode: "select",
+          options: options.map((option) => ({
+            id: option.id,
+            label: option.label,
+            data: { ref: option.ref },
+          })),
+          context: {
+            apply: "bind_bound_set_choice",
+            descriptor: structuredClone(descriptor),
+            source_token: descriptor.source_token,
+          },
+        });
+        return;
+      }
+
+      const sourceToken = typeof step.source === "string" && step.source.startsWith("$")
+        ? step.source.slice(1)
+        : "";
+      const provenance = sourceToken
+        ? inspectionProvenanceMap(vars)[sourceToken]
+        : null;
+      const source = provenance
+        ? runtimeV02RebindInspectionRemainder(state, provenance)
+        : (resolveVar(vars, step.source) || []) as Inst[];
+      if (sourceToken) vars[sourceToken] = source.map((card) => ({ ...card }));
       const options = cardOptions(state, source, step.filters, ownerSeat);
-      const bounds = choiceBounds(step.count, options.length, false);
+      const bounds = choiceBounds(
+        step.count ?? { min: step.min, max: step.max },
+        options.length,
+        false,
+      );
       setPending(state, effect, {
         seat: ownerSeat,
         kind: "choose_cards",
@@ -631,7 +1497,11 @@ function executeUntilChoice(state: any) {
         max: bounds.max,
         mode: "select",
         options,
-        context: { apply: "set_var_cards", var_name: String(step.as || "chosen") },
+        context: {
+          apply: "set_var_cards",
+          var_name: String(step.as || "chosen"),
+          source_token: sourceToken,
+        },
       });
       return;
     }
@@ -657,7 +1527,19 @@ function executeUntilChoice(state: any) {
       const player = state.players[String(seat)];
       const options = cardOptions(state, player.deck, step.selection?.filters, ownerSeat);
       const bounds = choiceBounds(step.selection, options.length, true);
-      recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck");
+      recordRuntimeV02HiddenInformationView(
+        state,
+        seat as 1 | 2,
+        "deck",
+        {
+          action_kind: "tactic",
+          source_controller_seat: ownerSeat as 1 | 2,
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_creature_uid: null,
+          phase: String(state.phase || "effect_resolution"),
+        },
+      );
       setPending(state, effect, {
         seat: ownerSeat,
         kind: "search_deck",
@@ -673,6 +1555,7 @@ function executeUntilChoice(state: any) {
           reveal: step.reveal || null,
         },
       });
+      drainTacticHiddenInformationEvents(state, effect);
       return;
     }
     if (op === "SEARCH_DECK_GROUP") {
@@ -684,6 +1567,35 @@ function executeUntilChoice(state: any) {
         destination: step.destination || "hand",
       }));
       effect.steps.splice(effect.cursor, 1, ...generated);
+      continue;
+    }
+    if (op === "SHUFFLE_ZONE_INTO_DECK") {
+      const seat = playerSeat(ownerSeat, step.player || "self", vars);
+      if (String(step.zone || "") !== "hand") {
+        throw new Error(`unsupported_shuffle_zone:${step.zone}`);
+      }
+      if (String(step.visibility || "") !== "owner_private") {
+        throw new Error(`unsupported_shuffle_zone_visibility:${step.visibility}`);
+      }
+      const player = state.players[String(seat)];
+      if (!player || !Array.isArray(player.hand) || !Array.isArray(player.deck)) {
+        throw new Error("tcg_v0_2_tactic_shuffle_zone_player_invalid");
+      }
+      const handUids = (player.hand as Inst[]).map((inst) => inst.uid);
+      if (handUids.length > 0) {
+        runtimeV02ApplyCardZoneTransfer(player.hand as Inst[], player.deck as Inst[], {
+          cause: "effect",
+          action_kind: "tactic",
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source: { controller_seat: seat as 1 | 2, zone: "hand", owner_card_uid: null },
+          destination: { controller_seat: seat as 1 | 2, zone: "deck", owner_card_uid: null },
+          card_uids: handUids,
+          destination_position: "bottom",
+        });
+      }
+      runtimeV02ShuffleInPlace(player.deck as Inst[]);
+      effect.cursor++;
       continue;
     }
     if (op === "SHUFFLE_DECK") {
@@ -719,18 +1631,373 @@ function executeUntilChoice(state: any) {
     }
     if (op === "MOVE_CARDS") {
       const cards = (resolveVar(vars, step.cards) || []) as Inst[];
-      const seat = step.owner ? playerSeat(ownerSeat, step.owner, vars) : ownerSeat;
-      moveCardsToDestination(state, seat, cards, String(step.to || "hand"));
+      const destinationSeat = step.player
+        ? playerSeat(ownerSeat, step.player, vars)
+        : step.owner
+        ? playerSeat(ownerSeat, step.owner, vars)
+        : ownerSeat;
+      const token = typeof step.cards === "string" && step.cards.startsWith("$")
+        ? step.cards.slice(1)
+        : "";
+      const parentToken = token
+        ? inspectionParentTokenMap(vars)[token] || token
+        : "";
+      const boundParentToken = token
+        ? boundSetParentTokenMap(vars)[token] || ""
+        : "";
+      const boundProvenance = boundParentToken
+        ? boundDeckSetProvenanceMap(vars)[boundParentToken]
+        : null;
+      if (boundProvenance) {
+        if (destinationSeat !== boundProvenance.zone_owner_seat) {
+          throw new Error("tcg_v0_2_tactic_bound_set_move_owner_changed");
+        }
+        const rebound = runtimeV02RebindBoundDeckSet(
+          state,
+          boundProvenance,
+        );
+        const selected = cards.map((card, index) => {
+          const current = rebound.find((candidate) =>
+            candidate.uid === card.uid && candidate.card_id === card.card_id
+          );
+          if (!current) {
+            throw new Error(
+              `tcg_v0_2_tactic_bound_set_selected_card_changed:${index}`,
+            );
+          }
+          return current;
+        });
+        const destination = String(step.to ?? step.destination ?? "hand");
+        if (selected.length > 0) {
+          const player = state.players[String(destinationSeat)];
+          if (destination === "hand") {
+            runtimeV02ApplyCardZonePartitionTransfer(
+              player.deck as Inst[],
+              player.hand as Inst[],
+              {
+                cause: "effect",
+                action_kind: "tactic",
+                source_action_id: effect.id,
+                source_card_uid: effect.source_card.uid,
+                source: {
+                  controller_seat: destinationSeat as 1 | 2,
+                  zone: "deck",
+                  owner_card_uid: null,
+                },
+                destination: {
+                  controller_seat: destinationSeat as 1 | 2,
+                  zone: "hand",
+                  owner_card_uid: null,
+                },
+                source_window: {
+                  position: "top",
+                  card_uids: rebound.map((card) => card.uid),
+                },
+                destination_card_uids: selected.map((card) => card.uid),
+                source_remainder_position: "top",
+                destination_position: "bottom",
+              },
+            );
+          } else if (destination === "deck_bottom") {
+            applyTacticDeckReorder(state, effect, player.deck as Inst[], {
+              cause: "effect",
+              action_kind: "tactic",
+              source_action_id: effect.id,
+              source_card_uid: effect.source_card.uid,
+              zone: {
+                controller_seat: destinationSeat as 1 | 2,
+                zone: "deck",
+                owner_card_uid: null,
+              },
+              card_uids: selected.map((card) => card.uid),
+              destination_position: "bottom",
+            });
+          } else {
+            throw new Error(
+              `tcg_v0_2_tactic_bound_set_move_destination_unsupported:${destination}`,
+            );
+          }
+          boundDeckSetProvenanceMap(vars)[boundParentToken] =
+            runtimeV02BoundDeckSetAfterRemoval(
+              boundProvenance,
+              selected.map((card) => card.uid),
+            );
+        }
+        effect.cursor++;
+        continue;
+      }
+      const inspectionProvenance = parentToken
+        ? inspectionProvenanceMap(vars)[parentToken]
+        : null;
+      if (inspectionProvenance) {
+        if (
+          destinationSeat !== inspectionProvenance.zone_owner_seat ||
+          String(step.to || "") !== "discard"
+        ) {
+          throw new Error("tcg_v0_2_tactic_inspection_move_destination_unsupported");
+        }
+        const rebound = runtimeV02RebindInspectionRemainder(
+          state,
+          inspectionProvenance,
+        );
+        const selected = cards.map((card, index) => {
+          const current = rebound.find((candidate) => candidate.uid === card.uid);
+          if (!current || current.card_id !== card.card_id) {
+            throw new Error(
+              `tcg_v0_2_tactic_inspection_selected_card_changed:${index}`,
+            );
+          }
+          return current;
+        });
+        if (!selected.length) {
+          throw new Error("tcg_v0_2_tactic_inspection_selected_card_required");
+        }
+        const player = state.players[String(destinationSeat)];
+        runtimeV02ApplyCardZonePartitionTransfer(
+          player.deck as Inst[],
+          player.discard as Inst[],
+          {
+            cause: "effect",
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            source: {
+              controller_seat: destinationSeat as 1 | 2,
+              zone: "deck",
+              owner_card_uid: null,
+            },
+            destination: {
+              controller_seat: destinationSeat as 1 | 2,
+              zone: "discard",
+              owner_card_uid: null,
+            },
+            source_window: {
+              position: "top",
+              card_uids: rebound.map((card) => card.uid),
+            },
+            destination_card_uids: selected.map((card) => card.uid),
+            source_remainder_position: "top",
+            destination_position: "bottom",
+          },
+        );
+        const next = runtimeV02InspectionProvenanceAfterRemoval(
+          inspectionProvenance,
+          selected.map((card) => card.uid),
+        );
+        inspectionProvenanceMap(vars)[parentToken] = structuredClone(next);
+        effect.cursor++;
+        continue;
+      }
+      const selectDescriptor = token ? selectCardsDescriptorMap(vars)[token] : null;
+      if (selectDescriptor) {
+        const refs = selectedCardRefs(resolveVar(vars, step.cards));
+        const rebound = runtimeV02RebindSelectedCards(state, refs);
+        if (
+          rebound.some((ref) =>
+            ref.zone_owner_seat !== destinationSeat ||
+            ref.zone !== selectDescriptor.zone
+          )
+        ) throw new Error("tcg_v0_2_tactic_selected_cards_move_source_changed");
+        const order = String(step.order || "preserve");
+        if (order === "player_choice" && rebound.length > 1) {
+          setPending(state, effect, {
+            seat: ownerSeat,
+            kind: "order_selected_cards",
+            prompt: "Choose card order",
+            min: rebound.length,
+            max: rebound.length,
+            mode: "order",
+            options: rebound.map((ref) => ({
+              id: `card:${ref.uid}`,
+              label: cardName(state, { uid: ref.uid, card_id: ref.card_id }),
+              data: { ref },
+            })),
+            context: {
+              apply: "move_selected_cards",
+              source_token: token,
+              destination_seat: destinationSeat,
+              destination: String(step.to || "hand"),
+            },
+          });
+          return;
+        }
+        if (order !== "preserve" && order !== "player_choice") {
+          throw new Error(`tcg_v0_2_tactic_selected_cards_order_unsupported:${order}`);
+        }
+        commitSelectedCardMove(
+          state,
+          effect,
+          rebound,
+          destinationSeat,
+          String(step.to || "hand"),
+        );
+        effect.cursor++;
+        continue;
+      }
+      const provenanceMap = (
+        vars.__hidden_sample_sources && typeof vars.__hidden_sample_sources === "object"
+          ? vars.__hidden_sample_sources
+          : {}
+      ) as Record<string, { seat: number; zone: string }>;
+      const provenance = token ? provenanceMap[token] : null;
+      if (provenance) {
+        if (Number(provenance.seat) !== destinationSeat) {
+          throw new Error("tcg_v0_2_tactic_hidden_sample_move_controller_mismatch");
+        }
+        if (String(provenance.zone || "") !== "hand") {
+          throw new Error("tcg_v0_2_tactic_hidden_sample_move_source_unsupported");
+        }
+        const player = state.players[String(destinationSeat)];
+        const destination = String(step.to || "hand");
+        let destinationZone: Inst[];
+        let destinationPosition: "top" | "bottom" = "bottom";
+        if (destination === "hand") destinationZone = player.hand;
+        else if (destination === "discard") destinationZone = player.discard;
+        else if (destination === "deck_bottom") destinationZone = player.deck;
+        else if (destination === "deck_top") {
+          destinationZone = player.deck;
+          destinationPosition = "top";
+        } else throw new Error(`unsupported_card_destination:${destination}`);
+        const cardUids = cards.map((card) => String(card.uid));
+        if (cardUids.length > 0) {
+          runtimeV02ApplyCardZoneTransfer(player.hand as Inst[], destinationZone, {
+            cause: "effect",
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            source: { controller_seat: destinationSeat as 1 | 2, zone: "hand", owner_card_uid: null },
+            destination: {
+              controller_seat: destinationSeat as 1 | 2,
+              zone: destination === "deck_bottom" || destination === "deck_top" ? "deck" : destination,
+              owner_card_uid: null,
+            },
+            card_uids: cardUids,
+            destination_position: destinationPosition,
+          });
+        }
+        delete provenanceMap[token];
+      } else {
+        moveCardsToDestination(state, destinationSeat, cards, String(step.to || "hand"));
+      }
       effect.cursor++;
       continue;
     }
     if (op === "PUT_REMAINDER_ON_DECK_BOTTOM" || op === "RETURN_REMAINDER_TO_DECK_TOP" || op === "RETURN_SET_TO_DECK_TOP") {
-      const sourceToken = step.source || step.cards;
-      const source = ((resolveVar(vars, sourceToken) || []) as Inst[]).slice();
-      const except = new Set((((resolveVar(vars, step.except) || []) as Inst[]).map((inst) => inst.uid)));
-      const cards = source.filter((inst) => !except.has(inst.uid));
+      const sourceToken = step.source || step.set || step.cards;
+      const sourceVar = typeof sourceToken === "string" && sourceToken.startsWith("$")
+        ? sourceToken.slice(1)
+        : "";
+      const provenance = sourceVar
+        ? inspectionProvenanceMap(vars)[sourceVar]
+        : null;
+      const exceptToken = step.except ?? step.exclude;
+      const except = new Set((((resolveVar(vars, exceptToken) || []) as Inst[]).map((inst) => inst.uid)));
       const seat = step.player ? playerSeat(ownerSeat, step.player, vars) : ownerSeat;
       const destination = op === "PUT_REMAINDER_ON_DECK_BOTTOM" ? "deck_bottom" : "deck_top";
+      const boundProvenance = sourceVar
+        ? boundDeckSetProvenanceMap(vars)[sourceVar]
+        : null;
+      if (boundProvenance) {
+        if (seat !== boundProvenance.zone_owner_seat) {
+          throw new Error("tcg_v0_2_tactic_bound_set_remainder_owner_changed");
+        }
+        const removed = new Set(boundProvenance.removed_uids);
+        if (
+          except.size !== removed.size ||
+          [...except].some((uid) => !removed.has(uid))
+        ) {
+          throw new Error("tcg_v0_2_tactic_bound_set_except_changed");
+        }
+        const cards = runtimeV02RebindBoundDeckSet(state, boundProvenance);
+        vars[sourceVar] = cards.map((card) => ({ ...card }));
+        if (!cards.length) {
+          delete boundDeckSetProvenanceMap(vars)[sourceVar];
+          effect.cursor++;
+          continue;
+        }
+        if (String(step.order || "") === "player_choice" && cards.length > 1) {
+          const options = cardOptions(state, cards, null, ownerSeat);
+          setPending(state, effect, {
+            seat: ownerSeat,
+            kind: "order_bound_deck_set",
+            prompt: "Choose card order",
+            min: options.length,
+            max: options.length,
+            mode: "order",
+            options,
+            context: {
+              apply: "order_bound_deck_remainder",
+              zone_seat: seat,
+              provenance_token: sourceVar,
+              destination,
+            },
+          });
+          return;
+        }
+        if (
+          destination === "deck_bottom" ||
+          String(step.order || "") === "player_choice"
+        ) {
+          const player = state.players[String(seat)];
+          applyTacticDeckReorder(state, effect, player.deck as Inst[], {
+            cause: "effect",
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            zone: {
+              controller_seat: seat as 1 | 2,
+              zone: "deck",
+              owner_card_uid: null,
+            },
+            card_uids: cards.map((card) => card.uid),
+            destination_position: destination === "deck_bottom" ? "bottom" : "top",
+          });
+        }
+        if (destination === "deck_bottom") {
+          delete boundDeckSetProvenanceMap(vars)[sourceVar];
+        }
+        effect.cursor++;
+        continue;
+      }
+      if (provenance) {
+        if (
+          seat !== provenance.zone_owner_seat ||
+          destination !== "deck_top"
+        ) throw new Error("tcg_v0_2_tactic_inspection_remainder_destination_unsupported");
+        const removed = new Set(provenance.removed_uids);
+        if (
+          except.size !== removed.size ||
+          [...except].some((uid) => !removed.has(uid))
+        ) throw new Error("tcg_v0_2_tactic_inspection_remainder_except_changed");
+        const cards = runtimeV02RebindInspectionRemainder(state, provenance);
+        vars[sourceVar] = cards.map((card) => ({ ...card }));
+        if (cards.length <= 1) {
+          effect.cursor++;
+          continue;
+        }
+        if (!String(step.order || "").includes("choice")) {
+          effect.cursor++;
+          continue;
+        }
+        const options = cardOptions(state, cards, null, ownerSeat);
+        setPending(state, effect, {
+          seat: ownerSeat,
+          kind: "order_inspected_deck_top",
+          prompt: "Choose card order",
+          min: options.length,
+          max: options.length,
+          mode: "order",
+          options,
+          context: {
+            apply: "order_inspected_deck_top",
+            zone_seat: seat,
+            provenance_token: sourceVar,
+          },
+        });
+        return;
+      }
+      const source = ((resolveVar(vars, sourceToken) || []) as Inst[]).slice();
+      const cards = source.filter((inst) => !except.has(inst.uid));
       if (cards.length <= 1 || !String(step.order || "").includes("choice")) {
         moveCardsToDestination(state, seat, cards, destination);
         effect.cursor++;
@@ -765,14 +2032,216 @@ function executeUntilChoice(state: any) {
       }
       continue;
     }
+    if (op === "ADD_SHIELD_EACH") {
+      const resolved = resolveVar(vars, step.targets);
+      const refs = Array.isArray(resolved)
+        ? resolved
+        : resolved == null
+        ? []
+        : [resolved];
+      const amount = Number(step.amount);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        throw new Error("tcg_v0_2_tactic_add_shield_each_amount_invalid");
+      }
+      const shieldEvents: any[] = [];
+      let ordinal = 0;
+      for (const ref of refs as CreatureRef[]) {
+        const found = findCreature(state, ref);
+        if (!found) continue;
+        const actualShieldGained = addRuntimeShield(found.cr, amount);
+        const shieldEvent = createTacticShieldEvent(
+          state,
+          effect,
+          step,
+          found,
+          amount,
+          actualShieldGained,
+          ordinal++,
+        );
+        if (shieldEvent) shieldEvents.push(shieldEvent);
+      }
+      effect.cursor++;
+      if (beginTacticEffectEventFlow(state, effect, shieldEvents)) return;
+      continue;
+    }
+    if (op === "DIRECT_DAMAGE") {
+      const descriptor = runtimeV02NormalizeDirectDamageStep(step);
+      if (descriptor.damage_class !== "effect") {
+        throw new Error("tcg_v0_2_tactic_direct_damage_class_unsupported");
+      }
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (!found) throw new Error("tcg_v0_2_tactic_direct_damage_target_missing");
+      const sourceSeat = Number(effect.owner_seat);
+      const targetSeat = Number(found.seat);
+      if (sourceSeat !== 1 && sourceSeat !== 2) throw new Error("tcg_v0_2_tactic_direct_damage_source_seat_invalid");
+      if (targetSeat !== 1 && targetSeat !== 2) throw new Error("tcg_v0_2_tactic_direct_damage_target_seat_invalid");
+      const target = topInst(found.cr);
+      if (!target) throw new Error("tcg_v0_2_tactic_direct_damage_target_top_required");
+      const describe = tacticDefeatDescribe(state);
+      runtimeV02PreflightDefeatScan(state, describe);
+      const packetId = `${effect.id}:direct:${effect.cursor}:${target.uid}`;
+      const resolved = runtimeV02ApplyDirectDamage(
+        state,
+        found.cr,
+        step,
+        {
+          packet_id: packetId,
+          damage_class: "effect",
+          source_controller_seat: sourceSeat as 1 | 2,
+          source_kind: "tactic",
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source_card_id: effect.source_card_id,
+          source_creature_uid: null,
+          target_controller_seat: targetSeat as 1 | 2,
+          target_creature_uid: target.uid,
+          target_zone: found.where,
+          target_index: found.index,
+        },
+        String(step.target || ""),
+        null,
+      );
+      const packetFlow = runtimeV02BeginEventListenerContinuation(
+        state,
+        [resolved.after_damage_event],
+      );
+      if (packetFlow.status === "player_choice_required") {
+        throw new Error("tcg_v0_2_tactic_direct_damage_event_choice_not_yet_supported");
+      }
+      if (
+        packetFlow.emitted_movement_events.length ||
+        packetFlow.emitted_heal_packet_ids.length
+      ) {
+        throw new Error("tcg_v0_2_tactic_direct_damage_nested_listener_output_not_yet_supported");
+      }
+
+      // Defeat events are also routed through Event Listener ownership. Repeat
+      // only when those listeners create a new defeated Creature; each pass
+      // physically removes prior defeats, so the loop is strictly bounded.
+      for (let pass = 0; pass < 10; pass++) {
+        const defeat = runtimeV02ScanAndQueueDefeats(
+          state,
+          describe,
+          {
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_controller_seat: sourceSeat as 1 | 2,
+            source_card_uid: effect.source_card.uid,
+          },
+        );
+        if (!defeat.defeated_count) break;
+        if (defeat.defeat_events.length) {
+          const defeatFlow = runtimeV02BeginEventListenerContinuation(
+            state,
+            runtimeV02AdaptDefeatEventsForListener(
+              state,
+              defeat.defeat_events,
+            ),
+          );
+          if (defeatFlow.status === "player_choice_required") {
+            throw new Error("tcg_v0_2_tactic_direct_damage_defeat_event_choice_not_yet_supported");
+          }
+          if (
+            defeatFlow.emitted_movement_events.length ||
+            defeatFlow.emitted_heal_packet_ids.length
+          ) {
+            throw new Error("tcg_v0_2_tactic_direct_damage_defeat_listener_output_not_yet_supported");
+          }
+        }
+        if (pass === 9) throw new Error("tcg_v0_2_tactic_direct_damage_defeat_loop_guard");
+      }
+      effect.cursor++;
+      continue;
+    }
+    if (op === "APPLY_CONDITION") {
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (!found) throw new Error("condition_target_missing");
+      const condition = String(step.condition || "").trim();
+      if (!condition) throw new Error("tcg_v0_2_tactic_condition_required");
+      const rawMode = String(step.mode || "apply");
+      if (!["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"].includes(rawMode)) {
+        throw new Error("tcg_v0_2_tactic_condition_mode_unsupported");
+      }
+      const turn = Number(state.turn_seq);
+      if (!Number.isInteger(turn) || turn < 0) throw new Error("tcg_v0_2_tactic_condition_turn_invalid");
+      const activeSeat = Number(state.active_seat);
+      if (activeSeat !== 1 && activeSeat !== 2) throw new Error("tcg_v0_2_tactic_condition_active_seat_invalid");
+      const sourceSeat = Number(effect.owner_seat);
+      if (sourceSeat !== 1 && sourceSeat !== 2) throw new Error("tcg_v0_2_tactic_condition_source_seat_invalid");
+      const targetSeat = Number(found.seat);
+      if (targetSeat !== 1 && targetSeat !== 2) throw new Error("tcg_v0_2_tactic_condition_target_seat_invalid");
+      const sourceActionId = String(effect.id || "").trim();
+      if (!sourceActionId) throw new Error("tcg_v0_2_tactic_condition_action_required");
+      const conditionResult = applyRuntimeConditionWithContext(
+        found.cr,
+        condition,
+        turn,
+        rawMode as ApplyConditionMode,
+        {
+          turn_seq: turn,
+          active_seat: activeSeat as 1 | 2,
+          source_controller_seat: sourceSeat as 1 | 2,
+          target_controller_seat: targetSeat as 1 | 2,
+          card_effect: true,
+          source_action_id: sourceActionId,
+        },
+      );
+      const conditionEvents: any[] = [];
+      if (conditionResult.change_kind) {
+        const target = topInst(found.cr);
+        if (!target) throw new Error("tcg_v0_2_tactic_condition_target_top_required");
+        conditionEvents.push(runtimeV02CreateConditionChangedEvent(state, {
+          event_id:
+            `condition-changed:${turn}:tactic:${effect.id}:${effect.cursor}:${target.uid}`,
+          source_controller_seat: sourceSeat as 1 | 2,
+          target_controller_seat: targetSeat as 1 | 2,
+          target_creature_uid: target.uid,
+          target_zone: found.where,
+          target_index: found.index,
+          condition,
+          condition_slot: conditionResult.condition_slot,
+          change_kind: conditionResult.change_kind,
+          source_action_id: sourceActionId,
+          source_card_uid: effect.source_card.uid,
+          source_card_id: effect.source_card_id,
+          source_creature_uid: null,
+          action_kind: "tactic",
+          phase: String(state.phase || "effect_resolution"),
+        }));
+      }
+      effect.cursor++;
+      if (beginTacticEffectEventFlow(state, effect, conditionEvents)) return;
+      continue;
+    }
     if (op === "ADD_SHIELD" || op === "CLEAR_CONDITION_IF_PRESENT" || op === "CLEAR_CONDITION") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
+      const shieldEvents: any[] = [];
       if (found) {
-        if (op === "ADD_SHIELD") addRuntimeShield(found.cr, Number(step.amount || 0));
-        else clearCondition(found.cr, String(step.condition || ""));
+        if (op === "ADD_SHIELD") {
+          const requestedAmount = Number(step.amount || 0);
+          if (!Number.isFinite(requestedAmount) || requestedAmount <= 0) {
+            throw new Error("tcg_v0_2_tactic_add_shield_amount_invalid");
+          }
+          const actualShieldGained = addRuntimeShield(found.cr, Number(step.amount || 0));
+          const shieldEvent = createTacticShieldEvent(
+            state,
+            effect,
+            step,
+            found,
+            requestedAmount,
+            actualShieldGained,
+            0,
+          );
+          if (shieldEvent) shieldEvents.push(shieldEvent);
+        } else {
+          clearCondition(found.cr, String(step.condition || ""));
+        }
       }
       effect.cursor++;
+      if (beginTacticEffectEventFlow(state, effect, shieldEvents)) return;
       continue;
     }
     if (op === "HEAL_EACH") {
@@ -792,19 +2261,21 @@ function executeUntilChoice(state: any) {
       }
       continue;
     }
-    if (op === "CHOOSE_AND_CLEAR_CONDITION") {
+    if (op === "CHOOSE_AND_CLEAR_CONDITION" || op === "CHOOSE_AND_CLEAR_CONTROL_CONDITION") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
       if (!found) throw new Error("condition_target_missing");
       let allowed = activeConditions(found.cr);
       if (Array.isArray(step.allowed)) allowed = allowed.filter((condition) => step.allowed.includes(condition));
-      if (step.condition_slot === "control") allowed = allowed.filter((condition) => conditions(found.cr).control === condition);
+      if (op === "CHOOSE_AND_CLEAR_CONTROL_CONDITION" || step.condition_slot === "control") {
+        allowed = allowed.filter((condition) => conditions(found.cr).control === condition);
+      }
       const options = allowed.map((condition) => ({
         id: `condition:${condition}`,
         label: condition,
         data: { condition },
       }));
-      const bounds = choiceBounds(step.count, options.length, false);
+      const bounds = choiceBounds(step.count == null ? 1 : step.count, options.length, false);
       setPending(state, effect, {
         seat: ownerSeat,
         kind: "clear_condition",
@@ -926,6 +2397,29 @@ function executeUntilChoice(state: any) {
       });
       return;
     }
+    if (op === "OPTIONAL") {
+      const chooserSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      const optionalSteps = Array.isArray(step.steps) ? step.steps : [];
+      const optionalElseSteps = Array.isArray(step.else_steps) ? step.else_steps : [];
+      setPending(state, effect, {
+        seat: chooserSeat,
+        kind: "optional",
+        prompt: String(step.prompt || "Use optional effect?"),
+        min: 1,
+        max: 1,
+        mode: "select",
+        options: [
+          { id: "optional:yes", label: "Yes", data: { use: true } },
+          { id: "optional:no", label: "No", data: { use: false } },
+        ],
+        context: {
+          apply: "optional_steps",
+          steps: optionalSteps,
+          else_steps: optionalElseSteps,
+        },
+      });
+      return;
+    }
     if (op === "REPEAT_OPTIONAL") {
       const min = Math.max(0, Number(step.min || 0));
       const max = Math.max(min, Number(step.max || 0));
@@ -945,7 +2439,15 @@ function executeUntilChoice(state: any) {
       });
       return;
     }
-    if (op === "IF_CONDITION") {
+    if (op === "IF") {
+      const matched = evaluateTacticIf(state, ownerSeat, vars, step.when);
+      const branch = matched
+        ? (Array.isArray(step.then) ? step.then : [])
+        : (Array.isArray(step.else) ? step.else : []);
+      effect.steps.splice(effect.cursor, 1, ...branch);
+      continue;
+    }
+        if (op === "IF_CONDITION") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
       const branch = found && hasCondition(found.cr, String(step.condition || "")) ? step.then : step.else;
@@ -970,6 +2472,18 @@ function executeUntilChoice(state: any) {
         uses: Math.max(1, Number(step.uses || 1)),
         expires: String(step.expires || "end_of_turn"),
       };
+      effect.cursor++;
+      continue;
+    }
+    if (op === "SET_WITHDRAWAL_MODIFIER") {
+      const found = tacticCreatureTarget(state, ownerSeat, vars, step.target);
+      if (!found) throw new Error("withdrawal_modifier_target_missing");
+      runtimeV02InstallWithdrawalModifier(state, found.cr, step, {
+        source_controller_seat: ownerSeat as 1 | 2,
+        target_controller_seat: found.seat as 1 | 2,
+        source_card_uid: effect.source_card.uid,
+        source_action_id: effect.id,
+      });
       effect.cursor++;
       continue;
     }
@@ -1000,19 +2514,99 @@ function executeUntilChoice(state: any) {
       continue;
     }
     if (op === "SET_ATTACK_ELIGIBILITY") {
-      const targetSeat = playerSeat(ownerSeat, step.player || "self", vars);
-      const player = state.players[String(targetSeat)];
-      const anchor = topInst(player?.vanguard || null)?.uid || "";
-      if (!anchor) throw new Error("attack_eligibility_vanguard_missing");
-      state.turn_flags ||= {};
-      state.turn_flags[String(targetSeat)] ||= {};
-      state.turn_flags[String(targetSeat)].lifecycle_attack_eligibility = {
-        turn_seq: Number(state.turn_seq || 0),
-        mode: String(step.mode || "final_vanguard_only"),
-        anchor_uid: anchor,
-        expires: String(step.expires || "end_of_turn"),
-      };
+      const player = state.players[String(ownerSeat)];
+      runtimeV02InstallAttackEligibilityRule(
+        state,
+        ownerSeat,
+        player?.vanguard || null,
+        step,
+      );
       effect.cursor++;
+      continue;
+    }
+    if (op === "ATTACH_ESSENCE_FROM_ZONE" && step.cards != null) {
+      if (step.manual_attachment !== false) throw new Error("tcg_v0_2_tactic_selected_attachment_manual_flag_required");
+      if (String(step.zone || "") !== "discard") throw new Error(`unsupported_essence_attachment_source:${step.zone}`);
+      const token = typeof step.cards === "string" && step.cards.startsWith("$")
+        ? step.cards.slice(1)
+        : "";
+      if (!token || !selectCardsDescriptorMap(vars)[token]) {
+        throw new Error("tcg_v0_2_tactic_selected_attachment_source_required");
+      }
+      const refs = runtimeV02RebindSelectedCards(
+        state,
+        selectedCardRefs(resolveVar(vars, step.cards)),
+      );
+      if (refs.length > 1) {
+        throw new Error("tcg_v0_2_tactic_selected_attachment_multiple_not_supported");
+      }
+      const targetRef = resolveVar(vars, step.target) as CreatureRef;
+      const target = findCreature(state, targetRef);
+      if (!target) throw new Error("essence_attachment_target_missing");
+      const sourceSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      if (
+        refs.some((ref) =>
+          ref.zone_owner_seat !== sourceSeat || ref.zone !== "discard"
+        )
+      ) throw new Error("tcg_v0_2_tactic_selected_attachment_source_changed");
+      const attachment = runtimeV02NormalizeEffectAttachmentState(step.attachment_state);
+      effect.cursor++;
+      if (!refs.length) continue;
+      const targetTop = topInst(target.cr);
+      if (!targetTop) throw new Error("tcg_v0_2_tactic_attachment_target_top_required");
+      const ref = refs[0];
+      const routed = runtimeV02BeginExternalEssenceAttachmentRoute(
+        state,
+        Number(target.seat) as 1 | 2,
+        targetTop.uid,
+        ref.uid,
+        "discard",
+        effect.id,
+        {
+          ...attachment.transaction,
+          phase: "effect_resolution",
+          action_kind: "effect_driven",
+          destination_index: target.where === "reserve" ? target.index : null,
+          source_owner_seat: sourceSeat as 1 | 2,
+          source_card_id: ref.card_id,
+        },
+      );
+      if (routed.flow.status === "player_choice_required") {
+        throw new Error("tcg_v0_2_tactic_attachment_event_choice_not_yet_supported");
+      }
+      const movementFlow = routed.flow.emitted_movement_events.length
+        ? runtimeV02BeginMovementListenerContinuation(
+          state,
+          routed.flow.emitted_movement_events,
+        )
+        : {
+          status: "complete",
+          processed_listener_keys: [],
+          emitted_heal_packet_ids: [],
+          pending_choice: null,
+        };
+      if (movementFlow.status === "player_choice_required") {
+        if (routed.flow.emitted_heal_packet_ids.length) {
+          throw new Error("tcg_v0_2_tactic_attachment_movement_choice_with_prior_heal_not_yet_supported");
+        }
+        setTacticMovementResume(state, effect);
+        return;
+      }
+      const healPacketIds = [
+        ...routed.flow.emitted_heal_packet_ids,
+        ...movementFlow.emitted_heal_packet_ids,
+      ];
+      if (healPacketIds.length) {
+        const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+          state,
+          healPacketIds,
+          effect.owner_seat as 1 | 2,
+        );
+        if (healFlow.status === "player_choice_required") {
+          setTacticHealResume(state, effect);
+          return;
+        }
+      }
       continue;
     }
     if (op === "ATTACH_ESSENCE_FROM_ZONE") {
@@ -1054,7 +2648,16 @@ function executeUntilChoice(state: any) {
     throw new Error(`unknown_effect_op:${op}`);
   }
 
-  if (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_movement_listener_choice && effect.cursor >= effect.steps.length) finishEffect(state, effect);
+  if (
+    !state.pending_choice &&
+    !state.pending_heal_listener_choice &&
+    !state.pending_event_listener_choice &&
+    !state.pending_movement_listener_choice &&
+    effect.cursor >= effect.steps.length
+  ) {
+    if (drainTacticHiddenInformationEvents(state, effect)) return;
+    finishEffect(state, effect);
+  }
 }
 
 function applyPendingChoice(state: any, selected: ChoiceOption[]) {
@@ -1067,14 +2670,91 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   let movementFlow: ReturnType<typeof runtimeV02BeginMovementListenerContinuation> | null = null;
   const attachmentHealPacketIds: string[] = [];
 
-  if (apply === "set_var") {
+  if (apply === "bind_bound_set_choice") {
+    const descriptor = context.descriptor as RuntimeV02ChooseFromSetDescriptor;
+    const sourceToken = String(context.source_token || "");
+    const provenance = boundDeckSetProvenanceMap(vars)[sourceToken];
+    if (!provenance) {
+      throw new Error("tcg_v0_2_tactic_bound_set_provenance_missing");
+    }
+    const source = runtimeV02RebindBoundDeckSet(state, provenance);
+    const selectedRefs = selected.map((option) => option.data.ref);
+    const resolved = runtimeV02ResolveBoundSetChoice(
+      state,
+      descriptor,
+      source,
+      selectedRefs,
+    );
+    vars[descriptor.as] = resolved.map((card) => ({ ...card }));
+    boundSetParentTokenMap(vars)[descriptor.as] = sourceToken;
+  } else if (apply === "inspect_reward") {
+    const descriptor = context.descriptor as RuntimeV02InspectZoneDescriptor;
+    const option = selected[0]?.data?.option as RuntimeV02RewardInspectionChoiceOption | undefined;
+    if (!option) throw new Error("tcg_v0_2_tactic_reward_inspection_option_required");
+    const view = runtimeV02ResolveRewardInspectionChoice(
+      state,
+      effect.owner_seat,
+      Number(context.zone_owner_seat),
+      descriptor,
+      option,
+    );
+    vars[descriptor.as] = view.cards.map((card) => ({
+      uid: card.uid,
+      card_id: card.card_id,
+    }));
+  } else if (apply === "select_cards") {
+    const descriptor = context.descriptor as RuntimeV02SelectCardsDescriptor;
+    const refs = selected.map((option) => option.data.ref as RuntimeV02SelectedCardRef);
+    const rebound = runtimeV02ResolveSelectCards(
+      state,
+      effect.owner_seat,
+      descriptor,
+      refs,
+    );
+    vars[descriptor.as] = rebound;
+    selectCardsDescriptorMap(vars)[descriptor.as] = structuredClone(descriptor);
+  } else if (apply === "move_selected_cards") {
+    const token = String(context.source_token || "");
+    const source = selectedCardRefs(vars[token]);
+    const rebound = runtimeV02RebindSelectedCards(state, source);
+    const ordered = selected.map((option) => option.data.ref as RuntimeV02SelectedCardRef);
+    if (
+      ordered.length !== rebound.length ||
+      new Set(ordered.map((ref) => ref.uid)).size !== rebound.length ||
+      ordered.some((ref) =>
+        !rebound.some((current) =>
+          current.uid === ref.uid &&
+          current.card_id === ref.card_id &&
+          current.zone_owner_seat === ref.zone_owner_seat &&
+          current.zone === ref.zone
+        )
+      )
+    ) throw new Error("tcg_v0_2_tactic_selected_cards_order_stale");
+    commitSelectedCardMove(
+      state,
+      effect,
+      ordered,
+      Number(context.destination_seat),
+      String(context.destination || ""),
+    );
+  } else if (apply === "set_var") {
     const values = selected.map((option) => option.data as CreatureRef);
     vars[String(context.var_name)] = context.many ? values : (values[0] || null);
   } else if (apply === "set_var_cards") {
     const sourceStep = effect.steps[effect.cursor];
-    const source = (resolveVar(vars, sourceStep.source) || []) as Inst[];
+    const sourceToken = String(context.source_token || "");
+    const provenance = sourceToken
+      ? inspectionProvenanceMap(vars)[sourceToken]
+      : null;
+    const source = provenance
+      ? runtimeV02RebindInspectionRemainder(state, provenance)
+      : (resolveVar(vars, sourceStep.source) || []) as Inst[];
     const selectedIds = new Set(selected.map((option) => String(option.data.uid)));
-    vars[String(context.var_name)] = source.filter((inst) => selectedIds.has(inst.uid));
+    const variable = String(context.var_name);
+    vars[variable] = source.filter((inst) => selectedIds.has(inst.uid));
+    if (provenance) {
+      inspectionParentTokenMap(vars)[variable] = sourceToken;
+    }
   } else if (apply === "set_var_player") {
     vars[String(context.var_name)] = selected[0]?.data?.player || null;
   } else if (apply === "hand_to_discard" || apply === "hand_to_bottom") {
@@ -1176,6 +2856,93 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       }
       runtimeV02CommitCardZoneTransfer(player.discard as Inst[], player.deck as Inst[], preflight);
     }
+  } else if (apply === "order_bound_deck_remainder") {
+    const token = String(context.provenance_token || "");
+    const provenance = boundDeckSetProvenanceMap(vars)[token];
+    if (!provenance) {
+      throw new Error("tcg_v0_2_tactic_bound_set_provenance_missing");
+    }
+    const zoneSeat = Number(context.zone_seat);
+    if (zoneSeat !== provenance.zone_owner_seat) {
+      throw new Error("tcg_v0_2_tactic_bound_set_reorder_owner_changed");
+    }
+    const current = runtimeV02RebindBoundDeckSet(state, provenance);
+    const ordered = selected.map((option) => ({
+      uid: String(option.data.uid),
+      card_id: String(option.data.card_id),
+    }));
+    if (
+      ordered.length !== current.length ||
+      new Set(ordered.map((card) => card.uid)).size !== current.length ||
+      ordered.some((card) =>
+        !current.some((now) =>
+          now.uid === card.uid && now.card_id === card.card_id
+        )
+      )
+    ) {
+      throw new Error("tcg_v0_2_tactic_bound_set_reorder_changed");
+    }
+    const destination = String(context.destination || "");
+    if (destination !== "deck_top" && destination !== "deck_bottom") {
+      throw new Error(
+        `tcg_v0_2_tactic_bound_set_reorder_destination_unsupported:${destination}`,
+      );
+    }
+    const player = state.players[String(zoneSeat)];
+    applyTacticDeckReorder(state, effect, player.deck as Inst[], {
+      cause: "effect",
+      action_kind: "tactic",
+      source_action_id: effect.id,
+      source_card_uid: effect.source_card.uid,
+      zone: {
+        controller_seat: zoneSeat as 1 | 2,
+        zone: "deck",
+        owner_card_uid: null,
+      },
+      card_uids: ordered.map((card) => card.uid),
+      destination_position: destination === "deck_bottom" ? "bottom" : "top",
+    });
+    vars[token] = ordered.map((card) => ({ ...card }));
+    if (destination === "deck_bottom") {
+      delete boundDeckSetProvenanceMap(vars)[token];
+    }
+  } else if (apply === "order_inspected_deck_top") {
+    const token = String(context.provenance_token || "");
+    const provenance = inspectionProvenanceMap(vars)[token];
+    if (!provenance) throw new Error("tcg_v0_2_tactic_inspection_provenance_missing");
+    const zoneSeat = Number(context.zone_seat);
+    if (zoneSeat !== provenance.zone_owner_seat) {
+      throw new Error("tcg_v0_2_tactic_inspection_reorder_owner_changed");
+    }
+    const current = runtimeV02RebindInspectionRemainder(state, provenance);
+    const ordered = selected.map((option) => ({
+      uid: String(option.data.uid),
+      card_id: String(option.data.card_id),
+    }));
+    if (
+      ordered.length !== current.length ||
+      new Set(ordered.map((card) => card.uid)).size !== current.length ||
+      ordered.some((card) =>
+        !current.some((now) =>
+          now.uid === card.uid && now.card_id === card.card_id
+        )
+      )
+    ) throw new Error("tcg_v0_2_tactic_inspection_reorder_changed");
+    const player = state.players[String(zoneSeat)];
+    applyTacticDeckReorder(state, effect, player.deck as Inst[], {
+      cause: "effect",
+      action_kind: "tactic",
+      source_action_id: effect.id,
+      source_card_uid: effect.source_card.uid,
+      zone: {
+        controller_seat: zoneSeat as 1 | 2,
+        zone: "deck",
+        owner_card_uid: null,
+      },
+      card_uids: ordered.map((card) => card.uid),
+      destination_position: "top",
+    });
+    vars[token] = ordered.map((card) => ({ ...card }));
   } else if (apply === "ordered_move") {
     const ordered: Inst[] = selected.map((option) => ({
       uid: String(option.data.uid),
@@ -1262,6 +3029,13 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
     if (attachmentMovementEvents.length) {
       movementFlow = runtimeV02BeginMovementListenerContinuation(state, attachmentMovementEvents);
     }
+  } else if (apply === "optional_steps") {
+    const use = selected[0]?.data?.use === true;
+    const branch = use ? context.steps : context.else_steps;
+    const chosen = structuredClone((Array.isArray(branch) ? branch : []) as any[]);
+    effect.steps.splice(effect.cursor, 1, ...chosen);
+    delete state.pending_choice;
+    return;
   } else if (apply === "repeat_optional") {
     const count = Number(selected[0]?.data?.count || 0);
     const repeated: any[] = [];
@@ -1321,7 +3095,7 @@ Deno.serve(async (req) => {
     }
     const action = String(body.action || "").trim();
     if (action === "ping") return json({ ok: true, version: VERSION, user_id: userId, effect_schema: EFFECT_SCHEMA });
-    if (!["play_tactic", "resolve_choice"].includes(action)) return json({ ok: false, version: VERSION, error: "unknown_action" }, 400);
+    if (!["play_tactic", "play_tactic_preview", "resolve_choice"].includes(action)) return json({ ok: false, version: VERSION, error: "unknown_action" }, 400);
 
     const matchId = String(body.match_id || "").trim();
     const nonce = String(body.client_nonce || "").trim();
@@ -1379,52 +3153,35 @@ Deno.serve(async (req) => {
       });
     };
 
+    if (action === "play_tactic_preview") {
+      const preview = tacticPlayability(state, seat, body.card_uid);
+      return json({
+        ok: true,
+        version: VERSION,
+        result: {
+          card_uid: String(body.card_uid || "").trim(),
+          eligible: preview.eligible,
+          reason: preview.reason,
+          subtype: preview.subtype,
+          unsupported_ops: preview.unsupported_ops,
+        },
+      });
+    }
+
     if (action === "play_tactic") {
-      if (state.phase !== "play" || Number(state.active_seat) !== seat) {
-        return json({ ok: false, version: VERSION, error: "not_active_player" }, 400);
-      }
-      if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_movement_resume) {
-        return json({ ok: false, version: VERSION, error: "effect_resolution_already_pending" }, 409);
-      }
-
-      const player = state.players[String(seat)];
-      const uid = String(body.card_uid || "").trim();
-      const index = player.hand.findIndex((inst: Inst) => inst.uid === uid);
-      if (index < 0) return json({ ok: false, version: VERSION, error: "tactic_not_in_hand" }, 400);
-      const source = player.hand[index] as Inst;
-      const d = definition(state, source) || {};
-      const engine = d.engine_effects || null;
-      if (String(d.card_family || d.kind || "") !== "Tactic" || engine?.schema !== EFFECT_SCHEMA) {
-        return json({ ok: false, version: VERSION, error: "structured_tactic_required" }, 400);
-      }
-
-      const subtype = String(d.tactic_subtype || d.family || engine.subtype || "");
-      if (
-        subtype === "Ally" &&
-        Number(state.first_player_seat) === seat &&
-        Number(state.personal_turns?.[String(seat)] || 0) === 1
-      ) {
-        return json({ ok: false, version: VERSION, error: "first_player_cannot_play_ally_on_first_turn" }, 400);
-      }
-      if (!checkPlayRequirements(state, seat, engine.play_requirements || [])) {
-        return json({ ok: false, version: VERSION, error: "tactic_play_requirement_not_met" }, 400);
-      }
-      if (!firstRequiredCreatureTargetAvailable(state, seat, engine.steps || [])) {
-        return json({ ok: false, version: VERSION, error: "required_tactic_target_unavailable" }, 400);
-      }
-      if (!requiredEffectResourcesAvailable(state, seat, engine.steps || [])) {
-        return json({ ok: false, version: VERSION, error: "required_tactic_resource_unavailable" }, 400);
-      }
-      const unsupported = unsupportedOps(engine.steps || []);
-      if (unsupported.length) {
+      const playability = tacticPlayability(state, seat, body.card_uid);
+      if (!playability.eligible) {
+        const status = playability.reason === "effect_resolution_already_pending" || playability.reason === "tactic_lifecycle_contract_unsupported" ? 409 : 400;
         return json({
           ok: false,
           version: VERSION,
-          error: "tactic_lifecycle_contract_unsupported",
-          unsupported_ops: unsupported,
-        }, 409);
+          error: playability.reason,
+          ...(playability.unsupported_ops.length ? { unsupported_ops: playability.unsupported_ops } : {}),
+        }, status);
       }
 
+      const player = state.players[String(seat)];
+      const { index, source, definition: d, engine, subtype } = playability;
       player.hand.splice(index, 1);
       state.phase = "effect_resolution";
       state.effect_resolution = {
@@ -1446,6 +3203,7 @@ Deno.serve(async (req) => {
         card_id: source.card_id,
         subtype,
         pending_choice: !!state.pending_choice,
+        pending_event_listener_choice: !!state.pending_event_listener_choice,
         pending_heal_listener_choice: !!state.pending_heal_listener_choice,
         pending_movement_listener_choice: !!state.pending_movement_listener_choice,
       });
@@ -1454,13 +3212,138 @@ Deno.serve(async (req) => {
         version: VERSION,
         result,
         pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_event_listener_choice: runtimeV02PendingEventListenerChoiceView(state.pending_event_listener_choice || null, seat as 1 | 2),
         pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
+        private_event_inspection: runtimeV02PrivateEventInspectionView(state, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
       });
     }
 
     const effect = state.effect_resolution as EffectState | null;
+    const eventPending = state.pending_event_listener_choice as RuntimeV02PendingEventListenerChoice | null;
+    if (eventPending) {
+      if (!effect || state.phase !== "effect_resolution") {
+        return json({ ok: false, version: VERSION, error: "no_tactic_event_choice_pending" }, 400);
+      }
+      let resolved;
+      try {
+        readTacticEventResume(state, effect);
+        const ids = Array.isArray(body.choice_ids)
+          ? body.choice_ids.map((value: unknown) => String(value))
+          : [];
+        resolved = runtimeV02ResolveEventListenerChoice(
+          state,
+          seat as 1 | 2,
+          String(body.choice_id || ""),
+          ids,
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message === "tcg_v0_2_event_listener_choice_not_yours") {
+          return json({ ok: false, version: VERSION, error: message }, 403);
+        }
+        if (
+          message.includes("_stale") ||
+          message.includes("_turn_stale") ||
+          message.includes("_owner_changed") ||
+          message.includes("_cursor_changed")
+        ) {
+          return json({ ok: false, version: VERSION, error: message }, 409);
+        }
+        if (
+          message.startsWith("tcg_v0_2_event_listener_choice_") ||
+          message.startsWith("tcg_v0_2_tactic_event_resume_")
+        ) {
+          return json({ ok: false, version: VERSION, error: message }, 400);
+        }
+        throw error;
+      }
+      const eventAudit = eventListenerAudit(resolved);
+      if ((resolved.emitted_movement_events || []).length) {
+        throw new Error(
+          "tcg_v0_2_tactic_hidden_event_movement_output_not_yet_supported",
+        );
+      }
+      if (resolved.status === "player_choice_required") {
+        const result = await commit("resolve_tactic_event_listener_choice", {
+          seat,
+          pending_choice: true,
+          event_listener: eventAudit,
+        });
+        return json({
+          ok: true,
+          version: VERSION,
+          result,
+          pending_choice: choiceView(state.pending_choice || null, seat),
+          pending_event_listener_choice:
+            runtimeV02PendingEventListenerChoiceView(
+              resolved.pending_choice,
+              seat as 1 | 2,
+            ),
+          pending_heal_listener_choice: null,
+          pending_movement_listener_choice: null,
+          private_event_inspection:
+            runtimeV02PrivateEventInspectionView(state, seat as 1 | 2),
+          private_movement_inspection:
+            runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+          private_reward_inspection:
+            runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
+        });
+      }
+      delete state.pending_tactic_event_resume;
+      if ((resolved.emitted_heal_packet_ids || []).length) {
+        const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+          state,
+          resolved.emitted_heal_packet_ids,
+          effect.owner_seat as 1 | 2,
+        );
+        if (healFlow.status === "player_choice_required") {
+          setTacticHealResume(state, effect);
+        }
+      }
+      const hiddenPending = state.pending_heal_listener_choice
+        ? true
+        : drainTacticHiddenInformationEvents(state, effect);
+      if (!hiddenPending) executeUntilChoice(state);
+      const result = await commit("resolve_tactic_event_listener_choice", {
+        seat,
+        pending_choice: !!state.pending_choice,
+        pending_event_listener_choice: !!state.pending_event_listener_choice,
+        pending_heal_listener_choice: !!state.pending_heal_listener_choice,
+        pending_movement_listener_choice: !!state.pending_movement_listener_choice,
+        event_listener: eventAudit,
+      });
+      return json({
+        ok: true,
+        version: VERSION,
+        result,
+        pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_event_listener_choice:
+          runtimeV02PendingEventListenerChoiceView(
+            state.pending_event_listener_choice || null,
+            seat as 1 | 2,
+          ),
+        pending_heal_listener_choice:
+          runtimeV02PendingHealListenerChoiceView(
+            state.pending_heal_listener_choice || null,
+            seat as 1 | 2,
+          ),
+        pending_movement_listener_choice:
+          runtimeV02PendingMovementListenerChoiceView(
+            state.pending_movement_listener_choice || null,
+            seat as 1 | 2,
+          ),
+        private_event_inspection:
+          runtimeV02PrivateEventInspectionView(state, seat as 1 | 2),
+        private_movement_inspection:
+          runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection:
+          runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
+      });
+    }
+
     const movementPending = state.pending_movement_listener_choice as RuntimeV02PendingMovementListenerChoice | null;
     if (movementPending) {
       if (!effect || state.phase !== "effect_resolution") {
@@ -1494,6 +3377,7 @@ Deno.serve(async (req) => {
           pending_heal_listener_choice: null,
           pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(resolved.pending_choice, seat as 1 | 2),
           private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
         });
       }
       delete state.pending_tactic_movement_resume;
@@ -1501,7 +3385,10 @@ Deno.serve(async (req) => {
         const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, resolved.emitted_heal_packet_ids, effect.owner_seat as 1 | 2);
         if (healFlow.status === "player_choice_required") setTacticHealResume(state, effect);
       }
-      executeUntilChoice(state);
+      const movementHiddenPending = state.pending_heal_listener_choice
+        ? true
+        : drainTacticHiddenInformationEvents(state, effect);
+      if (!movementHiddenPending) executeUntilChoice(state);
       const result = await commit("resolve_tactic_movement_listener_choice", {
         seat,
         pending_choice: !!state.pending_choice,
@@ -1517,6 +3404,7 @@ Deno.serve(async (req) => {
         pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
       });
     }
 
@@ -1556,13 +3444,15 @@ Deno.serve(async (req) => {
           pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(resolved.pending_choice, seat as 1 | 2),
           pending_movement_listener_choice: null,
           private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
         });
       }
       if (!resolved.resume_ready || resolved.resume_seat == null || resolved.resume_seat !== effect.owner_seat) {
         throw new Error("tcg_v0_2_tactic_heal_resume_not_ready");
       }
       delete state.pending_tactic_heal_resume;
-      executeUntilChoice(state);
+      const healHiddenPending = drainTacticHiddenInformationEvents(state, effect);
+      if (!healHiddenPending) executeUntilChoice(state);
       const result = await commit("resolve_tactic_heal_listener_choice", {
         seat,
         pending_choice: !!state.pending_choice,
@@ -1578,6 +3468,7 @@ Deno.serve(async (req) => {
         pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
       });
     }
 
@@ -1599,6 +3490,7 @@ Deno.serve(async (req) => {
       kind: pending.kind,
       selected_count: selected.length,
       pending_choice: !!state.pending_choice,
+      pending_event_listener_choice: !!state.pending_event_listener_choice,
       pending_heal_listener_choice: !!state.pending_heal_listener_choice,
       pending_movement_listener_choice: !!state.pending_movement_listener_choice,
     });
@@ -1610,6 +3502,7 @@ Deno.serve(async (req) => {
       pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
       pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
       private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        private_reward_inspection: runtimeV02PrivateRewardInspectionView(state, seat as 1 | 2),
     });
   } catch (error) {
     return json({ ok: false, version: VERSION, error: error instanceof Error ? error.message : String(error) }, 500);

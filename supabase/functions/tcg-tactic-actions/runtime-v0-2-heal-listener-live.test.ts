@@ -1,9 +1,11 @@
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import {
   runtimeV02BeginAttackHealListenerContinuation,
+  runtimeV02BeginAttackProgramHealListenerContinuation,
   runtimeV02BeginTacticHealListenerContinuation,
   runtimeV02PendingHealListenerChoiceView,
   runtimeV02ResolveAttackHealListenerChoice,
+  runtimeV02ResolveAttackProgramHealListenerChoice,
   runtimeV02ResolveTacticHealListenerChoice,
   type RuntimeV02PendingHealListenerChoice,
 } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
@@ -359,6 +361,35 @@ Deno.test("tactic heal facade uses its own resume kind and releases only after t
 
   const resolved = runtimeV02ResolveTacticHealListenerChoice(s, 1, choice.id, ["decline"]);
   assertEquals(resolved.accepted, false);
+  assertEquals(resolved.resume_ready, true);
+  assertEquals(resolved.resume_seat, 1);
+  assertEquals(resolved.pending_choice, null);
+  assertEquals(s.pending_heal_listener_choice, undefined);
+  assertEquals(s.pending_heal_listener_resume, undefined);
+});
+
+Deno.test("mixed Attack program heal facade resumes the program instead of ending the attack", () => {
+  const { s } = makeState();
+  const packet = attackHeal(s, 0);
+  const flow = runtimeV02BeginAttackProgramHealListenerContinuation(
+    s,
+    [packet.id],
+    1,
+  );
+  assertEquals(flow.status, "player_choice_required");
+  assertEquals(s.pending_heal_listener_resume, {
+    kind: "resume_attack_program",
+    seat: 1,
+    turn_seq: 33,
+  });
+
+  const choice = pending(s);
+  const resolved = runtimeV02ResolveAttackProgramHealListenerChoice(
+    s,
+    1,
+    choice.id,
+    ["decline"],
+  );
   assertEquals(resolved.resume_ready, true);
   assertEquals(resolved.resume_seat, 1);
   assertEquals(resolved.pending_choice, null);

@@ -1,5 +1,4 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
-import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
 import { runtimeConditions } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import type { RuntimeV02EssenceAttachedListenerEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
 
@@ -23,7 +22,11 @@ export type RuntimeV02EssenceAttachedEligibilitySnapshot = {
     element: string;
     essence_subtype: string | null;
   };
-  voluntary_withdrawal_legal_with_incoming: boolean;
+  voluntary_withdrawal_legal_with_incoming: boolean | null;
+};
+
+export type RuntimeV02EssenceAttachedEligibilityOptions = {
+  voluntary_withdrawal_legal_with_incoming?: boolean;
 };
 
 export type RuntimeV02EssenceAttachedPredicateContext = {
@@ -119,38 +122,6 @@ function conditionNames(cr: Cr): string[] {
   if (current.modifier) names.push(current.modifier);
   return names;
 }
-function printedWithdrawal(definition: Record<string, unknown>): number {
-  const cr = O(definition.creature);
-  const value = Number(cr?.withdrawal ?? definition.withdrawal ?? definition.withdraw ?? 0);
-  if (!Number.isFinite(value) || value < 0) {
-    throw new Error("tcg_v0_2_attachment_snapshot_withdrawal_printed_invalid");
-  }
-  return value;
-}
-function withdrawalLegal(state: Record<string, unknown>, controllerSeat: 1 | 2, incoming: Field): boolean {
-  if (Number(state.active_seat) !== controllerSeat || incoming.where !== "reserve") return false;
-  const owner = player(state, controllerSeat);
-  const flags = O(O(state.turn_flags)?.[String(controllerSeat)]);
-  if (Number(flags?.withdraw_turn ?? -1) === TURN(state)) return false;
-  const vanguard = creature(owner.vanguard);
-  if (!vanguard) return false;
-  const conditions = runtimeConditions(vanguard);
-  if (conditions.control === "Stunned" || conditions.control === "Rooted") return false;
-  const top = vanguard.stack[vanguard.stack.length - 1];
-  const definition = runtimeV02Definition(state, top);
-  if (!definition) throw new Error("tcg_v0_2_attachment_snapshot_vanguard_definition_missing");
-  const element = S(definition.element, "tcg_v0_2_attachment_snapshot_vanguard_element_missing");
-  const base = printedWithdrawal(definition);
-  const structured = structuredRuntimeWithdrawalBaseCost(
-    state,
-    vanguard,
-    base,
-    element,
-    conditions.modifier === "Crushed",
-  );
-  const cost = Math.max(0, structured == null ? base : structured);
-  return vanguard.essence.length >= cost;
-}
 function subjectMatches(snapshot: RuntimeV02EssenceAttachedEligibilitySnapshot, filtersRaw: unknown): boolean {
   const filters = O(filtersRaw) || {};
   if (filters.card_family != null && snapshot.subject.card_family !== String(filters.card_family)) return false;
@@ -175,6 +146,7 @@ function targetReferenceMatchesSnapshot(
 export function runtimeV02SnapshotEssenceAttachedEligibility(
   state: Record<string, unknown>,
   event: RuntimeV02EssenceAttachedListenerEvent,
+  options: RuntimeV02EssenceAttachedEligibilityOptions = {},
 ): RuntimeV02EssenceAttachedEligibilitySnapshot {
   if (event.event !== "essence_attached" || event.turn_seq !== TURN(state)) {
     throw new Error("tcg_v0_2_attachment_snapshot_event_invalid");
@@ -220,7 +192,8 @@ export function runtimeV02SnapshotEssenceAttachedEligibility(
       element: subjectElement,
       essence_subtype: subtype == null ? null : String(subtype),
     },
-    voluntary_withdrawal_legal_with_incoming: withdrawalLegal(state, event.controller_seat, target),
+    voluntary_withdrawal_legal_with_incoming:
+      options.voluntary_withdrawal_legal_with_incoming ?? null,
   } satisfies RuntimeV02EssenceAttachedEligibilitySnapshot);
 }
 
@@ -287,6 +260,9 @@ export function runtimeV02EssenceAttachedSnapshotPredicate(
     case "voluntary_withdrawal_legal_with_incoming":
       if (String(value.player || "self") !== "self" || String(value.incoming_target || "") !== "$attached_creature") {
         throw new Error("tcg_v0_2_attachment_snapshot_withdrawal_shape_unsupported");
+      }
+      if (snapshot.voluntary_withdrawal_legal_with_incoming == null) {
+        throw new Error("tcg_v0_2_attachment_snapshot_withdrawal_quote_required");
       }
       return snapshot.voluntary_withdrawal_legal_with_incoming;
     default:

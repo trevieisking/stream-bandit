@@ -47,6 +47,30 @@ Deno.test("after-heal dispatcher resolves Shellip and Symbiote while deferring M
   assertEquals(moonlit.effect_flags, undefined, "deferred Realm choice must not consume its limit early");
 });
 
+Deno.test("Symbiote target_stage_in rejects an attached Baby source", () => {
+  const { s } = state();
+  (s.card_index as any)["test-grove-source"].definition_v0_2.creature.stage = "Baby";
+  const result = dispatchRuntimeV02AfterHealPacket(s, attackHealShellip(s).id)!;
+  const p = (s.players as any)["1"];
+  assertEquals(result.resolved.map((item: any) => item.listener_id), ["tidepool-shell"]);
+  assertEquals(result.deferred.map((item: any) => item.listener_id), ["moonlit-reef-filter"]);
+  assertEquals(result.emitted_packet_ids, []);
+  assertEquals(p.vanguard.damage, 20);
+  assertEquals(p.reserve[0].shield, 10);
+});
+
+Deno.test("Symbiote target_element_is rejects a non-Grove attached source", () => {
+  const { s } = state();
+  (s.card_index as any)["test-grove-source"].definition_v0_2.element = "Stone";
+  const result = dispatchRuntimeV02AfterHealPacket(s, attackHealShellip(s).id)!;
+  const p = (s.players as any)["1"];
+  assertEquals(result.resolved.map((item: any) => item.listener_id), ["tidepool-shell"]);
+  assertEquals(result.deferred.map((item: any) => item.listener_id), ["moonlit-reef-filter"]);
+  assertEquals(result.emitted_packet_ids, []);
+  assertEquals(p.vanguard.damage, 20);
+  assertEquals(p.reserve[0].shield, 10);
+});
+
 Deno.test("source instance turn limits block a second trigger and reset next turn", () => {
   const { s } = state(); dispatchRuntimeV02AfterHealPacket(s, attackHealShellip(s).id);
   const p = (s.players as any)["1"]; p.reserve[0].damage = 10;

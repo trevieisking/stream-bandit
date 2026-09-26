@@ -49,8 +49,12 @@ export type RuntimeV02ConditionApplicationSourceContext = Omit<
   "new_application" | "condition" | "condition_slot"
 >;
 
+export type RuntimeV02ConditionChangeKind = "apply" | "replace";
+
 export type RuntimeV02ConditionApplyWithContextResult = RuntimeV02ConditionApplyResult & {
   protection: RuntimeV02ConditionProtectionReceipt | null;
+  condition_slot: RuntimeV02ConditionProtectionSlot;
+  change_kind: RuntimeV02ConditionChangeKind | null;
 };
 
 export const runtimeV02ConditionNames = [
@@ -288,6 +292,24 @@ export function applyRuntimeCondition(
  * consumed only when the underlying condition application is otherwise legal
  * and would newly add/replace that condition.
  */
+function runtimeV02ConditionIdentityInSlot(
+  creature: RuntimeV02ConditionCreature,
+  slot: RuntimeV02ConditionProtectionSlot,
+): string | null {
+  const current = runtimeConditions(creature);
+  if (slot === "scorched") return current.scorched ? "Scorched" : null;
+  if (slot === "venomed") return current.venomed > 0 ? "Venomed" : null;
+  return current[slot] ? String(current[slot]) : null;
+}
+
+function runtimeV02ConditionChangeKind(
+  before: string | null,
+  after: string | null,
+): RuntimeV02ConditionChangeKind | null {
+  if (before === after || after == null) return null;
+  return before == null ? "apply" : "replace";
+}
+
 export function applyRuntimeConditionWithContext(
   creature: RuntimeV02ConditionCreature,
   condition: string,
@@ -299,20 +321,29 @@ export function applyRuntimeConditionWithContext(
     throw new Error("tcg_v0_2_condition_application_turn_mismatch");
   }
   if (!CONDITION_NAMES.has(condition)) throw new Error(`unknown_condition:${condition}`);
+  const conditionSlot = runtimeV02ConditionSlot(condition);
+  const beforeIdentity = runtimeV02ConditionIdentityInSlot(creature, conditionSlot);
 
   // Prove the ordinary condition owner would accept the operation first. This
   // prevents a protection use from being consumed by an application that was
   // already illegal because its slot was occupied or legacy immunity applied.
   const previewCreature = structuredClone(creature) as RuntimeV02ConditionCreature;
   const preview = applyRuntimeCondition(previewCreature, condition, turnSeq, mode);
-  if (!preview.applied || preview.prevented) return { ...preview, protection: null };
+  if (!preview.applied || preview.prevented) {
+    return {
+      ...preview,
+      protection: null,
+      condition_slot: conditionSlot,
+      change_kind: null,
+    };
+  }
 
   const newApplication = !hasRuntimeCondition(creature, condition);
   const protection = runtimeV02ConsumeConditionProtection(creature, {
     ...sourceContext,
     turn_seq: turnSeq,
     condition,
-    condition_slot: runtimeV02ConditionSlot(condition),
+    condition_slot: conditionSlot,
     new_application: newApplication,
   });
   if (protection.prevented) {
@@ -321,8 +352,19 @@ export function applyRuntimeConditionWithContext(
       prevented: true,
       reason: "condition_protection",
       protection,
+      condition_slot: conditionSlot,
+      change_kind: null,
     };
   }
 
-  return { ...applyRuntimeCondition(creature, condition, turnSeq, mode), protection };
+  const applied = applyRuntimeCondition(creature, condition, turnSeq, mode);
+  const afterIdentity = runtimeV02ConditionIdentityInSlot(creature, conditionSlot);
+  return {
+    ...applied,
+    protection,
+    condition_slot: conditionSlot,
+    change_kind: applied.applied && !applied.prevented
+      ? runtimeV02ConditionChangeKind(beforeIdentity, afterIdentity)
+      : null,
+  };
 }

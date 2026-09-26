@@ -50,6 +50,32 @@ function drainAbility() {
   };
 }
 
+function conditionReplacementAbility() {
+  return {
+    id: "route-condition-replacement",
+    name: "Route Condition Replacement",
+    mode: "active",
+    event: null,
+    timing: "own_turn",
+    limit: { scope: "turn", count: 1, owner: "controller" },
+    requirements: {
+      all: [{
+        predicate: "control_condition_present",
+        target: "$current_opponent_vanguard",
+        exclude_condition: "Mindbound",
+      }],
+    },
+    costs: [],
+    steps: [{
+      op: "REPLACE_CONTROL_CONDITION",
+      target: "$current_opponent_vanguard",
+      condition: "Mindbound",
+      allow_if_empty: false,
+      replace_existing: true,
+    }],
+  };
+}
+
 function rewardInspectionAbility() {
   return {
     id: "route-inspect-reward",
@@ -186,6 +212,43 @@ Deno.test("single active Ability live router chooses immediate program without m
   assertEquals((s.players["2"].vanguard as { damage: number }).damage, 10);
   assertEquals((s as Record<string, unknown>).pending_ability_choice, undefined);
   assertEquals(runtimeV02CurrentTurnActiveAbilityUseCount(s, 1, "route-drain"), 1);
+});
+
+Deno.test("single active Ability live router selects generic condition replacement without using Drain immediate semantics", () => {
+  const s = state(conditionReplacementAbility());
+  (s.players["2"].vanguard as Record<string, unknown>).conditions = {
+    scorched: false,
+    venomed: 0,
+    control: "Dazed",
+    modifier: null,
+  };
+  const route = runtimeV02BeginActiveAbilityLiveRoute(
+    s,
+    1,
+    source(),
+    defeatDescribe,
+    "unused-condition-choice-id",
+  );
+  if (!route || route.kind !== "condition_replacement") {
+    throw new Error("condition replacement route required");
+  }
+
+  assertEquals(
+    route.condition_replacement.kind,
+    "replace_opponent_vanguard_control_condition",
+  );
+  assertEquals(route.condition_replacement.previous_condition, "Dazed");
+  assertEquals(route.condition_replacement.resulting_condition, "Mindbound");
+  assertEquals(route.condition_replacement.applied, true);
+  assertEquals((s as Record<string, unknown>).pending_ability_choice, undefined);
+  assertEquals(
+    runtimeV02CurrentTurnActiveAbilityUseCount(
+      s,
+      1,
+      "route-condition-replacement",
+    ),
+    1,
+  );
 });
 
 Deno.test("single active Ability live router preserves existing Reward-inspection private-choice family", () => {

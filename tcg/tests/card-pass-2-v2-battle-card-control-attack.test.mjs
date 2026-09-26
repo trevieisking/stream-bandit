@@ -20,7 +20,7 @@ test('V2 battle surface makes the creature card the primary control without repl
   assert.match(surface, /stream-bandit-tcg-v2-battle-controller\.js/);
   assert.doesNotMatch(surface, /Debug/i);
   assert.ok(contract.input_modes.desktop.includes('click_select'));
-  assert.deepEqual(flow('creature_context').steps.slice(0, 3), ['select_creature', 'enlarge_card', 'show_ability_or_attack_slots']);
+  assert.deepEqual(flow('creature_context').steps.slice(0, 3), ['tap_or_click_compact_field_card', 'keep_source_card_anchored_in_its_board_slot', 'open_full_canonical_card_inspector']);
   assert.ok(contract.forbidden_client_patterns.includes('generic_global_attack_buttons_as_primary_attack_ui'));
   assert.ok(contract.forbidden_client_patterns.includes('debug_form_layout_as_release_battlefield'));
 });

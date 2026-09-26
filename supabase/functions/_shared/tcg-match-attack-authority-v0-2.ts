@@ -89,7 +89,7 @@ function declarationSourceControllerSeat(
   return null;
 }
 
-function declarationSourceAttachedEssenceKinds(
+export function runtimeV02AttackSourceAttachedEssenceKinds(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
 ): Array<"temporary" | "borrowed"> {
@@ -405,7 +405,7 @@ export function resolveRuntimeAttackAuthority(
     };
   }
 
-  if (!legacy) {
+  if (!legacy && structured.legacy_compatibility_required) {
     throw new Error(`tcg_v0_2_attack_legacy_compatibility_required:${structured.id}`);
   }
   if (structured.base_damage == null || structured.damage_source == null) {
@@ -414,8 +414,8 @@ export function resolveRuntimeAttackAuthority(
 
   const conditionalAddFormula = cloneConditionalAddFormula(structured.conditional_add_formula);
   return {
-    raw: legacy.raw,
-    effect: legacy.effect,
+    raw: legacy?.raw || "",
+    effect: legacy?.effect || "",
     starbound: structured.starbound,
     id: structured.id,
     name: structured.name,
@@ -426,7 +426,7 @@ export function resolveRuntimeAttackAuthority(
     damage_source: structured.damage_source,
     count_add_formula: cloneCountAddFormula(structured.count_add_formula),
     conditional_add_formula: conditionalAddFormula,
-    declaration_source_attached_essence_kinds: declarationSourceAttachedEssenceKinds(state, instanceOrId),
+    declaration_source_attached_essence_kinds: runtimeV02AttackSourceAttachedEssenceKinds(state, instanceOrId),
     declaration_current_turn_events: declarationCurrentTurnEvents(state, instanceOrId, conditionalAddFormula),
     declaration_previous_opponent_turn_events: declarationPreviousOpponentTurnEvents(state, instanceOrId, conditionalAddFormula),
     declaration_damage_history_evidence: declarationDamageHistoryEvidence(state, instanceOrId, conditionalAddFormula),

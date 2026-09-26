@@ -1,12 +1,13 @@
 import {
   addRuntimeShield,
-  applyRuntimeCondition,
   healRuntimeDamage,
-  placeRuntimeDamage,
   type ApplyConditionMode,
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import { applyRuntimeConditionWithContext } from "./tcg-match-condition-engine-v0-2.ts";
+import { runtimeV02EvaluateAttackIf } from "./tcg-match-attack-if-v0-2.ts";
+import { runtimeV02ApplyDirectDamage } from "./tcg-match-direct-damage-v0-2.ts";
 import {
   recordRuntimeV02AttackHealEachPackets,
   recordRuntimeV02AttackSelfHealPackets,
@@ -16,7 +17,16 @@ import {
 export type RuntimeV02AttackConditionTarget =
   | "$source_creature"
   | "$attack_target"
+  | "$bound_attack_target"
   | "$current_opponent_vanguard";
+
+export type RuntimeV02AttackConditionApplicationContext = {
+  source_controller_seat: 1 | 2;
+  attack_target_controller_seat: 1 | 2;
+  current_opponent_vanguard_controller_seat: 1 | 2;
+  active_seat: 1 | 2;
+  source_action_id: string;
+};
 
 export type RuntimeV02AttackConditionEffectResult = {
   target: RuntimeV02AttackConditionTarget;
@@ -25,6 +35,8 @@ export type RuntimeV02AttackConditionEffectResult = {
   applied: boolean;
   prevented: boolean;
   reason: string | null;
+  condition_slot: "scorched" | "venomed" | "control" | "modifier";
+  change_kind: "apply" | "replace" | null;
 };
 
 export type RuntimeV02AttackConditionPhaseResult = {
@@ -71,6 +83,7 @@ function targetToken(value: unknown, attackId: string, index: number): RuntimeV0
   if (
     target !== "$source_creature" &&
     target !== "$attack_target" &&
+    target !== "$bound_attack_target" &&
     target !== "$current_opponent_vanguard"
   ) {
     throw new Error(`tcg_v0_2_attack_condition_target_unsupported:${attackId}:${index}:${String(value)}`);
@@ -83,11 +96,14 @@ function resolveTarget(
   sourceCreature: RuntimeCreature,
   attackTarget: RuntimeCreature,
   currentOpponentVanguard: RuntimeCreature | null | undefined,
-): RuntimeCreature {
-  if (target === "$source_creature") return sourceCreature;
-  if (target === "$attack_target") return attackTarget;
+  context: RuntimeV02AttackConditionApplicationContext,
+): { creature: RuntimeCreature; controller_seat: 1 | 2 } {
+  if (target === "$source_creature") return { creature: sourceCreature, controller_seat: context.source_controller_seat };
+  if (target === "$attack_target" || target === "$bound_attack_target") {
+    return { creature: attackTarget, controller_seat: context.attack_target_controller_seat };
+  }
   if (!currentOpponentVanguard) throw new Error("tcg_v0_2_attack_condition_opponent_vanguard_missing");
-  return currentOpponentVanguard;
+  return { creature: currentOpponentVanguard, controller_seat: context.current_opponent_vanguard_controller_seat };
 }
 
 /**
@@ -105,6 +121,7 @@ export function structuredRuntimeAfterDamageConditionEffects(
   sourceCreature: RuntimeCreature,
   attackTarget: RuntimeCreature,
   currentOpponentVanguard: RuntimeCreature | null | undefined,
+  applicationContext: RuntimeV02AttackConditionApplicationContext,
 ): RuntimeV02AttackConditionPhaseResult | null {
   const definition = runtimeV02Definition(state, instanceOrId);
   if (!definition) return null;
@@ -152,8 +169,21 @@ export function structuredRuntimeAfterDamageConditionEffects(
   const turn = currentTurn(state);
   const effects = normalized.map((raw) => {
     const step = raw!;
-    const target = resolveTarget(step.target, sourceCreature, attackTarget, currentOpponentVanguard);
-    const result = applyRuntimeCondition(target, step.condition, turn, step.mode);
+    const target = resolveTarget(step.target, sourceCreature, attackTarget, currentOpponentVanguard, applicationContext);
+    const result = applyRuntimeConditionWithContext(
+      target.creature,
+      step.condition,
+      turn,
+      step.mode,
+      {
+        turn_seq: turn,
+        active_seat: applicationContext.active_seat,
+        source_controller_seat: applicationContext.source_controller_seat,
+        target_controller_seat: target.controller_seat,
+        card_effect: true,
+        source_action_id: applicationContext.source_action_id,
+      },
+    );
     return {
       target: step.target,
       condition: step.condition,
@@ -161,12 +191,22 @@ export function structuredRuntimeAfterDamageConditionEffects(
       applied: result.applied,
       prevented: result.prevented,
       reason: result.reason || null,
+      condition_slot: result.condition_slot,
+      change_kind: result.change_kind,
     };
   });
 
   return { attack_id: attackId, phase: "after_damage", effects };
 }
 
+
+export type RuntimeV02AttackRecoilExecutionContext = {
+  source_controller_seat: 1 | 2;
+  source_action_id: string;
+  source_card_uid: string;
+  source_card_id: string;
+  source_creature_uid: string;
+};
 
 export type RuntimeV02AttackRecoilEffectResult = {
   target: "$source_creature";
@@ -175,6 +215,8 @@ export type RuntimeV02AttackRecoilEffectResult = {
   source_attack_id: string;
   placed: number;
   shield_prevented: 0;
+  packet_id: string;
+  after_damage_event: Record<string, unknown>;
 };
 
 export type RuntimeV02AttackRecoilPhaseResult = {
@@ -187,10 +229,9 @@ export type RuntimeV02AttackRecoilPhaseResult = {
  * Owns only structured v0.2 attack after-damage programs made entirely from
  * attack-owned DIRECT_DAMAGE recoil instructions aimed at the source creature.
  *
- * This intentionally preserves the current recoil placement rule: recoil adds
- * directly to accumulated damage and does not consume Shield. Damage-packet
- * listeners remain a separate later runtime pass; this owner does not pretend
- * those listener lifecycles are complete.
+ * Recoil remains damage placement and therefore does not consume Shield, but
+ * it now delegates through owner #20 DIRECT_DAMAGE so before-packet protection,
+ * packet history and after-packet listener events are canonical.
  *
  * Mixed programs and non-recoil DIRECT_DAMAGE return null so compatibility
  * authority remains whole rather than partially executing a structured list.
@@ -200,6 +241,7 @@ export function structuredRuntimeAfterDamageRecoilEffects(
   instanceOrId: string | { card_id?: unknown } | null | undefined,
   attackSlot: number,
   sourceCreature: RuntimeCreature,
+  execution: RuntimeV02AttackRecoilExecutionContext,
 ): RuntimeV02AttackRecoilPhaseResult | null {
   const definition = runtimeV02Definition(state, instanceOrId);
   if (!definition) return null;
@@ -250,16 +292,49 @@ export function structuredRuntimeAfterDamageRecoilEffects(
 
   if (normalized.some((step) => step == null)) return null;
 
-  const effects = normalized.map((raw) => {
+  const effects = normalized.map((raw, index) => {
     const step = raw!;
-    const placed = placeRuntimeDamage(sourceCreature, step.amount);
+    const packetId = `${execution.source_action_id}:recoil:${index}`;
+    const resolved = runtimeV02ApplyDirectDamage(
+      state,
+      sourceCreature,
+      {
+        op: "DIRECT_DAMAGE",
+        target: "$source_creature",
+        amount: step.amount,
+        damage_class: "recoil",
+        source_attack_id: step.source_attack_id,
+      },
+      {
+        packet_id: packetId,
+        damage_class: "recoil",
+        source_controller_seat: execution.source_controller_seat,
+        source_kind: "attack",
+        source_action_id: execution.source_action_id,
+        source_card_uid: execution.source_card_uid,
+        source_card_id: execution.source_card_id,
+        source_creature_uid: execution.source_creature_uid,
+        target_controller_seat: execution.source_controller_seat,
+        target_creature_uid: execution.source_creature_uid,
+        target_zone: "vanguard",
+        target_index: null,
+      },
+      "$source_creature",
+      attackId,
+    );
+    const receipt = resolved.packet.receipt;
+    if (receipt.kind !== "damage_placement") {
+      throw new Error("tcg_v0_2_attack_recoil_packet_receipt_invalid");
+    }
     return {
       target: "$source_creature" as const,
       damage_class: "recoil" as const,
       amount: step.amount,
       source_attack_id: step.source_attack_id,
-      placed,
+      placed: receipt.actual_damage_placed,
       shield_prevented: 0 as const,
+      packet_id: packetId,
+      after_damage_event: resolved.after_damage_event,
     };
   });
 
@@ -415,16 +490,6 @@ function selfHealPredicate(
   throw new Error(`tcg_v0_2_attack_self_heal_predicate_unsupported:${attackId}:${index}:${predicate}`);
 }
 
-function selfHealConditionMatches(
-  when: RuntimeV02AttackSelfHealPredicate,
-  sourceCreature: RuntimeCreature,
-): boolean {
-  if (when.predicate === "source_damaged") {
-    return Math.max(0, Number(sourceCreature.damage || 0)) > 0;
-  }
-  return Math.max(0, Number(sourceCreature.shield || 0)) >= when.value;
-}
-
 function selfHealPacketContext(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown } | null | undefined,
@@ -554,7 +619,16 @@ export function structuredRuntimeAfterDamageSelfHealEffects(
 
   const resolved = normalized.map((raw) => {
     const step = raw!;
-    const conditionMet = selfHealConditionMatches(step.when, sourceCreature);
+    const conditionMet = runtimeV02EvaluateAttackIf(step.when, {
+      source_creature: sourceCreature,
+      attack_target: sourceCreature,
+      self_reserve: [],
+      opponent_reserve: [],
+      variables: {},
+      current_action_events: {},
+      target_remains_in_play_after_damage: false,
+      card_matches: () => false,
+    });
     const actualHeal = conditionMet ? healRuntimeDamage(sourceCreature, step.amount) : 0;
     return {
       target: "$source_creature" as const,
@@ -794,7 +868,17 @@ export function structuredRuntimeAfterDamageHealEachEffects(
 
   const effects = normalized.map((raw) => {
     const step = raw!;
-    const conditionMet = occupied.length >= step.when.count;
+    const predicateSource = packetContext?.source_creature ?? ({ damage: 0, shield: 0 } as RuntimeCreature);
+    const conditionMet = runtimeV02EvaluateAttackIf(step.when, {
+      source_creature: predicateSource,
+      attack_target: predicateSource,
+      self_reserve: friendlyReserve,
+      opponent_reserve: [],
+      variables: {},
+      current_action_events: {},
+      target_remains_in_play_after_damage: false,
+      card_matches: () => false,
+    });
     const targets = conditionMet
       ? occupied.map(({ target, reserveIndex }) => ({
         reserve_index: reserveIndex,
@@ -835,7 +919,7 @@ export type RuntimeV02AttackSelectedHealChoice = {
   phase: "after_damage";
   selection: {
     controller: "self";
-    zone: "field";
+    zone: "field" | "reserve";
     count: 1;
     filters: { damaged: true };
     as: string;
@@ -848,8 +932,9 @@ export type RuntimeV02AttackSelectedHealChoice = {
 
 /**
  * Owns only the deterministic structured after-damage choice program:
- * SELECT_CREATURE(self, field, exactly one damaged creature) followed by
- * HEAL $selected. It describes the choice but deliberately does not select or
+ * SELECT_CREATURE(self, field|reserve, exactly one damaged creature) followed by
+ * HEAL $selected. The zone stays part of the descriptor so the choice owner can
+ * preserve a Reserve-only selector without adding card-specific routing. It describes the choice but deliberately does not select or
  * heal a target; the revision-checked attack-choice owner performs that work.
  *
  * Mixed programs and other selectors remain outside this owner. Marked v0.2
@@ -897,7 +982,8 @@ export function structuredRuntimeAfterDamageSelectedHealChoice(
   if (String(select.controller || "") !== "self") {
     throw new Error(`tcg_v0_2_attack_selected_heal_controller_unsupported:${attackId}`);
   }
-  if (String(select.zone || "") !== "field") {
+  const selectionZone = String(select.zone || "");
+  if (selectionZone !== "field" && selectionZone !== "reserve") {
     throw new Error(`tcg_v0_2_attack_selected_heal_zone_unsupported:${attackId}`);
   }
   if (Number(select.count) !== 1 || !Number.isInteger(Number(select.count))) {
@@ -935,7 +1021,7 @@ export function structuredRuntimeAfterDamageSelectedHealChoice(
     phase: "after_damage",
     selection: {
       controller: "self",
-      zone: "field",
+      zone: selectionZone as "field" | "reserve",
       count: 1,
       filters: { damaged: true },
       as: variable,

@@ -22,9 +22,21 @@ const attackWired = 'function attackDamage(cr:Cr,target:Cr,s:any,base:number,ctx
 const legacyAttackContext = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent"}';
 const protectionAttackContext = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent",source_controller_seat:1|2,target_controller_seat:1|2,target_creature_uid:string,packet_id:string}';
 const attackWiredWithProtection = attackWired.replace(legacyAttackContext, protectionAttackContext);
+const creatureContinuousAttackContext = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent",source_controller_seat:1|2,target_controller_seat:1|2,target_creature_uid:string,packet_id:string,attack_id:string}';
+const legacyStructuredContext = 'const structuredContext={...ctx,target_has_any_condition:hasCondition(target)};';
+const creatureContinuousStructuredContext = 'const sourceOpponentSeat=ctx.source_controller_seat===1?2:1;const currentOpponentVanguard=s.players?.[String(sourceOpponentSeat)]?.vanguard;const structuredContext={...ctx,target_has_any_condition:hasCondition(target),current_opponent_vanguard_control_condition:currentOpponentVanguard?runtimeConditions(currentOpponentVanguard).control:null};';
+const attackWiredWithCreatureContinuous = attackWiredWithProtection
+  .replace(protectionAttackContext, creatureContinuousAttackContext)
+  .replace(legacyStructuredContext, creatureContinuousStructuredContext);
+const detailedAttackMarkers = [
+  'const structuredAttachmentBonus=structuredRuntimeAttachmentAttackBonus(s,cr,Number(s.turn_seq||0));if(structuredAttachmentBonus!=null)n+=structuredAttachmentBonus;',
+  'structuredRuntimeIncomingAttackDamageDetailed(s,cr,target,n,structuredContext)',
+  'return{dealt:n-blocked,blocked,preventions}',
+];
+const detailedAttackWired = detailedAttackMarkers.every((marker) => source.includes(marker));
 
 const attachLegacy = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);\n   if(d.id===';
-const attachEngineBoundary = 'const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
+const attachEngineBoundary = 'const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
 const attachRouteCall = 'runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,uid,"hand","manual_essence"';
 const attachmentEngineLifecycleImport = 'import { registerStructuredRuntimeEssenceAttachmentLifecycleState } from "./tcg-match-surge-lifecycle-v0-2.ts";';
 const attachmentEngineLifecycleCall = 'const lifecycleRegistered = registerStructuredRuntimeEssenceAttachmentLifecycleState(';
@@ -52,7 +64,7 @@ if (!next.includes(surgeImportAttackOnly)) {
 }
 
 if (next.includes(attackLegacy)) next = next.replace(attackLegacy, attackWired);
-else if (!next.includes(attackWired) && !next.includes(attackWiredWithProtection)) throw new Error('match_actions_surge_attack_damage_anchor_changed');
+else if (!next.includes(attackWired) && !next.includes(attackWiredWithProtection) && !next.includes(attackWiredWithCreatureContinuous) && !detailedAttackWired) throw new Error('match_actions_surge_attack_damage_anchor_changed');
 
 // Essence attachment lifecycle authority moved out of Match Actions. Do not
 // re-materialize the historical direct helper path: verify the canonical
@@ -96,11 +108,21 @@ if (!aftermathSource.includes(aftermathOwnerDispositionCall)) {
   throw new Error('aftermath_owner_surge_disposition_delegate_missing');
 }
 
-const attackWiredVariants = [attackWired, attackWiredWithProtection].filter((candidate) => next.includes(candidate));
-if (attackWiredVariants.length !== 1) throw new Error('match_actions_surge_attack_damage_variant_invalid');
-for (const required of [surgeImportAttackOnly, attackWiredVariants[0], aftermathOwnerImport, aftermathOwnerDelegate, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
+const attackWiredVariants = [attackWired, attackWiredWithProtection, attackWiredWithCreatureContinuous].filter((candidate) => next.includes(candidate));
+const attackVariantCount = attackWiredVariants.length + (detailedAttackWired ? 1 : 0);
+if (attackVariantCount !== 1) throw new Error('match_actions_surge_attack_damage_variant_invalid');
+for (const required of [surgeImportAttackOnly, aftermathOwnerImport, aftermathOwnerDelegate, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
   if (!next.includes(required)) throw new Error('match_actions_surge_wiring_incomplete');
   if (next.indexOf(required) !== next.lastIndexOf(required)) throw new Error('match_actions_surge_wiring_duplicate');
+}
+if (attackWiredVariants.length === 1 && next.indexOf(attackWiredVariants[0]) !== next.lastIndexOf(attackWiredVariants[0])) {
+  throw new Error('match_actions_surge_wiring_duplicate');
+}
+if (detailedAttackWired) {
+  for (const marker of detailedAttackMarkers) {
+    if (!next.includes(marker)) throw new Error('match_actions_surge_detailed_attack_wiring_incomplete');
+    if (next.indexOf(marker) !== next.lastIndexOf(marker)) throw new Error('match_actions_surge_detailed_attack_wiring_duplicate');
+  }
 }
 
 if (process.argv.includes('--check')) {

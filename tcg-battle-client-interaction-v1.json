@@ -1,10 +1,18 @@
 {
   "schema": "stream-bandit-tcg-battle-client-interaction-v1",
-  "recorded_at": "2026-09-16",
+  "recorded_at": "2026-09-20",
   "authority": {
     "reference_video": "Dar match up test deck(1).mp4",
     "purpose": "Interaction choreography reference only; Stream Bandit retains original names, art, rules, card identities and UI design.",
-    "server_authoritative": true
+    "server_authoritative": true,
+    "cross_device_observation": "Trevor desktop native drag/drop worked; Kay phone coarse-touch drag/drop did not. V2.4.53 requires pointer/touch drag parity while retaining tap fallback.",
+    "layout_reference_videos": [
+      "WhatsApp Video 2026-09-20 at 17.52.36(1).mp4",
+      "Video Project 5.mp4"
+    ],
+    "layout_reference_scope": "Interaction and viewport composition only: whole-board visibility, compact field cards, click/tap inspection, bottom horizontal hand and drag/drop. Stream Bandit retains original art, styling, card identities, terminology and rules.",
+    "human_layout_finding": "Trevor required 50% browser zoom to see the previous full-rule cards with the whole board; the reference interaction model proves full rules should open on inspection rather than permanently consume battlefield/hand space.",
+    "human_layout_finding_v2_4_55": "Trevor desktop and Kay phone V2.4.54 recordings confirmed the whole board can fit, but height-filled Vanguard cards dominate the table and full tiny hand cards are hard to recognize. The accepted correction is bounded field cards plus a larger bottom-edge peek/fan hand."
   },
   "board": {
     "opponent_position": "top",
@@ -15,69 +23,222 @@
     "show_deck_pile": true,
     "show_discard_pile": true,
     "hand_position": "bottom_edge",
-    "board_remains_visible_during_choices": true
+    "board_remains_visible_during_choices": true,
+    "normal_browser_zoom_required": true,
+    "field_card_presentation": "bounded_compact_art_status_preview",
+    "full_card_presentation": "click_or_tap_opens_shared_inspect_face_with_moves_and_abilities",
+    "hand_behavior": "bottom_edge_peek_fan_horizontal_scroll",
+    "mobile_hand_behavior": "larger_cards_partially_clipped_below_bottom_rail_swipe_left_right",
+    "viewport_contract": "entire_battlefield_plus_hand_visible_in_one_device_viewport_at_normal_zoom",
+    "source_card_stays_in_slot_during_inspection": true,
+    "field_card_scale": "bounded_by_viewport_height_not_slot_fill",
+    "hand_card_visibility": "show_upper_identity_and_art_in_rail; full card only in inspector",
+    "hand_cards_may_extend_below_visible_rail": true
   },
   "input_modes": {
-    "desktop": ["hover_inspect", "click_select", "drag_drop"],
-    "touch": ["tap_inspect", "tap_select", "tap_destination"],
-    "accessibility": ["reduced_motion", "keyboard_focus", "text_legality_reason"]
+    "desktop": [
+      "hover_inspect",
+      "click_select",
+      "drag_drop"
+    ],
+    "touch": [
+      "tap_inspect",
+      "tap_select",
+      "tap_destination",
+      "drag_drop"
+    ],
+    "accessibility": [
+      "reduced_motion",
+      "keyboard_focus",
+      "text_legality_reason"
+    ],
+    "touch_drag_transport": "touch_safe_hold_and_drag_gesture_with_existing_server_actions",
+    "touch_tap_fallback_required": true,
+    "touch_drag_activation": "short_hold_then_drag; movement_before_activation_cancels_to_preserve_scrolling",
+    "touch_drag_setup_owner": "runSetupPlace",
+    "touch_drag_play_owner": "runPlayHandTarget",
+    "mobile_rules_engine": false,
+    "tap_fallback_preserved": true,
+    "hand_click_behavior": "inspect_card_and_preserve_selection_for_tap_fallback",
+    "hand_drag_behavior": "drag_peek_card_directly_to_existing_legal_destination_using_existing_server_action",
+    "field_click_behavior": "inspect_bounded_compact_card_without_relocating_source",
+    "mobile_page_scroll_required": false,
+    "mobile_hand_horizontal_scroll_required": true
   },
   "required_flows": [
     {
       "id": "opening_setup",
-      "steps": ["opening_choice", "opening_hand", "place_vanguard", "place_reserves", "confirm_setup", "install_rewards"]
+      "steps": [
+        "opening_choice",
+        "opening_hand",
+        "place_vanguard",
+        "place_reserves",
+        "confirm_setup",
+        "install_rewards"
+      ]
     },
     {
       "id": "play_creature",
-      "steps": ["select_or_drag_hand_card", "highlight_legal_slots", "choose_slot", "server_validate", "animate_card_to_board"]
+      "steps": [
+        "tap_or_click_hand_card_to_inspect",
+        "close_inspector_with_selection_preserved_for_tap_fallback_or_drag_card_directly",
+        "highlight_legal_slots",
+        "choose_slot_by_drop_or_tap",
+        "server_validate",
+        "animate_card_to_board"
+      ]
     },
     {
       "id": "evolve_creature",
-      "steps": ["select_or_drag_evolution", "highlight_legal_lower_stages", "choose_target", "server_validate", "animate_stack"]
+      "steps": [
+        "select_or_drag_evolution",
+        "highlight_legal_lower_stages",
+        "choose_target_by_drop_or_tap",
+        "server_validate",
+        "animate_stack"
+      ]
     },
     {
       "id": "attach_essence",
-      "steps": ["select_or_drag_essence", "highlight_legal_creatures", "choose_target", "server_validate_payment_or_attachment", "animate_attachment"]
+      "steps": [
+        "select_or_drag_essence",
+        "highlight_legal_creatures",
+        "choose_target_by_drop_or_tap",
+        "server_validate_payment_or_attachment",
+        "animate_attachment",
+        "render_attached_element_orbs"
+      ]
     },
     {
       "id": "play_tactic",
-      "steps": ["select_tactic", "show_effect_preview", "highlight_legal_targets", "resolve_private_choice_if_needed", "server_commit", "animate_effect"]
+      "steps": [
+        "select_tactic",
+        "show_effect_preview",
+        "highlight_legal_targets",
+        "resolve_private_choice_if_needed",
+        "server_commit",
+        "animate_effect"
+      ]
     },
     {
       "id": "search_or_select",
-      "steps": ["keep_board_visible", "open_card_carousel_or_grid", "show_requirement_and_selected_count", "select_cards", "confirm", "server_commit", "return_to_board"]
+      "steps": [
+        "keep_board_visible",
+        "open_card_carousel_or_grid",
+        "show_requirement_and_selected_count",
+        "select_cards",
+        "confirm",
+        "server_commit",
+        "return_to_board"
+      ]
     },
     {
       "id": "creature_context",
-      "steps": ["select_creature", "enlarge_card", "show_ability_or_attack_slots", "show_withdraw", "show_legality_reason_for_locked_actions"]
+      "steps": [
+        "tap_or_click_compact_field_card",
+        "keep_source_card_anchored_in_its_board_slot",
+        "open_full_canonical_card_inspector",
+        "show_ability_or_attack_slots",
+        "show_withdraw",
+        "show_legality_reason_for_locked_actions"
+      ]
     },
     {
       "id": "attack",
-      "steps": ["select_vanguard", "choose_attack_1_or_attack_2", "show_attack_cost", "choose_target_if_required", "server_validate", "animate_payment", "animate_attack", "show_damage_shield_condition_listener_results", "scan_defeat_and_aftermath"]
+      "steps": [
+        "select_vanguard",
+        "choose_attack_1_or_attack_2",
+        "show_attack_cost",
+        "choose_target_if_required",
+        "server_validate",
+        "animate_payment",
+        "animate_attack",
+        "show_damage_shield_condition_listener_results",
+        "scan_defeat_and_aftermath"
+      ]
     },
     {
       "id": "ability",
-      "steps": ["select_creature", "choose_ability", "show_cost_and_legal_targets", "server_validate", "resolve_choices", "animate_effect", "show_once_per_turn_or_cooldown_state"]
+      "steps": [
+        "select_creature",
+        "choose_ability",
+        "show_cost_and_legal_targets",
+        "server_validate",
+        "resolve_choices",
+        "animate_effect",
+        "show_once_per_turn_or_cooldown_state"
+      ]
     },
     {
       "id": "voluntary_withdraw",
-      "steps": ["select_vanguard", "choose_withdraw", "show_withdraw_cost", "highlight_legal_reserve_replacements", "choose_replacement", "server_preflight", "animate_payment", "animate_vanguard_to_reserve", "animate_reserve_to_vanguard", "emit_switch_context"]
+      "steps": [
+        "select_vanguard",
+        "choose_withdraw",
+        "show_withdraw_cost",
+        "highlight_legal_reserve_replacements",
+        "choose_replacement",
+        "server_preflight",
+        "animate_payment",
+        "animate_vanguard_to_reserve",
+        "animate_reserve_to_vanguard",
+        "emit_switch_context"
+      ]
     },
     {
       "id": "effect_switch",
-      "steps": ["show_source_card_or_effect", "highlight_legal_switch_targets", "choose_if_optional", "server_resolve", "reuse_board_switch_animation", "preserve_effect_action_kind"]
+      "steps": [
+        "show_source_card_or_effect",
+        "highlight_legal_switch_targets",
+        "choose_if_optional",
+        "server_resolve",
+        "reuse_board_switch_animation",
+        "preserve_effect_action_kind"
+      ]
     },
     {
       "id": "forced_promotion",
-      "steps": ["defeat_animation", "highlight_legal_reserve_promotions", "choose_replacement", "server_resolve", "animate_to_vanguard"]
+      "steps": [
+        "defeat_animation",
+        "highlight_legal_reserve_promotions",
+        "choose_replacement",
+        "server_resolve",
+        "animate_to_vanguard"
+      ]
     },
     {
       "id": "reward_take",
-      "steps": ["open_reward_overlay", "show_face_down_reward_positions", "choose_required_count", "server_commit", "animate_rewards_to_hand_or_destination"]
+      "steps": [
+        "open_reward_overlay",
+        "show_face_down_reward_positions",
+        "choose_required_count",
+        "server_commit",
+        "animate_rewards_to_hand_or_destination"
+      ]
     },
     {
       "id": "terminal",
-      "steps": ["show_final_state", "show_victory_or_defeat", "show_match_rewards_once", "offer_rematch_or_exit"]
+      "steps": [
+        "show_final_state",
+        "show_victory_or_defeat",
+        "show_match_rewards_once",
+        "back_to_matchmaking",
+        "require_new_find_opponent"
+      ]
+    },
+    {
+      "id": "search_attach_shuffle",
+      "steps": [
+        "server_open_private_search_choice",
+        "show_authorized_eligible_cards_and_authoritative_selection_count",
+        "select_cards",
+        "show_server_projected_legal_attachment_targets",
+        "assign_selected_cards_to_targets",
+        "server_commit",
+        "animate_chosen_cards_to_creature_attachments",
+        "animate_unchosen_cards_back_to_deck_representation",
+        "animate_authoritative_shuffle",
+        "render_latest_authoritative_state"
+      ]
     }
   ],
   "visual_feedback": [
@@ -87,18 +248,208 @@
     "damage_number_and_hp_delta",
     "shield_delta",
     "condition_badge_and_timer",
-    "attached_essence_visual_stack",
     "relic_attachment_badge",
     "realm_presence",
     "listener_or_trigger_notice",
     "turn_banner",
-    "opponent_thinking_or_choice_state"
+    "opponent_thinking_or_choice_state",
+    "attached_essence_element_orb_rail",
+    "attack_cost_element_orbs",
+    "touch_drag_legal_destination_glow",
+    "compact_field_card_art_status_preview",
+    "full_card_inspector_without_board_reflow",
+    "horizontal_hand_scroll_position",
+    "bottom_edge_hand_peek_fan",
+    "shared_read_only_card_inspector_on_decks_collection_battlepass",
+    "generic_card_zone_movement_effects",
+    "attack_windup_impact_and_result_effects",
+    "ability_and_listener_resolution_effects",
+    "private_search_selection_counter",
+    "searched_card_assignment_to_legal_targets",
+    "post_search_return_and_shuffle_effect",
+    "reduced_motion_equivalent_feedback"
   ],
   "forbidden_client_patterns": [
     "browser_prompt_for_gameplay_targeting",
     "duplicate_browser_rules_engine",
     "generic_global_attack_buttons_as_primary_attack_ui",
     "hidden_opponent_card_leak",
-    "debug_form_layout_as_release_battlefield"
-  ]
+    "debug_form_layout_as_release_battlefield",
+    "touch_drag_with_duplicate_client_legality_engine"
+  ],
+  "essence_visibility": {
+    "source_of_truth": "authoritative_creature_attached_essence_plus_structured_provides",
+    "display": "tiny_element_orb_rail_on_creature",
+    "represents": "effective_payable_essence_units",
+    "element_identity": [
+      "Astral",
+      "Ember",
+      "Gale",
+      "Grove",
+      "Shade",
+      "Stone",
+      "Tide",
+      "Volt"
+    ],
+    "color_plus_glyph_required": true,
+    "remove_when_authoritative_attachment_leaves": true,
+    "browser_resource_authority": false,
+    "compare_directly_with_attack_cost_orbs": true,
+    "hidden_information_rule": "render_only_attached_essence_information_exposed_by_the_viewer_authorized_match_view",
+    "unit_layout": {
+      "normal": "individual_tiny_orbs_while_the_rail_fits_inside_allocated_card_bounds",
+      "compression_trigger": "rendered_essence_rail_would_breach_allocated_card_parameters",
+      "compression_threshold": "dynamic_layout_measurement_not_a_fixed_essence_count",
+      "overflow": "one_counted_orb_per_present_element",
+      "count_position": "inside_orb",
+      "count_value": "current_authoritative_total_for_that_element",
+      "keep_different_elements_separate": true,
+      "never_merge_different_elements_into_one_total": true,
+      "can_expand_back_to_individual_orbs_when_space_allows": true,
+      "responsive_presentation_only": true
+    },
+    "group_same_element_overflow_as_counted_orb": true
+  },
+  "priority_order": [
+    "canonical_card_visuals_and_readability",
+    "real_attack_damage_turn_reward_lifecycle",
+    "essence_visibility_and_cross_device_input_parity",
+    "final_board_decoration"
+  ],
+  "non_battle_card_inspection": {
+    "pages": [
+      "decks",
+      "collection",
+      "battlepass"
+    ],
+    "source": "shared_card_renderer",
+    "mode": "inspect",
+    "read_only": true,
+    "battle_pass_scope": "card-backed reward samples only; no progression entitlement or economy authority",
+    "deck_scope": "canonical deck recipe preview only; no deck ownership mutation",
+    "collection_scope": "card preview only; no collection ownership inference"
+  },
+  "special_effects": {
+    "schema": "tcg-battle-special-effects-v1",
+    "authority": "presentation_only_from_authoritative_state_events_pending_choices_and_results",
+    "extensibility": "generic_event_and_effect_families_not_card_id_branches",
+    "reduced_motion_required": true,
+    "reconnect_rule": "drop_unfinished_animation_and_render_latest_authoritative_snapshot",
+    "movement_families": [
+      "deck_to_hand_draw",
+      "opening_deal",
+      "discard",
+      "return_to_deck",
+      "reward_take",
+      "play_creature",
+      "evolve",
+      "switch",
+      "forced_promotion",
+      "attach_essence",
+      "attach_relic",
+      "remove_attachment"
+    ],
+    "combat_effect_families": [
+      "attack_windup",
+      "target_focus",
+      "payment",
+      "impact",
+      "damage",
+      "shield_delta",
+      "heal",
+      "condition",
+      "listener_trigger",
+      "defeat",
+      "reward_followup",
+      "turn_continuation"
+    ],
+    "search_attach_shuffle": {
+      "source": "authoritative_search_or_pending_choice",
+      "private_search_overlay": true,
+      "selection_count": "authoritative_required_or_maximum_count",
+      "example_three_card_display": [
+        "0/3",
+        "1/3",
+        "2/3",
+        "3/3"
+      ],
+      "hard_code_three_globally": false,
+      "targets": "server_projected_legal_adult_creature_or_creature_targets",
+      "chosen_cards": "animate_to_authoritative_creature_attachment_or_essence_rail",
+      "unchosen_cards": "return_to_face_down_deck_representation",
+      "shuffle_after_resolution": true,
+      "shuffle_order_owner": "authoritative_rng_or_shuffle_engine",
+      "client_may_reconstruct_permutation": false,
+      "opponent_view": "public_safe_search_attachment_shuffle_feedback_without_private_card_identity_unless_explicitly_revealed"
+    }
+  },
+  "reference_comparison_v2_4_60": {
+    "evidence": [
+      "WhatsApp Video 2026-09-20 at 17.52.36(1).mp4",
+      "Video Project 5.mp4",
+      "Desktop 2026.09.20 - 18.22.38.08.mp4",
+      "WhatsApp Video 2026-09-20 at 18.30.29.mp4",
+      "Screen_Recording_20260920_193339_Chrome.mp4"
+    ],
+    "external_reference_scope": "interaction_grammar_only_no_external_assets_rules_names_or_card_designs",
+    "conclusion": "stream_bandit_keeps_authoritative_rules_and_adds_generic_presentation_choreography"
+  },
+  "presentation_choreography_engine": {
+    "authority": "presentation_only",
+    "gameplay_owner": false,
+    "generic_not_card_id_specific": true,
+    "systems": [
+      "zone_motion",
+      "choice_overlay",
+      "combat_ability_fx",
+      "deck_hidden_zone_presentation",
+      "stable_inspector",
+      "pacing_recovery"
+    ],
+    "consumes": [
+      "authoritative_state_delta",
+      "authoritative_event_or_result_packet",
+      "authoritative_pending_choice",
+      "viewer_visibility_projection"
+    ],
+    "forbidden": [
+      "calculate_legality",
+      "choose_rng",
+      "choose_damage_or_heal_amount",
+      "invent_targets",
+      "retain_private_identity_beyond_authorized_view",
+      "submit_gameplay_mutation_from_animation"
+    ],
+    "stable_tabletop": true,
+    "desktop_touch_semantic_parity": true,
+    "latest_authoritative_snapshot_wins": true,
+    "receipt_schema": "tcg-presentation-envelope-v1",
+    "receipt_runtime_owner": "authoritative_action_or_continuation_projects_viewer_filtered_receipt_at_commit",
+    "receipt_replay_key": "receipt_id_plus_authoritative_revision",
+    "stale_receipt_rule": "newer_authoritative_revision_cancels_older_queued_choreography",
+    "intensity_tiers": [
+      "micro",
+      "standard",
+      "hero"
+    ],
+    "resolution_ribbon": "accessible_temporary_causal_breadcrumb_from_same_receipt_queue",
+    "private_choice_mirror": "public_safe_in_progress_feedback_only_no_private_card_identity",
+    "backlog_rule": "stale_cues_disposable_micro_cues_may_be_coalesced_later_latest_snapshot_always_wins"
+  },
+  "stream_bandit_element_fx_language": {
+    "authority": "presentation_only_from_public_structured_element_metadata",
+    "not_card_id_specific": true,
+    "color_only_forbidden": true,
+    "reduced_motion_equivalent_required": true,
+    "elements": {
+      "Astral": "stellar_orbit_glyph_motion",
+      "Ember": "heat_spark_motion",
+      "Gale": "wind_arc_motion",
+      "Grove": "growth_leaf_vine_motion",
+      "Shade": "shadow_veil_motion",
+      "Stone": "weight_shock_dust_motion",
+      "Tide": "wave_ripple_motion",
+      "Volt": "pulse_arc_electric_motion"
+    }
+  }
 }

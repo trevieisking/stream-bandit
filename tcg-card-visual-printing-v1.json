@@ -1,6 +1,6 @@
 {
   "schema": "stream-bandit-tcg-card-visual-printing-v1",
-  "recorded_at": "2026-09-16",
+  "recorded_at": "2026-09-20",
   "visual_authority": {
     "approved_showcase_decks": [
       "Ember/Ashrush",
@@ -16,21 +16,44 @@
     ],
     "artwork_on_every_printable_card": true,
     "concept_art_is_rules_authority": false,
-    "structured_card_data_is_rules_authority": true
+    "structured_card_data_is_rules_authority": true,
+    "canonical_card_face_reference": {
+      "label": "Orbitortoise canonical Stream Bandit TCG card-face reference",
+      "url": "https://chatgpt.com/s/m_6aafc9a916c88191b0f63b164d1923cc",
+      "usage": "visual layout reference only; structured card data remains gameplay/rules authority"
+    },
+    "global_card_face_priority": true,
+    "missing_artwork_must_remain_playable_and_readable": true
   },
   "creature_card": {
     "header": {
-      "top_left": "HP + value",
-      "top_right": "Creature type / element badge",
-      "identity_band": ["card_name", "stage_or_classification"]
+      "top_left": "HP + value beside the name",
+      "top_right": "Element / energy type badge",
+      "identity_band": [
+        "card_name",
+        "stage_or_classification"
+      ]
     },
-    "art": "large dedicated card-specific artwork window",
-    "action_slot_count": 2,
+    "art": "large upper card-specific artwork window; artwork is fitted/cropped inside the renderer and never carries rules/UI text",
+    "action_slot_count": "data-driven: show Ability when present plus every canonical Attack row",
     "legal_action_slot_shapes": [
-      ["Ability", "Attack 1"],
-      ["Attack 1", "Attack 2"]
+      [
+        "Attack 1"
+      ],
+      [
+        "Attack 1",
+        "Attack 2"
+      ],
+      [
+        "Ability",
+        "Attack 1"
+      ],
+      [
+        "Ability",
+        "Attack 1",
+        "Attack 2"
+      ]
     ],
-    "forbidden_action_slot_shape": ["Ability", "Attack 1", "Attack 2"],
     "attack_fields": [
       "Attack label",
       "Attack name",
@@ -38,7 +61,39 @@
       "Damage label + value",
       "rules/effect text"
     ],
-    "footer": ["Withdraw Cost + value", "rarity marker", "printing finish marker", "set/pack marker"]
+    "footer": {
+      "bottom_left": "Reward Cards + reward_value",
+      "center": [
+        "set marker",
+        "printing finish marker"
+      ],
+      "bottom_right": [
+        "rarity marker",
+        "Withdraw Cost + value directly beneath rarity"
+      ]
+    },
+    "ability_fields": [
+      "Ability label",
+      "Ability name",
+      "active_or_triggered state",
+      "rules/effect text",
+      "server-authoritative availability state when active"
+    ],
+    "missing_artwork": {
+      "behavior": "render the complete real card face with an element-themed Artwork Pending window",
+      "hide_rules_or_actions": false,
+      "gameplay_blocked": false
+    },
+    "attached_essence": {
+      "display": "tiny element-colored orb rail in Battle",
+      "source": "authoritative attached essence instances + structured essence.provides visible in the viewer match state",
+      "normal_layout": "individual resource-unit orbs while the rail fits inside its allocated card bounds",
+      "overflow_layout": "one counted orb per present element only when the rendered rail would overflow",
+      "fixed_count_threshold": false,
+      "different_elements_never_merged": true,
+      "removed_attachment_disappears_on_authoritative_refresh": true,
+      "rules_authority": false
+    }
   },
   "numeric_label_policy": {
     "rule": "Every visible gameplay number must have a named property or a globally standardized labeled icon with accessible text.",
@@ -54,10 +109,45 @@
     "floating_unlabeled_numbers_allowed": false
   },
   "other_card_families": {
-    "Tactic": ["Cost", "type", "name", "large art", "effect text", "rarity", "finish", "set marker"],
-    "Essence": ["Essence type", "amount or special identity", "large art", "effect text if special", "rarity", "finish", "set marker"],
-    "Relic": ["Cost", "type", "name", "large art", "attachment/effect text", "rarity", "finish", "set marker"],
-    "Realm": ["Cost", "type", "name", "large environment art", "persistent/replace text", "rarity", "finish", "set marker"]
+    "Tactic": [
+      "Cost",
+      "type",
+      "name",
+      "large art",
+      "effect text",
+      "rarity",
+      "finish",
+      "set marker"
+    ],
+    "Essence": [
+      "Essence type",
+      "amount or special identity",
+      "large art",
+      "effect text if special",
+      "rarity",
+      "finish",
+      "set marker"
+    ],
+    "Relic": [
+      "Cost",
+      "type",
+      "name",
+      "large art",
+      "attachment/effect text",
+      "rarity",
+      "finish",
+      "set marker"
+    ],
+    "Realm": [
+      "Cost",
+      "type",
+      "name",
+      "large environment art",
+      "persistent/replace text",
+      "rarity",
+      "finish",
+      "set marker"
+    ]
   },
   "rarity": {
     "gameplay_and_acquisition_tiers": [
@@ -127,9 +217,40 @@
   },
   "battle_renderer": {
     "field_card_is_real_card_face": true,
+    "hand_card_is_real_card_face": true,
     "hover_or_tap_enlarges": true,
+    "tap_is_primary_touch_interaction": true,
+    "drag_is_optional_desktop_convenience": true,
     "runtime_text_generated_from_structured_data": true,
     "finish_shader_layers_on_top_of_rarity_frame": true,
-    "printing_selection_may_be_cosmetic_preference": true
+    "printing_selection_may_be_cosmetic_preference": true,
+    "active_ability_ready_state": "glow/pulse only when the authoritative server field_actions response includes the creature in ability_sources",
+    "triggered_ability_state": "display rules text but never present as a manual activation button",
+    "attack_state": "each canonical attack row stays visible; legal/ready state is visually explicit and insufficient Essence must explain the shortfall",
+    "attack_resolution": "Attack transport remains server-owned; the card renderer never decides legality or damage",
+    "missing_artwork": "same complete card face with Artwork Pending window; card remains readable and playable",
+    "attached_essence_state": "render attached effective Essence as element orbs on the Creature; compress by measured card-space overflow only",
+    "attack_cost_state": "render required Essence with the same element-orb identity system used by attached resources"
+  },
+  "global_renderer": {
+    "one_renderer_for_all_card_surfaces": true,
+    "required_surfaces": [
+      "Battle Vanguard",
+      "Battle Reserve",
+      "Battle hand",
+      "Collection",
+      "Decks",
+      "Shop previews",
+      "Pack/reward previews",
+      "Battle Pass previews"
+    ],
+    "presentation_modes": [
+      "full",
+      "battle",
+      "hand",
+      "compact"
+    ],
+    "source_of_truth": "SB1 structured card registry + printing/art metadata",
+    "no_card_id_specific_rendering_branches": true
   }
 }

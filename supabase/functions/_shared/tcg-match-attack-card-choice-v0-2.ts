@@ -272,7 +272,14 @@ export function runtimeV02CreateTopDeckCardChoice(
     throw new Error("tcg_v0_2_attack_card_choice_top_card_uid_duplicate");
   }
 
-  recordRuntimeV02HiddenInformationView(state, seat, "deck_top");
+  recordRuntimeV02HiddenInformationView(state, seat, "deck_top", {
+    action_kind: "attack",
+    source_controller_seat: seat,
+    source_action_id: descriptor.attack_id,
+    source_card_uid: source.uid,
+    source_creature_uid: source.uid,
+    phase: descriptor.phase,
+  });
   const options = topCards.map((card) => ({
     id: `card:${card.uid}`,
     label: cardLabel(state, card),

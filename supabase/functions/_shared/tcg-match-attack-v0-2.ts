@@ -55,6 +55,7 @@ export type RuntimeV02AttackMetadata = {
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
   starbound: boolean;
+  legacy_compatibility_required: boolean;
 };
 
 export type RuntimeV02AttackControlTargetMode =
@@ -286,6 +287,49 @@ export function evaluateStructuredRuntimeAttackRequirements(
   return { ok: true };
 }
 
+function nonEmptyProgramWindow(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
+}
+
+function selectedDamagedFriendlyHealProgramOwned(attack: Record<string, unknown>): boolean {
+  if (!Array.isArray(attack.on_declare) || attack.on_declare.length !== 0) return false;
+  if (!Array.isArray(attack.before_damage) || attack.before_damage.length !== 0) return false;
+  if (!Array.isArray(attack.after_damage) || attack.after_damage.length !== 2) return false;
+  if (nonEmptyProgramWindow(attack.after_attack_finished) || nonEmptyProgramWindow(attack.after_damage_finished)) return false;
+
+  const select = objectRecord(attack.after_damage[0]);
+  const heal = objectRecord(attack.after_damage[1]);
+  if (!select || !heal) return false;
+  if (String(select.op || "") !== "SELECT_CREATURE" || String(heal.op || "") !== "HEAL") return false;
+  if (String(select.controller || "") !== "self") return false;
+  const zone = String(select.zone || "");
+  if (zone !== "field" && zone !== "reserve") return false;
+  if (Number(select.count) !== 1 || !Number.isInteger(Number(select.count))) return false;
+  const filters = objectRecord(select.filters);
+  if (!filters || filters.damaged !== true || Object.keys(filters).some((key) => key !== "damaged")) return false;
+  const variable = typeof select.as === "string" ? select.as.trim() : "";
+  if (!variable || String(heal.target || "") !== `${variable}`) return false;
+  const amount = Number(heal.amount);
+  return Number.isFinite(amount) && amount > 0;
+}
+
+function structuredAttackLegacyCompatibilityRequired(attack: Record<string, unknown>): boolean {
+  const ordinaryWindows = [attack.on_declare, attack.before_damage, attack.after_damage];
+  const ordinaryWindowsComplete = ordinaryWindows.every((window) => Array.isArray(window));
+  const finishProgramPresent =
+    nonEmptyProgramWindow(attack.after_attack_finished) ||
+    nonEmptyProgramWindow(attack.after_damage_finished);
+
+  if (
+    ordinaryWindowsComplete &&
+    ordinaryWindows.every((window) => (window as unknown[]).length === 0) &&
+    !finishProgramPresent
+  ) return false;
+
+  if (selectedDamagedFriendlyHealProgramOwned(attack)) return false;
+  return true;
+}
+
 function structuredAttackStarbound(
   definition: Record<string, unknown>,
   creature: Record<string, unknown>,
@@ -415,6 +459,7 @@ export function structuredRuntimeAttackMetadata(
     target_permissions: attackTargetPermissions(attack.target_permissions, id),
     requirements: attackRequirements(attack.requirements, id),
     starbound: structuredAttackStarbound(definition, creature, attacks, id),
+    legacy_compatibility_required: structuredAttackLegacyCompatibilityRequired(attack),
   };
 }
 
