@@ -64,6 +64,7 @@ export type RuntimeAttackDamageContext = {
 
 const DAMAGE_PREVENTION_MARKER = "runtime_v0_2_damage_prevention";
 const PREVIOUS_OPPONENT_PREVENTION_MARKER = "runtime_v0_2_previous_opponent_damage_prevention";
+const ABILITY_CONTINUOUS_USAGE_KEY = "runtime_v0_2_attack_damage_ability_continuous_usage";
 const DAMAGE_PREVENTION_KINDS = new Set<RuntimeV02DamagePreventionKind>(["ability", "relic", "shield"]);
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -349,15 +350,14 @@ function incomingSelfAbilityEffects(
     .filter((value): value is RuntimeContinuousEffect => Boolean(value))
     .filter((effect) =>
       String(effect.kind || "") === "incoming_attack_damage" &&
-      String(effect.target || "") === "$source_creature" &&
-      effect.limit == null &&
-      effect.consume_when == null
+      String(effect.target || "") === "$source_creature"
     );
 }
 
 function selfAbilityWhenMatches(
   when: unknown,
   target: RuntimeAttackDamageCreature,
+  currentAttackDamage: number,
 ): boolean {
   if (when == null) return true;
   const predicate = objectRecord(when);
@@ -369,7 +369,142 @@ function selfAbilityWhenMatches(
     if (!condition) return false;
     return hasRuntimeCondition(target as RuntimeV02ConditionCreature, condition);
   }
+  if (kind === "current_attack_damage_at_least") {
+    const allowed = new Set(["predicate", "value", "stage"]);
+    const unsupported = Object.keys(predicate).find((field) => !allowed.has(field));
+    if (unsupported) {
+      throw new Error(
+        `tcg_v0_2_attack_damage_current_threshold_field_unsupported:${unsupported}`,
+      );
+    }
+    if (String(predicate.stage || "") !== "before_shield") {
+      throw new Error("tcg_v0_2_attack_damage_current_threshold_stage_unsupported");
+    }
+    const threshold = Number(predicate.value);
+    if (!Number.isInteger(threshold) || threshold < 0) {
+      throw new Error("tcg_v0_2_attack_damage_current_threshold_value_invalid");
+    }
+    return currentAttackDamage >= threshold;
+  }
   return false;
+}
+
+type RuntimeV02AbilityContinuousLimit = {
+  source: RuntimeCardInstance;
+  effect_id: string;
+  scope: "turn" | "match";
+  count: number;
+  used: number;
+  turn_seq: number;
+};
+
+function sourceCreatureCardInstance(
+  target: RuntimeAttackDamageCreature,
+): RuntimeCardInstance | null {
+  const stack = Array.isArray(target.stack) ? target.stack : [];
+  return stack.length ? stack[stack.length - 1] : null;
+}
+
+function abilityContinuousUsage(
+  source: RuntimeCardInstance,
+  effectId: string,
+  scope: "turn" | "match",
+  turnSeq: number,
+): number {
+  const flags = objectRecord(source.effect_flags);
+  if (!flags) return 0;
+  const rawLedger = flags[ABILITY_CONTINUOUS_USAGE_KEY];
+  if (rawLedger == null) return 0;
+  const ledger = objectRecord(rawLedger);
+  if (!ledger) throw new Error("tcg_v0_2_attack_damage_ability_usage_ledger_invalid");
+  const rawReceipt = ledger[effectId];
+  if (rawReceipt == null) return 0;
+  const receipt = objectRecord(rawReceipt);
+  if (!receipt) throw new Error("tcg_v0_2_attack_damage_ability_usage_receipt_invalid");
+  if (String(receipt.scope || "") !== scope) {
+    throw new Error("tcg_v0_2_attack_damage_ability_usage_scope_mismatch");
+  }
+  const used = Number(receipt.used);
+  if (!Number.isInteger(used) || used < 0) {
+    throw new Error("tcg_v0_2_attack_damage_ability_usage_count_invalid");
+  }
+  if (scope === "turn") {
+    const receiptTurn = Number(receipt.turn_seq);
+    if (!Number.isInteger(receiptTurn) || receiptTurn < 0) {
+      throw new Error("tcg_v0_2_attack_damage_ability_usage_turn_invalid");
+    }
+    return receiptTurn === turnSeq ? used : 0;
+  }
+  return used;
+}
+
+function consumeAbilityContinuousUsage(
+  source: RuntimeCardInstance,
+  effectId: string,
+  scope: "turn" | "match",
+  turnSeq: number,
+): void {
+  const flags = (
+    source.effect_flags && typeof source.effect_flags === "object" && !Array.isArray(source.effect_flags)
+      ? source.effect_flags
+      : (source.effect_flags = {})
+  ) as Record<string, unknown>;
+  const rawLedger = flags[ABILITY_CONTINUOUS_USAGE_KEY];
+  if (rawLedger != null && !objectRecord(rawLedger)) {
+    throw new Error("tcg_v0_2_attack_damage_ability_usage_ledger_invalid");
+  }
+  const ledger = objectRecord(rawLedger) || {};
+  const used = abilityContinuousUsage(source, effectId, scope, turnSeq);
+  ledger[effectId] = scope === "turn"
+    ? { scope, used: used + 1, turn_seq: turnSeq }
+    : { scope, used: used + 1 };
+  flags[ABILITY_CONTINUOUS_USAGE_KEY] = ledger;
+}
+
+function abilityContinuousLimit(
+  state: Record<string, unknown>,
+  source: RuntimeCardInstance,
+  effect: RuntimeContinuousEffect,
+): RuntimeV02AbilityContinuousLimit | null {
+  const limit = objectRecord(effect.limit);
+  if (!limit) {
+    if (effect.limit != null) {
+      throw new Error("tcg_v0_2_attack_damage_ability_limit_invalid");
+    }
+    if (effect.consume_when != null) {
+      throw new Error("tcg_v0_2_attack_damage_ability_consume_without_limit");
+    }
+    return null;
+  }
+  const unsupported = Object.keys(limit).find((field) => !["scope", "count", "owner"].includes(field));
+  if (unsupported) {
+    throw new Error(`tcg_v0_2_attack_damage_ability_limit_field_unsupported:${unsupported}`);
+  }
+  const scope = String(limit.scope || "");
+  if (scope !== "turn" && scope !== "match") {
+    throw new Error("tcg_v0_2_attack_damage_ability_limit_scope_unsupported");
+  }
+  if (String(limit.owner || "") !== "card_instance") {
+    throw new Error("tcg_v0_2_attack_damage_ability_limit_owner_unsupported");
+  }
+  const count = Number(limit.count);
+  if (!Number.isInteger(count) || count < 1) {
+    throw new Error("tcg_v0_2_attack_damage_ability_limit_count_invalid");
+  }
+  if (String(effect.consume_when || "") !== "prevention_amount_at_least_1") {
+    throw new Error("tcg_v0_2_attack_damage_ability_consume_unsupported");
+  }
+  const effectId = String(effect.id || "").trim();
+  if (!effectId) throw new Error("tcg_v0_2_attack_damage_ability_effect_id_required");
+  const turnSeq = currentTurn(state);
+  return {
+    source,
+    effect_id: effectId,
+    scope,
+    count,
+    used: abilityContinuousUsage(source, effectId, scope, turnSeq),
+    turn_seq: turnSeq,
+  };
 }
 
 function continuousFiltersMatch(
@@ -417,8 +552,15 @@ function applyIncomingSelfAbilityDamage(
 ): { value: number; prevented: number } {
   let value = Math.max(0, Number(baseValue || 0));
   let prevented = 0;
-  for (const effect of incomingSelfAbilityEffects(state, target)) {
-    if (!selfAbilityWhenMatches(effect.when, target)) continue;
+  const effects = incomingSelfAbilityEffects(state, target);
+  const source = effects.length ? sourceCreatureCardInstance(target) : null;
+  if (effects.length && !source) {
+    throw new Error("tcg_v0_2_attack_damage_ability_source_required");
+  }
+  for (const effect of effects) {
+    const limit = abilityContinuousLimit(state, source as RuntimeCardInstance, effect);
+    if (limit && limit.used >= limit.count) continue;
+    if (!selfAbilityWhenMatches(effect.when, target, value)) continue;
     if (!continuousFiltersMatch(effect.filters, context)) continue;
     const amount = Number(effect.amount);
     if (!Number.isFinite(amount)) continue;
@@ -431,7 +573,16 @@ function applyIncomingSelfAbilityDamage(
     const maximum = Number(effect.maximum);
     if (Number.isFinite(maximum)) value = Math.min(value, maximum);
     value = Math.max(0, value);
-    prevented += Math.max(0, before - value);
+    const effectPrevented = Math.max(0, before - value);
+    prevented += effectPrevented;
+    if (effectPrevented > 0 && limit) {
+      consumeAbilityContinuousUsage(
+        limit.source,
+        limit.effect_id,
+        limit.scope,
+        limit.turn_seq,
+      );
+    }
   }
   return { value, prevented };
 }

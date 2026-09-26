@@ -191,6 +191,28 @@ const kilnback = continuousCreature("ember-kilnback", "furnace-hide", [{
   filters: { source_controller: "opponent" },
 }]);
 
+const shalejaw = continuousCreature("stone-shalejaw", "tough-bite", [{
+  id: "tough-bite-threshold",
+  kind: "incoming_attack_damage",
+  target: "$source_creature",
+  when: { predicate: "current_attack_damage_at_least", value: 100, stage: "before_shield" },
+  amount: -20,
+  filters: { source_controller: "opponent" },
+  limit: { scope: "turn", count: 1, owner: "card_instance" },
+  consume_when: "prevention_amount_at_least_1",
+}]);
+
+const obsidianox = continuousCreature("stone-obsidianox", "glass-armour", [{
+  id: "glass-armour-threshold",
+  kind: "incoming_attack_damage",
+  target: "$source_creature",
+  when: { predicate: "current_attack_damage_at_least", value: 120, stage: "before_shield" },
+  amount: -30,
+  filters: { source_controller: "opponent" },
+  limit: { scope: "match", count: 1, owner: "card_instance" },
+  consume_when: "prevention_amount_at_least_1",
+}]);
+
 const wingclipCharm = structuredEntry("gale-wingclip-charm", {
   card_family: "Tactic",
   element: "Gale",
@@ -359,6 +381,146 @@ Deno.test("Kilnback incoming Attack damage uses canonical source_has_condition s
     structuredRuntimeIncomingAttackDamage(state, attacker, makeTarget(false), 80, context),
     80,
     "Furnace Hide must not prevent damage while Kilnback is not Scorched",
+  );
+});
+
+
+Deno.test("Stone current Attack-damage thresholds use canonical pre-Shield value and card-instance limits", () => {
+  const state = {
+    ...markedState({
+      "stone-shalejaw": shalejaw,
+      "stone-obsidianox": obsidianox,
+      "stone-anchor-essence": anchor,
+    }),
+    turn_seq: 7,
+  } as Record<string, unknown>;
+  const attacker = { essence: [], damage: 0, shield: 0 };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+
+  const shaleTarget = {
+    stack: [{ uid: "shale-1", card_id: "stone-shalejaw" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 99, context),
+    99,
+    "Tough Bite must not consume below its current-damage threshold",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 100, context),
+    80,
+    "Tough Bite should prevent 20 at exactly 100 current pre-Shield damage",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 140, context),
+    140,
+    "Tough Bite should be consumed for the rest of the same turn",
+  );
+  state.turn_seq = 8;
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 100, context),
+    80,
+    "Tough Bite turn-scoped card-instance use should reset on a new turn",
+  );
+
+  const obsidianTarget = {
+    stack: [{ uid: "obsidian-1", card_id: "stone-obsidianox" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, obsidianTarget, 119, context),
+    119,
+    "Glass Armour must not consume below 120 current pre-Shield damage",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, obsidianTarget, 120, context),
+    90,
+    "Glass Armour should prevent 30 at exactly 120 current pre-Shield damage",
+  );
+  state.turn_seq = 9;
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, obsidianTarget, 160, context),
+    160,
+    "Glass Armour match-scoped card-instance use must remain consumed on later turns",
+  );
+
+  const layeredShaleTarget = {
+    stack: [{ uid: "shale-2", card_id: "stone-shalejaw" }],
+    essence: [{ uid: "anchor-1", card_id: "stone-anchor-essence" }],
+    damage: 0,
+    shield: 0,
+  };
+  state.turn_seq = 10;
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, layeredShaleTarget, 100, context),
+    90,
+    "current_attack_damage_at_least must read the canonical current packet after earlier incoming modifiers and before Shield",
+  );
+});
+
+Deno.test("Stone threshold Ability grammar fails closed on unsupported stage and limit ownership", () => {
+  const wrongStage = continuousCreature("stone-wrong-stage", "wrong-stage", [{
+    id: "wrong-stage-effect",
+    kind: "incoming_attack_damage",
+    target: "$source_creature",
+    when: { predicate: "current_attack_damage_at_least", value: 100, stage: "after_shield" },
+    amount: -20,
+    filters: { source_controller: "opponent" },
+    limit: { scope: "turn", count: 1, owner: "card_instance" },
+    consume_when: "prevention_amount_at_least_1",
+  }]);
+  const wrongOwner = continuousCreature("stone-wrong-owner", "wrong-owner", [{
+    id: "wrong-owner-effect",
+    kind: "incoming_attack_damage",
+    target: "$source_creature",
+    when: { predicate: "current_attack_damage_at_least", value: 100, stage: "before_shield" },
+    amount: -20,
+    filters: { source_controller: "opponent" },
+    limit: { scope: "turn", count: 1, owner: "controller" },
+    consume_when: "prevention_amount_at_least_1",
+  }]);
+  const state = {
+    ...markedState({
+      "stone-wrong-stage": wrongStage,
+      "stone-wrong-owner": wrongOwner,
+    }),
+    turn_seq: 4,
+  } as Record<string, unknown>;
+  const attacker = { essence: [] };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+  assertThrows(
+    () => structuredRuntimeIncomingAttackDamage(
+      state,
+      attacker,
+      { stack: [{ uid: "ws", card_id: "stone-wrong-stage" }], essence: [] },
+      120,
+      context,
+    ),
+    "tcg_v0_2_attack_damage_current_threshold_stage_unsupported",
+  );
+  assertThrows(
+    () => structuredRuntimeIncomingAttackDamage(
+      state,
+      attacker,
+      { stack: [{ uid: "wo", card_id: "stone-wrong-owner" }], essence: [] },
+      120,
+      context,
+    ),
+    "tcg_v0_2_attack_damage_ability_limit_owner_unsupported",
   );
 });
 
