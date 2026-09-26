@@ -4580,3 +4580,81 @@ Capability blob is `c7679c45facfab4849f991387e1806dd03aaa3f3`.
 Capability catalogue is now **61/72 operations + 91/108 predicates = 152/180 (84.4%)** implemented. Frozen Release 1 used-missing falls from **15 to 11**.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+
+## V2.4.126 — Shade generic condition-changed event parity
+
+**Baseline authority head:** `ec66322ed453829f1993cc9625a248b945cb5bfb` — Card Pass #1718 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen structured-card sweep identifies the remaining Shade `condition_changed` predicate consumers as:
+- `event_condition_slot_is` — exactly one consumer: Shade Mirror Fang / `mirror-fang-reflection`;
+- `event_change_kind_in` — exactly two consumers: Shade Mirror Fang / `mirror-fang-reflection` and Shade Eclipse Essence / `eclipse-condition-heal`.
+
+Mirror Fang requires a changed **control** slot and accepts both `apply` and `replace`. Eclipse Essence accepts the same two canonical change kinds.
+
+### Canonical Condition ownership
+Condition Engine #19 remains the sole Condition mutation owner. V2.4.126 does not create a second Condition write path.
+
+The canonical source-aware Condition result now exposes:
+- the resolved canonical slot: `scorched`, `venomed`, `control` or `modifier`;
+- `change_kind: "apply"` when a previously empty slot receives a condition;
+- `change_kind: "replace"` when the canonical slot changes from one condition identity to another;
+- `change_kind: null` for prevented, rejected or no-op applications.
+
+Only a successful canonical mutation may be adapted into the metadata-only `condition_changed` Event Listener view.
+
+### Generic condition_changed event and listener parity
+Event Listener #28 owns the metadata event and strict generic predicate leaves:
+- `event_condition_slot_is` validates the declared slot against the canonical Condition slot;
+- `event_change_kind_in` accepts only unique `apply` / `replace` values;
+- undeclared predicate fields, invalid slots and invalid change-kind values fail closed.
+
+Current structured producer routes feed the same generic event after canonical Condition mutation:
+- Tactic `APPLY_CONDITION`;
+- Attack after-damage Condition effects;
+- conditional Attack Condition effects;
+- delayed `after_attack_finished` Condition continuation;
+- active-Ability control-condition replacement;
+- nested Event Listener `APPLY_CONDITION`.
+
+The event carries metadata only: affected Creature/controller/zone, source controller/action/card context, canonical Condition slot and canonical change kind. It never performs the Condition mutation itself.
+
+### Privacy, continuation and deterministic proof
+Public active-Ability receipts keep the existing privacy boundary while internal routing retains the target identity needed to create the event. Existing Event Listener and Heal Listener continuation owners remain authoritative.
+
+Dedicated deterministic proof covers:
+- canonical Condition Engine apply, replace and no-op classification;
+- Mirror Fang reacting to a control-slot `condition_changed` event;
+- Mirror Fang applying Dazed through canonical Condition ownership to the opposing Vanguard;
+- the resulting nested `condition_changed` event chaining into Eclipse Essence;
+- Eclipse Essence producing the expected canonical Heal packet;
+- strict rejection of undeclared `condition_changed` predicate fields.
+
+### Validation and release-control reconciliation
+Runtime head `68e8446e0946c1aaf5fbabb0816db8e6c214fc71` passed Card Pass #1721 **SUCCESS** end-to-end.
+
+Capability head `95891e24e8ea6e097444f7c0b00846d342300451` moved exactly:
+- `event_condition_slot_is`;
+- `event_change_kind_in`
+
+from missing -> implemented.
+
+Card Pass #1722 then exposed exactly one stale static release-control fingerprint: the capability manifest blob changed from `c7679c45facfab4849f991387e1806dd03aaa3f3` to `552c25286b02140124220b45d03797cd4dba4ccc`. The deterministic runtime job remained green and the structural suite had 564/565 tests passing; the only failure was that expected fingerprint mismatch.
+
+Release-control-only head `7053ca758f2fb5e9f6cfa2eed3d980cde757ce88` synchronized that exact capability fingerprint and passed Card Pass #1723 **SUCCESS** with both jobs green.
+
+Accepted closures remain:
+- Match Edge: **123 files**, SHA-256 `46cc092cf16c02c8c8b6d136ea9e3374205d303f18e9c5d970e4c589e3e2ce67`;
+- Tactic Edge: **55 files**, SHA-256 `08e2bd33ff3307218603a6c8179e51250b6ae8286b2712ae25ecc4f3a1afca8a`.
+
+### Capability acceptance
+Capability blob is `552c25286b02140124220b45d03797cd4dba4ccc`.
+
+Capability catalogue is now **61/72 operations + 93/108 predicates = 154/180 (85.6%)** implemented. Frozen Release 1 used-missing falls from **11 to 9**.
+
+The nine remaining frozen used-missing capabilities are:
+- operations: `PERFORM_VOLUNTARY_WITHDRAWAL`, `SET_RESOLVING_CARD_DESTINATION`, `TIMEFOLD`;
+- predicates: `essence_discarded_by_own_card_effect`, `essence_discarded_source_controller_is_self`, `event_previous_attachment_target_is_attached_creature`, `voluntary_withdrawal_legal_with_incoming`, `current_attack_damage_at_least`, `essence_discarded_attachment_kind_is`.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

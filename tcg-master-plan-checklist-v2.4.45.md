@@ -1715,3 +1715,37 @@
 - [x] Preserve 40 owner families and unchanged production.
 
 **Acceptance:** capability blob `c7679c45facfab4849f991387e1806dd03aaa3f3`; Compact Shell is fed by generic Shield-gained events across current Release 1 Shield producer routes.
+
+
+### V2.4.126 — Shade generic condition-changed event parity
+- [x] Sweep frozen Release 1 sources for `event_condition_slot_is`.
+- [x] Sweep frozen Release 1 sources for `event_change_kind_in`.
+- [x] Confirm the sole `event_condition_slot_is` consumer is Shade Mirror Fang / `mirror-fang-reflection`.
+- [x] Confirm the two `event_change_kind_in` consumers are Shade Mirror Fang and Shade Eclipse Essence.
+- [x] Preserve Condition Engine #19 as the sole physical Condition mutation owner.
+- [x] Derive canonical `condition_slot` from the successful Condition Engine result.
+- [x] Derive `change_kind=apply` only for a newly occupied canonical slot.
+- [x] Derive `change_kind=replace` only when the canonical slot changes condition identity.
+- [x] Keep `change_kind=null` for prevented, rejected and no-op Condition attempts.
+- [x] Add a strict metadata-only `condition_changed` event shape to Event Listener #28.
+- [x] Add strict `event_condition_slot_is` matching with canonical slot validation.
+- [x] Add strict `event_change_kind_in` matching limited to unique apply/replace values.
+- [x] Route Tactic `APPLY_CONDITION` successful changes into the generic event.
+- [x] Route Attack after-damage Condition changes into the generic event.
+- [x] Route conditional Attack Condition changes into the generic event.
+- [x] Route delayed after-attack-finished Condition changes into the generic event.
+- [x] Route active-Ability control-condition replacement into the generic event.
+- [x] Route nested Event Listener `APPLY_CONDITION` changes into the generic event.
+- [x] Preserve public active-Ability receipt privacy while retaining internal event-routing metadata.
+- [x] Preserve existing Event Listener / Heal Listener continuation and card-instance limit ownership.
+- [x] Prove Mirror Fang applies Dazed canonically and its nested change can chain into Eclipse Essence Heal.
+- [x] Prove `condition_changed` predicate grammar rejects undeclared fields and invalid values.
+- [x] Confirm no Mirror Fang/Eclipse card-ID dispatch and no new owner family.
+- [x] Pass runtime head `68e8446e0946c1aaf5fbabb0816db8e6c214fc71` / Card Pass #1721 SUCCESS.
+- [x] Move exactly `event_condition_slot_is` and `event_change_kind_in` missing -> implemented.
+- [x] Record Card Pass #1722 as one stale capability-manifest fingerprint failure only; deterministic runtime/type-check evidence remained green.
+- [x] Synchronize release-control capability fingerprint to blob `552c25286b02140124220b45d03797cd4dba4ccc`.
+- [x] Pass repaired capability/release-control head `7053ca758f2fb5e9f6cfa2eed3d980cde757ce88` / Card Pass #1723 SUCCESS.
+- [x] Preserve 40 owner families and unchanged Supabase production.
+
+**Acceptance:** capability blob `552c25286b02140124220b45d03797cd4dba4ccc`; Shade Mirror Fang and Eclipse Essence are fed through canonical Condition Engine -> Event Listener -> Heal/Condition ownership; capability coverage is 154/180 (85.6%) and frozen Release 1 used-missing is 9.

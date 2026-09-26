@@ -1420,3 +1420,19 @@ Head `e81906ee031b3b5eb33dca10aca90b49538f23b2` had deterministic Shield-gained 
 
 ## 480 — V2.4.125 Shield-gained predicates accepted
 Capability head `ddd8a5af15e7d9c6b9a6fdb57efefab617469ad4` passed Card Pass #1717. Exactly `shield_target_is_self`, `shield_source_is_card_effect`, `shield_actual_gain_at_least` and `event_source_action_is` moved missing -> implemented. Capability blob is `c7679c45facfab4849f991387e1806dd03aaa3f3`. Coverage is 152/180 (84.4%), frozen used-missing falls to 11, owner-family count remains 40 and production is unchanged.
+
+
+## 481 — V2.4.126 Shade condition_changed has two frozen predicate leaves
+The frozen Release 1 sweep finds exactly one `event_condition_slot_is` consumer, Shade Mirror Fang / `mirror-fang-reflection`, and exactly two `event_change_kind_in` consumers, Mirror Fang plus Shade Eclipse Essence / `eclipse-condition-heal`.
+
+## 482 — Condition Engine remains the sole mutation owner
+V2.4.126 derives canonical slot and apply/replace metadata only from successful source-aware Condition Engine results. Tactic, Attack after-damage, conditional Attack, delayed after-attack-finished, active-Ability replacement and nested Event Listener condition routes adapt those results into metadata-only `condition_changed` events. Event Listener #28 owns strict slot/change-kind predicates; no second Condition mutation path or new owner family is introduced.
+
+## 483 — V2.4.126 runtime proof passed
+Runtime head `68e8446e0946c1aaf5fbabb0816db8e6c214fc71` passed Card Pass #1721 end-to-end. Dedicated proof covers canonical apply/replace/no-op classification, Mirror Fang control-slot reflection, nested Eclipse Essence Heal chaining, fail-closed predicate grammar and preserved active-Ability receipt privacy. Accepted Match/Tactic closures are `46cc092cf16c02c8c8b6d136ea9e3374205d303f18e9c5d970e4c589e3e2ce67` / `08e2bd33ff3307218603a6c8179e51250b6ae8286b2712ae25ecc4f3a1afca8a`.
+
+## 484 — Capability reconciliation exposed one stale static fingerprint only
+Capability head `95891e24e8ea6e097444f7c0b00846d342300451` moved exactly `event_condition_slot_is` and `event_change_kind_in` missing -> implemented. Card Pass #1722 had deterministic runtime/type-check evidence green and 564/565 structural tests passing; its sole failure was release-control still naming old capability blob `c7679c45facfab4849f991387e1806dd03aaa3f3` instead of new blob `552c25286b02140124220b45d03797cd4dba4ccc`.
+
+## 485 — V2.4.126 condition_changed predicates accepted
+Release-control-only head `7053ca758f2fb5e9f6cfa2eed3d980cde757ce88` synchronized the exact capability fingerprint and passed Card Pass #1723 **SUCCESS** with both jobs green. Capability coverage is now **61/72 operations + 93/108 predicates = 154/180 (85.6%)** and frozen Release 1 used-missing falls from **11 to 9**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3; no database migration, Edge deployment, main merge or live promotion occurred.
