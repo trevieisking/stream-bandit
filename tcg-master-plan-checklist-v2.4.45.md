@@ -1749,3 +1749,41 @@
 - [x] Preserve 40 owner families and unchanged Supabase production.
 
 **Acceptance:** capability blob `552c25286b02140124220b45d03797cd4dba4ccc`; Shade Mirror Fang and Eclipse Essence are fed through canonical Condition Engine -> Event Listener -> Heal/Condition ownership; capability coverage is 154/180 (85.6%) and frozen Release 1 used-missing is 9.
+
+
+### V2.4.127 — Stone current Attack-damage threshold parity
+- [x] Sweep all eight frozen Release 1 element sources for `current_attack_damage_at_least`.
+- [x] Confirm exactly two consumers: Stone Shalejaw / Tough Bite and Stone Obsidianox / Glass Armour.
+- [x] Confirm both consumers are incoming self-Creature continuous Ability prevention effects.
+- [x] Preserve Attack Damage owner as the sole incoming Attack-damage/prevention owner.
+- [x] Identify the exact gap: limited incoming self-Abilities were excluded by `limit == null` / `consume_when == null` filtering.
+- [x] Extend the generic incoming self-Ability path instead of adding card-ID dispatch.
+- [x] Accept only `predicate`, `value` and `stage` fields for the current-damage threshold.
+- [x] Require threshold stage `before_shield`.
+- [x] Require a non-negative integer threshold value.
+- [x] Compare against the canonical current incoming packet value at the Ability stage.
+- [x] Preserve earlier incoming Essence modifier ordering before the Ability threshold check.
+- [x] Preserve later Relic/protection/Shield ordering after the Ability stage.
+- [x] Support `turn` limited use only with owner `card_instance`.
+- [x] Support `match` limited use only with owner `card_instance`.
+- [x] Require a positive integer limit count.
+- [x] Require `consume_when=prevention_amount_at_least_1`.
+- [x] Persist limited-use receipts on the source Creature card instance.
+- [x] Reset turn-scoped usage when canonical `turn_seq` changes.
+- [x] Preserve match-scoped usage across later turns.
+- [x] Consume a receipt only when actual prevention is at least 1.
+- [x] Preserve existing unlimited incoming continuous Ability behavior.
+- [x] Preserve the existing generic limited-use Relic prevention path.
+- [x] Prove Shalejaw 99 rejects, 100 qualifies, same-turn reuse rejects and next-turn use resets.
+- [x] Prove Obsidianox 119 rejects, 120 qualifies and later-turn reuse remains consumed.
+- [x] Prove an earlier Anchor Essence modifier can reduce 100 to 90 before Tough Bite threshold evaluation.
+- [x] Prove unsupported threshold stage fails closed.
+- [x] Prove unsupported limit ownership fails closed.
+- [x] Confirm no Shalejaw/Obsidianox card-name dispatch and no new owner family.
+- [x] Synchronize Match release-control closure to `9eb91319e59a57f1e2c7e11f99e9192745706c3051a3b4e4341cf59a7b92c171`.
+- [x] Pass runtime head `197420a274eefd7ffe2b6d34beaeccaf82752ead` / Card Pass #1725 SUCCESS.
+- [x] Move exactly `current_attack_damage_at_least` missing -> implemented.
+- [x] Pass capability head `05bfd980364c54bf073ef7466c3c338ac4c3cb8e` / Card Pass #1726 SUCCESS.
+- [x] Preserve 40 owner families and unchanged Supabase production.
+
+**Acceptance:** capability blob `bd709ecd6f32db979df0087b1f573b339b38a3cd`; Tough Bite and Glass Armour now run through canonical Attack Damage ownership with strict current pre-Shield threshold evaluation and card-instance usage receipts.

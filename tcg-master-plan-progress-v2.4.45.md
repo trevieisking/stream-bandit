@@ -4658,3 +4658,82 @@ The nine remaining frozen used-missing capabilities are:
 - predicates: `essence_discarded_by_own_card_effect`, `essence_discarded_source_controller_is_self`, `event_previous_attachment_target_is_attached_creature`, `voluntary_withdrawal_legal_with_incoming`, `current_attack_damage_at_least`, `essence_discarded_attachment_kind_is`.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+
+## V2.4.127 — Stone current Attack-damage threshold parity
+
+**Baseline authority head:** `375fcfb71d2bf9cb5beeec520167655b9937593f` — Card Pass #1724 **SUCCESS**.
+
+### Exact Release 1 inventory
+The frozen eight-element sweep finds exactly **two** consumers of `current_attack_damage_at_least`:
+- Stone Shalejaw / Tough Bite — threshold **100**, stage `before_shield`, prevent 20, once per turn per card instance;
+- Stone Obsidianox / Glass Armour — threshold **120**, stage `before_shield`, prevent 30, once per match per card instance.
+
+No other Release 1 card uses this predicate.
+
+### Canonical owner and identified runtime gap
+Attack Damage owner `tcg-match-attack-damage-v0-2.ts` already owns incoming continuous Ability prevention and the ordered pre-Shield damage pipeline. Before V2.4.127 it deliberately accepted only unlimited incoming self-Ability effects by excluding any effect with `limit` or `consume_when`. That exclusion is the exact reason Tough Bite and Glass Armour were not runnable.
+
+V2.4.127 extends that existing owner rather than creating a second prevention engine or card-specific branch.
+
+### Current pre-Shield threshold semantics
+`current_attack_damage_at_least` is evaluated from the authoritative **current incoming Attack packet value at the Ability stage before Shield**.
+
+That means:
+- earlier canonical incoming modifiers already applied by the same pipeline are reflected in the threshold value;
+- the threshold is checked before the qualifying Ability's own reduction;
+- later Relic, temporary protection and Shield layers remain later in their existing order;
+- raw printed attack damage and client arithmetic are not authoritative.
+
+The runtime accepts only:
+- fields `predicate`, `value`, `stage`;
+- `stage: "before_shield"`;
+- a non-negative integer threshold.
+
+Unsupported fields, stages or values fail closed.
+
+### Card-instance limited-use ownership
+Limited incoming self-Abilities use a generic receipt ledger on the **source Creature card instance**.
+
+Accepted Release 1 grammar is deliberately narrow:
+- owner must be `card_instance`;
+- scope must be `turn` or `match`;
+- count must be a positive integer;
+- `consume_when` must be `prevention_amount_at_least_1`.
+
+Turn-scoped receipts are keyed to canonical `turn_seq` and therefore reset on a later turn. Match-scoped receipts persist for the card instance. A use is consumed only when the effect actually prevents at least 1 damage; sub-threshold or zero-prevention evaluation does not spend the receipt.
+
+Existing unlimited incoming Ability handling and the separate generic limited-use Relic path are preserved.
+
+### Deterministic proof
+Runtime head `197420a274eefd7ffe2b6d34beaeccaf82752ead` passed Card Pass #1725 **SUCCESS** end-to-end.
+
+Dedicated proof covers:
+- Shalejaw at 99 does not qualify or consume;
+- Shalejaw at exactly 100 prevents 20;
+- a second qualifying packet in the same turn does not receive Tough Bite again;
+- Tough Bite becomes available on a later `turn_seq`;
+- Obsidianox at 119 does not qualify or consume;
+- Obsidianox at exactly 120 prevents 30;
+- Glass Armour remains consumed on later turns because its scope is match;
+- an earlier Anchor Essence reduction takes a 100 packet to 90 before Tough Bite's Ability stage, so the current-damage threshold no longer qualifies;
+- unsupported threshold stage and wrong limit owner fail closed.
+
+The runtime commit also synchronized the Match release-control closure:
+- Match Edge: **123 files**, SHA-256 `9eb91319e59a57f1e2c7e11f99e9192745706c3051a3b4e4341cf59a7b92c171`;
+- Tactic Edge remains **55 files**, SHA-256 `08e2bd33ff3307218603a6c8179e51250b6ae8286b2712ae25ecc4f3a1afca8a`.
+
+### Capability acceptance
+Capability head `05bfd980364c54bf073ef7466c3c338ac4c3cb8e` passed Card Pass #1726 **SUCCESS**.
+
+Exactly `current_attack_damage_at_least` moved missing -> implemented.
+
+Capability blob is `bd709ecd6f32db979df0087b1f573b339b38a3cd`.
+
+Capability catalogue is now **61/72 operations + 94/108 predicates = 155/180 (86.1%)** implemented. Frozen Release 1 used-missing falls from **9 to 8**.
+
+The eight remaining frozen used-missing capabilities are:
+- operations: `PERFORM_VOLUNTARY_WITHDRAWAL`, `SET_RESOLVING_CARD_DESTINATION`, `TIMEFOLD`;
+- predicates: `essence_discarded_by_own_card_effect`, `essence_discarded_source_controller_is_self`, `event_previous_attachment_target_is_attached_creature`, `voluntary_withdrawal_legal_with_incoming`, `essence_discarded_attachment_kind_is`.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.

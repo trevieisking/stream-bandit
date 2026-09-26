@@ -1436,3 +1436,19 @@ Capability head `95891e24e8ea6e097444f7c0b00846d342300451` moved exactly `event_
 
 ## 485 — V2.4.126 condition_changed predicates accepted
 Release-control-only head `7053ca758f2fb5e9f6cfa2eed3d980cde757ce88` synchronized the exact capability fingerprint and passed Card Pass #1723 **SUCCESS** with both jobs green. Capability coverage is now **61/72 operations + 93/108 predicates = 154/180 (85.6%)** and frozen Release 1 used-missing falls from **11 to 9**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3; no database migration, Edge deployment, main merge or live promotion occurred.
+
+
+## 486 — V2.4.127 Stone threshold inventory is exactly two cards
+The frozen eight-element sweep finds exactly two `current_attack_damage_at_least` consumers: Shalejaw / Tough Bite at 100 and Obsidianox / Glass Armour at 120. Both are `before_shield` incoming self-Ability reductions with card-instance limits; no other Release 1 card uses the predicate.
+
+## 487 — Attack Damage owner now owns limited continuous Ability receipts
+The pre-existing Attack Damage owner already handled unlimited incoming continuous Abilities but excluded effects carrying `limit` / `consume_when`. V2.4.127 extends that same owner generically: current threshold evaluation uses the canonical packet value at the Ability stage, turn/match card-instance receipts live on the source Creature card instance, and usage is consumed only after positive prevention. Existing unlimited Ability and Relic paths remain separate and preserved.
+
+## 488 — V2.4.127 runtime proof passed
+Runtime head `197420a274eefd7ffe2b6d34beaeccaf82752ead` passed Card Pass #1725 **SUCCESS**. Proof covers Shalejaw below/equal threshold, same-turn consumption and later-turn reset; Obsidianox below/equal threshold and match persistence; Anchor Essence reducing a 100 packet below Tough Bite's current threshold; and fail-closed unsupported stage/owner grammar. Match closure is now `9eb91319e59a57f1e2c7e11f99e9192745706c3051a3b4e4341cf59a7b92c171`.
+
+## 489 — current_attack_damage_at_least capability reconciliation accepted
+Capability head `05bfd980364c54bf073ef7466c3c338ac4c3cb8e` passed Card Pass #1726 **SUCCESS**. Exactly `current_attack_damage_at_least` moved missing -> implemented and release control was synchronized to capability blob `bd709ecd6f32db979df0087b1f573b339b38a3cd`.
+
+## 490 — V2.4.127 closes one more frozen Release 1 capability
+Capability coverage is now **61/72 operations + 94/108 predicates = 155/180 (86.1%)** and frozen Release 1 used-missing falls from **9 to 8**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3; no database migration, Edge deployment, main merge or live promotion occurred.
