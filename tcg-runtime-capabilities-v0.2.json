@@ -70,7 +70,8 @@
       "SHUFFLE_DECK",
       "SHUFFLE_ZONE_INTO_DECK",
       "SWITCH_WITH_VANGUARD",
-      "TRANSFER_SHIELD"
+      "TRANSFER_SHIELD",
+      "PERFORM_VOLUNTARY_WITHDRAWAL"
     ],
     "partial": [],
     "missing": [
@@ -78,7 +79,6 @@
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
       "MOVE_DAMAGE",
-      "PERFORM_VOLUNTARY_WITHDRAWAL",
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
       "SET_ATTACK_COST_FLOOR",
@@ -182,7 +182,8 @@
       "target_printed_hp_at_least",
       "target_remains_in_play_after_damage",
       "target_stage_in",
-      "target_zone_is"
+      "target_zone_is",
+      "voluntary_withdrawal_legal_with_incoming"
     ],
     "partial": [],
     "missing": [
@@ -198,8 +199,7 @@
       "target_has_any_named_condition",
       "target_remaining_hp_at_least",
       "target_remaining_hp_at_most",
-      "target_remaining_hp_equals",
-      "voluntary_withdrawal_legal_with_incoming"
+      "target_remaining_hp_equals"
     ]
   },
   "known_legacy_equivalents": {
@@ -2184,6 +2184,70 @@
       },
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-shield-gained-event-listener.test.ts"
+      ]
+    },
+    "release1_draft_voluntary_withdrawal_v2_4_128": {
+      "implementation_head": "6348e1c5affe4b4eb95c8a87b24bdf26c89cc4ce",
+      "accepted_proof_head": "91d048cf50bdd01aa2602c0bb07e594281d7c249",
+      "card_pass_run": 1731,
+      "operation": "PERFORM_VOLUNTARY_WITHDRAWAL",
+      "predicate": "voluntary_withdrawal_legal_with_incoming",
+      "frozen_consumers": [
+        {
+          "card_id": "gale-draft-essence",
+          "listener_id": "draft-attach-withdrawal",
+          "event": "essence_attached",
+          "surface": "essence_listener"
+        }
+      ],
+      "owners": {
+        "withdrawal_quote": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+        "attachment_snapshot": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "payment_and_switch": "supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts",
+        "match_route": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "normal_and_effect_withdrawal_share_quote": true,
+        "cost_order": [
+          "base_and_continuous",
+          "lifecycle_modifiers",
+          "before_voluntary_withdrawal_cost_listeners"
+        ],
+        "exact_attached_essence_payment_selected_by_player": true,
+        "atomic_switch_owner_reused": true,
+        "movement_events_resume_existing_listener_continuation": true,
+        "once_per_turn_withdrawal_allowance_preserved": true,
+        "lifecycle_modifier_consumption_preserved": true,
+        "zero_cost_withdrawal_supported": true,
+        "stale_target_cost_or_payment_fails_closed": true,
+        "no_auto_payment": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "validation_history": [
+        {
+          "head": "6348e1c5affe4b4eb95c8a87b24bdf26c89cc4ce",
+          "card_pass": 1729,
+          "result": "failure_guard_materialization_only",
+          "card_pass_tests": "565/565",
+          "runtime_job": "success"
+        },
+        {
+          "head": "6b47901717e5dcf21889dd7eb880bad19cbde845",
+          "card_pass": 1730,
+          "result": "failure_guard_syntax_only",
+          "runtime_job": "success"
+        },
+        {
+          "head": "91d048cf50bdd01aa2602c0bb07e594281d7c249",
+          "card_pass": 1731,
+          "result": "success"
+        }
+      ],
+      "deterministic_tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts"
       ]
     }
   }
