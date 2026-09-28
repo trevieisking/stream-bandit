@@ -1787,3 +1787,38 @@
 - [x] Preserve 40 owner families and unchanged Supabase production.
 
 **Acceptance:** capability blob `bd709ecd6f32db979df0087b1f573b339b38a3cd`; Tough Bite and Glass Armour now run through canonical Attack Damage ownership with strict current pre-Shield threshold evaluation and card-instance usage receipts.
+
+### V2.4.128 — Gale Draft Essence canonical voluntary Withdrawal parity
+- [x] Reconfirm the frozen Draft Essence consumer `draft-attach-withdrawal`.
+- [x] Bind the open pair to `voluntary_withdrawal_legal_with_incoming` + `PERFORM_VOLUNTARY_WITHDRAWAL`.
+- [x] Remove the attachment snapshot's incomplete local Withdrawal legality calculation.
+- [x] Add one shared structured `runtimeV02QuoteVoluntaryWithdrawal` owner.
+- [x] Reuse that same quote for ordinary Match Withdrawal.
+- [x] Reuse that same quote for effect-driven Draft Withdrawal.
+- [x] Preserve printed/base plus continuous Withdrawal-cost ownership.
+- [x] Preserve lifecycle/current Withdrawal modifier ownership.
+- [x] Preserve `before_voluntary_withdrawal_cost` Event Listener cost modification.
+- [x] Inject only the canonical quote result into the immutable attachment trigger snapshot.
+- [x] Require the exact newly attached Reserve Creature as Draft's incoming target.
+- [x] Keep `PERFORM_VOLUNTARY_WITHDRAWAL` grammar limited to `player=self` and `$attached_creature`.
+- [x] Support zero-cost legal Withdrawal without invented payment.
+- [x] Require an exact-count player choice over outgoing-Vanguard attached Essence when cost is positive.
+- [x] Revalidate target, cost and payment identities before mutation.
+- [x] Fail closed when target, quote, cost or payment becomes stale.
+- [x] Delegate payment and switch mutation to the existing Withdrawal Transaction / Atomic Switch owner.
+- [x] Preserve canonical once-per-turn `withdraw_turn` state.
+- [x] Preserve lifecycle modifier consumption on a legal declaration.
+- [x] Feed `moved_to_reserve` and `became_vanguard` back into the existing movement-listener continuation.
+- [x] Preserve structured Withdrawal compatibility when a legacy-compatible Creature definition has no element value.
+- [x] Confirm no auto-payment, free-switch shortcut, Draft card-ID dispatch or new owner family.
+- [x] Prove the Draft chain with deterministic Event Listener and attachment-snapshot tests.
+- [x] Repair the stale Runtime Pass B import-materialization guard without changing gameplay semantics.
+- [x] Pass accepted runtime/guard head `91d048cf50bdd01aa2602c0bb07e594281d7c249` / Card Pass #1731 SUCCESS.
+- [x] Move exactly `PERFORM_VOLUNTARY_WITHDRAWAL` missing -> implemented.
+- [x] Move exactly `voluntary_withdrawal_legal_with_incoming` missing -> implemented.
+- [x] Synchronize release control to capability blob `ec8ebc507b52f1f0590943716583f17f448bafa0`.
+- [x] Pass capability/release-control head `f820ae31f3a2bb361f424427594f30fa4bcdcc70` / Card Pass #1732 SUCCESS.
+- [x] Preserve 40 owner families and unchanged Supabase production.
+
+**Acceptance:** Draft Essence now reuses the canonical voluntary-Withdrawal quote, exact attached-Essence Payment and existing Withdrawal Transaction / Atomic Switch owners. Coverage is **157/180 (87.2%)** and frozen Release 1 used-missing is **6**.
+

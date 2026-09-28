@@ -4737,3 +4737,70 @@ The eight remaining frozen used-missing capabilities are:
 - predicates: `essence_discarded_by_own_card_effect`, `essence_discarded_source_controller_is_self`, `event_previous_attachment_target_is_attached_creature`, `voluntary_withdrawal_legal_with_incoming`, `essence_discarded_attachment_kind_is`.
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
+## V2.4.128 — Gale Draft Essence canonical voluntary Withdrawal parity
+
+**Last synchronized authority head:** `13cc8cab8f0a9eb0761a09aba36981578bef3e65` — Card Pass #1727 **SUCCESS** through V2.4.127.
+
+### Exact frozen Release 1 consumer
+The remaining voluntary-Withdrawal pair is used by exactly the frozen Gale Draft Essence listener `draft-attach-withdrawal` on `essence_attached`:
+- predicate `voluntary_withdrawal_legal_with_incoming`;
+- operation `PERFORM_VOLUNTARY_WITHDRAWAL`.
+
+V2.4.113 deliberately left this pair missing because the old attachment snapshot could only approximate Withdrawal legality. V2.4.128 closes that gap by removing the local partial quote and reusing the canonical Withdrawal owner.
+
+### One canonical Withdrawal quote
+`runtimeV02QuoteVoluntaryWithdrawal` in `tcg-match-withdrawal-v0-2.ts` is now the shared structured quote used by both ordinary Match Withdrawal and effect-driven Draft Withdrawal.
+
+The quote preserves the authoritative order:
+1. printed/base Withdrawal cost plus continuous attachment modifiers;
+2. lifecycle/current Withdrawal modifiers;
+3. `before_voluntary_withdrawal_cost` Event Listener modifiers;
+4. exact attached-Essence Payment chosen by the player when cost is greater than zero;
+5. existing Withdrawal Transaction / Atomic Switch ownership.
+
+The attachment trigger snapshot no longer computes its own incomplete legality. Event Listener asks the canonical quote for the exact newly attached Reserve Creature and injects only that frozen boolean into the immutable trigger snapshot.
+
+### Draft execution and continuation
+`PERFORM_VOLUNTARY_WITHDRAWAL` remains operation-shaped and accepts only the frozen `player: self` + `incoming_target: $attached_creature` form.
+
+- zero-cost legal Withdrawal proceeds without inventing a payment;
+- positive cost installs an exact-count player choice over the outgoing Vanguard's attached Essence;
+- target, quote, cost and chosen payment identities are revalidated before mutation;
+- stale target/cost/payment state fails closed;
+- mutation delegates to the existing `runtimeV02ApplyWithdrawalPaymentAndSwitch` transaction;
+- canonical `withdraw_turn` once-per-turn state is recorded;
+- `moved_to_reserve` and `became_vanguard` events are returned to the existing movement-listener continuation;
+- no auto-payment, free-switch shortcut, Draft card-ID dispatch or new owner family is introduced.
+
+The follow-up compatibility correction at `6348e1c5affe4b4eb95c8a87b24bdf26c89cc4ce` preserves structured Withdrawal for legacy-compatible Creature definitions whose element field may be empty; element-specific modifiers still receive the actual available element string.
+
+### Validation history
+The V2.4.128 runtime implementation landed at `6348e1c5affe4b4eb95c8a87b24bdf26c89cc4ce`.
+
+Card Pass #1729 proved all **565/565** Card Pass tests and the deterministic runtime/type-check lane green but failed the old Runtime Pass B materialization guard because it required the previous exact Withdrawal import statement. The first guard repair then exposed an over-escaped guard-only regex on #1730; runtime evidence remained green. Guard-only head `91d048cf50bdd01aa2602c0bb07e594281d7c249` removed that fragility and passed Card Pass **#1731 SUCCESS** end-to-end.
+
+Accepted runtime closures remain:
+- Match Edge: **123 files**, SHA-256 `b5ff9ba42c6cd0137d983eb5490b50f8307f039f6222845af9ec88970df1cf20`;
+- Tactic Edge: **57 files**, SHA-256 `b12fb73d4f1e726d029f114b9cdd82407e3647407f2baab6f821e455d7efb893`.
+
+### Capability acceptance
+Capability/release-control head `f820ae31f3a2bb361f424427594f30fa4bcdcc70` passed Card Pass **#1732 SUCCESS**.
+
+Exactly these two capabilities moved missing -> implemented:
+- operation `PERFORM_VOLUNTARY_WITHDRAWAL`;
+- predicate `voluntary_withdrawal_legal_with_incoming`.
+
+Capability blob is `ec8ebc507b52f1f0590943716583f17f448bafa0`.
+
+Capability catalogue is now **62/72 operations + 95/108 predicates = 157/180 (87.2%)** implemented. Frozen Release 1 used-missing falls from **8 to 6**.
+
+The six remaining frozen used-missing capabilities are:
+- operations: `SET_RESOLVING_CARD_DESTINATION`, `TIMEFOLD`;
+- predicates: `essence_discarded_by_own_card_effect`, `essence_discarded_source_controller_is_self`, `event_previous_attachment_target_is_attached_creature`, `essence_discarded_attachment_kind_is`.
+
+### Next exact target — V2.4.129
+Audit the frozen **Volt Essence-discard family** across Pulse Essence and Dynamo Lens as one bounded four-predicate target. Preserve the existing Card-Zone / attachment / event-listener ownership chain; do not add card-ID dispatch or a second Essence-discard engine.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+

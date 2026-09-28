@@ -1452,3 +1452,19 @@ Capability head `05bfd980364c54bf073ef7466c3c338ac4c3cb8e` passed Card Pass #172
 
 ## 490 — V2.4.127 closes one more frozen Release 1 capability
 Capability coverage is now **61/72 operations + 94/108 predicates = 155/180 (86.1%)** and frozen Release 1 used-missing falls from **9 to 8**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3; no database migration, Edge deployment, main merge or live promotion occurred.
+
+## 491 — V2.4.128 Draft Essence owns the frozen voluntary-Withdrawal pair
+The frozen Gale Draft Essence `draft-attach-withdrawal` listener is the Release 1 consumer for `voluntary_withdrawal_legal_with_incoming` and `PERFORM_VOLUNTARY_WITHDRAWAL`. V2.4.113 intentionally held both missing because the attachment snapshot's local quote did not include the complete Withdrawal cost/listener/payment chain.
+
+## 492 — One canonical Withdrawal quote now serves normal Match and Draft
+V2.4.128 moves the complete structured quote into `tcg-match-withdrawal-v0-2.ts`. Both ordinary Match Withdrawal and effect-driven Draft Withdrawal now resolve base/continuous cost, lifecycle modifiers and `before_voluntary_withdrawal_cost` listeners through that same owner. The immutable attachment snapshot receives the resulting legality instead of reimplementing it.
+
+## 493 — Draft execution delegates exact Payment, Atomic Switch and movement continuation
+Positive-cost Draft Withdrawal installs an exact attached-Essence payment choice and revalidates target, quote, cost and selected payment before mutation. Zero-cost Withdrawal proceeds without fabricated payment. Mutation delegates to the existing Withdrawal Transaction / Atomic Switch owner, records the normal once-per-turn allowance and returns `moved_to_reserve` / `became_vanguard` into the existing movement-listener continuation. No Draft identity dispatch or new owner family was added.
+
+## 494 — V2.4.128 runtime proof passed after guard-only repairs
+Runtime implementation head `6348e1c5affe4b4eb95c8a87b24bdf26c89cc4ce` preserved element compatibility and deterministic semantics. Card Pass #1729 had 565/565 Card Pass tests and the deterministic runtime/type-check lane green but stopped on a stale exact-import materialization guard. The first guard edit exposed an over-escaped guard-only regex on #1730. Guard-only head `91d048cf50bdd01aa2602c0bb07e594281d7c249` removed the fragility and passed Card Pass #1731 **SUCCESS** end-to-end. Accepted Match/Tactic closures are `b5ff9ba42c6cd0137d983eb5490b50f8307f039f6222845af9ec88970df1cf20` / `b12fb73d4f1e726d029f114b9cdd82407e3647407f2baab6f821e455d7efb893`.
+
+## 495 — V2.4.128 capability reconciliation accepted
+Capability/release-control head `f820ae31f3a2bb361f424427594f30fa4bcdcc70` passed Card Pass #1732 **SUCCESS**. Exactly `PERFORM_VOLUNTARY_WITHDRAWAL` and `voluntary_withdrawal_legal_with_incoming` moved missing -> implemented. Capability blob is `ec8ebc507b52f1f0590943716583f17f448bafa0`. Coverage is now **62/72 operations + 95/108 predicates = 157/180 (87.2%)** and frozen Release 1 used-missing falls from **8 to 6**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3. Next target is V2.4.129, the four-predicate Volt Essence-discard family across Pulse Essence and Dynamo Lens.
+
