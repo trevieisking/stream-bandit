@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "12ce27098c55344fa2defc11909a575ea89c926f",
+        "entrypoint_git_blob_sha": "7ba151c41c909f45cf6234437f3174ab67385ed6",
         "file_count": 123,
-        "closure_sha256": "b5ff9ba42c6cd0137d983eb5490b50f8307f039f6222845af9ec88970df1cf20",
+        "closure_sha256": "0b9a97515abbb940d95d39d90b0c8a7ade0f791d6e9c866b6cc480f83afc626e",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -282,7 +282,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
-            "git_blob_sha": "243360d9e3f719fd7787f30df07651c449d050b2"
+            "git_blob_sha": "ac3fa9e4f5da63d11398be3e5c06feeb9b663a2d"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-selected-heal-packet-v0-2.ts",
@@ -430,7 +430,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "75b794ea6f930132d2e04d98914dda0c405b5fba"
+            "git_blob_sha": "70755e5c47a555f7b313ee26b69e6042d9ef1738"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
@@ -582,7 +582,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "12ce27098c55344fa2defc11909a575ea89c926f"
+            "git_blob_sha": "7ba151c41c909f45cf6234437f3174ab67385ed6"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
@@ -594,7 +594,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "430ec363710597ec948f728d84ad3c868a3d9423",
         "file_count": 57,
-        "closure_sha256": "b12fb73d4f1e726d029f114b9cdd82407e3647407f2baab6f821e455d7efb893",
+        "closure_sha256": "a4694be9837523404dddedb9e69482277e3a56b3b615b53b97e690abff28d22b",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -718,7 +718,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "75b794ea6f930132d2e04d98914dda0c405b5fba"
+            "git_blob_sha": "70755e5c47a555f7b313ee26b69e6042d9ef1738"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",

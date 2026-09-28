@@ -30,7 +30,6 @@ import { runtimeV02NormalizeEffectAttachmentState } from "./tcg-match-essence-at
 import {
   runtimeV02BuildEssenceAttachedTriggerPlan,
   type RuntimeV02EssenceAttachedCandidateDescriptor,
-  type RuntimeV02FrozenEssenceAttachedWorkItem,
 } from "./tcg-match-essence-attachment-work-v0-2.ts";
 import {
   applyRuntimeConditionWithContext,
@@ -51,6 +50,7 @@ import {
 import {
   runtimeV02ApplyCardZoneTransfer,
   type RuntimeV02CardZoneInstance,
+  type RuntimeV02CardZoneTransferReceipt,
 } from "./tcg-match-card-zone-engine-v0-2.ts";
 import type {
   RuntimeV02DamageProgramCreatureRef,
@@ -64,6 +64,7 @@ type Inst = {
   uid: string;
   card_id: string;
   attached_turn?: number;
+  borrowed?: boolean;
   effect_flags?: Record<string, unknown>;
 };
 
@@ -113,6 +114,7 @@ export type RuntimeV02EventListenerEvent = {
   zone?: "deck_top" | "deck";
   count?: number;
   attachment_target_uid?: string;
+  previous_attachment_target_uid?: string;
   attachment_kind?: string;
   attack_id?: string;
   source_creature_uid?: string;
@@ -581,11 +583,21 @@ export type RuntimeV02VoluntaryWithdrawalCostResult = {
   applications: RuntimeV02VoluntaryWithdrawalCostApplication[];
 };
 
+type RuntimeV02FrozenEventListenerCandidate = {
+  kind: Candidate["kind"];
+  source: Inst;
+  source_controller_seat: 1 | 2;
+  source_creature_uid: string | null;
+  listener_id: string;
+  listener: Record<string, unknown>;
+};
+
 type WorkItem = {
   event: RuntimeV02EventListenerEvent;
   source_uid: string;
   listener_id: string;
-  frozen_candidate?: RuntimeV02FrozenEssenceAttachedWorkItem;
+  frozen_candidate?: RuntimeV02FrozenEventListenerCandidate;
+  requirements_prevalidated?: boolean;
 };
 
 type CardRef = {
@@ -1021,7 +1033,107 @@ function essenceAttachedWorkItems(
     source_uid: frozen.source.uid,
     listener_id: frozen.listener_id,
     frozen_candidate: structuredClone(frozen),
+    requirements_prevalidated: true,
   }));
+}
+
+
+function discardedAttachmentKind(
+  source: Inst,
+): "normal" | "temporary" | "borrowed" {
+  const flags = source.effect_flags || {};
+  const structured = objectRecord(flags.runtime_v0_2_effect_attachment_state);
+  const kind = String(structured?.kind || "");
+  if (kind === "temporary" || kind === "borrowed") return kind;
+  if (source.borrowed === true) return "borrowed";
+  if (flags.discard_during_target_aftermath === true) return "temporary";
+  return "normal";
+}
+
+function essenceDiscardedWorkItems(
+  state: Record<string, unknown>,
+  event: RuntimeV02EventListenerEvent,
+): WorkItem[] {
+  if (event.event !== "essence_discarded") {
+    throw new Error("tcg_v0_2_essence_discarded_work_event_invalid");
+  }
+  const controller = normalizedSeat(
+    event.controller_seat,
+    "tcg_v0_2_essence_discarded_controller_invalid",
+  );
+  const subjectUid = requiredString(
+    event.subject_uid,
+    "tcg_v0_2_essence_discarded_subject_uid_required",
+  );
+  const subjectCardId = requiredString(
+    event.subject_card_id,
+    "tcg_v0_2_essence_discarded_subject_card_id_required",
+  );
+  const previousTargetUid = requiredString(
+    event.previous_attachment_target_uid,
+    "tcg_v0_2_essence_discarded_previous_target_required",
+  );
+  const attachmentKind = String(event.attachment_kind || "");
+  if (!["normal", "temporary", "borrowed"].includes(attachmentKind)) {
+    throw new Error("tcg_v0_2_essence_discarded_attachment_kind_invalid");
+  }
+
+  const discard = player(state, controller).discard as Inst[];
+  const discardedMatches = discard.filter((card) => card.uid === subjectUid);
+  if (discardedMatches.length !== 1) {
+    throw new Error("tcg_v0_2_essence_discarded_subject_missing");
+  }
+  const discarded = discardedMatches[0];
+  if (discarded.card_id !== subjectCardId) {
+    throw new Error("tcg_v0_2_essence_discarded_subject_changed");
+  }
+
+  const previousField = fieldByUid(state, previousTargetUid);
+  if (previousField && previousField.seat !== controller) {
+    throw new Error("tcg_v0_2_essence_discarded_previous_target_controller_changed");
+  }
+
+  const discardedDefinition = definition(state, discarded);
+  const essence = objectRecord(discardedDefinition.essence);
+  if (!essence) throw new Error("tcg_v0_2_essence_discarded_subject_not_essence");
+  const frozenSourceWork = listenerList(
+    essence.listeners,
+    "tcg_v0_2_essence_discarded_source_listener_list_invalid",
+  )
+    .filter((listener) => String(listener.event || "") === event.event)
+    .map((listener): WorkItem => {
+      const candidate: Candidate = {
+        kind: "essence",
+        source: discarded,
+        seat: controller,
+        field: previousField,
+        listener,
+      };
+      const id = listenerId(candidate);
+      return {
+        event: structuredClone(event),
+        source_uid: discarded.uid,
+        listener_id: id,
+        frozen_candidate: {
+          kind: "essence",
+          source: structuredClone(discarded),
+          source_controller_seat: controller,
+          source_creature_uid: previousTargetUid,
+          listener_id: id,
+          listener: structuredClone(listener),
+        },
+      };
+    });
+
+  const liveWork = collectCandidates(state, event.event)
+    .filter((candidate) => candidate.source.uid !== discarded.uid)
+    .map((candidate): WorkItem => ({
+      event: { ...event },
+      source_uid: candidate.source.uid,
+      listener_id: listenerId(candidate),
+    }));
+
+  return [...frozenSourceWork, ...liveWork];
 }
 
 function eventWorkItems(
@@ -1030,6 +1142,9 @@ function eventWorkItems(
 ): WorkItem[] {
   if (event.event === "essence_attached") {
     return essenceAttachedWorkItems(state, event);
+  }
+  if (event.event === "essence_discarded") {
+    return essenceDiscardedWorkItems(state, event);
   }
   return collectCandidates(state, event.event).map((candidate) => ({
     event: { ...event },
@@ -1048,13 +1163,13 @@ function frozenCandidate(
     frozen.source.uid !== work.source_uid ||
     frozen.listener_id !== work.listener_id
   ) {
-    throw new Error("tcg_v0_2_attachment_continuation_work_mismatch");
+    throw new Error("tcg_v0_2_event_listener_frozen_work_mismatch");
   }
   const field = frozen.source_creature_uid == null
     ? null
     : fieldByUid(state, frozen.source_creature_uid);
   if (field && field.seat !== frozen.source_controller_seat) {
-    throw new Error("tcg_v0_2_attachment_continuation_source_seat_mismatch");
+    throw new Error("tcg_v0_2_event_listener_frozen_source_seat_mismatch");
   }
   return {
     kind: frozen.kind,
@@ -1401,6 +1516,9 @@ function requirementLeaf(
     case "source_is_self":
       return candidate.seat === event.controller_seat;
     case "event_subject_is_source":
+      if (event.event === "essence_discarded") {
+        return candidate.source.uid === event.subject_uid;
+      }
       return !!candidate.field &&
         candidate.field.top.uid === event.subject_uid;
     case "event_subject_is_attached_creature":
@@ -1445,6 +1563,58 @@ function requirementLeaf(
       return event.controller_seat === (candidate.seat === 1 ? 2 : 1);
     case "source_controller_is_self":
       return event.source_controller_seat === candidate.seat;
+    case "essence_discarded_source_controller_is_self": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_essence_discarded_source_controller_field_unsupported:${unsupported}`,
+        );
+      }
+      return event.event === "essence_discarded" &&
+        event.source_controller_seat === candidate.seat;
+    }
+    case "essence_discarded_by_own_card_effect": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_essence_discarded_own_effect_field_unsupported:${unsupported}`,
+        );
+      }
+      return event.event === "essence_discarded" &&
+        event.card_effect === true &&
+        event.source_controller_seat === candidate.seat;
+    }
+    case "event_previous_attachment_target_is_attached_creature": {
+      const unsupported = Object.keys(value).find((key) => key !== "predicate");
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_essence_discarded_previous_target_field_unsupported:${unsupported}`,
+        );
+      }
+      return event.event === "essence_discarded" &&
+        !!candidate.field &&
+        candidate.field.top.uid ===
+          String(event.previous_attachment_target_uid || "");
+    }
+    case "essence_discarded_attachment_kind_is": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "kind"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_essence_discarded_attachment_kind_field_unsupported:${unsupported}`,
+        );
+      }
+      const kind = requiredString(
+        value.kind,
+        "tcg_v0_2_essence_discarded_attachment_kind_required",
+      );
+      if (!["normal", "temporary", "borrowed"].includes(kind)) {
+        throw new Error("tcg_v0_2_essence_discarded_attachment_kind_unsupported");
+      }
+      return event.event === "essence_discarded" &&
+        String(event.attachment_kind || "") === kind;
+    }
     case "event_condition_is": {
       const unsupported = Object.keys(value).find((key) =>
         key !== "predicate" && key !== "condition"
@@ -3250,7 +3420,7 @@ function continueFlow(
     if (!continuation.program_loaded) {
       if (
         alreadyResolved(state, candidate, work.event) ||
-        (!work.frozen_candidate &&
+        (!work.requirements_prevalidated &&
           !matches(state, continuation, candidate, work.event))
       ) {
         continuation.work_index++;
@@ -3350,6 +3520,114 @@ function recordEvent(
   if (!events.some((entry) => entry.event_id === event.event_id)) {
     events.push({ ...event });
   }
+}
+
+
+export type RuntimeV02EssenceDiscardedEventInput = {
+  receipt: RuntimeV02CardZoneTransferReceipt;
+  source_controller_seat: 1 | 2;
+  phase: string;
+};
+
+export function runtimeV02CreateEssenceDiscardedEvents(
+  state: Record<string, unknown>,
+  input: RuntimeV02EssenceDiscardedEventInput,
+): RuntimeV02EventListenerEvent[] {
+  const receipt = input?.receipt;
+  if (!receipt || receipt.schema !== "sb-tcg-card-zone-transfer-v0.2") {
+    throw new Error("tcg_v0_2_essence_discarded_receipt_invalid");
+  }
+  if (
+    receipt.source.zone !== "attached_essence" ||
+    receipt.destination.zone !== "discard"
+  ) return [];
+  if (receipt.cause !== "effect") return [];
+
+  const controller = normalizedSeat(
+    receipt.source.controller_seat,
+    "tcg_v0_2_essence_discarded_source_controller_invalid",
+  );
+  if (receipt.destination.controller_seat !== controller) {
+    throw new Error("tcg_v0_2_essence_discarded_destination_controller_changed");
+  }
+  const sourceController = normalizedSeat(
+    input.source_controller_seat,
+    "tcg_v0_2_essence_discarded_effect_controller_invalid",
+  );
+  const previousTargetUid = requiredString(
+    receipt.source.owner_card_uid,
+    "tcg_v0_2_essence_discarded_source_owner_required",
+  );
+  const sourceActionId = requiredString(
+    receipt.source_action_id,
+    "tcg_v0_2_essence_discarded_source_action_required",
+  );
+  const actionKind = requiredString(
+    receipt.action_kind,
+    "tcg_v0_2_essence_discarded_action_kind_required",
+  );
+  const phase = requiredString(
+    input.phase,
+    "tcg_v0_2_essence_discarded_phase_required",
+  );
+  if (
+    !Array.isArray(receipt.card_uids) ||
+    receipt.card_uids.length < 1 ||
+    receipt.count !== receipt.card_uids.length
+  ) {
+    throw new Error("tcg_v0_2_essence_discarded_card_count_invalid");
+  }
+
+  const discard = player(state, controller).discard as Inst[];
+  const turn = currentTurn(state);
+  const sourceCardUid = receipt.source_card_uid == null
+    ? null
+    : requiredString(
+      receipt.source_card_uid,
+      "tcg_v0_2_essence_discarded_source_card_invalid",
+    );
+  const sourceField = sourceCardUid == null ? null : fieldByUid(state, sourceCardUid);
+  const existingEventCount = Array.isArray(state.effect_events)
+    ? state.effect_events.length
+    : 0;
+
+  return receipt.card_uids.map((rawUid, index) => {
+    const uid = requiredString(
+      rawUid,
+      `tcg_v0_2_essence_discarded_card_uid_invalid:${index}`,
+    );
+    const matches = discard.filter((card) => card.uid === uid);
+    if (matches.length !== 1) {
+      throw new Error(`tcg_v0_2_essence_discarded_destination_card_missing:${uid}`);
+    }
+    const discarded = matches[0];
+    const event: RuntimeV02EventListenerEvent = {
+      event_id:
+        `essence-discarded:${turn}:${sourceActionId}:${uid}:${existingEventCount + index}`,
+      event: "essence_discarded",
+      subject_uid: discarded.uid,
+      subject_card_id: discarded.card_id,
+      controller_seat: controller,
+      source_controller_seat: sourceController,
+      origin_zone: "attached_essence",
+      destination_zone: "discard",
+      destination_index: null,
+      phase,
+      source_action_id: sourceActionId,
+      source_card_uid: sourceCardUid,
+      action_kind: actionKind,
+      turn_seq: turn,
+      previous_attachment_target_uid: previousTargetUid,
+      attachment_kind: discardedAttachmentKind(discarded),
+      source_creature_uid:
+        sourceField && sourceField.seat === sourceController
+          ? sourceField.top.uid
+          : undefined,
+      card_effect: sourceCardUid !== null,
+    };
+    recordEvent(state, event);
+    return { ...event };
+  });
 }
 
 export function runtimeV02AdaptHiddenInformationOccurrencesForListener(

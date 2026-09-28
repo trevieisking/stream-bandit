@@ -1,10 +1,12 @@
 import {
   runtimeV02BeginEventListenerContinuation,
   runtimeV02CreateCreatureEnteredPlayEvent,
+  runtimeV02CreateEssenceDiscardedEvents,
   runtimeV02PendingEventListenerChoiceView,
   runtimeV02PrivateEventInspectionView,
   runtimeV02ResolveEventListenerChoice,
 } from "../_shared/tcg-match-event-listener-v0-2.ts";
+import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02PrivateRewardInspectionView } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
 import { runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
 import {
@@ -49,7 +51,12 @@ function throws(fn: () => unknown, expected: string): void {
 }
 
 type Ability = Record<string, unknown>;
-type Inst = { uid: string; card_id: string };
+type Inst = {
+  uid: string;
+  card_id: string;
+  borrowed?: boolean;
+  effect_flags?: Record<string, unknown>;
+};
 
 const marker = {
   registry_id: "SB1-set-one-v0.2",
@@ -134,6 +141,30 @@ function tacticDefinition(
       subtype,
       program: { steps: [] },
       listeners: [],
+      continuous: [],
+    },
+  };
+}
+
+
+function relicDefinition(
+  id: string,
+  name: string,
+  listeners: Record<string, unknown>[] = [],
+) {
+  return {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id,
+    name,
+    card_family: "Tactic",
+    element: "Volt",
+    creature: null,
+    essence: null,
+    tactic: {
+      subtype: "Relic",
+      program: { steps: [] },
+      listeners,
       continuous: [],
     },
   };
@@ -1355,5 +1386,234 @@ Deno.test("Orbit Ring source_element_is follows the attack source Creature eleme
   );
   equal(rejected.status, "complete");
   equal(rejected.processed_listener_keys.length, 0);
+});
+
+function installVoltDiscardListenerFixture(
+  state: Record<string, unknown>,
+  pulseUid: string,
+  sourceControllerSeat: 1 | 2,
+): {
+  pulse: Inst;
+  host: any;
+  player: any;
+  receipt: ReturnType<typeof runtimeV02ApplyCardZoneTransfer>["receipt"];
+} {
+  const pulseDefinition = essenceDefinition(
+    "volt-pulse-essence",
+    "Pulse Essence",
+    "Volt",
+    [{
+      id: "pulse-discharge-draw",
+      event: "essence_discarded",
+      requirements: {
+        all: [
+          { predicate: "event_subject_is_source" },
+          { predicate: "essence_discarded_source_controller_is_self" },
+          { predicate: "essence_discarded_by_own_card_effect" },
+        ],
+      },
+      limit: { scope: "turn", count: 1, owner: "controller" },
+      steps: [{ op: "DRAW", player: "self", count: 1 }],
+    }],
+  );
+  const dynamoDefinition = relicDefinition(
+    "volt-dynamo-lens",
+    "Dynamo Lens",
+    [{
+      id: "dynamo-lens-draw",
+      event: "essence_discarded",
+      requirements: {
+        all: [
+          {
+            predicate:
+              "event_previous_attachment_target_is_attached_creature",
+          },
+          {
+            any: [
+              {
+                predicate: "essence_discarded_attachment_kind_is",
+                kind: "temporary",
+              },
+              {
+                predicate: "essence_discarded_attachment_kind_is",
+                kind: "borrowed",
+              },
+            ],
+          },
+        ],
+      },
+      limit: { scope: "turn", count: 1, owner: "attachment" },
+      steps: [{ op: "DRAW", player: "self", count: 1 }],
+    }],
+  );
+  const drawDefinitionA = tacticDefinition("draw-a", "Draw A", "Device");
+  const drawDefinitionB = tacticDefinition("draw-b", "Draw B", "Device");
+  const drawDefinitionC = tacticDefinition("draw-c", "Draw C", "Device");
+  const cardIndex = state.card_index as Record<string, unknown>;
+  cardIndex["volt-pulse-essence"] = { definition_v0_2: pulseDefinition };
+  cardIndex["volt-dynamo-lens"] = { definition_v0_2: dynamoDefinition };
+  cardIndex["draw-a"] = { definition_v0_2: drawDefinitionA };
+  cardIndex["draw-b"] = { definition_v0_2: drawDefinitionB };
+  cardIndex["draw-c"] = { definition_v0_2: drawDefinitionC };
+
+  const player = (state.players as any)["1"];
+  const host = player.reserve[0];
+  const pulse: Inst = {
+    uid: pulseUid,
+    card_id: "volt-pulse-essence",
+    effect_flags: {
+      discard_during_target_aftermath: true,
+      runtime_v0_2_effect_attachment_state: {
+        kind: "temporary",
+        expires: "controller_aftermath",
+        destination_on_expire: "discard",
+      },
+    },
+  };
+  host.essence = [pulse];
+  host.relic = instance("dynamo-uid", "volt-dynamo-lens");
+  player.deck = [
+    instance("draw-a-uid", "draw-a"),
+    instance("draw-b-uid", "draw-b"),
+    instance("draw-c-uid", "draw-c"),
+  ];
+
+  const transfer = runtimeV02ApplyCardZoneTransfer(
+    host.essence,
+    player.discard,
+    {
+      cause: "effect",
+      action_kind: "aftermath",
+      source_action_id: "aftermath_essence_disposition",
+      source_card_uid:
+        sourceControllerSeat === 1 ? "source-uid" : "opponent-vanguard-uid",
+      source: {
+        controller_seat: 1,
+        zone: "attached_essence",
+        owner_card_uid: "source-uid",
+      },
+      destination: {
+        controller_seat: 1,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      card_uids: [pulse.uid],
+      destination_position: "bottom",
+    },
+  );
+  return { pulse, host, player, receipt: transfer.receipt };
+}
+
+Deno.test("Pulse Essence and Dynamo Lens consume one canonical Essence-discard event", () => {
+  const state = baseState(
+    creatureDefinition("volt-host", "Volt Host", "Volt"),
+  );
+  const fixture = installVoltDiscardListenerFixture(state, "pulse-uid", 1);
+  const events = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: fixture.receipt,
+    source_controller_seat: 1,
+    phase: "aftermath",
+  });
+  equal(events.length, 1);
+  equal(events[0].event, "essence_discarded");
+  equal(events[0].subject_uid, "pulse-uid");
+  equal(events[0].previous_attachment_target_uid, "source-uid");
+  equal(events[0].attachment_kind, "temporary");
+  equal(events[0].source_controller_seat, 1);
+  equal(events[0].card_effect, true);
+
+  const complete = runtimeV02BeginEventListenerContinuation(state, events);
+  equal(complete.status, "complete");
+  equal(complete.processed_listener_keys.length, 2);
+  equal(fixture.player.hand.length, 2);
+  equal(fixture.player.deck.length, 1);
+});
+
+Deno.test("opponent-controlled Essence discard blocks Pulse but still satisfies Dynamo attachment metadata", () => {
+  const state = baseState(
+    creatureDefinition("volt-host-opponent-effect", "Volt Host", "Volt"),
+  );
+  const fixture = installVoltDiscardListenerFixture(
+    state,
+    "pulse-opponent-effect-uid",
+    2,
+  );
+  const events = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: fixture.receipt,
+    source_controller_seat: 2,
+    phase: "aftermath",
+  });
+  const complete = runtimeV02BeginEventListenerContinuation(state, events);
+  equal(complete.status, "complete");
+  equal(complete.processed_listener_keys.length, 1);
+  equal(fixture.player.hand.length, 1);
+  equal(fixture.player.deck.length, 2);
+});
+
+Deno.test("Pulse controller and Dynamo attachment turn limits suppress repeated Essence-discard draws", () => {
+  const state = baseState(
+    creatureDefinition("volt-host-limits", "Volt Host", "Volt"),
+  );
+  const first = installVoltDiscardListenerFixture(state, "pulse-first-uid", 1);
+  const firstEvents = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: first.receipt,
+    source_controller_seat: 1,
+    phase: "aftermath",
+  });
+  const firstComplete = runtimeV02BeginEventListenerContinuation(
+    state,
+    firstEvents,
+  );
+  equal(firstComplete.processed_listener_keys.length, 2);
+  equal(first.player.hand.length, 2);
+
+  const secondPulse: Inst = {
+    uid: "pulse-second-uid",
+    card_id: "volt-pulse-essence",
+    effect_flags: {
+      runtime_v0_2_effect_attachment_state: {
+        kind: "borrowed",
+        expires: "controller_aftermath",
+        destination_on_expire: "discard",
+      },
+    },
+  };
+  first.host.essence = [secondPulse];
+  const secondTransfer = runtimeV02ApplyCardZoneTransfer(
+    first.host.essence,
+    first.player.discard,
+    {
+      cause: "effect",
+      action_kind: "aftermath",
+      source_action_id: "aftermath_essence_disposition",
+      source_card_uid: "source-uid",
+      source: {
+        controller_seat: 1,
+        zone: "attached_essence",
+        owner_card_uid: "source-uid",
+      },
+      destination: {
+        controller_seat: 1,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      card_uids: [secondPulse.uid],
+      destination_position: "bottom",
+    },
+  );
+  const secondEvents = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: secondTransfer.receipt,
+    source_controller_seat: 1,
+    phase: "aftermath",
+  });
+  equal(secondEvents[0].attachment_kind, "borrowed");
+  const secondComplete = runtimeV02BeginEventListenerContinuation(
+    state,
+    secondEvents,
+  );
+  equal(secondComplete.status, "complete");
+  equal(secondComplete.processed_listener_keys.length, 0);
+  equal(first.player.hand.length, 2);
+  equal(first.player.deck.length, 1);
 });
 

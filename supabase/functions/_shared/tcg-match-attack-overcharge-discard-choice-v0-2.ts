@@ -10,6 +10,7 @@ import {
   runtimeV02PreflightCardZoneTransfer,
   type RuntimeV02CardZoneInstance,
   type RuntimeV02CardZoneTransferPreflight,
+  type RuntimeV02CardZoneTransferReceipt,
 } from "./tcg-match-card-zone-engine-v0-2.ts";
 
 type RuntimeInst = { uid: string; card_id: string };
@@ -79,6 +80,7 @@ export type RuntimeV02AttackOverchargeDiscardResolution = {
   choice_id: string;
   discarded_uid: string;
   discarded_card_id: string;
+  discard_receipt: RuntimeV02CardZoneTransferReceipt;
   target_remained_after_damage: boolean;
   condition: string;
   condition_applied: boolean;
@@ -507,7 +509,11 @@ export function runtimeV02ResolveAttackOverchargeDiscardChoice(
     "tcg_v0_2_attack_overcharge_selected_essence_invalid",
   );
   assertSameInst(selected, { uid: option.uid, card_id: option.card_id }, "tcg_v0_2_attack_overcharge_selected_essence_changed");
-  runtimeV02CommitCardZoneTransfer(essence, discard, transferPreflight);
+  const transfer = runtimeV02CommitCardZoneTransfer(
+    essence,
+    discard,
+    transferPreflight,
+  );
 
   let conditionApplied = false;
   let conditionPrevented = false;
@@ -537,6 +543,7 @@ export function runtimeV02ResolveAttackOverchargeDiscardChoice(
     choice_id: choice.id,
     discarded_uid: selected.uid,
     discarded_card_id: selected.card_id,
+    discard_receipt: transfer.receipt,
     target_remained_after_damage: choice.target_remained_after_damage,
     condition: choice.condition,
     condition_applied: conditionApplied,
