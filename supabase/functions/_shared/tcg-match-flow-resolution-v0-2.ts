@@ -26,9 +26,6 @@ export type RuntimeV02ResolutionContinuationResult =
     status: "resume_turn_advance";
   }
   | {
-    status: "resume_timefold_turn_advance";
-  }
-  | {
     status: "play";
   };
 
@@ -94,9 +91,6 @@ export function runtimeV02ContinueResolution(
   }
   if (resume === "turn_advance") {
     return { status: "resume_turn_advance" };
-  }
-  if (resume === "timefold_turn_advance") {
-    return { status: "resume_timefold_turn_advance" };
   }
 
   state.phase = "play";

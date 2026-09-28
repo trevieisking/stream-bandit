@@ -149,11 +149,3 @@ Deno.test("Match Flow rejects malformed resolution queue state before lifecycle 
   assert(message === "tcg_v0_2_match_flow_resolution_queue_invalid", "malformed queue guard changed");
   assert(JSON.stringify(s) === before, "malformed queue mutated lifecycle state");
 });
-
-Deno.test("Match Flow returns an explicit TIMEFOLD turn-advance resume", () => {
-  const s = state({ resume_after_resolution: "timefold_turn_advance" });
-  const result = runtimeV02ContinueResolution(s);
-  assert(result.status === "resume_timefold_turn_advance", "TIMEFOLD resume route changed");
-  assert(s.resume_after_resolution === null, "TIMEFOLD resume token was not consumed");
-  assert(s.phase === "resolution", "resolution owner executed TIMEFOLD itself");
-});
