@@ -72,7 +72,8 @@
       "SWITCH_WITH_VANGUARD",
       "TRANSFER_SHIELD",
       "PERFORM_VOLUNTARY_WITHDRAWAL",
-      "SET_RESOLVING_CARD_DESTINATION"
+      "SET_RESOLVING_CARD_DESTINATION",
+      "TIMEFOLD"
     ],
     "partial": [],
     "missing": [
@@ -83,8 +84,7 @@
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
       "SET_ATTACK_COST_FLOOR",
-      "SUPPRESS_ABILITY",
-      "TIMEFOLD"
+      "SUPPRESS_ABILITY"
     ]
   },
   "predicates": {
@@ -2398,6 +2398,82 @@
         "Stormgrid City decline preserves discard and consumes the existing event-controller turn limit",
         "Stormgrid resolving-card destination fails closed if the resolving Device identity changes",
         "Card-Zone Engine moves an exact transient resolving card to deck bottom"
+      ]
+    },
+    "release1_celestyr_timefold_v2_4_131": {
+      "implementation_head": "7e876973d2fb7ca000cbcc5338e299dd1f3e7001",
+      "accepted_proof_head": "2764afc63dea728b8398a58324945ff53b492b9c",
+      "card_pass_run": 1743,
+      "prior_failed_run": {
+        "run": 1742,
+        "result": "compatibility_source_fences_and_new_test_type_narrowing_only",
+        "structural_failures": [
+          "aftermath exact turn_advance source pattern",
+          "resolution dispatcher exact declarative source pattern",
+          "turn-start draw exact import/source pattern",
+          "turn-history exact source spacing"
+        ],
+        "runtime_compile_failure": "new TIMEFOLD lock-clear test TypeScript narrowing",
+        "gameplay_failure_proven": false
+      },
+      "frozen_consumer": {
+        "card_id": "astral-celestyr-dream-cartographer",
+        "attack_id": "second-horizon",
+        "operation": "TIMEFOLD",
+        "phase": "after_damage",
+        "starbound": true
+      },
+      "owners": {
+        "attack_metadata": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
+        "turn_lifecycle": "supabase/functions/_shared/tcg-match-flow-turn-v0-2.ts",
+        "turn_history": "supabase/functions/_shared/tcg-match-turn-history-v0-2.ts",
+        "aftermath": "supabase/functions/_shared/tcg-match-aftermath-v0-2.ts",
+        "dispatcher": "supabase/functions/tcg-match-actions/index.ts",
+        "turn_start_draw": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts"
+      },
+      "semantics": {
+        "exact_zero_field_timefold_step": true,
+        "arm_only_after_legal_attack_target_and_control_resolution": true,
+        "damage_effects_defeats_rewards_terminal_precede_grant": true,
+        "terminal_match_grants_no_extra_turn": true,
+        "same_seat_full_turn": true,
+        "same_seat_turn_history_recorded": true,
+        "personal_turn_incremented": true,
+        "normal_turn_start_draw_preserved": true,
+        "skip_only_scheduled_condition_damage_and_recovery_transition": true,
+        "ordinary_aftermath_cleanup_preserved": true,
+        "temporary_essence_disposition_preserved": true,
+        "scheduled_controller_aftermath_actions_preserved": true,
+        "anti_chain_lock_armed_after_grant": true,
+        "anti_chain_lock_survives_extra_turn": true,
+        "anti_chain_lock_clears_after_opponent_normal_turn": true,
+        "existing_starbound_lock_guard_reused": true,
+        "no_card_id_dispatch": true,
+        "no_second_turn_engine": true,
+        "owner_family_count": 40
+      },
+      "accepted_edge_closures": {
+        "match": {
+          "files": 123,
+          "sha256": "cc0c41c357cb4c5cb4c08193ec795123bb14a2ddd46cf6c95b7739cd09c94a0c"
+        },
+        "tactic": {
+          "files": 57,
+          "sha256": "1ca1cc30ee8634cdebf6b59af512b9599699cf3f2e1ae87012e5ecdef6e6b9b3"
+        },
+        "private_alpha": {
+          "files": 8,
+          "sha256": "c90d05bdf4af90c197464efad9adaeebee6a113cd4d971fc70c81796afe1d468"
+        }
+      },
+      "deterministic_tests": [
+        "TIMEFOLD descriptor is registry-driven and exact",
+        "non-TIMEFOLD after_damage remains outside TIMEFOLD ownership",
+        "mixed or extended TIMEFOLD metadata fails closed",
+        "TIMEFOLD aftermath skips only Condition transition and preserves cleanup",
+        "TIMEFOLD grants a full same-seat turn and records explicit consecutive ownership",
+        "TIMEFOLD lock clears only after opponent completes a normal turn",
+        "TIMEFOLD terminal preflight grants no extra turn"
       ]
     }
   }
