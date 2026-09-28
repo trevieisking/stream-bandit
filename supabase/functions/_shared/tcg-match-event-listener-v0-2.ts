@@ -2632,6 +2632,60 @@ function executeStep(
     return "choice";
   }
 
+
+  if (op === "SET_RESOLVING_CARD_DESTINATION") {
+    if (event.event !== "device_resolved") {
+      throw new Error(
+        "tcg_v0_2_resolving_card_destination_event_unsupported",
+      );
+    }
+    if (String(step.card || "") !== "$resolving_card") {
+      throw new Error(
+        "tcg_v0_2_resolving_card_destination_card_token_unsupported",
+      );
+    }
+    const destination = requiredString(
+      step.destination,
+      "tcg_v0_2_resolving_card_destination_required",
+    );
+    if (!["discard", "deck_bottom", "deck_top"].includes(destination)) {
+      throw new Error(
+        "tcg_v0_2_resolving_card_destination_unsupported",
+      );
+    }
+    const effect = objectRecord(state.effect_resolution);
+    const source = objectRecord(effect?.source_card);
+    if (
+      !effect ||
+      !source ||
+      String(effect.source_subtype || "") !== "Device" ||
+      Number(effect.owner_seat) !== event.controller_seat ||
+      String(source.uid || "") !== event.subject_uid ||
+      String(source.card_id || "") !== String(event.subject_card_id || "") ||
+      String(event.source_card_uid || "") !== event.subject_uid
+    ) {
+      throw new Error(
+        "tcg_v0_2_resolving_card_destination_source_stale",
+      );
+    }
+    effect.resolving_card_destination = destination;
+    event.destination_zone = destination;
+    const history = Array.isArray(state.effect_events)
+      ? state.effect_events as Record<string, unknown>[]
+      : [];
+    const historyEvent = history.find((item) =>
+      String(item.event_id || "") === event.event_id
+    );
+    if (!historyEvent) {
+      throw new Error(
+        "tcg_v0_2_resolving_card_destination_event_history_missing",
+      );
+    }
+    historyEvent.destination_zone = destination;
+    continuation.step_cursor++;
+    return "continue";
+  }
+
   if (op === "LOOK_TOP") {
     const owner = playerForToken(candidate, step.player, event);
     const count = Math.max(0, Number(step.count || 0));
@@ -3522,6 +3576,67 @@ function recordEvent(
   }
 }
 
+
+
+export type RuntimeV02DeviceResolvedEventInput = {
+  controller_seat: 1 | 2;
+  resolving_card_uid: string;
+  resolving_card_id: string;
+  source_action_id: string;
+  phase: string;
+  destination?: "discard" | "deck_bottom" | "deck_top";
+};
+
+export function runtimeV02CreateDeviceResolvedEvent(
+  state: Record<string, unknown>,
+  input: RuntimeV02DeviceResolvedEventInput,
+): RuntimeV02EventListenerEvent {
+  const controller = normalizedSeat(
+    input.controller_seat,
+    "tcg_v0_2_device_resolved_controller_invalid",
+  );
+  const uid = requiredString(
+    input.resolving_card_uid,
+    "tcg_v0_2_device_resolved_card_uid_required",
+  );
+  const cardId = requiredString(
+    input.resolving_card_id,
+    "tcg_v0_2_device_resolved_card_id_required",
+  );
+  const sourceActionId = requiredString(
+    input.source_action_id,
+    "tcg_v0_2_device_resolved_source_action_required",
+  );
+  const phase = requiredString(
+    input.phase,
+    "tcg_v0_2_device_resolved_phase_required",
+  );
+  const destination = input.destination ?? "discard";
+  if (!["discard", "deck_bottom", "deck_top"].includes(destination)) {
+    throw new Error("tcg_v0_2_device_resolved_destination_invalid");
+  }
+  const turn = currentTurn(state);
+  const event: RuntimeV02EventListenerEvent = {
+    event_id: `device-resolved:${turn}:${sourceActionId}:${uid}`,
+    event: "device_resolved",
+    subject_uid: uid,
+    subject_card_id: cardId,
+    controller_seat: controller,
+    source_controller_seat: controller,
+    origin_zone: "resolving",
+    destination_zone: destination,
+    destination_index: null,
+    phase,
+    source_action_id: sourceActionId,
+    source_card_uid: uid,
+    source_card_id: cardId,
+    action_kind: "tactic",
+    turn_seq: turn,
+    card_effect: true,
+  };
+  recordEvent(state, event);
+  return event;
+}
 
 export type RuntimeV02EssenceDiscardedEventInput = {
   receipt: RuntimeV02CardZoneTransferReceipt;

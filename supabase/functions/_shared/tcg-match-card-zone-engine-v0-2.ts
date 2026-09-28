@@ -9,6 +9,7 @@ export type RuntimeV02CardZoneKind =
   | "discard"
   | "rewards"
   | "void"
+  | "resolving"
   | "creature_stack"
   | "attached_essence"
   | "attached_relic";
@@ -120,6 +121,7 @@ const OWNER_REQUIRED_ZONES = new Set<RuntimeV02CardZoneKind>([
 ]);
 
 const SPECIALIST_DESTINATION_ZONES = new Set<RuntimeV02CardZoneKind>([
+  "resolving",
   "creature_stack",
   "attached_essence",
   "attached_relic",
@@ -142,6 +144,7 @@ function validateEndpoint(endpoint: RuntimeV02CardZoneEndpoint, role: "source" |
       "discard",
       "rewards",
       "void",
+      "resolving",
       "creature_stack",
       "attached_essence",
       "attached_relic",

@@ -447,3 +447,30 @@ Deno.test("Card-Zone reorder rejects unknown or duplicate uids before mutation",
   );
   assertEquals(deck.map((entry) => entry.uid), [first.uid, second.uid]);
 });
+
+Deno.test("Card-Zone Engine moves an exact transient resolving card to deck bottom", () => {
+  const resolving = card("device-resolving-1", "volt-test-device");
+  const source = [resolving];
+  const deck = [card("deck-existing-1", "existing-card")];
+
+  const result = runtimeV02ApplyCardZoneTransfer(source, deck, {
+    cause: "rule",
+    action_kind: "tactic_resolution",
+    source_action_id: "device-effect-1",
+    source_card_uid: resolving.uid,
+    source: endpoint("resolving"),
+    destination: endpoint("deck"),
+    card_uids: [resolving.uid],
+    destination_position: "bottom",
+  });
+
+  assertEquals(source, []);
+  assertEquals(deck.map((entry) => entry.uid), [
+    "deck-existing-1",
+    "device-resolving-1",
+  ]);
+  assertSame(deck[1], resolving);
+  assertEquals(result.receipt.source.zone, "resolving");
+  assertEquals(result.receipt.destination.zone, "deck");
+});
+

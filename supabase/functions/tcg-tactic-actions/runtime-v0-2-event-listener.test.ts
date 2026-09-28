@@ -1,6 +1,7 @@
 import {
   runtimeV02BeginEventListenerContinuation,
   runtimeV02CreateCreatureEnteredPlayEvent,
+  runtimeV02CreateDeviceResolvedEvent,
   runtimeV02CreateEssenceDiscardedEvents,
   runtimeV02PendingEventListenerChoiceView,
   runtimeV02PrivateEventInspectionView,
@@ -146,6 +147,30 @@ function tacticDefinition(
   };
 }
 
+
+
+function realmDefinition(
+  id: string,
+  name: string,
+  listeners: Record<string, unknown>[] = [],
+) {
+  return {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id,
+    name,
+    card_family: "Tactic",
+    element: "Volt",
+    creature: null,
+    essence: null,
+    tactic: {
+      subtype: "Realm",
+      program: { steps: [] },
+      listeners,
+      continuous: [],
+    },
+  };
+}
 
 function relicDefinition(
   id: string,
@@ -1615,5 +1640,156 @@ Deno.test("Pulse controller and Dynamo attachment turn limits suppress repeated 
   equal(secondComplete.processed_listener_keys.length, 0);
   equal(first.player.hand.length, 2);
   equal(first.player.deck.length, 1);
+});
+
+function installStormgridFixture(state: Record<string, unknown>) {
+  const stormgrid = realmDefinition(
+    "volt-stormgrid-city",
+    "Stormgrid City",
+    [{
+      id: "stormgrid-recycle",
+      event: "device_resolved",
+      controller_scope: "any",
+      limit: { scope: "turn", count: 1, owner: "event_controller" },
+      requirements: { predicate: "event_controller_is_active_seat" },
+      steps: [{
+        op: "OPTIONAL",
+        player: "$event_controller",
+        steps: [{
+          op: "SET_RESOLVING_CARD_DESTINATION",
+          card: "$resolving_card",
+          destination: "deck_bottom",
+        }],
+      }],
+    }],
+  );
+  const device = tacticDefinition(
+    "volt-test-device",
+    "Test Device",
+    "Device",
+  );
+  const cardIndex = state.card_index as Record<string, unknown>;
+  cardIndex["volt-stormgrid-city"] = { definition_v0_2: stormgrid };
+  cardIndex["volt-test-device"] = { definition_v0_2: device };
+  state.realm = {
+    card: instance("stormgrid-uid", "volt-stormgrid-city"),
+    owner_seat: 2,
+    played_turn: 6,
+  };
+  const effect = {
+    id: "device-effect-1",
+    owner_seat: 1,
+    source_card: instance("device-uid", "volt-test-device"),
+    source_name: "Test Device",
+    source_card_id: "volt-test-device",
+    source_subtype: "Device",
+    discard_after_resolve: true,
+    resolving_card_destination: "discard",
+    device_resolved_event_started: true,
+    steps: [],
+    cursor: 0,
+    vars: {},
+  };
+  state.effect_resolution = effect;
+  return effect;
+}
+
+Deno.test("Stormgrid City can replace the exact resolving Device destination with deck bottom", () => {
+  const state = baseState(
+    creatureDefinition("volt-stormgrid-host", "Stormgrid Host", "Volt"),
+  );
+  const effect = installStormgridFixture(state);
+  const event = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: effect.source_card.uid,
+    resolving_card_id: effect.source_card.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+    destination: "discard",
+  });
+
+  const pending = runtimeV02BeginEventListenerContinuation(state, [event]);
+  equal(pending.status, "player_choice_required");
+  assert(pending.pending_choice, "Stormgrid optional choice required");
+  equal(pending.pending_choice.seat, 1);
+  equal(pending.pending_choice.kind, "optional");
+
+  const complete = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    pending.pending_choice.id,
+    ["accept"],
+  );
+  equal(complete.status, "complete");
+  equal(effect.resolving_card_destination, "deck_bottom");
+  equal(event.destination_zone, "discard");
+  const history = state.effect_events as any[];
+  equal(history.length, 1);
+  equal(history[0].destination_zone, "deck_bottom");
+  equal(complete.processed_listener_keys.length, 1);
+});
+
+Deno.test("Stormgrid City decline preserves discard and consumes the existing event-controller turn limit", () => {
+  const state = baseState(
+    creatureDefinition("volt-stormgrid-decline-host", "Stormgrid Host", "Volt"),
+  );
+  const effect = installStormgridFixture(state);
+  const first = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: effect.source_card.uid,
+    resolving_card_id: effect.source_card.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+  });
+  const pending = runtimeV02BeginEventListenerContinuation(state, [first]);
+  assert(pending.pending_choice, "Stormgrid optional choice required");
+  const declined = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    pending.pending_choice.id,
+    ["decline"],
+  );
+  equal(declined.status, "complete");
+  equal(effect.resolving_card_destination, "discard");
+
+  const secondCard = instance("device-uid-2", "volt-test-device");
+  effect.id = "device-effect-2";
+  effect.source_card = secondCard;
+  const second = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: secondCard.uid,
+    resolving_card_id: secondCard.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+  });
+  const suppressed = runtimeV02BeginEventListenerContinuation(state, [second]);
+  equal(suppressed.status, "complete");
+  equal(suppressed.processed_listener_keys.length, 0);
+});
+
+Deno.test("Stormgrid resolving-card destination fails closed if the resolving Device identity changes", () => {
+  const state = baseState(
+    creatureDefinition("volt-stormgrid-stale-host", "Stormgrid Host", "Volt"),
+  );
+  const effect = installStormgridFixture(state);
+  const event = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: effect.source_card.uid,
+    resolving_card_id: effect.source_card.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+  });
+  const pending = runtimeV02BeginEventListenerContinuation(state, [event]);
+  assert(pending.pending_choice, "Stormgrid optional choice required");
+  effect.source_card = instance("changed-device-uid", "volt-test-device");
+  throws(
+    () => runtimeV02ResolveEventListenerChoice(
+      state,
+      1,
+      pending.pending_choice!.id,
+      ["accept"],
+    ),
+    "tcg_v0_2_resolving_card_destination_source_stale",
+  );
 });
 

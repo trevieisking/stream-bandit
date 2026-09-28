@@ -27,6 +27,7 @@ import {
   runtimeV02AdaptHiddenInformationOccurrencesForListener,
   runtimeV02BeginEventListenerContinuation,
   runtimeV02CreateConditionChangedEvent,
+  runtimeV02CreateDeviceResolvedEvent,
   runtimeV02CreateShieldGainedEvent,
   runtimeV02PendingEventListenerChoiceView,
   runtimeV02PrivateEventInspectionView,
@@ -122,6 +123,8 @@ type EffectState = {
   source_card_id: string;
   source_subtype: string;
   discard_after_resolve: boolean;
+  resolving_card_destination?: "discard" | "deck_bottom" | "deck_top";
+  device_resolved_event_started?: boolean;
   steps: any[];
   cursor: number;
   vars: Record<string, unknown>;
@@ -1171,10 +1174,56 @@ function log(state: any, message: string) {
 }
 function finishEffect(state: any, effect: EffectState) {
   const owner = state.players[String(effect.owner_seat)];
-  if (effect.discard_after_resolve) owner.discard.push(effect.source_card);
+  if (!owner) throw new Error("tcg_v0_2_tactic_resolution_owner_missing");
+
+  if (effect.source_subtype === "Device" && !effect.device_resolved_event_started) {
+    effect.resolving_card_destination ||= "discard";
+    effect.device_resolved_event_started = true;
+    const event = runtimeV02CreateDeviceResolvedEvent(state, {
+      controller_seat: effect.owner_seat as 1 | 2,
+      resolving_card_uid: effect.source_card.uid,
+      resolving_card_id: effect.source_card.card_id,
+      source_action_id: effect.id,
+      phase: String(state.phase || "effect_resolution"),
+      destination: effect.resolving_card_destination,
+    });
+    if (beginTacticEffectEventFlow(state, effect, [event])) return;
+  }
+
+  if (effect.discard_after_resolve) {
+    const destination = effect.source_subtype === "Device"
+      ? effect.resolving_card_destination || "discard"
+      : "discard";
+    const destinationZone = destination === "discard" ? owner.discard : owner.deck;
+    if (!Array.isArray(destinationZone)) {
+      throw new Error("tcg_v0_2_tactic_resolution_destination_missing");
+    }
+    const sourceZone = [effect.source_card];
+    runtimeV02ApplyCardZoneTransfer(sourceZone, destinationZone, {
+      cause: "rule",
+      action_kind: "tactic_resolution",
+      source_action_id: effect.id,
+      source_card_uid: effect.source_card.uid,
+      source: {
+        controller_seat: effect.owner_seat as 1 | 2,
+        zone: "resolving",
+        owner_card_uid: null,
+      },
+      destination: {
+        controller_seat: effect.owner_seat as 1 | 2,
+        zone: destination === "discard" ? "discard" : "deck",
+        owner_card_uid: null,
+      },
+      card_uids: [effect.source_card.uid],
+      destination_position: destination === "deck_top" ? "top" : "bottom",
+    });
+  }
+
   state.turn_flags ||= {};
   state.turn_flags[String(effect.owner_seat)] ||= {};
-  if (effect.source_subtype === "Device") state.turn_flags[String(effect.owner_seat)].device_turn = Number(state.turn_seq || 0);
+  if (effect.source_subtype === "Device") {
+    state.turn_flags[String(effect.owner_seat)].device_turn = Number(state.turn_seq || 0);
+  }
   log(state, `Seat ${effect.owner_seat} resolved ${effect.source_name}.`);
   delete state.effect_resolution;
   delete state.pending_choice;
