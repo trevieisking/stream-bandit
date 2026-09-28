@@ -183,16 +183,16 @@
       "target_remains_in_play_after_damage",
       "target_stage_in",
       "target_zone_is",
-      "voluntary_withdrawal_legal_with_incoming"
+      "voluntary_withdrawal_legal_with_incoming",
+      "essence_discarded_by_own_card_effect",
+      "essence_discarded_source_controller_is_self",
+      "event_previous_attachment_target_is_attached_creature",
+      "essence_discarded_attachment_kind_is"
     ],
     "partial": [],
     "missing": [
       "attached_essence_distinct_element_count_at_most",
       "attached_essence_distinct_element_count_equals",
-      "essence_discarded_attachment_kind_is",
-      "essence_discarded_by_own_card_effect",
-      "essence_discarded_source_controller_is_self",
-      "event_previous_attachment_target_is_attached_creature",
       "target_damage_at_least",
       "target_damage_at_most",
       "target_damage_equals",
@@ -2248,6 +2248,86 @@
       "deterministic_tests": [
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
         "supabase/functions/tcg-tactic-actions/runtime-v0-2-essence-attachment-eligibility.test.ts"
+      ]
+    },
+    "release1_volt_essence_discard_family_v2_4_129": {
+      "implementation_head": "c2190d56136547bae866afa70a2317ab67d6ab12",
+      "accepted_proof_head": "32d2a52ed8fe34ab9dea7b6ed7ce8b23aba56c04",
+      "card_pass_run": 1735,
+      "prior_contract_run": {
+        "run": 1734,
+        "result": "failure_existing_overcharge_exact_object_assertion_only",
+        "new_volt_tests": "3/3_passed",
+        "deterministic_summary": "1034_passed_1_failed"
+      },
+      "frozen_consumers": [
+        {
+          "card_id": "volt-pulse-essence",
+          "listener_id": "pulse-discharge-draw",
+          "event": "essence_discarded",
+          "predicates": [
+            "essence_discarded_source_controller_is_self",
+            "essence_discarded_by_own_card_effect"
+          ]
+        },
+        {
+          "card_id": "volt-dynamo-lens",
+          "listener_id": "dynamo-lens-draw",
+          "event": "essence_discarded",
+          "predicates": [
+            "event_previous_attachment_target_is_attached_creature",
+            "essence_discarded_attachment_kind_is"
+          ]
+        }
+      ],
+      "owners": {
+        "physical_zone_mutation": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+        "event_metadata_and_listener_execution": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "structured_stormmane_discard": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
+        "aftermath_disposition": "supabase/functions/_shared/tcg-match-aftermath-v0-2.ts",
+        "match_route": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "event_name": "essence_discarded",
+        "producer_gate": "successful cause=effect attached_essence -> discard Card-Zone receipt",
+        "payment_and_withdrawal_costs_do_not_emit": true,
+        "effect_controller_separate_from_zone_owner": true,
+        "previous_attachment_target_frozen": true,
+        "attachment_kind_values": [
+          "normal",
+          "temporary",
+          "borrowed"
+        ],
+        "discarded_subject_listener_frozen_from_exact_moved_instance": true,
+        "live_previous_host_listeners_remain_discoverable": true,
+        "pulse_controller_turn_limit_preserved": true,
+        "dynamo_attachment_turn_limit_preserved": true,
+        "opponent_controlled_discard_does_not_satisfy_pulse_own_effect": true,
+        "stormmane_structured_and_legacy_paths_adapted": true,
+        "aftermath_temporary_and_borrowed_cleanup_adapted": true,
+        "no_second_zone_engine": true,
+        "no_card_id_dispatch": true,
+        "owner_family_count": 40
+      },
+      "accepted_edge_closures": {
+        "match": {
+          "files": 123,
+          "sha256": "0b9a97515abbb940d95d39d90b0c8a7ade0f791d6e9c866b6cc480f83afc626e"
+        },
+        "tactic": {
+          "files": 57,
+          "sha256": "a4694be9837523404dddedb9e69482277e3a56b3b615b53b97e690abff28d22b"
+        },
+        "private_alpha": {
+          "files": 8,
+          "sha256": "47294c975b6dc0b87cdcdf293f4cfb46cc0322edebc7a21cf49d2cebd4d848cc"
+        }
+      },
+      "deterministic_tests": [
+        "Pulse Essence and Dynamo Lens consume one canonical Essence-discard event",
+        "opponent-controlled Essence discard blocks Pulse but still satisfies Dynamo attachment metadata",
+        "Pulse controller and Dynamo attachment turn limits suppress repeated Essence-discard draws",
+        "resolution discards exactly the selected attached Essence then applies the condition when the target survived"
       ]
     }
   }
