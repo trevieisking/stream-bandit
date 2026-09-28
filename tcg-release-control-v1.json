@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "7ba151c41c909f45cf6234437f3174ab67385ed6",
+        "entrypoint_git_blob_sha": "de978e88995201a897cc55fcdfef3541e6c0c736",
         "file_count": 123,
-        "closure_sha256": "fc17392eeaf5439db35542431177a8ceca9fb8aef0cdfa32d5db56c7f412725a",
+        "closure_sha256": "b7b9b94c6ed70ab77a83bf70bae172e44d6c8149186a913ca710345d7a16b8ae",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -202,7 +202,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-aftermath-v0-2.ts",
-            "git_blob_sha": "3fd352c5f2c0fd06749b483a52338ac6c42482b7"
+            "git_blob_sha": "9324b1118131f0e8df633e77602e06d2f2615e2b"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-after-damage-finished-v0-2.ts",
@@ -254,7 +254,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
-            "git_blob_sha": "1bf14f0bdd3a316f007a018ce45b1ea3e84bb4af"
+            "git_blob_sha": "00ffc3c41edde238774bf610d3d242b0f2056e06"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -442,11 +442,11 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-resolution-v0-2.ts",
-            "git_blob_sha": "57a0711785d216a31d68b6d6c82e3fa97084026e"
+            "git_blob_sha": "c29a75c329b682e39acbf2f58216dfda5027bb93"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-turn-v0-2.ts",
-            "git_blob_sha": "16bb82d954592ace54ec05056ac4e3af3cd406e4"
+            "git_blob_sha": "87ccc5d62953bfe79071b46a903af49c663be2b1"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
@@ -582,7 +582,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "7ba151c41c909f45cf6234437f3174ab67385ed6"
+            "git_blob_sha": "de978e88995201a897cc55fcdfef3541e6c0c736"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",

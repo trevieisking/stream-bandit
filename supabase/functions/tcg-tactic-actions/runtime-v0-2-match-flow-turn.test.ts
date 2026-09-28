@@ -1,5 +1,8 @@
 import {
+  runtimeV02AdvanceTimefoldTurn,
   runtimeV02AdvanceTurn,
+  runtimeV02ArmTimefold,
+  runtimeV02TimefoldPendingForSeat,
   type RuntimeV02TurnAdvanceState,
 } from "../_shared/tcg-match-flow-turn-v0-2.ts";
 
@@ -179,4 +182,45 @@ Deno.test("Match Flow rejects an invalid active seat before mutation", () => {
   }
   assert(message === "tcg_v0_2_match_flow_active_seat_invalid", "invalid active-seat guard changed");
   assert(JSON.stringify(s) === before, "invalid active seat mutated state");
+});
+
+Deno.test("TIMEFOLD grants a full same-seat turn and records explicit consecutive ownership", () => {
+  const s = state();
+  runtimeV02ArmTimefold(s, { seat: 1, turn_seq: 4, source_action_id: "second-horizon", source_card_uid: "celestyr-uid", source_card_id: "astral-celestyr-dream-cartographer" });
+  assert(runtimeV02TimefoldPendingForSeat(s, 1), "TIMEFOLD did not arm");
+  let drawSeat = 0;
+  const result = runtimeV02AdvanceTimefoldTurn(s, (plan) => {
+    drawSeat = plan.controller_seat;
+    assert(s.active_seat === 1 && s.turn_seq === 4, "TIMEFOLD mutated lifecycle before draw");
+  });
+  assert(result.status === "advanced", "TIMEFOLD did not advance");
+  assert(drawSeat === 1, "TIMEFOLD drew for wrong seat");
+  assert(s.active_seat === 1 && s.turn_seq === 5, "TIMEFOLD did not keep same seat");
+  const turns = s.personal_turns as Record<string, number>;
+  assert(turns["1"] === 3 && turns["2"] === 2, "TIMEFOLD personal turns changed");
+  const history = s.turn_owner_history as Array<{ turn_seq: number; active_seat: number }>;
+  assert(history.at(-1)?.turn_seq === 5 && history.at(-1)?.active_seat === 1, "TIMEFOLD history changed");
+  assert(s.pending_timefold == null && s.timefold_lock_seat === 1, "TIMEFOLD lock lifecycle changed");
+});
+
+Deno.test("TIMEFOLD lock clears only after opponent completes a normal turn", () => {
+  const s = state({ active_seat: 1, turn_seq: 5, personal_turns: { "1": 3, "2": 2 }, timefold_lock_seat: 1 });
+  runtimeV02AdvanceTurn(s, () => {});
+  assert(s.active_seat === 2 && s.timefold_lock_seat === 1, "lock cleared before opponent turn");
+  runtimeV02AdvanceTurn(s, () => {});
+  assert(s.active_seat === 1 && s.timefold_lock_seat == null, "lock did not clear after opponent turn");
+});
+
+Deno.test("TIMEFOLD terminal preflight grants no extra turn", () => {
+  const players = {
+    "1": { rewards: [], vanguard: creature("p1-v"), reserve: [null, null, null, null], deck: [card("p1-draw")] },
+    "2": { rewards: [card("p2-reward")], vanguard: creature("p2-v"), reserve: [null, null, null, null], deck: [card("p2-draw")] },
+  };
+  const s = state({ players });
+  runtimeV02ArmTimefold(s, { seat: 1, turn_seq: 4, source_action_id: "second-horizon", source_card_uid: "celestyr-uid", source_card_id: "astral-celestyr-dream-cartographer" });
+  let draws = 0;
+  const result = runtimeV02AdvanceTimefoldTurn(s, () => { draws += 1; });
+  assert(result.status === "terminal" && draws === 0, "terminal TIMEFOLD advanced");
+  assert(s.active_seat === 1 && s.turn_seq === 4, "terminal TIMEFOLD changed turn");
+  assert(s.pending_timefold == null && s.timefold_lock_seat == null, "terminal TIMEFOLD lifecycle marker survived");
 });

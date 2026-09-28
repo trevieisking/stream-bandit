@@ -200,6 +200,53 @@ export function structuredRuntimeAfterDamageConditionEffects(
 }
 
 
+export type RuntimeV02AttackTimefoldDescriptor = {
+  attack_id: string;
+  phase: "after_damage";
+};
+
+export function structuredRuntimeAfterDamageTimefoldEffect(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  attackSlot: number,
+): RuntimeV02AttackTimefoldDescriptor | null {
+  const definition = runtimeV02Definition(state, instanceOrId);
+  if (!definition) return null;
+  if (String(definition.card_family || "") !== "Creature") {
+    throw new Error("tcg_v0_2_attack_timefold_requires_creature");
+  }
+  const creature = objectRecord(definition.creature);
+  if (!creature) throw new Error("tcg_v0_2_attack_timefold_creature_required");
+  const attacks = creature.attacks;
+  if (!Array.isArray(attacks)) throw new Error("tcg_v0_2_attack_timefold_attacks_required");
+  if (!Number.isInteger(attackSlot) || attackSlot < 1 || attackSlot > attacks.length) {
+    throw new Error("tcg_v0_2_attack_timefold_slot_invalid");
+  }
+  const attack = objectRecord(attacks[attackSlot - 1]);
+  if (!attack) throw new Error("tcg_v0_2_attack_timefold_attack_invalid");
+  const attackId = typeof attack.id === "string" ? attack.id.trim() : "";
+  if (!attackId) throw new Error("tcg_v0_2_attack_timefold_attack_id_required");
+  if (!Array.isArray(attack.after_damage)) {
+    throw new Error(`tcg_v0_2_attack_timefold_after_damage_required:${attackId}`);
+  }
+  const timefoldSteps = attack.after_damage.filter((rawStep) => {
+    const step = objectRecord(rawStep);
+    return step && String(step.op || "") === "TIMEFOLD";
+  });
+  if (timefoldSteps.length === 0) return null;
+  if (attack.after_damage.length !== 1 || timefoldSteps.length !== 1) {
+    throw new Error(`tcg_v0_2_attack_timefold_program_unsupported:${attackId}`);
+  }
+  const step = objectRecord(timefoldSteps[0]);
+  if (!step) throw new Error(`tcg_v0_2_attack_timefold_step_invalid:${attackId}`);
+  rejectUnsupportedFields(
+    step,
+    ["op"],
+    `tcg_v0_2_attack_timefold_step_field_unsupported:${attackId}`,
+  );
+  return { attack_id: attackId, phase: "after_damage" };
+}
+
 export type RuntimeV02AttackRecoilExecutionContext = {
   source_controller_seat: 1 | 2;
   source_action_id: string;
