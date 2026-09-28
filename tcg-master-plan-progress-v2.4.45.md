@@ -5091,3 +5091,119 @@ Machine preflight comes first:
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
 
+## V2.4.132 — G5 Battle machine preflight + exact Tactic preview promotion
+
+**Last synchronized authority head:** `1317a05d1e0572fad5ad0ab40afb73f78e538558` — Card Pass #1745 **SUCCESS** through V2.4.131.
+
+### Runtime closeout -> G5 gate transition
+Frozen Release 1 used-missing capability debt is zero, so V2.4.57's deferred gate has now advanced exactly as planned: the active target is again Trevor/Kay two-device G5 Battle acceptance.
+
+No human gate is auto-passed by this transition.
+
+### Static build identity
+GitHub `main` is **not** the current G5 candidate:
+- main head: `cbbcf17313506e3b8d580f8443e3e60f5f9cdd1d`;
+- PR #591 synchronized candidate: `1317a05d1e0572fad5ad0ab40afb73f78e538558`;
+- main's Battle controller is older and lacks the current projected-action / Tactic-preview / Withdraw / touch / Reward-overlay client surface;
+- current PR-only presentation and shared card-renderer files are absent from main.
+
+Therefore GitHub Pages / main must not be used as the G5 acceptance build yet.
+
+The established non-main test surface remains the commit-pinned rawcdn.githack preview:
+- home: `https://rawcdn.githack.com/trevieisking/stream-bandit/1317a05d1e0572fad5ad0ab40afb73f78e538558/tcg-game-home.html`;
+- direct Battle: `https://rawcdn.githack.com/trevieisking/stream-bandit/1317a05d1e0572fad5ad0ab40afb73f78e538558/tcg-battle-v2.html`.
+
+The repository files at that exact commit are the source of truth even when an external fetch tool cannot independently render the CDN route.
+
+### Backend drift audit
+Before this pass, production was:
+- Match `tcg-match-actions` v9 — 84-file closure;
+- Tactic `tcg-tactic-actions` v4 — 36-file closure;
+- Private Alpha `tcg-private-alpha-api` v3 — 7-file closure.
+
+The latest green PR release-control closures are materially larger:
+- Match: 123 files;
+- Tactic: 57 files;
+- Private Alpha: 8 files.
+
+The current connector cannot safely materialize the complete 123/57-file later closures atomically from GitHub, and there is no existing free Supabase preview branch. Creating a new Supabase branch may incur cost and is outside the no-paid-services rule. Therefore the full later Match/Tactic/Private Alpha closure promotion remains **HOLD** until an exact complete bundle can be materialized safely.
+
+### G5-required Match surface
+Production Match v9 still exposes the machine-verifiable mechanics required by the existing G5 human gate:
+- server-projected Attacks;
+- server-projected active Ability sources;
+- server-projected Withdraw;
+- authoritative Attack action;
+- authoritative Withdraw action;
+- Essence attach;
+- Realm play;
+- Reward selection;
+- forced promotion;
+- successful Match Flow return to `phase=play`;
+- concede/result lifecycle.
+
+The newer presentation-envelope choreography is absent from Match v9, but the PR client accepts absent/invalid presentation envelopes and continues to refresh authoritative revision state. Presentation-envelope deployment is therefore **not** treated as a blocker for the already-defined functional G5 gate; it remains part of later polish/full-runtime promotion.
+
+### Exact Tactic preview prerequisite
+Production Tactic v4 lacked the read-only `play_tactic_preview` route required by the V2.4.56 client preflight.
+
+The exact historical accepted V2.4.56 source was recovered:
+- accepted head: `29e3ba5aa0259814563a0d8227a48c08a6e67a1e`;
+- Card Pass: **#1138 SUCCESS**;
+- exact Tactic closure: **36 files**;
+- closure SHA-256: `73e742dead2460ef9a6f3c9bc60168b1fadf778ab16312feca6d428f21a9b55f`.
+
+Compared with production v4:
+- **34 / 36 files were byte-identical**;
+- exactly two reviewed files differed;
+- no files were missing or extra:
+  1. `supabase/functions/tcg-tactic-actions/index.ts`;
+  2. `supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts`.
+
+The accepted Essence-attachment engine SHA `93f7f955c22a892f6c9a988084023a7276e472ff` is still the exact current PR SHA, proving the scoped deployment did not roll that owner backward.
+
+### Scoped backend promotion — PROMOTE
+A complete 36-file bundle was reconstructed from production v4 plus the exact two reviewed overlays, then every file was re-hashed against the accepted #1138 manifest before deployment.
+
+Result:
+- `tcg-tactic-actions` **v5 ACTIVE**;
+- JWT verification remains enabled;
+- deployed file count: **36**;
+- Supabase bundle SHA-256: `995266bd7deedfee2c431f9ef2da30870178e04cd7a8a625728d20aecebc1058`;
+- readback confirms `play_tactic_preview`;
+- readback confirms `required_tactic_target_unavailable`;
+- Match remains v9;
+- Private Alpha remains v3;
+- database/schema/economy unchanged;
+- main/static Pages untouched.
+
+This is a deliberately narrow G5 prerequisite promotion, not the later full 123/57/8-file runtime promotion.
+
+### G5 test stack
+The machine-approved G5 acceptance stack is now:
+- static/client: exact PR commit `1317a05d1e0572fad5ad0ab40afb73f78e538558` via commit-pinned non-main preview;
+- Match: production v9 ACTIVE;
+- Tactic: production **v5 ACTIVE**;
+- Private Alpha: production v3 ACTIVE.
+
+### Remaining G5 human evidence
+Human evidence remains required for:
+1. Trevor desktop complete board/card readability at default zoom;
+2. Kay phone complete card readability;
+3. Kay finger hold-drag transport;
+4. Kay tap-select fallback;
+5. visible Attack readiness/block reason and a legal Attack;
+6. visible damage placement + automatic turn handoff;
+7. lethal Defeat -> Reward -> forced promotion -> ordinary play/turn continuation;
+8. genuinely legal active Ability ready feedback and disappearance after use;
+9. Essence rail colours/counts readable and updating when Essence leaves;
+10. Quit Match quitter DEFEAT / opponent VICTORY / fresh matchmaking.
+
+### Promotion state
+- **Tactic preview prerequisite: PROMOTED**.
+- **G5 human acceptance: OPEN**.
+- **full latest Edge closure promotion: HOLD** until an exact complete bundle is safely materializable.
+- **main/static live promotion: HOLD** until G5 and remaining release gates pass.
+
+Owner-family count remains **40**. No database migration, main merge, static Pages promotion, Repo Desk, CG Repair Lab, Code God or Writer action occurred.
+

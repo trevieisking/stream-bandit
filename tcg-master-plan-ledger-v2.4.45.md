@@ -1522,3 +1522,21 @@ Twenty-nine historical runtime planning/next-target boxes remained unchecked eve
 ## 513 — next gate returns to G5 two-device Battle acceptance
 With frozen Release 1 runtime capability debt at zero, V2.4.132 returns to the G5 Battle path. Machine preflight must first re-verify current Battle presentation/projection and exact preview/deployment identities; only then should Trevor/Kay human acceptance resume. Main/static live promotion remains HOLD until those gates pass.
 
+## 514 — V2.4.132 returns the loop to the real G5 gate
+Frozen Release 1 runtime capability debt is zero, so the deferred V2.4.57 transition is complete: Trevor/Kay two-device Battle acceptance is again the active gate. No human evidence is inferred from machine runtime closeout.
+
+## 515 — main/static Pages is not the current acceptance build
+Main `cbbcf17313506e3b8d580f8443e3e60f5f9cdd1d` is materially older than PR #591 `1317a05d1e0572fad5ad0ab40afb73f78e538558`. The current Battle controller/presentation/shared renderer surfaces are PR-only. G5 acceptance must therefore use the exact commit-pinned non-main preview, not GitHub Pages main.
+
+## 516 — current production backend is mixed-generation, but Match v9 still covers the G5 functional gate
+Current green release-control closures are larger than production and cannot be safely bulk-materialized with the available connector path. Match v9 nevertheless retains the projected Attack/Ability/Withdraw surface plus Attack, Withdraw, Essence, Realm, Reward, promotion, phase-return and concede mechanics required by the already-defined G5 functional acceptance. Full current closure promotion remains a later exact-bundle requirement.
+
+## 517 — V2.4.56 Tactic preview prerequisite had an exact narrow deploy path
+The actual accepted V2.4.56 head is `29e3ba5aa0259814563a0d8227a48c08a6e67a1e` / Card Pass #1138 SUCCESS. Its 36-file Tactic closure differs from production v4 in exactly two files and has no missing/extra files. The shared Essence-attachment engine used by that closure remains byte-exact with the current PR owner.
+
+## 518 — Tactic preview prerequisite promoted safely
+The complete accepted 36-file bundle was reconstructed and re-hashed against closure `73e742dead2460ef9a6f3c9bc60168b1fadf778ab16312feca6d428f21a9b55f` before deployment. `tcg-tactic-actions` is now **v5 ACTIVE**, JWT verification remains enabled, Supabase bundle SHA-256 is `995266bd7deedfee2c431f9ef2da30870178e04cd7a8a625728d20aecebc1058`, and readback confirms `play_tactic_preview` plus friendly rejection guidance. Match remains v9, Private Alpha v3, main/static untouched.
+
+## 519 — V2.4.132 now waits only on genuine G5 human evidence before the next promotion decision
+The machine-approved test stack is exact PR static preview + Match v9 + Tactic v5 + Private Alpha v3. Trevor/Kay must still prove desktop/mobile readability, phone drag/tap, Attack/damage/handoff, lethal Reward/promotion continuation, active Ability usability feedback, Essence visibility/update and quit/result/fresh-match behavior. Full latest Edge closure and main/static promotion remain HOLD.
+

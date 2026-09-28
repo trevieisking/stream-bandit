@@ -290,7 +290,7 @@
 - [x] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback; 7 Tactic + 13 Attack + 9 Ability.
 - [x] Reconcile IF + its proven Release 1 predicate classifications in tcg-runtime-capabilities-v0.2.json; accepted by Card Pass #1326.
 - [x] Continue operation/predicate audit until **every Release 1-used partial/missing capability** is either implemented or proven already implemented by the rightful owner.
-- [ ] Only after Release 1 runtime capability closeout return to Trevor/Kay full two-device G5 Battle acceptance.
+- [x] Only after Release 1 runtime capability closeout return to Trevor/Kay full two-device G5 Battle acceptance.
 - [ ] Main/static live promotion remains HOLD until runtime closeout + G5 + final release gates.
 
 
@@ -1947,4 +1947,46 @@
 - [x] Reconcile 29 stale historical runtime checklist boxes from later accepted V2.4.x evidence.
 
 **Acceptance:** Release 1 runtime capability closeout is complete. Capability coverage is **163/180 (90.6%)**, with **0 frozen Release 1-used missing capabilities**. The next gate returns to G5 Battle presentation/human acceptance; no merge/live promotion is authorized yet.
+
+### V2.4.132 — G5 Battle machine preflight + exact Tactic preview promotion
+- [x] Re-enter the G5 two-device Battle gate after frozen Release 1 runtime capability closeout reached zero.
+- [x] Confirm no human G5 gate is auto-passed by runtime closeout.
+- [x] Confirm GitHub main/static Pages is stale versus PR #591 and must not be used for current G5 acceptance.
+- [x] Bind the G5 static candidate to exact PR head `1317a05d1e0572fad5ad0ab40afb73f78e538558`.
+- [x] Preserve the commit-pinned rawcdn.githack non-main preview method.
+- [x] Audit production Match/Tactic/Private Alpha file counts against the current release-control closures.
+- [x] Prove full current Match/Tactic closures cannot be safely reconstructed atomically with the available connector path.
+- [x] Confirm no existing free Supabase development branch is available.
+- [x] Do not create a potentially paid Supabase preview branch.
+- [x] Verify production Match v9 still exposes the functional mechanics required by the current G5 human gate.
+- [x] Confirm presentation-envelope absence does not prevent authoritative-state polling/fallback for the existing G5 functional gate.
+- [x] Prove production Tactic v4 lacked `play_tactic_preview`.
+- [x] Recover exact accepted V2.4.56 Tactic head `29e3ba5aa0259814563a0d8227a48c08a6e67a1e`.
+- [x] Verify Card Pass #1138 SUCCESS for that exact head.
+- [x] Verify accepted Tactic closure is 36 files / `73e742dead2460ef9a6f3c9bc60168b1fadf778ab16312feca6d428f21a9b55f`.
+- [x] Compare accepted closure with production v4: 34 exact / 2 changed / 0 missing / 0 extra.
+- [x] Prove the accepted Essence-attachment overlay is still the exact current GitHub owner SHA.
+- [x] Reconstruct the complete 36-file bundle and hash every file against the accepted manifest before deploy.
+- [x] Promote only `tcg-tactic-actions` to the accepted V2.4.56 closure.
+- [x] Confirm `tcg-tactic-actions` v5 ACTIVE.
+- [x] Confirm Tactic v5 JWT verification remains enabled.
+- [x] Confirm Tactic v5 post-deploy file count remains 36.
+- [x] Confirm post-deploy `play_tactic_preview` readback.
+- [x] Confirm post-deploy `required_tactic_target_unavailable` readback.
+- [x] Leave Match at v9 and Private Alpha at v3 for this narrow prerequisite.
+- [x] Leave database/schema/economy untouched.
+- [x] Leave main/static Pages untouched.
+- [ ] Trevor desktop: complete board/card readability at default zoom.
+- [ ] Kay phone: complete card readability.
+- [ ] Kay phone: finger hold-drag works for legal hand actions.
+- [ ] Kay phone: tap-select fallback works.
+- [ ] Visible Attack readiness/block reason is correct.
+- [ ] A legal Attack visibly places damage and automatically hands over the turn.
+- [ ] A lethal Attack visibly reaches Reward -> forced promotion -> ordinary continuation.
+- [ ] A genuinely legal active Ability visibly shows readiness and loses it after use.
+- [ ] Attached Essence colours/counts are readable and update when Essence leaves.
+- [ ] Quit Match shows quitter DEFEAT / opponent VICTORY and both return to fresh matchmaking.
+- [ ] Only after the G5 human gate passes, decide full current Edge/static promotion from exact evidence.
+
+**Acceptance so far:** machine preflight and the narrow Tactic preview prerequisite are complete. Human G5 evidence remains open; main/static promotion remains HOLD.
 
