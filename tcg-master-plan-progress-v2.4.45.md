@@ -4804,3 +4804,93 @@ Audit the frozen **Volt Essence-discard family** across Pulse Essence and Dynamo
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
 
+## V2.4.129 — Volt canonical attached-Essence discard events
+
+**Previous synchronized authority head:** `7b23f36c3ec30dd653c03cb37b575251731c7c09` — Card Pass #1733 **SUCCESS** through V2.4.128.
+
+### Frozen Release 1 consumers
+The remaining Volt discard family consisted of exactly four frozen predicates across two listeners:
+
+**Pulse Essence / `pulse-discharge-draw`**
+- event `essence_discarded`;
+- `essence_discarded_source_controller_is_self`;
+- `essence_discarded_by_own_card_effect`;
+- controller once per turn;
+- then `DRAW 1`.
+
+**Dynamo Lens / `dynamo-lens-draw`**
+- event `essence_discarded`;
+- `event_previous_attachment_target_is_attached_creature`;
+- `essence_discarded_attachment_kind_is` for `temporary` or `borrowed`;
+- attachment once per turn;
+- then `DRAW 1`.
+
+### Proven gap
+The Card-Zone engine already owned the physical attached-Essence -> discard mutation and returned exact successful transfer receipts. Aftermath already selected temporary/borrowed Essence for discard, and structured Stormmane already committed its selected overcharge Essence through Card-Zone. The missing piece was not another discard engine: Match discarded the transfer context without adapting it into the generic Event Listener stream.
+
+V2.4.129 therefore adds a metadata/event adapter only after successful `cause: "effect"` `attached_essence -> discard` Card-Zone receipts.
+
+### Canonical event contract
+`runtimeV02CreateEssenceDiscardedEvents` now freezes:
+- the exact discarded Essence UID/card ID from the real destination discard;
+- the zone owner/controller;
+- the real effect controller separately from zone ownership;
+- the previous attachment target UID;
+- the pre-discard attachment kind: `normal`, `temporary` or `borrowed`;
+- source action/card provenance and phase;
+- whether the discard came from a card effect.
+
+Payment/Withdrawal-cost removal does **not** enter this family.
+
+The discarded subject's own matching listener is frozen from the exact moved instance so Pulse remains eligible after leaving play. Live listeners still use the normal battlefield candidate scan, so Dynamo Lens remains attached to the previous host and can compare that host against the frozen previous attachment target. Existing Essence-attachment trigger snapshots remain prevalidated through their dedicated trigger plan; discarded-subject frozen work still evaluates normal Event Listener requirements before execution.
+
+### Producer wiring
+The adapter is wired only to proven Release 1 effect producers:
+- structured Stormmane overcharge now carries the successful Card-Zone receipt out of its resolver;
+- legacy-compatible Stormmane adapts the successful direct Card-Zone transfer;
+- Aftermath temporary/borrowed disposition adapts each successful Card-Zone transfer.
+
+No second zone mutation path, no card-ID listener dispatch and no payment shortcut were added.
+
+### Predicate semantics
+The four frozen predicates are now strict Event Listener leaves:
+- `essence_discarded_source_controller_is_self` compares the actual effect controller to the listener controller;
+- `essence_discarded_by_own_card_effect` additionally requires card-effect provenance;
+- `event_previous_attachment_target_is_attached_creature` compares the frozen previous host UID to the live listener attachment host;
+- `essence_discarded_attachment_kind_is` accepts only `normal`, `temporary` or `borrowed`.
+
+For `essence_discarded` only, `event_subject_is_source` compares against the discarded source instance UID. Other event families retain their prior semantics.
+
+### Validation history
+Runtime implementation head `c2190d56136547bae866afa70a2317ab67d6ab12`:
+- Card Pass #1734 structural/release/guard lane **SUCCESS**;
+- all three new Pulse/Dynamo tests **PASS**;
+- deterministic summary **1034 passed / 1 failed** because the pre-existing overcharge unit test compared the whole internal resolver object and did not yet include the newly exposed successful transfer receipt.
+
+Test-contract-only head `32d2a52ed8fe34ab9dea7b6ed7ce8b23aba56c04` updated that exact assertion and passed Card Pass **#1735 SUCCESS**, including **1035/1035 deterministic tests** and all Match/Tactic/Private API type checks.
+
+Accepted Edge closures:
+- Match: **123 files**, SHA-256 `0b9a97515abbb940d95d39d90b0c8a7ade0f791d6e9c866b6cc480f83afc626e`;
+- Tactic: **57 files**, SHA-256 `a4694be9837523404dddedb9e69482277e3a56b3b615b53b97e690abff28d22b`;
+- Private Alpha: **8 files**, SHA-256 `47294c975b6dc0b87cdcdf293f4cfb46cc0322edebc7a21cf49d2cebd4d848cc`.
+
+### Capability acceptance
+Capability/release-control head `2e29e83e565dec34207bf14775e8bf889f479c75` passed Card Pass **#1736 SUCCESS**.
+
+Exactly these four predicates moved missing -> implemented:
+- `essence_discarded_by_own_card_effect`;
+- `essence_discarded_source_controller_is_self`;
+- `event_previous_attachment_target_is_attached_creature`;
+- `essence_discarded_attachment_kind_is`.
+
+Capability blob is `b63af5eeb59dd3c036a5fb782fbf86a9430a4a16`.
+
+Capability catalogue is now **62/72 operations + 99/108 predicates = 161/180 (89.4%)** implemented. Frozen Release 1 used-missing falls from **6 to 2**:
+- `SET_RESOLVING_CARD_DESTINATION`;
+- `TIMEFOLD`.
+
+### Next exact target — V2.4.130
+Audit Stormgrid City's `SET_RESOLVING_CARD_DESTINATION` consumer and the real `device_resolved` production/resolution path. Reuse existing Tactic/Card-Zone/Event Listener ownership; do not create a second resolving-card destination engine or card-ID dispatch.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+

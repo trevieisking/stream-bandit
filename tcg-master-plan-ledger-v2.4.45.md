@@ -1468,3 +1468,18 @@ Runtime implementation head `6348e1c5affe4b4eb95c8a87b24bdf26c89cc4ce` preserved
 ## 495 — V2.4.128 capability reconciliation accepted
 Capability/release-control head `f820ae31f3a2bb361f424427594f30fa4bcdcc70` passed Card Pass #1732 **SUCCESS**. Exactly `PERFORM_VOLUNTARY_WITHDRAWAL` and `voluntary_withdrawal_legal_with_incoming` moved missing -> implemented. Capability blob is `ec8ebc507b52f1f0590943716583f17f448bafa0`. Coverage is now **62/72 operations + 95/108 predicates = 157/180 (87.2%)** and frozen Release 1 used-missing falls from **8 to 6**. Owner-family count remains 40; Supabase production remains Match v9, Tactic v4 and Private Alpha v3. Next target is V2.4.129, the four-predicate Volt Essence-discard family across Pulse Essence and Dynamo Lens.
 
+## 496 — V2.4.129 isolates the Volt discard family to Pulse Essence and Dynamo Lens
+The remaining frozen Volt capability debt was exactly four predicates across `pulse-discharge-draw` and `dynamo-lens-draw`. Pulse requires its own discarded instance plus real effect-controller provenance; Dynamo Lens requires the previous host plus temporary/borrowed attachment provenance.
+
+## 497 — Card-Zone remains the sole physical discard owner
+Audit proved Aftermath and Stormmane already move attached Essence through the canonical Card-Zone engine. V2.4.129 does not add another mutation path. It adapts only successful `cause=effect` `attached_essence -> discard` receipts into `essence_discarded` Event Listener events. Payment and Withdrawal-cost removal stay outside this family.
+
+## 498 — Discard-event metadata preserves both the removed source and the live previous host
+The adapter freezes the exact discarded instance, true effect controller, prior attachment target and normal/temporary/borrowed attachment kind. The removed Essence's own listener is frozen so Pulse remains eligible after leaving play; normal live candidate discovery still sees Dynamo Lens on the previous host. Existing Essence-attachment snapshot work retains explicit prevalidation while discarded-source work evaluates ordinary listener requirements.
+
+## 499 — V2.4.129 runtime proof closes the generic bridge
+Implementation head `c2190d56136547bae866afa70a2317ab67d6ab12` passed all three new Pulse/Dynamo tests on #1734; the only failure was an old exact-object overcharge assertion that did not include the newly exposed successful transfer receipt. Test-only head `32d2a52ed8fe34ab9dea7b6ed7ce8b23aba56c04` updated that intentional internal contract and passed Card Pass #1735 **SUCCESS**, including 1035/1035 deterministic tests and all type-checks. Accepted Match/Tactic closures are `0b9a97515abbb940d95d39d90b0c8a7ade0f791d6e9c866b6cc480f83afc626e` / `a4694be9837523404dddedb9e69482277e3a56b3b615b53b97e690abff28d22b`.
+
+## 500 — V2.4.129 capability reconciliation leaves only two frozen Release 1 gaps
+Capability/release-control head `2e29e83e565dec34207bf14775e8bf889f479c75` passed Card Pass #1736 **SUCCESS**. Exactly `essence_discarded_by_own_card_effect`, `essence_discarded_source_controller_is_self`, `event_previous_attachment_target_is_attached_creature` and `essence_discarded_attachment_kind_is` moved missing -> implemented. Capability blob is `b63af5eeb59dd3c036a5fb782fbf86a9430a4a16`. Coverage is now **62/72 operations + 99/108 predicates = 161/180 (89.4%)**. Frozen Release 1 used-missing is now exactly **2**: `SET_RESOLVING_CARD_DESTINATION` and `TIMEFOLD`. Next target is V2.4.130, Stormgrid City / real `device_resolved` destination ownership.
+

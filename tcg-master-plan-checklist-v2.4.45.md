@@ -1822,3 +1822,48 @@
 
 **Acceptance:** Draft Essence now reuses the canonical voluntary-Withdrawal quote, exact attached-Essence Payment and existing Withdrawal Transaction / Atomic Switch owners. Coverage is **157/180 (87.2%)** and frozen Release 1 used-missing is **6**.
 
+### V2.4.129 — Volt canonical attached-Essence discard events
+- [x] Reconfirm Pulse Essence and Dynamo Lens as the only frozen Release 1 consumers of the four Volt discard predicates.
+- [x] Prove Card-Zone already owns physical attached-Essence -> discard mutation.
+- [x] Prove Aftermath already selects temporary/borrowed Essence disposition.
+- [x] Prove structured Stormmane already commits its selected overcharge Essence through Card-Zone.
+- [x] Keep payment/Withdrawal-cost removal outside the card-effect discard event family.
+- [x] Add one generic post-commit `essence_discarded` Event Listener adapter.
+- [x] Require a successful `cause=effect` attached-Essence -> discard Card-Zone receipt.
+- [x] Freeze the exact discarded Essence UID/card ID from the real destination discard.
+- [x] Preserve zone-owner controller separately from actual effect controller.
+- [x] Freeze previous attachment target UID.
+- [x] Normalize pre-discard attachment kind to normal / temporary / borrowed.
+- [x] Preserve source action/card provenance and phase.
+- [x] Mark card-effect provenance only when an effect source card identity exists.
+- [x] Freeze a discarded subject's own matching listener from the exact moved instance.
+- [x] Continue discovering previous-host Relic/Essence/Ability listeners through the normal live candidate scan.
+- [x] Keep dedicated Essence-attachment trigger work prevalidated without globally bypassing requirements for other frozen work.
+- [x] Evaluate discarded-source frozen work through normal Event Listener requirements.
+- [x] Make `event_subject_is_source` compare source instance UID only for `essence_discarded`.
+- [x] Implement `essence_discarded_source_controller_is_self` as an event-specific strict leaf.
+- [x] Implement `essence_discarded_by_own_card_effect` as an event-specific strict leaf.
+- [x] Implement `event_previous_attachment_target_is_attached_creature` as an event-specific strict leaf.
+- [x] Implement `essence_discarded_attachment_kind_is` with only normal / temporary / borrowed values.
+- [x] Carry the real structured Stormmane Card-Zone receipt out of the overcharge resolver.
+- [x] Adapt structured Stormmane discard after the successful commit.
+- [x] Adapt legacy-compatible Stormmane discard after the successful commit.
+- [x] Adapt each Aftermath temporary/borrowed discard after the successful commit.
+- [x] Preserve Pulse controller once-per-turn limit.
+- [x] Preserve Dynamo Lens attachment once-per-turn limit.
+- [x] Prove an opponent-controlled discard does not satisfy Pulse's own-card-effect predicates.
+- [x] Prove Dynamo can still react to qualifying temporary/borrowed discard metadata.
+- [x] Prove repeated same-turn qualifying discards do not overdraw through Pulse/Dynamo limits.
+- [x] Preserve one Card-Zone mutation owner and one Event Listener execution owner.
+- [x] Add no Pulse/Dynamo card-ID dispatch and no new owner family.
+- [x] Update exact Match/Tactic dependency closures in the same runtime commit.
+- [x] Record #1734 as a test-contract-only failure after all new Volt tests passed.
+- [x] Update the pre-existing overcharge resolver assertion to include the successful Card-Zone receipt.
+- [x] Pass accepted runtime/test head `32d2a52ed8fe34ab9dea7b6ed7ce8b23aba56c04` / Card Pass #1735 SUCCESS.
+- [x] Move exactly the four frozen Volt predicates missing -> implemented.
+- [x] Synchronize release control to capability blob `b63af5eeb59dd3c036a5fb782fbf86a9430a4a16`.
+- [x] Pass capability/release-control head `2e29e83e565dec34207bf14775e8bf889f479c75` / Card Pass #1736 SUCCESS.
+- [x] Preserve 40 owner families and unchanged Supabase production.
+
+**Acceptance:** Pulse Essence and Dynamo Lens now consume canonical post-commit attached-Essence discard events without owning movement. Coverage is **161/180 (89.4%)** and frozen Release 1 used-missing is **2**.
+
