@@ -1498,3 +1498,27 @@ Implementation head `f44a8ae55eb660fa17e8d75e028e99ba74230a11` added Device even
 ## 505 — V2.4.130 leaves TIMEFOLD as the sole frozen Release 1 capability gap
 Capability/release-control head `09eef5071ec9935bae491c2cbbbfaca66e0dfde6` passed Card Pass #1740 **SUCCESS**. Exactly `SET_RESOLVING_CARD_DESTINATION` moved missing -> implemented. Capability blob is `2a51776936c810f49f982e93cfcd9e4078e29a7a`. Coverage is now **63/72 operations + 99/108 predicates = 162/180 (90.0%)**. Frozen Release 1 used-missing is exactly **1**: `TIMEFOLD`. Next target is V2.4.131 Celestyr.
 
+## 506 — V2.4.131 isolates the final frozen runtime gap to Celestyr TIMEFOLD
+Celestyr — Dream Cartographer / Second Horizon is the sole frozen Release 1 `TIMEFOLD` consumer. The accepted grammar is exactly one zero-field `TIMEFOLD` step after damage. Mixed/extended metadata fails closed and no Celestyr identity dispatch is introduced.
+
+## 507 — TIMEFOLD is a Match Flow transition, not a second turn engine
+The existing Match Flow turn owner now recognizes an exact pending TIMEFOLD marker and, at the ordinary turn-advance boundary, chooses same-seat full-turn progression instead of alternating progression. Canonical turn sequence, personal-turn counters, Turn History and Card-Zone turn-start draw remain authoritative. Terminal evaluation occurs before any grant.
+
+## 508 — TIMEFOLD skips only the scheduled Condition transition
+Aftermath receives one narrow `skip_condition_transition` option for the TIMEFOLD boundary. Condition damage/recovery is skipped once; withdrawal/lifecycle expiry, temporary modifiers, attachment cleanup, temporary/borrowed Essence disposition, listener continuation, unused Attack-modifier expiry, Defeat scan and controller-aftermath scheduled actions still run.
+
+## 509 — V2.4.131 anti-chain ownership reuses the existing Starbound lock
+A successful granted turn arms `timefold_lock_seat`. The lock survives the extra turn and the opponent's following normal turn, then clears when that opponent turn completes. The pre-existing Starbound declaration guard rejects chained extra-turn use while the lock is present.
+
+## 510 — V2.4.131 proof passed after compatibility-only repair
+Initial head `7e876973d2fb7ca000cbcc5338e299dd1f3e7001` / #1742 failed four stale source-shape guards plus one new-test TypeScript narrowing; no gameplay assertion proved TIMEFOLD wrong. Compatibility-preserving head `2764afc63dea728b8398a58324945ff53b492b9c` restored the proven source contracts, moved the same-seat decision inside Match Flow and passed Card Pass #1743 **SUCCESS**. Accepted Match/Tactic/Private Alpha closures are `cc0c41c357cb4c5cb4c08193ec795123bb14a2ddd46cf6c95b7739cd09c94a0c` / `1ca1cc30ee8634cdebf6b59af512b9599699cf3f2e1ae87012e5ecdef6e6b9b3` / `c90d05bdf4af90c197464efad9adaeebee6a113cd4d971fc70c81796afe1d468`.
+
+## 511 — Release 1 used-capability debt is closed
+Capability/release-control head `87f888cfcca74d5b7017e57da9f551c8778673dc` passed Card Pass #1744 **SUCCESS**. Exactly `TIMEFOLD` moved missing -> implemented. Capability blob is `68613af0160c47343cd93794802df8347c38788f`. Coverage is **64/72 operations + 99/108 predicates = 163/180 (90.6%)**. Frozen Release 1 used-missing is **0**. The remaining 17 catalogue gaps are unused by the frozen Release 1 set.
+
+## 512 — historical runtime checklist debt was bookkeeping, not runtime debt
+Twenty-nine historical runtime planning/next-target boxes remained unchecked even though subsequent accepted V2.4.x sections had already closed them, including Murkmite/Hollowcrown, Stormmane, Nightmaw, Noctivane, Archivist Sol, Quiet Step, Bastion Plate, Sapstone, ADD_SHIELD_EACH, Heatguard, Highwind, Pilot Sera, Withdrawal Modifier, CHOOSE_FROM_SET and Draft voluntary Withdrawal. They are reconciled to checked. Human, artwork, presentation, deployment and promotion gates remain open.
+
+## 513 — next gate returns to G5 two-device Battle acceptance
+With frozen Release 1 runtime capability debt at zero, V2.4.132 returns to the G5 Battle path. Machine preflight must first re-verify current Battle presentation/projection and exact preview/deployment identities; only then should Trevor/Kay human acceptance resume. Main/static live promotion remains HOLD until those gates pass.
+

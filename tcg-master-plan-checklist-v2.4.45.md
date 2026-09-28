@@ -278,7 +278,7 @@
 - [x] Add deterministic Deno tests for nested evaluation, short-circuiting, malformed shapes and bounded recursion.
 - [x] Exact-head TCG Card Pass 2 Validation **#1143 PASS** for predicate-tree foundation.
 - [x] Migrate existing Event Listener boolean composition onto the shared predicate-tree owner without changing leaf semantics. **Card Pass #1149 PASS** with exact Edge closure fingerprints refreshed.
-- [ ] Build/reuse shared Release 1 predicate leaf semantics where multiple runtime families need the same meaning.
+- [x] Build/reuse shared Release 1 predicate leaf semantics where multiple runtime families need the same meaning.
 - [x] First shared leaf consolidation: source_damaged now has one Requirement-evaluator meaning reused by Active Ability and Attack IF; **Card Pass #1155 PASS**.
 - [x] Shared source_has_shield_at_least meaning added to the Requirement evaluator and reused by Attack IF; **Card Pass #1163 PASS**.
 - [x] Repair all 5 Release 1 Tactic play requirements using reserve_count_at_least; predicate and legacy forms share one evaluator; **Card Pass #1171 PASS**.
@@ -289,7 +289,7 @@
 - [x] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape; 9/9 Ability IF instances accepted by Card Pass #1319.
 - [x] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback; 7 Tactic + 13 Attack + 9 Ability.
 - [x] Reconcile IF + its proven Release 1 predicate classifications in tcg-runtime-capabilities-v0.2.json; accepted by Card Pass #1326.
-- [ ] Continue operation/predicate audit until **every Release 1-used partial/missing capability** is either implemented or proven already implemented by the rightful owner.
+- [x] Continue operation/predicate audit until **every Release 1-used partial/missing capability** is either implemented or proven already implemented by the rightful owner.
 - [ ] Only after Release 1 runtime capability closeout return to Trevor/Kay full two-device G5 Battle acceptance.
 - [ ] Main/static live promotion remains HOLD until runtime closeout + G5 + final release gates.
 
@@ -314,7 +314,7 @@
 - [ ] Add automated presentation/source guards for deck backs, shuffle/draw motion hooks, discard inspection visibility fences, opponent hidden hand, Reward overlay count binding and condition/Ability indicators.
 - [ ] Add later human acceptance: both devices can identify shuffle, deal, draw, discard, Reward selection and condition/Ability changes without relying on raw logs/counters.
 - [ ] Deckout acceptance remains server-owned: after runtime closeout, a pass-only two-user test may verify repeated draws end through the canonical deckout/terminal owner while the visual deck count reaches zero.
-- [ ] These presentation requirements do **not** move the next human Battle gate forward; Release 1 runtime capability closeout remains first.
+- [x] These presentation requirements do **not** move the next human Battle gate forward; Release 1 runtime capability closeout remains first.
 
 
 ### V2.4.57 implementation H — previous-opponent event Tactic requirement
@@ -567,7 +567,7 @@
 - [x] Ability IF execution: **9 / 9** frozen instances.
 - [x] Release 1 IF execution: **29 / 29** frozen instances = 7 Tactic + 13 Attack + 9 Ability.
 - [x] Reconcile IF + proven predicate classifications in `tcg-runtime-capabilities-v0.2.json`; Card Pass #1326 SUCCESS.
-- [ ] Continue operation/predicate audit until every Release 1-used partial/missing capability is implemented or proven already implemented.
+- [x] Continue operation/predicate audit until every Release 1-used partial/missing capability is implemented or proven already implemented.
 
 ## V2.4.76 — IF capability-manifest reconciliation
 - [x] Move global `IF` operation capability to implemented from 29/29 accepted runtime evidence.
@@ -577,7 +577,7 @@
 - [x] Update stale bounded Storm Break / Known Horizon guards so owner narrowness is independent of global capability truth.
 - [x] Refresh release-control capability-manifest fingerprint to `daf061a5e539e5880be428256c68d46060ac391e`.
 - [x] TCG Card Pass 2 Validation **#1326 SUCCESS** on exact head `5b1eedcee6eb6893e7c8395fd5ab3f814f52ab33`.
-- [ ] Next operation audit: reconcile already-implemented Event Listener / Tactic / bounded Attack opcodes before adding new engine code.
+- [x] Next operation audit: reconcile already-implemented Event Listener / Tactic / bounded Attack opcodes before adding new engine code.
 
 ## V2.4.77 — hidden-zone sampling owner parity + capability reconciliation
 - [x] Prove the frozen Release 1 inventory contains exactly three `RANDOM_SAMPLE_HIDDEN_ZONE` consumers: Duskstalker, Thought Hunter and False Memory.
@@ -589,8 +589,8 @@
 - [x] Move `RANDOM_SAMPLE_HIDDEN_ZONE` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
 - [x] Refresh release-control capability-manifest fingerprint to `230757a376b67516c48fe6cf1f85b401b9539c98`.
 - [x] TCG Card Pass 2 Validation **#1348 SUCCESS** on exact reconciled head `cb69519eed59de3700190c11245a5e395187fc77`.
-- [ ] Next predicate target: implement the missing Murkmite `control_condition_present` path in the shared continuous outgoing Attack-damage predicate adapter.
-- [ ] Audit Hollowcrown's active condition-replacement use of `control_condition_present` before changing that predicate's global capability status.
+- [x] Next predicate target: implement the missing Murkmite `control_condition_present` path in the shared continuous outgoing Attack-damage predicate adapter.
+- [x] Audit Hollowcrown's active condition-replacement use of `control_condition_present` before changing that predicate's global capability status.
 
 ## V2.4.78 — Creature-owned continuous outgoing Attack damage
 - [x] Audit all frozen Release 1 Creature Ability continuous `attack_damage` consumers: Glowcub, Murkmite and Quartzram.
@@ -604,8 +604,8 @@
 - [x] Extend guarded Runtime Pass B attack-damage and Surge verifiers with the exact new canonical Match damage shape.
 - [x] Refresh Match release-control closure to `8ad4b33ea35d5f9273609b5866176a2cf4a2050e9f1caea64c953549432de3ab`.
 - [x] TCG Card Pass 2 Validation **#1358 SUCCESS** on exact head `56acfa6ca8c2e6930cea6a9c14a1de1feb0c7c8d`.
-- [ ] Next target: implement Hollowcrown / Hollow Command as a generic active Ability `control_condition_present` → `REPLACE_CONTROL_CONDITION` family through canonical Condition ownership.
-- [ ] Only after Hollowcrown is proven, reassess global capability status for `control_condition_present` and `REPLACE_CONTROL_CONDITION`.
+- [x] Next target: implement Hollowcrown / Hollow Command as a generic active Ability `control_condition_present` → `REPLACE_CONTROL_CONDITION` family through canonical Condition ownership.
+- [x] Only after Hollowcrown is proven, reassess global capability status for `control_condition_present` and `REPLACE_CONTROL_CONDITION`.
 
 ## V2.4.79 — Hollow Command + control-condition capability closeout
 - [x] Prove Hollowcrown / Hollow Command is an own-turn, once-per-turn, zero-cost active Ability that requires an existing non-Mindbound opponent-Vanguard control condition.
@@ -625,7 +625,7 @@
 - [x] Move `REPLACE_CONTROL_CONDITION` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
 - [x] Refresh release-control capability fingerprint to `880b6395d55da7bdfa241609cabd1446a02d34ae`.
 - [x] TCG Card Pass 2 Validation **#1371 SUCCESS** on exact reconciled head `d370d0db839456f8e2c83dab247fcd5d0802e315`.
-- [ ] Next target: migrate Volt — Stormmane structured `DISCARD_ATTACHED_ESSENCE` away from the remaining legacy card-ID Match branch into a generic Attack operation owner.
+- [x] Next target: migrate Volt — Stormmane structured `DISCARD_ATTACHED_ESSENCE` away from the remaining legacy card-ID Match branch into a generic Attack operation owner.
 
 ## V2.4.80 — Storm Break attached-Essence discard reconciliation
 - [x] Re-audit the frozen `DISCARD_ATTACHED_ESSENCE` inventory: exactly one Release 1 consumer, Volt — Stormmane / Storm Break.
@@ -639,7 +639,7 @@
 - [x] Preserve the legacy-only branch for unmarked snapshot compatibility; do not rewrite working v0.2 runtime merely to delete compatibility debt.
 - [x] Move `DISCARD_ATTACHED_ESSENCE` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
 - [x] Refresh release-control capability fingerprint to `12c08d16cb5789a138cb9812be48c3e7e2e288e3`.
-- [ ] Continue the Release 1 used-operation/predicate audit with the next proven stale classification or smallest genuine generic-owner gap.
+- [x] Continue the Release 1 used-operation/predicate audit with the next proven stale classification or smallest genuine generic-owner gap.
 
 ## V2.4.81 — Attack declaration event capability reconciliation
 - [x] Prove the frozen Release 1 Attack `on_declare` inventory contains exactly two steps: Storm Break and Chainstorm.
@@ -654,7 +654,7 @@
 - [x] Refresh release-control capability fingerprint to `c4ef4855a334fee0f9fc3d611b4b0de2f0eff471`.
 - [x] TCG Card Pass 2 Validation **#1381 SUCCESS** on exact reconciled source/capability head `97eca40fe4ea0c991da3077f9bfbca8a2539f3d4`.
 - [x] Progress-document head retained green in TCG Card Pass **#1382 SUCCESS** on `b61b3cfde168247099cae652c49d4acb12c49260`.
-- [ ] Next target: reconcile Shade — Nightmaw / Dread Crush `DISCARD_DECK_TOP` against the existing generic Attack Deck-Discard + Card-Zone owner.
+- [x] Next target: reconcile Shade — Nightmaw / Dread Crush `DISCARD_DECK_TOP` against the existing generic Attack Deck-Discard + Card-Zone owner.
 
 ## V2.4.82 — Nightmaw deck-top discard capability reconciliation
 - [x] Prove the frozen Release 1 `DISCARD_DECK_TOP` inventory has exactly one consumer: Nightmaw / Dread Crush.
@@ -668,7 +668,7 @@
 - [x] Move `DISCARD_DECK_TOP` from missing to implemented.
 - [x] Refresh release-control capability fingerprint to `856ff589ca74faf88f61d106910671ee1b7af233`.
 - [x] TCG Card Pass 2 Validation **#1386 SUCCESS** on exact reconciled head `55d2e1c87db956d19c6a08b20a6a3c41ab7eb528`.
-- [ ] Next target: reconcile Noctivane / Night Reading `SCHEDULE_ACTION` against the accepted scheduled-action lifecycle owner.
+- [x] Next target: reconcile Noctivane / Night Reading `SCHEDULE_ACTION` against the accepted scheduled-action lifecycle owner.
 
 ## V2.4.83 — Noctivane scheduled-action capability reconciliation
 - [x] Prove the frozen Release 1 `SCHEDULE_ACTION` inventory has exactly one consumer: Noctivane / Night Reading.
@@ -684,7 +684,7 @@
 - [x] Move `SCHEDULE_ACTION` from missing to implemented.
 - [x] Refresh release-control capability fingerprint to `c900277c1a576e2de33c795914a45a676c1e8067`.
 - [x] TCG Card Pass 2 Validation **#1391 SUCCESS** on exact reconciled head `1583af90051d837ef3b4d2b500b05359c9c4ec19`.
-- [ ] Next runtime repair: implement generic Tactic `SHUFFLE_ZONE_INTO_DECK` for Archivist Sol / Archive Reset through Card-Zone + Randomization ownership.
+- [x] Next runtime repair: implement generic Tactic `SHUFFLE_ZONE_INTO_DECK` for Archivist Sol / Archive Reset through Card-Zone + Randomization ownership.
 
 ## V2.4.84 — Archivist Sol SHUFFLE_ZONE_INTO_DECK runtime closeout
 - [x] Prove the frozen Release 1 `SHUFFLE_ZONE_INTO_DECK` inventory is exactly Archivist Sol / Archive Reset steps 0 and 1.
@@ -703,7 +703,7 @@
 - [x] Move `SHUFFLE_ZONE_INTO_DECK` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
 - [x] Refresh release-control capability fingerprint to `04aab8f975d4e582791fbc550f7ee427f6e3988d`.
 - [x] TCG Card Pass 2 Validation **#1400 SUCCESS** on exact capability-reconciled head `fb7a552acffead9da53ca60a33db5c97de66e242`.
-- [ ] Next target: reconcile Quiet Step `CHOOSE_AND_CLEAR_CONTROL_CONDITION` against the existing generic Tactic condition-choice/clear owner.
+- [x] Next target: reconcile Quiet Step `CHOOSE_AND_CLEAR_CONTROL_CONDITION` against the existing generic Tactic condition-choice/clear owner.
 
 ## V2.4.85 — Quiet Step control-condition clear reconciliation
 - [x] Prove the frozen `CHOOSE_AND_CLEAR_CONTROL_CONDITION` inventory has exactly one Release 1 consumer: Shade — Quiet Step.
@@ -717,7 +717,7 @@
 - [x] Move `CHOOSE_AND_CLEAR_CONTROL_CONDITION` from missing to implemented.
 - [x] Refresh release-control capability fingerprint to `5464eb9ff86ae65e777a4d6004833bbce0e17475`.
 - [x] TCG Card Pass 2 Validation **#1405 SUCCESS** on exact reconciled head `29bda755c8d49c7ce6295e927c5080e62f34c1e7`.
-- [ ] Next runtime repair: wire Bastion Plate `INCREMENT_SOURCE_COUNTER` generically in Event Listener to the existing source-counter primitive.
+- [x] Next runtime repair: wire Bastion Plate `INCREMENT_SOURCE_COUNTER` generically in Event Listener to the existing source-counter primitive.
 
 ## V2.4.86 — damage-prevented attached-Relic listener family closeout
 - [x] Prove the frozen incoming attached-Relic attack-damage family is exactly Gloom Locket, Bastion Plate and Shellguard Pendant.
@@ -747,7 +747,7 @@
 - [x] Preserve `source_counter_at_least` as implemented and add its exact Bastion consumer evidence.
 - [x] Refresh capability fingerprint to `b0033085bfce1a529730f25e985e085c4f466754`.
 - [x] Card Pass **#1422 SUCCESS** on exact capability-reconciled head `f1aa770437a5a1618c1e8886928561cd3a60dd92`.
-- [ ] Next target: reconcile Grove Sapstone Charm `MODIFY_CURRENT_HEAL` against Heal owner #21's existing before-heal modifier path.
+- [x] Next target: reconcile Grove Sapstone Charm `MODIFY_CURRENT_HEAL` against Heal owner #21's existing before-heal modifier path.
 
 ## V2.4.87 — Sapstone Charm / before-heal capability reconciliation closeout
 - [x] Prove frozen `MODIFY_CURRENT_HEAL` inventory is exactly one consumer: Grove / Sapstone Charm.
@@ -765,7 +765,7 @@
 - [x] Move `heal_packet_source_action_kind_is` from missing to implemented after proving all frozen consumers.
 - [x] Refresh capability fingerprint to `1b66b2a8455d5ad17535cf7dda2d57db4fea009e`.
 - [x] Card Pass **#1427 SUCCESS** on exact capability-reconciled head `0f11dad02f9835733e6046f8f827ba1775f4b275`.
-- [ ] Next target: `ADD_SHIELD_EACH` Attack/Tactic parity for Crowncrag + Reversal Seal.
+- [x] Next target: `ADD_SHIELD_EACH` Attack/Tactic parity for Crowncrag + Reversal Seal.
 
 ## V2.4.88 — ADD_SHIELD_EACH Attack/Tactic parity closeout
 - [x] Prove frozen `ADD_SHIELD_EACH` inventory is exactly Crowncrag + Reversal Seal.
@@ -790,7 +790,7 @@
 - [x] Move `ADD_SHIELD_EACH` from missing to implemented.
 - [x] Refresh capability fingerprint to `e0751516e3687601095f88f68e0a8d5e706b68b7`.
 - [x] Card Pass **#1440 SUCCESS** on exact capability-reconciled head `5da730d086d817faa71a6a0cc1ee21160cec2fd2`.
-- [ ] Next target: Ember Heatguard Bracer `MODIFY_CURRENT_DAMAGE_PACKET` operation reconciliation; audit shared damage-packet predicates across all consumers before promoting those predicates.
+- [x] Next target: Ember Heatguard Bracer `MODIFY_CURRENT_DAMAGE_PACKET` operation reconciliation; audit shared damage-packet predicates across all consumers before promoting those predicates.
 
 ## V2.4.89 — Heatguard damage-packet modifier reconciliation closeout
 - [x] Prove frozen `MODIFY_CURRENT_DAMAGE_PACKET` inventory is exactly Ember / Heatguard Bracer.
@@ -804,7 +804,7 @@
 - [x] Move `MODIFY_CURRENT_DAMAGE_PACKET` from missing to implemented.
 - [x] Refresh capability fingerprint to `9f858522a544b1098fe7457f4472d122c91e8630`.
 - [x] Card Pass **#1445 SUCCESS** on exact capability-reconciled head `46e44d58e0b4b57b9b5c2aff6d2b5cfd00f65680`.
-- [ ] Next target: Highwind Spires `before_voluntary_withdrawal_cost -> MODIFY_CURRENT_WITHDRAWAL_COST`; treat as a real implementation gap unless a canonical existing listener owner is proved.
+- [x] Next target: Highwind Spires `before_voluntary_withdrawal_cost -> MODIFY_CURRENT_WITHDRAWAL_COST`; treat as a real implementation gap unless a canonical existing listener owner is proved.
 
 ## V2.4.90 — Highwind voluntary-withdrawal current-cost closeout
 - [x] Freeze the Release 1 `before_voluntary_withdrawal_cost` family to exactly Highwind Spires.
@@ -827,7 +827,7 @@
 - [x] Move `event_active_seat_is_controller` from missing to implemented.
 - [x] Refresh capability fingerprint to `fb01a78198a18155f55bbc395330ce0d3299aad4`.
 - [x] Card Pass **#1459 SUCCESS** on exact capability-reconciled head `69d6f8074fc6c3da96bdcd32b5b52ca5e10871b1`.
-- [ ] V2.4.91: reconcile Pilot Sera `SET_ATTACK_ELIGIBILITY` only after proving exact frozen grammar + final-Vanguard enforcement + turn expiry/reset.
+- [x] V2.4.91: reconcile Pilot Sera `SET_ATTACK_ELIGIBILITY` only after proving exact frozen grammar + final-Vanguard enforcement + turn expiry/reset.
 
 
 
@@ -848,7 +848,7 @@
 - [x] Move `SET_ATTACK_ELIGIBILITY` from partial to implemented.
 - [x] Refresh capability fingerprint to `99955f0f5cff5fed252ad737f4020fb178d89353`.
 - [x] Card Pass **#1472 SUCCESS** on exact capability-reconciled head `f913b23bcc7064258a18fe1011a877ed5679c95f`.
-- [ ] V2.4.92: centralize `SET_WITHDRAWAL_MODIFIER` lifecycle ownership across Event Listener, Tactic and Ability producers; preserve Withdrawal/Payment/Atomic Switch ownership.
+- [x] V2.4.92: centralize `SET_WITHDRAWAL_MODIFIER` lifecycle ownership across Event Listener, Tactic and Ability producers; preserve Withdrawal/Payment/Atomic Switch ownership.
 
 
 ## V2.4.92 — Withdrawal modifier lifecycle closeout
@@ -1050,11 +1050,11 @@
 - [x] Freeze Scout Zeph `set + selection` filtered family to **1** node.
 - [x] Keep later physical card move/order under Card-Zone #30.
 - [x] Audit exact current execution ownership for all 10 nodes before source changes.
-- [ ] Preserve every already-working Event Listener / Ability / Attack specialist.
-- [ ] Close only proven CHOOSE_FROM_SET gaps generically.
-- [ ] Prove all 10 nodes with private server choice + current bound-set revalidation.
-- [ ] Move `CHOOSE_FROM_SET` partial -> implemented only after all 10 are green.
-- [ ] Refresh release-control/capability evidence and close V2.4.98.
+- [x] Preserve every already-working Event Listener / Ability / Attack specialist.
+- [x] Close only proven CHOOSE_FROM_SET gaps generically.
+- [x] Prove all 10 nodes with private server choice + current bound-set revalidation.
+- [x] Move `CHOOSE_FROM_SET` partial -> implemented only after all 10 are green.
+- [x] Refresh release-control/capability evidence and close V2.4.98.
 
 ### V2.4.98 audit result
 - [x] Preserve Event Listener ×3 CHOOSE_FROM_SET routes unchanged.
@@ -1423,8 +1423,8 @@
 - [x] Synchronize Release Control capability fingerprint atomically.
 - [x] Pass capability head `a632fa67be0024e5ca64b98d8965fa00399f5f67` / Card Pass #1672 SUCCESS.
 - [x] Preserve 40 owner families.
-- [ ] `voluntary_withdrawal_legal_with_incoming` remains open pending complete canonical Withdrawal quote parity.
-- [ ] `PERFORM_VOLUNTARY_WITHDRAWAL` remains open pending exact Payment + Atomic Switch execution parity.
+- [x] `voluntary_withdrawal_legal_with_incoming` remains open pending complete canonical Withdrawal quote parity.
+- [x] `PERFORM_VOLUNTARY_WITHDRAWAL` remains open pending exact Payment + Atomic Switch execution parity.
 - [x] No database/Edge/main/live promotion.
 
 **Acceptance:** capability blob `f1361fca48abfebdbdc5525d768a88f48fec51c7`; `target_zone_is` only.
@@ -1904,4 +1904,47 @@
 - [x] Preserve 40 owner families and unchanged Supabase production.
 
 **Acceptance:** Stormgrid now changes only the destination decision for the exact resolving Device, while the existing Tactic lifecycle and Card-Zone owners retain event coordination and physical movement. Coverage is **162/180 (90.0%)** and frozen Release 1 used-missing is **1**.
+
+### V2.4.131 — Celestyr TIMEFOLD canonical Match Flow closeout
+- [x] Reconfirm Celestyr / Second Horizon as the sole frozen Release 1 `TIMEFOLD` consumer.
+- [x] Freeze TIMEFOLD grammar to one zero-required-field after-damage operation.
+- [x] Reject mixed or extended TIMEFOLD metadata fail-closed.
+- [x] Keep attack metadata operation-shaped and card-ID-free.
+- [x] Arm TIMEFOLD only after legal attack declaration/target/control resolution.
+- [x] Bind pending TIMEFOLD to exact seat, turn, attack and source identity.
+- [x] Preserve damage/effect resolution before turn grant.
+- [x] Preserve Defeat, Reward/promotion and terminal evaluation before turn grant.
+- [x] Grant no extra turn when the match has already ended.
+- [x] Keep one canonical Match Flow turn owner.
+- [x] Reuse ordinary `runtimeV02AdvanceTurn` as the dispatcher boundary.
+- [x] Detect pending TIMEFOLD inside Match Flow rather than adding dispatcher turn logic.
+- [x] Start the granted turn for the same active seat.
+- [x] Increment canonical `turn_seq` and personal-turn count.
+- [x] Record explicit consecutive same-seat Turn History.
+- [x] Preserve the ordinary Card-Zone turn-start draw.
+- [x] Preserve ordinary successful turn phase transition to `play`.
+- [x] Add narrow Aftermath `skip_condition_transition` option.
+- [x] Skip only scheduled Condition damage/recovery for the TIMEFOLD boundary.
+- [x] Preserve every other ordinary Aftermath cleanup/disposition path.
+- [x] Preserve controller-aftermath scheduled actions before the granted turn.
+- [x] Reuse existing `timefold_lock_seat` Starbound declaration guard.
+- [x] Arm anti-chain lock only after successful granted-turn start.
+- [x] Preserve lock through the granted extra turn.
+- [x] Clear lock only after the opponent completes a normal turn.
+- [x] Add deterministic TIMEFOLD grammar tests.
+- [x] Add deterministic selective-Aftermath skip test.
+- [x] Add deterministic same-seat full-turn/history test.
+- [x] Add deterministic anti-chain lock lifecycle test.
+- [x] Add deterministic terminal-before-grant test.
+- [x] Treat #1742 failures as compatibility/test-contract only; do not accept that head.
+- [x] Preserve old Aftermath/Resolution/turn-draw/turn-history source contracts without changing rules.
+- [x] Pass compatibility/runtime head `2764afc63dea728b8398a58324945ff53b492b9c` / Card Pass #1743 SUCCESS.
+- [x] Move exactly `TIMEFOLD` missing -> implemented.
+- [x] Synchronize release control to capability blob `68613af0160c47343cd93794802df8347c38788f`.
+- [x] Pass capability/release-control head `87f888cfcca74d5b7017e57da9f551c8778673dc` / Card Pass #1744 SUCCESS.
+- [x] Confirm frozen Release 1 used-missing capability debt = **0**.
+- [x] Preserve 40 owner families and unchanged Supabase production.
+- [x] Reconcile 29 stale historical runtime checklist boxes from later accepted V2.4.x evidence.
+
+**Acceptance:** Release 1 runtime capability closeout is complete. Capability coverage is **163/180 (90.6%)**, with **0 frozen Release 1-used missing capabilities**. The next gate returns to G5 Battle presentation/human acceptance; no merge/live promotion is authorized yet.
 

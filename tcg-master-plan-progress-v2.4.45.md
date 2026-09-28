@@ -4980,3 +4980,114 @@ Audit Celestyr / `TIMEFOLD` as the final frozen Release 1 capability. Trace the 
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
 
+## V2.4.131 — Celestyr TIMEFOLD canonical Match Flow closeout
+
+**Last synchronized authority head:** `b93fce22c8e0bd902b89b3db872a8bbe49bf1012` — Card Pass #1741 **SUCCESS** through V2.4.130.
+
+### Exact frozen Release 1 consumer
+Celestyr — Dream Cartographer / Second Horizon is the sole frozen Release 1 consumer of `TIMEFOLD`.
+
+The structured operation is deliberately exact:
+- phase: `after_damage`;
+- operation: `TIMEFOLD`;
+- required fields: none;
+- no card-ID/name dispatch;
+- mixed or extended TIMEFOLD metadata fails closed.
+
+### Match Flow ownership
+TIMEFOLD is a special transition inside the existing Match Flow turn owner, not a second turn engine.
+
+When Second Horizon is legally declared and its target/control declaration has resolved, Match records an exact pending TIMEFOLD marker bound to:
+- current seat;
+- current `turn_seq`;
+- source action/attack id;
+- source Creature UID/card ID.
+
+Normal attack damage, after-damage effects, Defeat, Reward/promotion resolution and winner evaluation remain ahead of turn grant.
+
+At the canonical turn-advance boundary, `runtimeV02AdvanceTurn`:
+- evaluates terminal state first;
+- if no TIMEFOLD is pending, preserves ordinary alternating progression;
+- if TIMEFOLD is pending, starts a full new turn for the **same seat**;
+- increments canonical `turn_seq` and that seat's personal-turn counter;
+- appends explicit same-seat ownership through Turn History;
+- delegates the normal turn-start draw to the existing Card-Zone callback;
+- leaves phase in ordinary `play`.
+
+A terminal match consumes the pending TIMEFOLD without granting the extra turn.
+
+### Selective Aftermath semantics
+TIMEFOLD does **not** skip all Aftermath.
+
+The existing Aftermath owner accepts one narrow option that suppresses only the scheduled Condition damage/recovery transition for that boundary. All other ordinary cleanup remains owned and executed normally, including:
+- withdrawal/lifecycle expiry;
+- temporary Attack/Condition/eligibility cleanup;
+- attachment Attack-bonus cleanup;
+- temporary/borrowed Essence disposition planning;
+- attached-Essence Card-Zone movement and discard listeners;
+- unused Attack-modifier expiry;
+- Defeat scan;
+- controller-aftermath scheduled actions before the new turn.
+
+### Anti-chain lifecycle
+The pre-existing Starbound declaration guard against `timefold_lock_seat` is reused.
+
+After a successful same-seat TIMEFOLD turn starts:
+- the lock is armed for the granting seat;
+- it survives that granted extra turn;
+- it remains during the opponent's following normal turn;
+- it clears only when that opponent normal turn completes and Match Flow returns turn ownership.
+
+No extra-turn chaining is introduced and no new owner family is added.
+
+### Validation history
+Initial implementation head `7e876973d2fb7ca000cbcc5338e299dd1f3e7001` / Card Pass #1742 failed only compatibility/test-contract fences:
+- old exact Aftermath `turn_advance` source pattern;
+- old exact declarative Resolution dispatcher pattern;
+- old exact turn-start draw import/source pattern;
+- old Turn History source-spacing pattern;
+- one TypeScript control-flow narrowing in the new lock-clear test.
+
+No gameplay assertion established a TIMEFOLD semantic failure.
+
+Compatibility-preserving head `2764afc63dea728b8398a58324945ff53b492b9c` restored the proven dispatcher/source contracts while moving the same-seat decision wholly into Match Flow. Card Pass **#1743 SUCCESS** passed:
+- complete structural/grammar suite;
+- all Runtime Pass B guards;
+- deterministic runtime suite;
+- Match/Tactic/Private Alpha type-checks;
+- Withdrawal, Attack Damage and Surge type-checks.
+
+Accepted Edge closures:
+- Match: **123 files**, SHA-256 `cc0c41c357cb4c5cb4c08193ec795123bb14a2ddd46cf6c95b7739cd09c94a0c`;
+- Tactic: **57 files**, SHA-256 `1ca1cc30ee8634cdebf6b59af512b9599699cf3f2e1ae87012e5ecdef6e6b9b3`;
+- Private Alpha: **8 files**, SHA-256 `c90d05bdf4af90c197464efad9adaeebee6a113cd4d971fc70c81796afe1d468`.
+
+### Capability acceptance
+Capability/release-control head `87f888cfcca74d5b7017e57da9f551c8778673dc` passed Card Pass **#1744 SUCCESS**.
+
+Exactly `TIMEFOLD` moved missing -> implemented.
+
+Capability blob is `68613af0160c47343cd93794802df8347c38788f`.
+
+Capability catalogue is now **64/72 operations + 99/108 predicates = 163/180 (90.6%)** implemented.
+
+**Frozen Release 1 used-missing capability debt is now 0.**
+
+The remaining catalogue gaps are currently unused by the frozen Release 1 set and do not block the Release 1 G5 Battle gate:
+- operations: `DEAL_EFFECT_DAMAGE`, `DEFEAT_EACH_MATCHING`, `DEFEAT_TARGET_IF`, `MOVE_DAMAGE`, `PLACE_DAMAGE`, `PLACE_DAMAGE_MULTI`, `SET_ATTACK_COST_FLOOR`, `SUPPRESS_ABILITY`;
+- predicates: `attached_essence_distinct_element_count_at_most`, `attached_essence_distinct_element_count_equals`, `target_damage_at_least`, `target_damage_at_most`, `target_damage_equals`, `target_has_any_named_condition`, `target_remaining_hp_at_least`, `target_remaining_hp_at_most`, `target_remaining_hp_equals`.
+
+### Historical checklist reconciliation
+A read-only audit found 29 historical runtime planning/next-target boxes still unchecked even though later accepted V2.4.x sections prove them complete. Those boxes are now reconciled to checked without changing runtime source. Human, artwork, presentation, deployment, merge and live-promotion gates remain untouched.
+
+### Next exact target — V2.4.132
+Return to the **G5 two-device Battle acceptance path** now that Release 1 runtime capability closeout is complete.
+
+Machine preflight comes first:
+1. re-read current Battle presentation/projection ownership and the exact unresolved G5 human gates;
+2. verify the exact preview/static build and Supabase function identities that Trevor/Kay would test;
+3. repair only machine-provable presentation/continuation defects before asking for human evidence;
+4. keep main/static live promotion **HOLD** until the required Trevor/Kay acceptance gates pass.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+
