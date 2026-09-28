@@ -1221,9 +1221,7 @@ function finishEffect(state: any, effect: EffectState) {
 
   state.turn_flags ||= {};
   state.turn_flags[String(effect.owner_seat)] ||= {};
-  if (effect.source_subtype === "Device") {
-    state.turn_flags[String(effect.owner_seat)].device_turn = Number(state.turn_seq || 0);
-  }
+  if (effect.source_subtype === "Device") state.turn_flags[String(effect.owner_seat)].device_turn = Number(state.turn_seq || 0);
   log(state, `Seat ${effect.owner_seat} resolved ${effect.source_name}.`);
   delete state.effect_resolution;
   delete state.pending_choice;
