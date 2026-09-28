@@ -71,7 +71,8 @@
       "SHUFFLE_ZONE_INTO_DECK",
       "SWITCH_WITH_VANGUARD",
       "TRANSFER_SHIELD",
-      "PERFORM_VOLUNTARY_WITHDRAWAL"
+      "PERFORM_VOLUNTARY_WITHDRAWAL",
+      "SET_RESOLVING_CARD_DESTINATION"
     ],
     "partial": [],
     "missing": [
@@ -82,7 +83,6 @@
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
       "SET_ATTACK_COST_FLOOR",
-      "SET_RESOLVING_CARD_DESTINATION",
       "SUPPRESS_ABILITY",
       "TIMEFOLD"
     ]
@@ -2328,6 +2328,76 @@
         "opponent-controlled Essence discard blocks Pulse but still satisfies Dynamo attachment metadata",
         "Pulse controller and Dynamo attachment turn limits suppress repeated Essence-discard draws",
         "resolution discards exactly the selected attached Essence then applies the condition when the target survived"
+      ]
+    },
+    "release1_stormgrid_resolving_destination_v2_4_130": {
+      "implementation_head": "f44a8ae55eb660fa17e8d75e028e99ba74230a11",
+      "accepted_proof_head": "5fd923cb4b1408863d81b5a451c7806ef1a64283",
+      "card_pass_run": 1739,
+      "prior_guard_run": {
+        "run": 1738,
+        "result": "failure_stale_exact_device_turn_source_pattern_only",
+        "structural_failure_test": "card-pass-2-runtime-active-ability-selected-heal-wiring",
+        "gameplay_semantics_changed": false
+      },
+      "frozen_consumer": {
+        "card_id": "volt-stormgrid-city",
+        "listener_id": "stormgrid-recycle",
+        "event": "device_resolved",
+        "operation": "SET_RESOLVING_CARD_DESTINATION",
+        "optional": true,
+        "destination": "deck_bottom",
+        "limit": {
+          "scope": "turn",
+          "count": 1,
+          "owner": "event_controller"
+        }
+      },
+      "owners": {
+        "realm_presence": "supabase/functions/_shared/tcg-match-realm-engine-v0-2.ts",
+        "event_and_destination_decision": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "resolving_lifecycle": "supabase/functions/tcg-tactic-actions/index.ts",
+        "final_physical_move": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts"
+      },
+      "semantics": {
+        "real_device_resolved_event_before_destination_commit": true,
+        "exact_resolving_card_identity_revalidated": true,
+        "effect_controller_is_event_controller": true,
+        "supported_destinations": [
+          "discard",
+          "deck_bottom",
+          "deck_top"
+        ],
+        "resolving_zone_source_only": true,
+        "generic_code_cannot_move_into_resolving": true,
+        "default_destination": "discard",
+        "optional_decline_preserves_discard": true,
+        "existing_optional_limit_semantics_preserved": true,
+        "device_turn_truth_preserved": true,
+        "one_final_card_zone_move": true,
+        "no_card_id_dispatch": true,
+        "no_second_destination_engine": true,
+        "owner_family_count": 40
+      },
+      "accepted_edge_closures": {
+        "match": {
+          "files": 123,
+          "sha256": "fc17392eeaf5439db35542431177a8ceca9fb8aef0cdfa32d5db56c7f412725a"
+        },
+        "tactic": {
+          "files": 57,
+          "sha256": "1ca1cc30ee8634cdebf6b59af512b9599699cf3f2e1ae87012e5ecdef6e6b9b3"
+        },
+        "private_alpha": {
+          "files": 8,
+          "sha256": "c90d05bdf4af90c197464efad9adaeebee6a113cd4d971fc70c81796afe1d468"
+        }
+      },
+      "deterministic_tests": [
+        "Stormgrid City can replace the exact resolving Device destination with deck bottom",
+        "Stormgrid City decline preserves discard and consumes the existing event-controller turn limit",
+        "Stormgrid resolving-card destination fails closed if the resolving Device identity changes",
+        "Card-Zone Engine moves an exact transient resolving card to deck bottom"
       ]
     }
   }
