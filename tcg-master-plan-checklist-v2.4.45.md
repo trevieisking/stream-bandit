@@ -1867,3 +1867,41 @@
 
 **Acceptance:** Pulse Essence and Dynamo Lens now consume canonical post-commit attached-Essence discard events without owning movement. Coverage is **161/180 (89.4%)** and frozen Release 1 used-missing is **2**.
 
+### V2.4.130 — Stormgrid City resolving Device destination ownership
+- [x] Reconfirm Stormgrid City as the sole frozen `SET_RESOLVING_CARD_DESTINATION` consumer.
+- [x] Reconfirm Stormgrid's real Realm route can place it canonically in `state.realm`.
+- [x] Reconfirm Stormgrid listens to `device_resolved` with `event_controller_is_active_seat`.
+- [x] Reconfirm the listener is OPTIONAL and limited once per turn for `event_controller`.
+- [x] Prove the pre-slice Tactic finalizer directly discarded resolved Devices and emitted no real `device_resolved` event.
+- [x] Preserve Tactic resolution as the Device lifecycle coordinator.
+- [x] Create one canonical `device_resolved` event before final destination commit.
+- [x] Freeze the exact resolving Device UID/card ID and controller in that event.
+- [x] Reuse normal Realm/Event Listener candidate discovery; add no Stormgrid identity branch.
+- [x] Implement `SET_RESOLVING_CARD_DESTINATION` in the generic Event Listener executor.
+- [x] Require the exact `$resolving_card` token.
+- [x] Support `discard`, `deck_bottom`, and `deck_top` as destination decisions.
+- [x] Revalidate exact current resolving Device identity before changing destination.
+- [x] Revalidate effect owner == event controller and subtype == Device.
+- [x] Fail closed when resolving identity becomes stale.
+- [x] Preserve the accepted destination in Event Listener event history.
+- [x] Resume the existing Tactic event-choice continuation after OPTIONAL selection.
+- [x] Preserve decline -> default discard behavior.
+- [x] Preserve existing generic OPTIONAL/listener-limit semantics.
+- [x] Add `resolving` as a Card-Zone transient source zone.
+- [x] Reserve `resolving` as a specialist destination so generic code cannot move cards into it.
+- [x] Delegate exactly one final resolving-card move to Card-Zone.
+- [x] Preserve existing server-owned `device_turn` truth.
+- [x] Preserve ordinary Tactic cleanup, pending-resolution queue and winner evaluation.
+- [x] Add deterministic Stormgrid accept -> deck-bottom test.
+- [x] Add deterministic Stormgrid decline + once-per-turn suppression test.
+- [x] Add deterministic stale resolving-card identity failure test.
+- [x] Add deterministic Card-Zone resolving -> deck-bottom identity test.
+- [x] Confirm no second resolving-destination engine, no card-ID dispatch and no new owner family.
+- [x] Pass runtime/guard head `5fd923cb4b1408863d81b5a451c7806ef1a64283` / Card Pass #1739 SUCCESS.
+- [x] Move exactly `SET_RESOLVING_CARD_DESTINATION` missing -> implemented.
+- [x] Synchronize release control to capability blob `2a51776936c810f49f982e93cfcd9e4078e29a7a`.
+- [x] Pass capability/release-control head `09eef5071ec9935bae491c2cbbbfaca66e0dfde6` / Card Pass #1740 SUCCESS.
+- [x] Preserve 40 owner families and unchanged Supabase production.
+
+**Acceptance:** Stormgrid now changes only the destination decision for the exact resolving Device, while the existing Tactic lifecycle and Card-Zone owners retain event coordination and physical movement. Coverage is **162/180 (90.0%)** and frozen Release 1 used-missing is **1**.
+

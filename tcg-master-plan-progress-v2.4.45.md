@@ -4894,3 +4894,89 @@ Audit Stormgrid City's `SET_RESOLVING_CARD_DESTINATION` consumer and the real `d
 
 Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
 
+## V2.4.130 — Stormgrid City resolving Device destination ownership
+
+**Last synchronized authority head:** `1d0fc5b06e8c931cce7b2a5272b3990397c62769` — Card Pass #1737 **SUCCESS** through V2.4.129.
+
+### Exact frozen Release 1 consumer
+Stormgrid City / `stormgrid-recycle` is the sole frozen consumer of `SET_RESOLVING_CARD_DESTINATION`.
+
+Its normalized Realm listener:
+- event: `device_resolved`;
+- controller scope: any;
+- requirement: `event_controller_is_active_seat`;
+- limit: once per turn, owner `event_controller`;
+- optional nested operation: put `$resolving_card` on `deck_bottom` instead of discard.
+
+### Real Device-resolution lifecycle
+Before V2.4.130 the Tactic interpreter removed a Device from hand, resolved its program, then pushed the card directly to discard in `finishEffect`. It maintained the historical `device_turn` truth source but produced no real `device_resolved` Event Listener event.
+
+V2.4.130 makes the existing Tactic finalizer the lifecycle coordinator:
+1. after the Device program completes, but before final zone commit, create one canonical `device_resolved` event for that exact resolving card;
+2. allow existing Realm/Event Listener ownership to evaluate Stormgrid;
+3. if the optional operation is accepted, mutate only the frozen resolving-card destination decision;
+4. resume Tactic finalization;
+5. perform exactly one Card-Zone transfer from the transient resolving source to discard/deck;
+6. then retain the existing `device_turn` server truth and normal cleanup.
+
+### Destination ownership
+`SET_RESOLVING_CARD_DESTINATION` is implemented as a generic Event Listener operation, not Stormgrid identity logic.
+
+It accepts only:
+- event `device_resolved`;
+- card token `$resolving_card`;
+- destinations `discard`, `deck_bottom`, or `deck_top`.
+
+Before changing the decision it revalidates:
+- exact resolving Device UID/card ID;
+- effect owner == event controller;
+- source subtype == Device;
+- event source identity == current effect source identity.
+
+Stale/mismatched resolution fails closed.
+
+### Card-Zone ownership
+Card-Zone remains the sole physical movement owner. V2.4.130 adds `resolving` as a source-only transient zone. It is a specialist destination, so generic Card-Zone callers cannot move arbitrary cards *into* resolving state.
+
+The Device finalizer supplies the exact current source card as the transient source array and delegates its final move to Card-Zone:
+- default / decline -> discard;
+- `deck_bottom` -> bottom of controller deck;
+- `deck_top` -> top of controller deck.
+
+No second destination engine and no new owner family are introduced.
+
+### Optional and limit semantics
+Stormgrid uses the existing generic OPTIONAL continuation and existing event-controller once-per-turn listener limit. V2.4.130 deliberately does not change engine-wide OPTIONAL-limit semantics: a declined optional listener still resolves that listener and consumes its current turn limit, matching the existing Event Listener contract.
+
+### Validation history
+Implementation head `f44a8ae55eb660fa17e8d75e028e99ba74230a11` introduced:
+- canonical `device_resolved` production;
+- exact resolving-card destination mutation;
+- source-only Card-Zone `resolving` support;
+- deterministic Stormgrid accept/decline/stale-identity tests;
+- deterministic transient resolving -> deck-bottom Card-Zone proof.
+
+Card Pass #1738 stopped only because an older structural test expected the unchanged `device_turn` assignment as one exact source line. Guard-compatibility head `5fd923cb4b1408863d81b5a451c7806ef1a64283` restored that byte-pattern without changing gameplay semantics and passed Card Pass **#1739 SUCCESS** end-to-end.
+
+Accepted Edge dependency closures:
+- Match: **123 files**, SHA-256 `fc17392eeaf5439db35542431177a8ceca9fb8aef0cdfa32d5db56c7f412725a`;
+- Tactic: **57 files**, SHA-256 `1ca1cc30ee8634cdebf6b59af512b9599699cf3f2e1ae87012e5ecdef6e6b9b3`;
+- Private Alpha: **8 files**, SHA-256 `c90d05bdf4af90c197464efad9adaeebee6a113cd4d971fc70c81796afe1d468`.
+
+### Capability acceptance
+Capability/release-control head `09eef5071ec9935bae491c2cbbbfaca66e0dfde6` passed Card Pass **#1740 SUCCESS**.
+
+Exactly `SET_RESOLVING_CARD_DESTINATION` moved missing -> implemented.
+
+Capability blob is `2a51776936c810f49f982e93cfcd9e4078e29a7a`.
+
+Capability catalogue is now **63/72 operations + 99/108 predicates = 162/180 (90.0%)** implemented.
+
+Frozen Release 1 used-missing is now exactly **1**:
+- `TIMEFOLD` — Celestyr.
+
+### Next exact target — V2.4.131
+Audit Celestyr / `TIMEFOLD` as the final frozen Release 1 capability. Trace the existing Match Flow, turn-history and aftermath owners before changing runtime code. The implementation must preserve same-seat extra-turn behavior, selective aftermath skipping, anti-chain rules, and ordinary turn lifecycle without creating a second turn engine.
+
+Owner-family count remains **40**. Supabase production remains `tcg-match-actions` v9, `tcg-tactic-actions` v4 and `tcg-private-alpha-api` v3. No database migration, Edge deployment, main merge or live promotion occurred.
+

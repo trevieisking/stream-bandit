@@ -1483,3 +1483,18 @@ Implementation head `c2190d56136547bae866afa70a2317ab67d6ab12` passed all three 
 ## 500 — V2.4.129 capability reconciliation leaves only two frozen Release 1 gaps
 Capability/release-control head `2e29e83e565dec34207bf14775e8bf889f479c75` passed Card Pass #1736 **SUCCESS**. Exactly `essence_discarded_by_own_card_effect`, `essence_discarded_source_controller_is_self`, `event_previous_attachment_target_is_attached_creature` and `essence_discarded_attachment_kind_is` moved missing -> implemented. Capability blob is `b63af5eeb59dd3c036a5fb782fbf86a9430a4a16`. Coverage is now **62/72 operations + 99/108 predicates = 161/180 (89.4%)**. Frozen Release 1 used-missing is now exactly **2**: `SET_RESOLVING_CARD_DESTINATION` and `TIMEFOLD`. Next target is V2.4.130, Stormgrid City / real `device_resolved` destination ownership.
 
+## 501 — V2.4.130 isolates the final Device-destination gap to Stormgrid City
+Stormgrid City / `stormgrid-recycle` is the sole frozen `SET_RESOLVING_CARD_DESTINATION` consumer. Audit proved the live Realm route already owns canonical Realm presence, while Tactic finalization still directly discarded resolved Devices and produced no real `device_resolved` event.
+
+## 502 — Tactic finalization now produces real Device-resolution timing
+After a Device program completes, Tactic finalization creates one canonical `device_resolved` event before final zone commit. Existing Realm/Event Listener discovery owns Stormgrid eligibility and OPTIONAL choice. The event freezes exact resolving-card identity and controller; no Stormgrid card-ID branch exists.
+
+## 503 — destination mutation is generic and Card-Zone still owns the move
+`SET_RESOLVING_CARD_DESTINATION` revalidates the exact current Device and changes only its destination decision. Card-Zone adds `resolving` as a source-only specialist transient zone and performs exactly one final move to discard, deck bottom or deck top. Generic callers cannot move cards into resolving state.
+
+## 504 — V2.4.130 runtime proof passed after one stale source-pattern fence
+Implementation head `f44a8ae55eb660fa17e8d75e028e99ba74230a11` added Device event production, resolving destination ownership and deterministic Stormgrid/Card-Zone tests. #1738 failed only an older exact-source assertion for the unchanged `device_turn` truth line. Compatibility head `5fd923cb4b1408863d81b5a451c7806ef1a64283` restored that exact source pattern and passed Card Pass #1739 **SUCCESS**. Accepted Match/Tactic/Private Alpha closures are `fc17392eeaf5439db35542431177a8ceca9fb8aef0cdfa32d5db56c7f412725a` / `1ca1cc30ee8634cdebf6b59af512b9599699cf3f2e1ae87012e5ecdef6e6b9b3` / `c90d05bdf4af90c197464efad9adaeebee6a113cd4d971fc70c81796afe1d468`.
+
+## 505 — V2.4.130 leaves TIMEFOLD as the sole frozen Release 1 capability gap
+Capability/release-control head `09eef5071ec9935bae491c2cbbbfaca66e0dfde6` passed Card Pass #1740 **SUCCESS**. Exactly `SET_RESOLVING_CARD_DESTINATION` moved missing -> implemented. Capability blob is `2a51776936c810f49f982e93cfcd9e4078e29a7a`. Coverage is now **63/72 operations + 99/108 predicates = 162/180 (90.0%)**. Frozen Release 1 used-missing is exactly **1**: `TIMEFOLD`. Next target is V2.4.131 Celestyr.
+
