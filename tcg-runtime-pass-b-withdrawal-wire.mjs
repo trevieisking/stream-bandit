@@ -5,8 +5,18 @@ const source = fs.readFileSync(target, 'utf8');
 
 const importAnchor = 'import { createClient } from "jsr:@supabase/supabase-js@2";\n';
 const bridgeImport = 'import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdrawal-v0-2.ts";\n';
-const withdrawalBridgeImportPattern = /import\\s*\\{[\\s\\S]*?\\bstructuredRuntimeWithdrawalBaseCost\\b[\\s\\S]*?\\}\\s*from\\s*"\\.\\.\\/_shared\\/tcg-match-withdrawal-v0-2\\.ts";\\n?/;
-const hasWithdrawalBridgeImport = (text) => withdrawalBridgeImportPattern.test(text);
+const withdrawalBridgeImportPath = 'from "../_shared/tcg-match-withdrawal-v0-2.ts";';
+const hasWithdrawalBridgeImport = (text) => {
+  const pathIndex = text.indexOf(withdrawalBridgeImportPath);
+  if (pathIndex < 0) return false;
+  const importStart = text.lastIndexOf('import {', pathIndex);
+  if (importStart < 0) return false;
+  const statement = text.slice(
+    importStart,
+    pathIndex + withdrawalBridgeImportPath.length,
+  );
+  return statement.includes('structuredRuntimeWithdrawalBaseCost');
+};
 
 const legacy = 'function withdrawalCost(cr:Cr,s:any){const d=top(cr,s);let n=Math.max(0,Number(d?.withdraw||0));let lockIncrease=false;for(const e of cr.essence||[]){const id=e.card_id;if(id==="gale-breeze-essence"||id==="grove-root-essence")n=Math.max(0,n-1);if(id==="stone-anchor-essence")n+=1;if(id==="stone-granite-essence")lockIncrease=true}if(conditions(cr).modifier==="Crushed"&&!lockIncrease)n+=1;const f=(cr.flags||{}) as any;if(Number.isFinite(Number(f.withdrawal_cost_override)))n=Math.max(0,Number(f.withdrawal_cost_override));const lifecycle=f.lifecycle_withdrawal_cost;if(lifecycle&&Number(lifecycle.turn_seq)===Number(s.turn_seq||0)&&Number.isFinite(Number(lifecycle.value)))n=Math.max(0,Number(lifecycle.value));return n}';
 
