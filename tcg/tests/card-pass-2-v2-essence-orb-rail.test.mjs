@@ -178,13 +178,13 @@ test('authoritative Essence attachment appears as an element orb on refreshed Cr
   assert.match(after,/aria-label="Attached Essence: 1 Astral"/);
   assert.match(after,/data-essence-element="Astral"/);
   assert.match(after,/data-essence-count="1"/);
-  assert.match(after,/Essence <strong>1<\/strong>/);
+  assert.doesNotMatch(after,/sb-card-live-status/,'live Essence count must not be injected into printed card text');
 
   h.setAuthoritativeAttached(false);
   await h.controllerApi.refresh();
   const removed=h.nodes.get('youVanguard').innerHTML;
   assert.doesNotMatch(removed,/data-essence-rail/,'authoritative removal must remove the visual rail on refresh');
-  assert.match(removed,/Essence <strong>0<\/strong>/);
+  assert.doesNotMatch(removed,/sb-card-live-status/,'clean printed face remains free of live stat text after removal');
 });
 
 

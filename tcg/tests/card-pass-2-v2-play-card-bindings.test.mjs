@@ -66,7 +66,7 @@ test('hand intents map only to existing authoritative server owners', () => {
 
 test('play Creature targets one continuous Bench while server reserve index remains transport-only', () => {
   assert.match(controller, /function renderBench\(target, player, ownerLabel, own\)/);
-  assert.match(controller, /class="sb-bench-zone/);
+  assert.match(controller, /node\.className = 'sb-reserve sb-bench-zone'/);
   assert.match(controller, /function reserveCapacity\(player\)/);
   assert.match(controller, /reserve_capacity/);
   assert.doesNotMatch(controller, /\[0, 1, 2, 3\]\.map/);

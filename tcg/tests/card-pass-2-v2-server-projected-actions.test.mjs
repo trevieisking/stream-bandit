@@ -60,7 +60,7 @@ test('Withdraw is rendered only from server field_actions projection and submits
 });
 
 test('active Realm remains visible and inspectable on compact/touch layouts',()=>{
-  assert.match(battle,/data-sb-tcg-play-bindings="v0-11-server-projected-actions"/);
+  assert.match(battle,/data-sb-tcg-play-bindings="v0-12-reference-tabletop"/);
   assert.match(battle,/\.sb-center-band \.sb-realm\{[\s\S]*?display:block/);
   assert.match(controller,/view\.realm && view\.realm\.card \? String\(view\.realm\.card\.card_id/);
   assert.match(controller,/realm\.textContent = realmCardId \? 'Realm · '/);
