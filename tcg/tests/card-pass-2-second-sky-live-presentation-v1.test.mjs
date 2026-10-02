@@ -32,8 +32,8 @@ test('accepted desktop and mobile Second Sky surfaces ship together',async()=>{
   for(const page of pages){
     const html=await read(page);
     assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.css?v=2-4-31'),page);
-    assert.ok(html.includes('stream-bandit-tcg-product-presentation-v2-4-46.css?v=2-4-46'),page);
-    assert.ok(html.includes('stream-bandit-tcg-product-presentation-v2-4-46.js?v=2-4-46'),page);
+    assert.ok(html.includes('stream-bandit-tcg-product-presentation-v2-4-46.css?v=2-4-55'),page);
+    assert.ok(html.includes('stream-bandit-tcg-product-presentation-v2-4-46.js?v=2-4-55'),page);
     assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.js?v=2-4-31'),page);
   }
   const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.css');

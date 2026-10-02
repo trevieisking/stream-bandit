@@ -1,4 +1,5 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import { runtimeV02EvaluateAttackIf } from "./tcg-match-attack-if-v0-2.ts";
 import {
   runtimeV02ApplyCardZoneTransfer,
   type RuntimeV02CardZoneInstance,
@@ -254,7 +255,28 @@ export function runtimeV02ResolveAfterDamageServerTopDeckConditionalMove(
   const topCard = runtimeInst(deck[0], "tcg_v0_2_attack_server_top_deck_top_card_invalid");
   const topDefinition = runtimeV02Definition(state, topCard);
   if (!topDefinition) throw new Error("tcg_v0_2_attack_server_top_deck_top_definition_required");
-  const matched = String(topDefinition.element || "") === descriptor.match_filters.element;
+  const sourceCreature = objectRecord(player.vanguard) ?? { damage: 0, shield: 0 };
+  const matched = runtimeV02EvaluateAttackIf(
+    {
+      predicate: "card_matches",
+      card: "$top_card",
+      filters: descriptor.match_filters,
+    },
+    {
+      source_creature: sourceCreature,
+      attack_target: { damage: 0, shield: 0 },
+      self_reserve: Array.isArray(player.reserve) ? player.reserve : [],
+      opponent_reserve: [],
+      variables: { top_card: topDefinition },
+      current_action_events: {},
+      target_remains_in_play_after_damage: true,
+      card_matches: (card, filters) => {
+        const definition = objectRecord(card);
+        if (!definition) return false;
+        return Object.entries(filters).every(([key, expected]) => definition[key] === expected);
+      },
+    },
+  );
   if (matched) {
     runtimeV02ApplyCardZoneTransfer(deck, hand, {
       cause: "effect",

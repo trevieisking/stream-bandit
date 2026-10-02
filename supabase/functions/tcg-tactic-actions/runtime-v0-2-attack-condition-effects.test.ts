@@ -1,4 +1,8 @@
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
+import {
+  runtimeV02ConditionProtectionCount,
+  runtimeV02InstallConditionProtection,
+} from "../_shared/tcg-match-condition-protection-v0-2.ts";
 import { structuredRuntimeAfterDamageConditionEffects } from "../_shared/tcg-match-attack-effects-v0-2.ts";
 
 function assertEquals(actual: unknown, expected: unknown, message = "values differ") {
@@ -24,6 +28,17 @@ function creature() {
     shield: 0,
     conditions: { scorched: false, venomed: 0, control: null, modifier: null },
     flags: {},
+  } as any;
+}
+
+function attackContext(overrides: Record<string, unknown> = {}) {
+  return {
+    source_controller_seat: 1 as const,
+    attack_target_controller_seat: 2 as const,
+    current_opponent_vanguard_controller_seat: 2 as const,
+    active_seat: 1 as const,
+    source_action_id: "attack:7:1:condition-strike:source-uid",
+    ...overrides,
   } as any;
 }
 
@@ -79,7 +94,7 @@ Deno.test("condition-only after_damage applies to the actual attack target", () 
     source,
     target,
     opponentVanguard,
-  );
+    attackContext());
   assertEquals(result?.attack_id, "condition-strike");
   assertEquals(result?.effects[0].applied, true);
   assertEquals(target.conditions.modifier, "Crushed");
@@ -102,7 +117,7 @@ Deno.test("source-creature condition effects are registry-driven", () => {
     source,
     target,
     creature(),
-  );
+    attackContext());
   assertEquals(result?.effects[0].condition, "Scorched");
   assertEquals(source.conditions.scorched, true);
   assertEquals(target.conditions.scorched, false);
@@ -125,7 +140,7 @@ Deno.test("current-opponent-vanguard target does not alias a Reserve attack targ
     source,
     reserveTarget,
     opponentVanguard,
-  );
+    attackContext());
   assertEquals(result?.effects[0].applied, true);
   assertEquals(opponentVanguard.conditions.modifier, "Silenced");
   assertEquals(reserveTarget.conditions.modifier, null);
@@ -147,7 +162,7 @@ Deno.test("apply_if_empty preserves an occupied condition slot", () => {
     creature(),
     target,
     creature(),
-  );
+    attackContext());
   assertEquals(result?.effects[0].applied, false);
   assertEquals(result?.effects[0].reason, "slot_occupied");
   assertEquals(target.conditions.modifier, "Silenced");
@@ -169,7 +184,7 @@ Deno.test("condition immunity prevents the structured attack condition", () => {
     creature(),
     target,
     creature(),
-  );
+    attackContext());
   assertEquals(result?.effects[0].prevented, true);
   assertEquals(result?.effects[0].reason, "condition_immunity");
   assertEquals(target.conditions.modifier, null);
@@ -188,7 +203,7 @@ Deno.test("mixed after_damage programs remain on compatibility authority and do 
     creature(),
     target,
     creature(),
-  );
+    attackContext());
   assertEquals(result, null);
   assertEquals(target.conditions.modifier, null);
 });
@@ -209,7 +224,7 @@ Deno.test("legacy-only matches remain on compatibility authority", () => {
     creature(),
     target,
     creature(),
-  );
+    attackContext());
   assertEquals(result, null);
   assertEquals(target.conditions.modifier, null);
 });
@@ -230,7 +245,68 @@ Deno.test("malformed owned condition metadata fails closed", () => {
       creature(),
       creature(),
       creature(),
-    ),
+    attackContext()),
     "tcg_v0_2_attack_condition_step_field_unsupported",
   );
+});
+
+
+Deno.test("bound attack target token resolves to the authoritative attacked Creature", () => {
+  const state = stateWith([{
+    op: "APPLY_CONDITION",
+    target: "$bound_attack_target",
+    condition: "Blinded",
+    mode: "apply_if_empty",
+  }], "blindside-spiral");
+  const target = creature();
+  const result = structuredRuntimeAfterDamageConditionEffects(
+    state,
+    { card_id: "test-condition-creature" },
+    1,
+    creature(),
+    target,
+    creature(),
+    attackContext(),
+  );
+  assertEquals(result?.effects[0].applied, true);
+  assertEquals(target.conditions.control, "Blinded");
+});
+
+Deno.test("direct structured Attack condition consumes matching opponent-card protection before mutation", () => {
+  const state = stateWith([{
+    op: "APPLY_CONDITION",
+    target: "$attack_target",
+    condition: "Crushed",
+    mode: "apply_if_empty",
+  }], "protected-condition-strike");
+  const target = creature();
+  runtimeV02InstallConditionProtection(target, {
+    protection_id: "attack-condition-protection",
+    source_action_id: "protection-source",
+    source_uid: "protection-source-uid",
+    source_card_id: "protection-source-card",
+    source_controller_seat: 2,
+    target_controller_seat: 2,
+    installed_turn_seq: 7,
+    condition_names: [],
+    condition_slot: "modifier",
+    source_controller: "opponent",
+    card_effect_only: true,
+    max_uses: 1,
+    expires_on: "start_of_controller_next_turn",
+  });
+  const result = structuredRuntimeAfterDamageConditionEffects(
+    state,
+    { card_id: "test-condition-creature" },
+    1,
+    creature(),
+    target,
+    creature(),
+    attackContext({ source_action_id: "attack:7:1:protected-condition-strike:source-uid" }),
+  );
+  assertEquals(result?.effects[0].applied, false);
+  assertEquals(result?.effects[0].prevented, true);
+  assertEquals(result?.effects[0].reason, "condition_protection");
+  assertEquals(target.conditions.modifier, null);
+  assertEquals(runtimeV02ConditionProtectionCount(target), 0);
 });

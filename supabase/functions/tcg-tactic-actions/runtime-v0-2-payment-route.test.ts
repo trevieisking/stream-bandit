@@ -2,6 +2,7 @@ import {
   runtimeV02ApplyResolvedCardCostRoute,
   runtimeV02BuildResolvedCardCostOperations,
 } from "../_shared/tcg-match-payment-route-v0-2.ts";
+import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
 declare const Deno: { test(name: string, fn: () => void): void };
 
@@ -65,6 +66,34 @@ const binding = {
 const sourceLocation = { where: "vanguard" as const, index: null };
 const describe = () => ({ max_hp: 200, reward_value: 1, label: "Source" });
 
+function tacticDefinition(id: string, subtype: string) {
+  return {
+    card_id: id,
+    definition_v0_2: {
+      schema: "sb-tcg-card-v0.2",
+      effect_schema: "sb-tcg-effects-v0.2",
+      id,
+      name: id,
+      card_family: "Tactic",
+      element: "Volt",
+      creature: null,
+      essence: null,
+      tactic: { subtype, requirements: null, program: [], listeners: [], continuous: [] },
+    },
+    definition_v0_2_rules_version: "sb-tcg-card-v0.2",
+  };
+}
+
+function filteredState() {
+  const match = state();
+  match.runtime_registry_v0_2 = runtimeV02SnapshotMarker();
+  match.card_index = {
+    "underworld-a": tacticDefinition("underworld-a", "Ally"),
+    "underworld-b": tacticDefinition("underworld-b", "Device"),
+  };
+  return match;
+}
+
 Deno.test("Payment route maps $source_creature damage to the exact anchored source", () => {
   const match = state();
   const result = runtimeV02ApplyResolvedCardCostRoute(match, binding, sourceLocation, [{
@@ -91,6 +120,38 @@ Deno.test("Payment route preserves exact private hand selection", () => {
   }], describe);
   equal(match.players["1"].hand.map((entry: any) => entry.uid), ["hand-a"]);
   equal(match.players["1"].discard.map((entry: any) => entry.uid), ["hand-b"]);
+});
+
+Deno.test("Payment route revalidates filtered exact hand selection before canonical payment", () => {
+  const match = filteredState();
+  runtimeV02ApplyResolvedCardCostRoute(match, binding, sourceLocation, [{
+    kind: "hand_discard",
+    player: "self",
+    count: 1,
+    filters: { card_family: "Tactic", tactic_subtype: "Device" },
+    cost_index: 0,
+    source_path: "cost/0",
+    card_uids: ["hand-b"],
+  }], describe);
+  equal(match.players["1"].hand.map((entry: any) => entry.uid), ["hand-a"]);
+  equal(match.players["1"].discard.map((entry: any) => entry.uid), ["hand-b"]);
+});
+
+Deno.test("Payment route rejects filtered selection drift before any mutation", () => {
+  const match = filteredState();
+  const before = structuredClone(match);
+  throws(() => runtimeV02ApplyResolvedCardCostRoute(match, binding, sourceLocation, [{
+    kind: "hand_discard",
+    player: "self",
+    count: 1,
+    filters: { card_family: "Tactic", tactic_subtype: "Device" },
+    cost_index: 0,
+    source_path: "cost/0",
+    card_uids: ["hand-a"],
+  }], describe), "discard_filter_changed");
+  equal(match.players["1"].hand, before.players["1"].hand);
+  equal(match.players["1"].discard, before.players["1"].discard);
+  equal(match.effect_events, before.effect_events);
 });
 
 Deno.test("Payment route keeps mixed costs atomic when a later exact discard is stale", () => {

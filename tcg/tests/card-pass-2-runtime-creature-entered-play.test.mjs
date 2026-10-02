@@ -133,7 +133,7 @@ test('the event continuation is card-id-free and reuses canonical owners', () =>
     'applyRuntimeV02HealPacket',
     'recordRuntimeV02HiddenInformationView',
     'runtimeV02InspectRewardPositions',
-    'structuredRuntimeWithdrawalBaseCost',
+    'runtimeV02InstallWithdrawalModifier',
   ]) {
     assert.ok(helper.includes(owner), `canonical owner not reused: ${owner}`);
   }

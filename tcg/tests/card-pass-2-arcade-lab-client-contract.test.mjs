@@ -22,7 +22,7 @@ test('Arcade Lab keeps one explicit setup, match and tactic Edge owner', () => {
   for (const action of ['choose_starter', 'matchmake', 'create_room', 'join_room', 'set_ready', 'match_view', 'opening_choice', 'setup_place', 'setup_ready']) {
     assert.ok(setup.includes(`action===\"${action}\"`) || setup.includes(`action === \"${action}\"`) || setup.includes(`action === '${action}'`) || setup.includes(`action==='${action}'`), `setup server missing ${action}`);
   }
-  assert.ok(tactic.includes('["play_tactic", "resolve_choice"].includes(action)'));
+  assert.ok(tactic.includes('["play_tactic", "play_tactic_preview", "resolve_choice"].includes(action)'));
   assert.ok(tactic.includes('if (action === "play_tactic")'));
 });
 

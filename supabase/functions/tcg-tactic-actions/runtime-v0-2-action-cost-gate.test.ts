@@ -77,6 +77,71 @@ Deno.test("action cost metadata keeps attack Essence cost separate from addition
   assert((definition.creature.attacks[0].cost[0] as { amount: number }).amount === 3, "Essence cost was changed");
 });
 
+Deno.test("Ability cost metadata adapts effect-form hand discard into canonical Payment leaf", () => {
+  const definition = {
+    card_family: "Creature",
+    creature: {
+      ability: {
+        id: "ability-1",
+        costs: [{
+          op: "CHOOSE_HAND_TO_DISCARD",
+          player: "self",
+          count: 1,
+          filters: { card_family: "Tactic", tactic_subtype: "Device" },
+        }],
+      },
+      attacks: [],
+    },
+  };
+  const state = baseState(definition);
+  const costs = runtimeV02StructuredActionAdditionalCosts(
+    state,
+    card("creature-1", "underworld-source"),
+    "ability",
+    "ability-1",
+  );
+  assert(Array.isArray(costs) && costs.length === 1, "adapted Ability cost missing");
+  const adapted = costs[0] as Record<string, unknown>;
+  assert(adapted.kind === "hand_discard", "effect-form discard cost was not normalized");
+  assert(adapted.player === "self" && adapted.count === 1, "normalized discard metadata changed");
+  assert(
+    JSON.stringify(adapted.filters) === JSON.stringify({ card_family: "Tactic", tactic_subtype: "Device" }),
+    "normalized discard filters changed",
+  );
+  const original = definition.creature.ability.costs[0] as Record<string, unknown>;
+  assert(original.op === "CHOOSE_HAND_TO_DISCARD" && original.kind == null, "card definition was mutated");
+});
+
+Deno.test("unsupported effect-form Ability cost fields fail closed before Payment", () => {
+  const state = baseState({
+    card_family: "Creature",
+    creature: {
+      ability: {
+        id: "ability-1",
+        costs: [{
+          op: "CHOOSE_HAND_TO_DISCARD",
+          player: "self",
+          count: 1,
+          mystery: true,
+        }],
+      },
+      attacks: [],
+    },
+  });
+  let failed = false;
+  try {
+    runtimeV02StructuredActionAdditionalCosts(
+      state,
+      card("creature-1", "underworld-source"),
+      "ability",
+      "ability-1",
+    );
+  } catch (error) {
+    failed = String(error).includes("hand_discard_field_unsupported:mystery");
+  }
+  assert(failed, "unsupported effect-form cost field did not fail closed");
+});
+
 Deno.test("no-cost Ability is permitted without Payment mutation", () => {
   const state = baseState({
     card_family: "Creature",

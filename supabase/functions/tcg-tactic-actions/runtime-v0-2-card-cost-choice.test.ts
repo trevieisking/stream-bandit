@@ -3,6 +3,7 @@ import {
   runtimeV02PendingCardCostChoiceView,
   runtimeV02ResumeCardCostChoice,
 } from "../_shared/tcg-match-card-cost-choice-v0-2.ts";
+import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`${label}: ${JSON.stringify(actual)} != ${JSON.stringify(expected)}`);
@@ -23,9 +24,41 @@ const binding = {
   source_card_id: "source-card",
   source_creature_uid: "source",
 };
+function definition(
+  id: string,
+  family: "Tactic" | "Creature",
+  subtype: string | null,
+) {
+  return {
+    card_id: id,
+    definition_v0_2: {
+      schema: "sb-tcg-card-v0.2",
+      effect_schema: "sb-tcg-effects-v0.2",
+      id,
+      name: id,
+      card_family: family,
+      element: "Volt",
+      creature: family === "Creature"
+        ? { stage: "Standalone", hp: 100, withdrawal: 1, reward_value: 1, ability: null, attacks: [] }
+        : null,
+      tactic: family === "Tactic"
+        ? { subtype, requirements: null, program: [], listeners: [], continuous: [] }
+        : null,
+      essence: null,
+    },
+    definition_v0_2_rules_version: "sb-tcg-card-v0.2",
+  };
+}
 function state() {
   return {
+    runtime_registry_v0_2: runtimeV02SnapshotMarker(),
     turn_seq: 4,
+    card_index: {
+      one: definition("one", "Tactic", "Device"),
+      two: definition("two", "Tactic", "Ally"),
+      three: definition("three", "Tactic", "Device"),
+      hidden: definition("hidden", "Creature", null),
+    },
     players: {
       "1": { hand: [{ uid: "h1", card_id: "one" }, { uid: "h2", card_id: "two" }, { uid: "h3", card_id: "three" }] },
       "2": { hand: [{ uid: "x1", card_id: "hidden" }] },
@@ -110,8 +143,50 @@ Deno.test("resume is bound to exact turn, action identity and cost snapshot", ()
   throws(() => runtimeV02ResumeCardCostChoice(s, binding, [{ kind: "optional", as: "paid", costs: [{ kind: "damage", target: "$source_creature", amount: 20 }] }], first.pending_choice, "s1", ["pay"]), "costs_stale");
 });
 
-Deno.test("non-empty discard filters fail closed until a filter owner is wired", () => {
+Deno.test("filtered hand-discard cost exposes only matching private cards", () => {
+  const s = state();
+  const costs = [{
+    kind: "hand_discard",
+    player: "self",
+    count: 1,
+    filters: { card_family: "Tactic", tactic_subtype: "Device" },
+  }];
+  const first = runtimeV02BeginCardCostChoice(s, binding, costs, "f1");
+  if (first.status !== "player_choice_required") throw new Error("expected filtered hand choice");
+  equal(runtimeV02PendingCardCostChoiceView(first.pending_choice, 2), {
+    id: "f1",
+    seat: 1,
+    kind: "card_cost_hand_selection",
+    waiting: true,
+  });
+  equal(runtimeV02PendingCardCostChoiceView(first.pending_choice, 1)?.options, [
+    { id: "hand:h1", label: "one" },
+    { id: "hand:h3", label: "three" },
+  ]);
+  const done = runtimeV02ResumeCardCostChoice(
+    s,
+    binding,
+    costs,
+    first.pending_choice,
+    "f1",
+    ["hand:h3"],
+    "f2",
+  );
+  if (done.status !== "ready") throw new Error("expected filtered cost ready");
+  equal(done.costs[0], {
+    kind: "hand_discard",
+    player: "self",
+    count: 1,
+    filters: { card_family: "Tactic", tactic_subtype: "Device" },
+    source_path: "cost/0",
+    cost_index: 0,
+    card_uids: ["h3"],
+  });
+  equal(s.players[1].hand.map((card: any) => card.uid), ["h1", "h2", "h3"]);
+});
+
+Deno.test("filtered hand-discard rejects unsupported filter grammar", () => {
   throws(() => runtimeV02BeginCardCostChoice(state(), binding, [
-    { kind: "hand_discard", player: "self", count: 1, filters: { element: "Underworld" } },
-  ], "f1"), "hand_filters_unsupported");
+    { kind: "hand_discard", player: "self", count: 1, filters: { mystery: true } },
+  ], "f3"), "select_cards_filter_unsupported:mystery");
 });

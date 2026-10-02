@@ -1,6 +1,7 @@
 import {
   runtimeV02ApplyCardZoneTransferBatch,
   runtimeV02ApplyCardZonePartitionTransfer,
+  runtimeV02ApplyCardZoneReorder,
   runtimeV02ApplyCardZoneTransfer,
   runtimeV02CommitCardZoneTransfer,
   runtimeV02PreflightCardZoneTransfer,
@@ -388,3 +389,88 @@ Deno.test("Card-Zone partition supports a bottom source window without changing 
   assertSame(source[0], remainder);
   assertSame(destination[0], chosen);
 });
+
+Deno.test("Card-Zone reorder moves exact existing instances within one zone", () => {
+  const first = card("alpha-1", "alpha");
+  const chosen = card("beta-1", "beta");
+  const third = card("gamma-1", "gamma");
+  const deck = [first, chosen, third];
+
+  const result = runtimeV02ApplyCardZoneReorder(deck, {
+    cause: "effect",
+    action_kind: "ability",
+    source_action_id: "night-reading",
+    source_card_uid: "source-creature-1",
+    zone: endpoint("deck"),
+    card_uids: [first.uid],
+    destination_position: "bottom",
+  });
+
+  assertEquals(deck.map((entry) => entry.uid), [chosen.uid, third.uid, first.uid]);
+  assertSame(deck[2], first, "reorder lost exact instance identity");
+  assertSame(result.cards[0], first, "reorder result cloned card");
+  assertEquals(result.receipt.schema, "sb-tcg-card-zone-reorder-v0.2");
+  assertEquals(result.receipt.card_uids, [first.uid]);
+  assertEquals(result.receipt.count, 1);
+});
+
+Deno.test("Card-Zone reorder rejects unknown or duplicate uids before mutation", () => {
+  const first = card("alpha-1", "alpha");
+  const second = card("beta-1", "beta");
+  const deck = [first, second];
+
+  assertThrows(
+    () => runtimeV02ApplyCardZoneReorder(deck, {
+      cause: "effect",
+      action_kind: "ability",
+      source_action_id: "night-reading",
+      source_card_uid: "source-creature-1",
+      zone: endpoint("deck"),
+      card_uids: ["missing"],
+      destination_position: "bottom",
+    }),
+    "tcg_v0_2_card_zone_reorder_selected_card_missing",
+  );
+  assertEquals(deck.map((entry) => entry.uid), [first.uid, second.uid]);
+
+  assertThrows(
+    () => runtimeV02ApplyCardZoneReorder(deck, {
+      cause: "effect",
+      action_kind: "ability",
+      source_action_id: "night-reading",
+      source_card_uid: "source-creature-1",
+      zone: endpoint("deck"),
+      card_uids: [first.uid, first.uid],
+      destination_position: "bottom",
+    }),
+    "tcg_v0_2_card_zone_reorder_card_uid_duplicate",
+  );
+  assertEquals(deck.map((entry) => entry.uid), [first.uid, second.uid]);
+});
+
+Deno.test("Card-Zone Engine moves an exact transient resolving card to deck bottom", () => {
+  const resolving = card("device-resolving-1", "volt-test-device");
+  const source = [resolving];
+  const deck = [card("deck-existing-1", "existing-card")];
+
+  const result = runtimeV02ApplyCardZoneTransfer(source, deck, {
+    cause: "rule",
+    action_kind: "tactic_resolution",
+    source_action_id: "device-effect-1",
+    source_card_uid: resolving.uid,
+    source: endpoint("resolving"),
+    destination: endpoint("deck"),
+    card_uids: [resolving.uid],
+    destination_position: "bottom",
+  });
+
+  assertEquals(source, []);
+  assertEquals(deck.map((entry) => entry.uid), [
+    "deck-existing-1",
+    "device-resolving-1",
+  ]);
+  assertSame(deck[1], resolving);
+  assertEquals(result.receipt.source.zone, "resolving");
+  assertEquals(result.receipt.destination.zone, "deck");
+});
+

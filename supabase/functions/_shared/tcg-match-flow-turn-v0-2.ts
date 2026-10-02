@@ -3,12 +3,25 @@ import {
   type RuntimeV02MatchFlowSeat,
   type RuntimeV02TerminalState,
 } from "./tcg-match-flow-engine-v0-2.ts";
+import { runtimeV02RecordTurnOwner } from "./tcg-match-turn-history-v0-2.ts";
+
+export type RuntimeV02PendingTimefold = {
+  seat: RuntimeV02MatchFlowSeat;
+  turn_seq: number;
+  source_action_id: string;
+  source_card_uid: string;
+  source_card_id: string;
+};
 
 export type RuntimeV02TurnAdvanceState = RuntimeV02TerminalState & {
+  phase?: unknown;
   active_seat?: unknown;
   turn_seq?: unknown;
   personal_turns?: unknown;
   log?: unknown;
+  turn_owner_history?: unknown;
+  pending_timefold?: unknown;
+  timefold_lock_seat?: unknown;
 };
 
 export type RuntimeV02TurnDrawPlan = {
@@ -57,10 +70,114 @@ function requiredTurn(value: unknown): number {
   return turn;
 }
 
+function requiredString(value: unknown, error: string): string {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) throw new Error(error);
+  return text;
+}
+
 function requiredCardUid(value: unknown): string {
-  const uid = typeof value === "string" ? value.trim() : "";
-  if (!uid) throw new Error("tcg_v0_2_match_flow_turn_draw_card_uid_required");
-  return uid;
+  return requiredString(
+    value,
+    "tcg_v0_2_match_flow_turn_draw_card_uid_required",
+  );
+}
+
+function pendingTimefold(
+  state: RuntimeV02TurnAdvanceState,
+): RuntimeV02PendingTimefold | null {
+  if (state.pending_timefold == null) return null;
+  const raw = objectRecord(state.pending_timefold);
+  if (!raw) throw new Error("tcg_v0_2_timefold_pending_invalid");
+  if (!isSeat(raw.seat)) throw new Error("tcg_v0_2_timefold_pending_seat_invalid");
+  return {
+    seat: raw.seat,
+    turn_seq: requiredTurn(raw.turn_seq),
+    source_action_id: requiredString(
+      raw.source_action_id,
+      "tcg_v0_2_timefold_pending_action_required",
+    ),
+    source_card_uid: requiredString(
+      raw.source_card_uid,
+      "tcg_v0_2_timefold_pending_source_uid_required",
+    ),
+    source_card_id: requiredString(
+      raw.source_card_id,
+      "tcg_v0_2_timefold_pending_source_card_required",
+    ),
+  };
+}
+
+function currentLockSeat(
+  state: RuntimeV02TurnAdvanceState,
+): RuntimeV02MatchFlowSeat | null {
+  if (state.timefold_lock_seat == null) return null;
+  if (!isSeat(state.timefold_lock_seat)) {
+    throw new Error("tcg_v0_2_timefold_lock_seat_invalid");
+  }
+  return state.timefold_lock_seat;
+}
+
+export function runtimeV02ArmTimefold(
+  state: RuntimeV02TurnAdvanceState,
+  input: {
+    seat: RuntimeV02MatchFlowSeat;
+    turn_seq: number;
+    source_action_id: string;
+    source_card_uid: string;
+    source_card_id: string;
+  },
+): RuntimeV02PendingTimefold {
+  if (!state || typeof state !== "object" || Array.isArray(state)) {
+    throw new Error("tcg_v0_2_timefold_state_required");
+  }
+  const activeSeat = state.active_seat;
+  if (!isSeat(activeSeat) || activeSeat !== input.seat) {
+    throw new Error("tcg_v0_2_timefold_active_seat_mismatch");
+  }
+  const turn = requiredTurn(state.turn_seq);
+  if (turn !== requiredTurn(input.turn_seq)) {
+    throw new Error("tcg_v0_2_timefold_turn_changed");
+  }
+  if (pendingTimefold(state)) {
+    throw new Error("tcg_v0_2_timefold_already_pending");
+  }
+  if (currentLockSeat(state) != null) {
+    throw new Error("tcg_v0_2_timefold_chain_blocked");
+  }
+  const pending: RuntimeV02PendingTimefold = {
+    seat: input.seat,
+    turn_seq: turn,
+    source_action_id: requiredString(
+      input.source_action_id,
+      "tcg_v0_2_timefold_action_required",
+    ),
+    source_card_uid: requiredString(
+      input.source_card_uid,
+      "tcg_v0_2_timefold_source_uid_required",
+    ),
+    source_card_id: requiredString(
+      input.source_card_id,
+      "tcg_v0_2_timefold_source_card_required",
+    ),
+  };
+  state.pending_timefold = structuredClone(pending);
+  return pending;
+}
+
+export function runtimeV02TimefoldPendingForSeat(
+  state: RuntimeV02TurnAdvanceState,
+  seat: RuntimeV02MatchFlowSeat,
+): boolean {
+  const pending = pendingTimefold(state);
+  if (!pending) return false;
+  if (!isSeat(state.active_seat) || state.active_seat !== pending.seat) {
+    throw new Error("tcg_v0_2_timefold_pending_active_seat_changed");
+  }
+  if (requiredTurn(state.turn_seq) !== pending.turn_seq) {
+    throw new Error("tcg_v0_2_timefold_pending_turn_changed");
+  }
+  return pending.seat === seat;
 }
 
 /**
@@ -87,8 +204,19 @@ export function runtimeV02AdvanceTurn(
     throw new Error("tcg_v0_2_match_flow_active_seat_invalid");
   }
   const currentTurn = requiredTurn(state.turn_seq);
+  const timefold = pendingTimefold(state);
+  const lockSeat = currentLockSeat(state);
+  if (timefold) {
+    if (timefold.seat !== currentSeat || timefold.turn_seq !== currentTurn) {
+      throw new Error("tcg_v0_2_timefold_pending_context_changed");
+    }
+    if (lockSeat != null) {
+      throw new Error("tcg_v0_2_timefold_chain_blocked");
+    }
+  }
 
   if (runtimeV02EvaluateWinner(state)) {
+    if (timefold) delete state.pending_timefold;
     return {
       status: "terminal",
       active_seat: currentSeat,
@@ -105,7 +233,9 @@ export function runtimeV02AdvanceTurn(
     throw new Error("tcg_v0_2_match_flow_log_required");
   }
 
-  const nextSeat: RuntimeV02MatchFlowSeat = currentSeat === 1 ? 2 : 1;
+  const nextSeat: RuntimeV02MatchFlowSeat = timefold
+    ? currentSeat
+    : currentSeat === 1 ? 2 : 1;
   const nextPlayer = objectRecord(players[String(nextSeat)]);
   if (!nextPlayer || !Array.isArray(nextPlayer.deck)) {
     throw new Error("tcg_v0_2_match_flow_turn_deck_required");
@@ -121,8 +251,14 @@ export function runtimeV02AdvanceTurn(
     state.active_seat = nextSeat;
     state.turn_seq = nextTurn;
     personalTurns[String(nextSeat)] = nextPersonalTurn;
+    runtimeV02RecordTurnOwner(state, nextTurn, nextSeat);
     state.deckout_loser = nextSeat;
     runtimeV02EvaluateWinner(state);
+    if (timefold) {
+      delete state.pending_timefold;
+    } else if (lockSeat != null && currentSeat !== lockSeat) {
+      state.timefold_lock_seat = null;
+    }
     return {
       status: "deckout",
       active_seat: nextSeat,
@@ -146,7 +282,15 @@ export function runtimeV02AdvanceTurn(
   state.active_seat = nextSeat;
   state.turn_seq = nextTurn;
   personalTurns[String(nextSeat)] = nextPersonalTurn;
+  runtimeV02RecordTurnOwner(state, nextTurn, nextSeat);
+  state.phase = "play";
   state.log.push(`Seat ${nextSeat} begins personal turn ${nextPersonalTurn}.`);
+  if (timefold) {
+    delete state.pending_timefold;
+    state.timefold_lock_seat = currentSeat;
+  } else if (lockSeat != null && currentSeat !== lockSeat) {
+    state.timefold_lock_seat = null;
+  }
 
   return {
     status: "advanced",
@@ -156,3 +300,4 @@ export function runtimeV02AdvanceTurn(
     draw: plan,
   };
 }
+

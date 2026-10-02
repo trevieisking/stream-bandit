@@ -246,7 +246,14 @@ export function runtimeV02CreateAttackInspectionChoice(
     throw new Error("tcg_v0_2_attack_inspection_choice_reward_uid_duplicate");
   }
 
-  recordRuntimeV02HiddenInformationView(state, seat, "deck_top");
+  recordRuntimeV02HiddenInformationView(state, seat, "deck_top", {
+    action_kind: "attack",
+    source_controller_seat: seat,
+    source_action_id: descriptor.attack_id,
+    source_card_uid: source.uid,
+    source_creature_uid: source.uid,
+    phase: descriptor.phase,
+  });
   const options = rewardCards.map((card, position) => ({
     id: `reward:${position}`,
     label: `Reward ${position + 1}`,

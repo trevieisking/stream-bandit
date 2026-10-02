@@ -60,8 +60,12 @@ test('Networked Growth live orchestration begins canonical Ability heal listener
   assert.equal(selectedHeal.includes('runtimeV02ResolveAbilityHealListenerChoice'), false, 'selected-heal semantic owner must not become listener choice owner');
   assert.ok(resolveAbility.includes('runtimeV02BeginAbilityHealListenerContinuation('));
   assert.ok(resolveAbility.includes('pending_heal_listener_choice:true'));
-  assert.equal(resolveAbility.includes('scanDefeats('), false, 'active Ability completion must not enter attack defeat scanning');
-  assert.equal(resolveAbility.includes('aftermath('), false, 'active Ability completion must not run attack Aftermath');
+  const selectedHealStart = resolveAbility.indexOf('if(resolved.kind==="heal_one_damaged_friendly_creature")');
+  const selectedHealEnd = resolveAbility.indexOf('if(resolved.kind==="modify_one_friendly_creature")', selectedHealStart);
+  assert.ok(selectedHealStart >= 0 && selectedHealEnd > selectedHealStart, 'selected-heal Ability branch required');
+  const selectedHealBranch = resolveAbility.slice(selectedHealStart, selectedHealEnd);
+  assert.equal(selectedHealBranch.includes('scanDefeats('), false, 'ordinary selected-heal Ability completion must not enter defeat scanning');
+  assert.equal(selectedHealBranch.includes('aftermath('), false, 'ordinary selected-heal Ability completion must not run attack Aftermath');
 });
 
 test('match owner resumes Ability listener choices to play while attack listener choices keep defeat and Aftermath continuation', () => {

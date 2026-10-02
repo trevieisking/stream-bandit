@@ -1,11 +1,26 @@
 import {
   runtimeV02BeginEventListenerContinuation,
   runtimeV02CreateCreatureEnteredPlayEvent,
+  runtimeV02CreateDeviceResolvedEvent,
+  runtimeV02CreateEssenceDiscardedEvents,
   runtimeV02PendingEventListenerChoiceView,
   runtimeV02PrivateEventInspectionView,
   runtimeV02ResolveEventListenerChoice,
 } from "../_shared/tcg-match-event-listener-v0-2.ts";
+import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02PrivateRewardInspectionView } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
+import { runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
+import {
+  runtimeV02ConditionProtectionCount,
+  runtimeV02InstallConditionProtection,
+} from "../_shared/tcg-match-condition-protection-v0-2.ts";
+import {
+  recordRuntimeV02EssenceAttachmentEvent,
+  runtimeV02CreateEssenceAttachedEvent,
+} from "../_shared/tcg-match-essence-attachment-event-v0-2.ts";
+import { runtimeV02InstallWithdrawalModifier } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
+import { runtimeV02QuoteVoluntaryWithdrawal } from "../_shared/tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02ResolveVoluntaryWithdrawalCostListeners } from "../_shared/tcg-match-event-listener-v0-2.ts";
 
 function assert(
   condition: unknown,
@@ -37,7 +52,12 @@ function throws(fn: () => unknown, expected: string): void {
 }
 
 type Ability = Record<string, unknown>;
-type Inst = { uid: string; card_id: string };
+type Inst = {
+  uid: string;
+  card_id: string;
+  borrowed?: boolean;
+  effect_flags?: Record<string, unknown>;
+};
 
 const marker = {
   registry_id: "SB1-set-one-v0.2",
@@ -76,6 +96,34 @@ function creatureDefinition(
   };
 }
 
+function essenceDefinition(
+  id: string,
+  name: string,
+  element: string,
+  listeners: Record<string, unknown>[] = [],
+  continuous: Record<string, unknown>[] = [],
+) {
+  return {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id,
+    name,
+    card_family: "Essence",
+    element,
+    creature: null,
+    essence: {
+      subtype: "Special",
+      provides: [{ element, amount: 1 }],
+      attach_requirements: [],
+      on_attach: [],
+      continuous,
+      lifecycle: null,
+      listeners,
+    },
+    tactic: null,
+  };
+}
+
 function tacticDefinition(
   id: string,
   name: string,
@@ -94,6 +142,54 @@ function tacticDefinition(
       subtype,
       program: { steps: [] },
       listeners: [],
+      continuous: [],
+    },
+  };
+}
+
+
+
+function realmDefinition(
+  id: string,
+  name: string,
+  listeners: Record<string, unknown>[] = [],
+) {
+  return {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id,
+    name,
+    card_family: "Tactic",
+    element: "Volt",
+    creature: null,
+    essence: null,
+    tactic: {
+      subtype: "Realm",
+      program: { steps: [] },
+      listeners,
+      continuous: [],
+    },
+  };
+}
+
+function relicDefinition(
+  id: string,
+  name: string,
+  listeners: Record<string, unknown>[] = [],
+) {
+  return {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id,
+    name,
+    card_family: "Tactic",
+    element: "Volt",
+    creature: null,
+    essence: null,
+    tactic: {
+      subtype: "Relic",
+      program: { steps: [] },
+      listeners,
       continuous: [],
     },
   };
@@ -264,10 +360,18 @@ Deno.test("creature-entered Whiffin installs one source-agnostic withdrawal modi
   const state = baseState(source);
   const result = begin(state);
   equal(result.status, "complete");
-  equal(
-    (state.players as any)["1"].vanguard.flags.lifecycle_withdrawal_cost.value,
+  const vanguard = (state.players as any)["1"].vanguard;
+  const resolved = runtimeV02ResolveWithdrawalModifierCost(
+    state,
+    vanguard,
     1,
+    "Gale",
+    2,
   );
+  equal(resolved.cost, 1);
+  equal(resolved.applications.length, 1);
+  equal(resolved.consumable_modifier_ids.length, 1);
+  equal(vanguard.flags.lifecycle_withdrawal_cost, undefined);
   equal(result.processed_listener_keys.length, 1);
 });
 
@@ -774,6 +878,244 @@ Deno.test("Tinkit chooses a Device from discard and moves it to deck bottom", ()
   equal((state.players as any)["1"].deck[0].uid, "device-uid");
 });
 
+
+Deno.test("Draft Essence quotes and executes the complete canonical voluntary Withdrawal chain", () => {
+  const draft = instance("draft-uid", "gale-draft-essence");
+  const breeze = instance("breeze-uid", "gale-breeze-essence");
+  const payment = instance("payment-uid", "gale-basic-payment");
+  const outgoing = instance("outgoing-uid", "gale-outgoing");
+  const incoming = instance("incoming-uid", "gale-incoming");
+  const opponent = instance("opponent-uid", "test-opponent-vanguard");
+  const realm = instance("realm-uid", "test-withdrawal-realm");
+
+  const draftDefinition = essenceDefinition(
+    "gale-draft-essence",
+    "Draft Essence",
+    "Gale",
+    [{
+      id: "draft-attach-withdrawal",
+      event: "essence_attached",
+      requirements: {
+        all: [
+          { predicate: "source_is_self" },
+          { predicate: "event_origin_zone_is", zone: "hand" },
+          {
+            predicate: "target_element_is",
+            target: "$attached_creature",
+            element: "Gale",
+          },
+          {
+            predicate: "target_zone_is",
+            target: "$attached_creature",
+            zone: "reserve",
+          },
+          {
+            predicate: "voluntary_withdrawal_legal_with_incoming",
+            player: "self",
+            incoming_target: "$attached_creature",
+          },
+        ],
+      },
+      limit: null,
+      steps: [{
+        op: "OPTIONAL",
+        player: "self",
+        steps: [{
+          op: "PERFORM_VOLUNTARY_WITHDRAWAL",
+          player: "self",
+          incoming_target: "$attached_creature",
+        }],
+      }],
+    }],
+  );
+  const breezeDefinition = essenceDefinition(
+    "gale-breeze-essence",
+    "Breeze Essence",
+    "Gale",
+    [],
+    [{
+      id: "breeze-withdrawal",
+      kind: "withdrawal",
+      target: "$attached_creature",
+      when: null,
+      amount: -1,
+      minimum: 0,
+      filters: { action_kind: "voluntary_withdrawal" },
+    }],
+  );
+  const paymentDefinition = essenceDefinition(
+    "gale-basic-payment",
+    "Basic Gale Essence",
+    "Gale",
+  );
+  const realmDefinition: any = tacticDefinition(
+    "test-withdrawal-realm",
+    "Withdrawal Realm",
+    "Realm",
+  );
+  realmDefinition.tactic.listeners = [{
+    id: "first-withdrawal-reducer",
+    event: "before_voluntary_withdrawal_cost",
+    controller_scope: "any",
+    requirements: {
+      all: [{ predicate: "event_active_seat_is_controller" }],
+    },
+    limit: { scope: "turn", count: 1, owner: "event_controller" },
+    steps: [{
+      op: "MODIFY_CURRENT_WITHDRAWAL_COST",
+      delta: -1,
+      minimum: 0,
+    }],
+  }];
+
+  const outgoingField: any = field(outgoing);
+  outgoingField.essence = [breeze, payment];
+  const incomingField: any = field(incoming);
+  incomingField.essence = [draft];
+  const definitions = [
+    creatureDefinition("gale-outgoing", "Outgoing", "Gale", null, 4),
+    creatureDefinition("gale-incoming", "Incoming", "Gale", null, 1),
+    creatureDefinition(
+      "test-opponent-vanguard",
+      "Opponent",
+      "Shade",
+      null,
+      1,
+    ),
+    draftDefinition,
+    breezeDefinition,
+    paymentDefinition,
+    realmDefinition,
+  ];
+  const state: Record<string, unknown> = {
+    turn_seq: 7,
+    active_seat: 1,
+    personal_turns: { "1": 3, "2": 3 },
+    runtime_registry_v0_2: { ...marker },
+    effect_events: [],
+    turn_flags: { "1": {} },
+    card_index: Object.fromEntries(definitions.map((definition) => [
+      String(definition.id),
+      { definition_v0_2: definition },
+    ])),
+    realm: { owner_seat: 1, card: realm },
+    players: {
+      "1": {
+        vanguard: outgoingField,
+        reserve: [incomingField, null, null, null],
+        hand: [],
+        deck: [],
+        discard: [],
+        rewards: [],
+      },
+      "2": {
+        vanguard: field(opponent),
+        reserve: [null, null, null, null],
+        hand: [],
+        deck: [],
+        discard: [],
+        rewards: [],
+      },
+    },
+  };
+
+  runtimeV02InstallWithdrawalModifier(
+    state,
+    outgoingField,
+    {
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    },
+    {
+      source_controller_seat: 1,
+      target_controller_seat: 1,
+      source_card_uid: "test-modifier-source",
+      source_action_id: "test-modifier",
+    },
+  );
+
+  const preview = runtimeV02QuoteVoluntaryWithdrawal(state, {
+    controller_seat: 1,
+    reserve_index: 0,
+    incoming_target_uid: "incoming-uid",
+    require_target: true,
+    consume_cost_listeners: false,
+    action_id: "withdraw",
+    resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+  });
+  equal(preview.ok, true);
+  equal(preview.cost, 1);
+  equal(preview.payment_options.length, 2);
+
+  const receipt = recordRuntimeV02EssenceAttachmentEvent(
+    state,
+    1,
+    "incoming-uid",
+    draft,
+    "hand",
+    "manual_essence",
+  );
+  const attachedEvent = runtimeV02CreateEssenceAttachedEvent(
+    receipt,
+    { destination_index: 0 },
+  );
+  const optional = runtimeV02BeginEventListenerContinuation(
+    state,
+    [attachedEvent as any],
+  );
+  equal(optional.pending_choice?.kind, "optional");
+
+  const pay = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    optional.pending_choice!.id,
+    ["accept"],
+  );
+  equal(pay.pending_choice?.kind, "withdrawal_payment");
+  equal(pay.pending_choice?.min, 1);
+  equal(pay.pending_choice?.max, 1);
+  equal((state.players as any)["1"].vanguard.stack[0].uid, "outgoing-uid");
+  equal((state.players as any)["1"].discard.length, 0);
+
+  const complete = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    pay.pending_choice!.id,
+    ["essence:payment-uid"],
+  );
+  equal(complete.status, "complete");
+  equal((state.players as any)["1"].vanguard.stack[0].uid, "incoming-uid");
+  equal((state.players as any)["1"].reserve[0].stack[0].uid, "outgoing-uid");
+  equal((state.players as any)["1"].reserve[0].essence.length, 1);
+  equal((state.players as any)["1"].reserve[0].essence[0].uid, "breeze-uid");
+  equal((state.players as any)["1"].discard.length, 1);
+  equal((state.players as any)["1"].discard[0].uid, "payment-uid");
+  equal((state.turn_flags as any)["1"].withdraw_turn, 7);
+  equal(complete.emitted_movement_events.length, 2);
+  equal(complete.emitted_movement_events[0].event, "moved_to_reserve");
+  equal(complete.emitted_movement_events[1].event, "became_vanguard");
+
+  const secondQuote = runtimeV02QuoteVoluntaryWithdrawal(state, {
+    controller_seat: 1,
+    reserve_index: 0,
+    incoming_target_uid: "outgoing-uid",
+    require_target: true,
+    consume_cost_listeners: false,
+    action_id: "withdraw",
+    resolve_cost_listeners: runtimeV02ResolveVoluntaryWithdrawalCostListeners,
+  });
+  equal(secondQuote.ok, false);
+  equal(secondQuote.error, "withdrawal_already_used_this_turn");
+});
+
 Deno.test("unmarked legacy matches preserve raw play behavior", () => {
   const source = creatureDefinition(
     "gale-whiffin",
@@ -805,3 +1147,649 @@ Deno.test("unmarked legacy matches preserve raw play behavior", () => {
     undefined,
   );
 });
+
+
+Deno.test("triggered APPLY_CONDITION uses source-aware Condition protection", () => {
+  const source = creatureDefinition(
+    "test-condition-trigger",
+    "Condition Trigger",
+    "Shade",
+    ability("condition-trigger", {
+      all: [{ predicate: "event_subject_is_source" }],
+    }, [{
+      op: "APPLY_CONDITION",
+      target: "$current_opponent_vanguard",
+      condition: "Dazed",
+      mode: "apply_if_empty",
+    }]),
+  );
+  const state = baseState(source);
+  const target = (state.players as any)["2"].vanguard;
+  runtimeV02InstallConditionProtection(target, {
+    protection_id: "event-condition-protection",
+    source_action_id: "protection-source",
+    source_uid: "protection-source-uid",
+    source_card_id: "protection-source-card",
+    source_controller_seat: 2,
+    target_controller_seat: 2,
+    installed_turn_seq: 7,
+    condition_names: [],
+    condition_slot: "control",
+    source_controller: "opponent",
+    card_effect_only: true,
+    max_uses: 1,
+    expires_on: "start_of_controller_next_turn",
+  });
+  const complete = begin(state);
+  equal(complete.status, "complete");
+  equal(target.conditions.control, null);
+  equal(runtimeV02ConditionProtectionCount(target), 0);
+});
+
+
+Deno.test("Event Listener active-seat controller predicate matches only the authoritative active seat", () => {
+  const source = creatureDefinition(
+    "gale-active-seat-proof",
+    "Active Seat Proof",
+    "Gale",
+    ability("active-seat-proof", {
+      all: [
+        { predicate: "event_subject_is_source" },
+        { predicate: "event_controller_is_active_seat" },
+      ],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+
+  const active = baseState(source);
+  const matched = begin(active);
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+  const activeCost = runtimeV02ResolveWithdrawalModifierCost(
+    active,
+    (active.players as any)["1"].vanguard,
+    1,
+    "Gale",
+    2,
+  );
+  equal(activeCost.cost, 1);
+
+  const inactive = baseState(source);
+  (inactive as any).active_seat = 2;
+  const rejected = begin(inactive);
+  equal(rejected.status, "complete");
+  equal(rejected.processed_listener_keys.length, 0);
+  const inactiveCost = runtimeV02ResolveWithdrawalModifierCost(
+    inactive,
+    (inactive.players as any)["1"].vanguard,
+    1,
+    "Gale",
+    2,
+  );
+  equal(inactiveCost.cost, 2);
+});
+
+Deno.test("Event Listener schema-valid any_turn timing remains eligible when the source controller is not the active seat", () => {
+  const source = creatureDefinition(
+    "stone-any-turn-proof",
+    "Any Turn Proof",
+    "Stone",
+    ability("any-turn-proof", {
+      all: [{ predicate: "event_subject_is_source" }],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+  (source as any).creature.ability.timing = "any_turn";
+
+  const state = baseState(source);
+  (state as any).active_seat = 2;
+  const matched = begin(state);
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+});
+
+Deno.test("Event Listener subject filters resolve the current event subject definition", () => {
+  const matchingSource = creatureDefinition(
+    "gale-subject-filter-proof",
+    "Subject Filter Proof",
+    "Gale",
+    ability("subject-filter-proof", {
+      all: [{
+        predicate: "event_subject_matches",
+        filters: { card_family: "Creature", element: "Gale" },
+      }],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+  const matchingState = baseState(matchingSource);
+  const matched = begin(matchingState);
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+
+  const rejectingSource = creatureDefinition(
+    "gale-subject-filter-reject",
+    "Subject Filter Reject",
+    "Gale",
+    ability("subject-filter-reject", {
+      all: [{
+        predicate: "event_subject_matches",
+        filters: { card_family: "Creature", element: "Ember" },
+      }],
+    }, [{
+      op: "SET_WITHDRAWAL_MODIFIER",
+      target: "$current_friendly_vanguard",
+      mode: "delta",
+      amount: -1,
+      minimum: 0,
+      duration: {
+        expires_on: ["end_of_turn"],
+        max_uses: 1,
+        consume_on: "legal_voluntary_withdrawal_declared",
+      },
+    }]),
+  );
+  const rejectingState = baseState(rejectingSource);
+  const rejected = begin(rejectingState);
+  equal(rejected.status, "complete");
+  equal(rejected.processed_listener_keys.length, 0);
+});
+
+Deno.test("Orbit Ring source_element_is follows the attack source Creature element", () => {
+  const reserveDummy = creatureDefinition(
+    "astral-orbit-source-dummy",
+    "Orbit Source Dummy",
+    "Astral",
+    null,
+  );
+  const orbitRing = {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id: "astral-orbit-ring",
+    name: "Orbit Ring",
+    card_family: "Tactic",
+    element: "Astral",
+    creature: null,
+    essence: null,
+    tactic: {
+      subtype: "Relic",
+      program: { steps: [] },
+      continuous: [],
+      listeners: [{
+        id: "orbit-ring-after-attack",
+        event: "attack_finished",
+        requirements: {
+          all: [
+            { predicate: "source_is_attached_creature" },
+            { predicate: "source_controller_is_self" },
+            { predicate: "source_element_is", element: "Astral" },
+          ],
+        },
+        limit: null,
+        steps: [{
+          op: "SET_WITHDRAWAL_MODIFIER",
+          target: "$attached_creature",
+          mode: "delta",
+          amount: -1,
+          minimum: 0,
+          duration: { expires_on: ["end_of_turn"], max_uses: 1 },
+        }],
+      }],
+    },
+  };
+  const attackFinished = {
+    event_id: "attack-finished:7:1:orbit-proof",
+    event: "attack_finished",
+    subject_uid: "own-vanguard-uid",
+    controller_seat: 1 as const,
+    source_controller_seat: 1 as const,
+    origin_zone: "vanguard",
+    destination_zone: "vanguard",
+    destination_index: null,
+    phase: "attack_finished",
+    source_action_id: "orbit-proof-attack",
+    source_card_uid: "own-vanguard-uid",
+    action_kind: "attack",
+    turn_seq: 7,
+    attack_id: "orbit-proof-attack",
+    source_creature_uid: "own-vanguard-uid",
+  };
+
+  const matching = baseState(reserveDummy);
+  (matching.players as any)["1"].vanguard.relic =
+    instance("orbit-ring-uid", "astral-orbit-ring");
+  (matching.card_index as any)["astral-orbit-ring"] = {
+    definition_v0_2: orbitRing,
+  };
+  const matched = runtimeV02BeginEventListenerContinuation(
+    matching,
+    [attackFinished],
+  );
+  equal(matched.status, "complete");
+  equal(matched.processed_listener_keys.length, 1);
+
+  const rejecting = baseState(reserveDummy);
+  (rejecting.players as any)["1"].vanguard.relic =
+    instance("orbit-ring-uid", "astral-orbit-ring");
+  (rejecting.card_index as any)["astral-orbit-ring"] = {
+    definition_v0_2: orbitRing,
+  };
+  (rejecting.card_index as any)["test-own-vanguard"].definition_v0_2.element =
+    "Gale";
+  const rejected = runtimeV02BeginEventListenerContinuation(
+    rejecting,
+    [attackFinished],
+  );
+  equal(rejected.status, "complete");
+  equal(rejected.processed_listener_keys.length, 0);
+});
+
+function installVoltDiscardListenerFixture(
+  state: Record<string, unknown>,
+  pulseUid: string,
+  sourceControllerSeat: 1 | 2,
+): {
+  pulse: Inst;
+  host: any;
+  player: any;
+  receipt: ReturnType<typeof runtimeV02ApplyCardZoneTransfer>["receipt"];
+} {
+  const pulseDefinition = essenceDefinition(
+    "volt-pulse-essence",
+    "Pulse Essence",
+    "Volt",
+    [{
+      id: "pulse-discharge-draw",
+      event: "essence_discarded",
+      requirements: {
+        all: [
+          { predicate: "event_subject_is_source" },
+          { predicate: "essence_discarded_source_controller_is_self" },
+          { predicate: "essence_discarded_by_own_card_effect" },
+        ],
+      },
+      limit: { scope: "turn", count: 1, owner: "controller" },
+      steps: [{ op: "DRAW", player: "self", count: 1 }],
+    }],
+  );
+  const dynamoDefinition = relicDefinition(
+    "volt-dynamo-lens",
+    "Dynamo Lens",
+    [{
+      id: "dynamo-lens-draw",
+      event: "essence_discarded",
+      requirements: {
+        all: [
+          {
+            predicate:
+              "event_previous_attachment_target_is_attached_creature",
+          },
+          {
+            any: [
+              {
+                predicate: "essence_discarded_attachment_kind_is",
+                kind: "temporary",
+              },
+              {
+                predicate: "essence_discarded_attachment_kind_is",
+                kind: "borrowed",
+              },
+            ],
+          },
+        ],
+      },
+      limit: { scope: "turn", count: 1, owner: "attachment" },
+      steps: [{ op: "DRAW", player: "self", count: 1 }],
+    }],
+  );
+  const drawDefinitionA = tacticDefinition("draw-a", "Draw A", "Device");
+  const drawDefinitionB = tacticDefinition("draw-b", "Draw B", "Device");
+  const drawDefinitionC = tacticDefinition("draw-c", "Draw C", "Device");
+  const cardIndex = state.card_index as Record<string, unknown>;
+  cardIndex["volt-pulse-essence"] = { definition_v0_2: pulseDefinition };
+  cardIndex["volt-dynamo-lens"] = { definition_v0_2: dynamoDefinition };
+  cardIndex["draw-a"] = { definition_v0_2: drawDefinitionA };
+  cardIndex["draw-b"] = { definition_v0_2: drawDefinitionB };
+  cardIndex["draw-c"] = { definition_v0_2: drawDefinitionC };
+
+  const player = (state.players as any)["1"];
+  const host = player.reserve[0];
+  const pulse: Inst = {
+    uid: pulseUid,
+    card_id: "volt-pulse-essence",
+    effect_flags: {
+      discard_during_target_aftermath: true,
+      runtime_v0_2_effect_attachment_state: {
+        kind: "temporary",
+        expires: "controller_aftermath",
+        destination_on_expire: "discard",
+      },
+    },
+  };
+  host.essence = [pulse];
+  host.relic = instance("dynamo-uid", "volt-dynamo-lens");
+  player.deck = [
+    instance("draw-a-uid", "draw-a"),
+    instance("draw-b-uid", "draw-b"),
+    instance("draw-c-uid", "draw-c"),
+  ];
+
+  const transfer = runtimeV02ApplyCardZoneTransfer(
+    host.essence,
+    player.discard,
+    {
+      cause: "effect",
+      action_kind: "aftermath",
+      source_action_id: "aftermath_essence_disposition",
+      source_card_uid:
+        sourceControllerSeat === 1 ? "source-uid" : "opponent-vanguard-uid",
+      source: {
+        controller_seat: 1,
+        zone: "attached_essence",
+        owner_card_uid: "source-uid",
+      },
+      destination: {
+        controller_seat: 1,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      card_uids: [pulse.uid],
+      destination_position: "bottom",
+    },
+  );
+  return { pulse, host, player, receipt: transfer.receipt };
+}
+
+Deno.test("Pulse Essence and Dynamo Lens consume one canonical Essence-discard event", () => {
+  const state = baseState(
+    creatureDefinition("volt-host", "Volt Host", "Volt"),
+  );
+  const fixture = installVoltDiscardListenerFixture(state, "pulse-uid", 1);
+  const events = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: fixture.receipt,
+    source_controller_seat: 1,
+    phase: "aftermath",
+  });
+  equal(events.length, 1);
+  equal(events[0].event, "essence_discarded");
+  equal(events[0].subject_uid, "pulse-uid");
+  equal(events[0].previous_attachment_target_uid, "source-uid");
+  equal(events[0].attachment_kind, "temporary");
+  equal(events[0].source_controller_seat, 1);
+  equal(events[0].card_effect, true);
+
+  const complete = runtimeV02BeginEventListenerContinuation(state, events);
+  equal(complete.status, "complete");
+  equal(complete.processed_listener_keys.length, 2);
+  equal(fixture.player.hand.length, 2);
+  equal(fixture.player.deck.length, 1);
+});
+
+Deno.test("opponent-controlled Essence discard blocks Pulse but still satisfies Dynamo attachment metadata", () => {
+  const state = baseState(
+    creatureDefinition("volt-host-opponent-effect", "Volt Host", "Volt"),
+  );
+  const fixture = installVoltDiscardListenerFixture(
+    state,
+    "pulse-opponent-effect-uid",
+    2,
+  );
+  const events = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: fixture.receipt,
+    source_controller_seat: 2,
+    phase: "aftermath",
+  });
+  const complete = runtimeV02BeginEventListenerContinuation(state, events);
+  equal(complete.status, "complete");
+  equal(complete.processed_listener_keys.length, 1);
+  equal(fixture.player.hand.length, 1);
+  equal(fixture.player.deck.length, 2);
+});
+
+Deno.test("Pulse controller and Dynamo attachment turn limits suppress repeated Essence-discard draws", () => {
+  const state = baseState(
+    creatureDefinition("volt-host-limits", "Volt Host", "Volt"),
+  );
+  const first = installVoltDiscardListenerFixture(state, "pulse-first-uid", 1);
+  const firstEvents = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: first.receipt,
+    source_controller_seat: 1,
+    phase: "aftermath",
+  });
+  const firstComplete = runtimeV02BeginEventListenerContinuation(
+    state,
+    firstEvents,
+  );
+  equal(firstComplete.processed_listener_keys.length, 2);
+  equal(first.player.hand.length, 2);
+
+  const secondPulse: Inst = {
+    uid: "pulse-second-uid",
+    card_id: "volt-pulse-essence",
+    effect_flags: {
+      runtime_v0_2_effect_attachment_state: {
+        kind: "borrowed",
+        expires: "controller_aftermath",
+        destination_on_expire: "discard",
+      },
+    },
+  };
+  first.host.essence = [secondPulse];
+  const secondTransfer = runtimeV02ApplyCardZoneTransfer(
+    first.host.essence,
+    first.player.discard,
+    {
+      cause: "effect",
+      action_kind: "aftermath",
+      source_action_id: "aftermath_essence_disposition",
+      source_card_uid: "source-uid",
+      source: {
+        controller_seat: 1,
+        zone: "attached_essence",
+        owner_card_uid: "source-uid",
+      },
+      destination: {
+        controller_seat: 1,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      card_uids: [secondPulse.uid],
+      destination_position: "bottom",
+    },
+  );
+  const secondEvents = runtimeV02CreateEssenceDiscardedEvents(state, {
+    receipt: secondTransfer.receipt,
+    source_controller_seat: 1,
+    phase: "aftermath",
+  });
+  equal(secondEvents[0].attachment_kind, "borrowed");
+  const secondComplete = runtimeV02BeginEventListenerContinuation(
+    state,
+    secondEvents,
+  );
+  equal(secondComplete.status, "complete");
+  equal(secondComplete.processed_listener_keys.length, 0);
+  equal(first.player.hand.length, 2);
+  equal(first.player.deck.length, 1);
+});
+
+function installStormgridFixture(state: Record<string, unknown>) {
+  const stormgrid = realmDefinition(
+    "volt-stormgrid-city",
+    "Stormgrid City",
+    [{
+      id: "stormgrid-recycle",
+      event: "device_resolved",
+      controller_scope: "any",
+      limit: { scope: "turn", count: 1, owner: "event_controller" },
+      requirements: { predicate: "event_controller_is_active_seat" },
+      steps: [{
+        op: "OPTIONAL",
+        player: "$event_controller",
+        steps: [{
+          op: "SET_RESOLVING_CARD_DESTINATION",
+          card: "$resolving_card",
+          destination: "deck_bottom",
+        }],
+      }],
+    }],
+  );
+  const device = tacticDefinition(
+    "volt-test-device",
+    "Test Device",
+    "Device",
+  );
+  const cardIndex = state.card_index as Record<string, unknown>;
+  cardIndex["volt-stormgrid-city"] = { definition_v0_2: stormgrid };
+  cardIndex["volt-test-device"] = { definition_v0_2: device };
+  state.realm = {
+    card: instance("stormgrid-uid", "volt-stormgrid-city"),
+    owner_seat: 2,
+    played_turn: 6,
+  };
+  const effect = {
+    id: "device-effect-1",
+    owner_seat: 1,
+    source_card: instance("device-uid", "volt-test-device"),
+    source_name: "Test Device",
+    source_card_id: "volt-test-device",
+    source_subtype: "Device",
+    discard_after_resolve: true,
+    resolving_card_destination: "discard",
+    device_resolved_event_started: true,
+    steps: [],
+    cursor: 0,
+    vars: {},
+  };
+  state.effect_resolution = effect;
+  return effect;
+}
+
+Deno.test("Stormgrid City can replace the exact resolving Device destination with deck bottom", () => {
+  const state = baseState(
+    creatureDefinition("volt-stormgrid-host", "Stormgrid Host", "Volt"),
+  );
+  const effect = installStormgridFixture(state);
+  const event = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: effect.source_card.uid,
+    resolving_card_id: effect.source_card.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+    destination: "discard",
+  });
+
+  const pending = runtimeV02BeginEventListenerContinuation(state, [event]);
+  equal(pending.status, "player_choice_required");
+  assert(pending.pending_choice, "Stormgrid optional choice required");
+  equal(pending.pending_choice.seat, 1);
+  equal(pending.pending_choice.kind, "optional");
+
+  const complete = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    pending.pending_choice.id,
+    ["accept"],
+  );
+  equal(complete.status, "complete");
+  equal(effect.resolving_card_destination, "deck_bottom");
+  equal(event.destination_zone, "discard");
+  const history = state.effect_events as any[];
+  equal(history.length, 1);
+  equal(history[0].destination_zone, "deck_bottom");
+  equal(complete.processed_listener_keys.length, 1);
+});
+
+Deno.test("Stormgrid City decline preserves discard and consumes the existing event-controller turn limit", () => {
+  const state = baseState(
+    creatureDefinition("volt-stormgrid-decline-host", "Stormgrid Host", "Volt"),
+  );
+  const effect = installStormgridFixture(state);
+  const first = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: effect.source_card.uid,
+    resolving_card_id: effect.source_card.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+  });
+  const pending = runtimeV02BeginEventListenerContinuation(state, [first]);
+  assert(pending.pending_choice, "Stormgrid optional choice required");
+  const declined = runtimeV02ResolveEventListenerChoice(
+    state,
+    1,
+    pending.pending_choice.id,
+    ["decline"],
+  );
+  equal(declined.status, "complete");
+  equal(effect.resolving_card_destination, "discard");
+
+  const secondCard = instance("device-uid-2", "volt-test-device");
+  effect.id = "device-effect-2";
+  effect.source_card = secondCard;
+  const second = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: secondCard.uid,
+    resolving_card_id: secondCard.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+  });
+  const suppressed = runtimeV02BeginEventListenerContinuation(state, [second]);
+  equal(suppressed.status, "complete");
+  equal(suppressed.processed_listener_keys.length, 0);
+});
+
+Deno.test("Stormgrid resolving-card destination fails closed if the resolving Device identity changes", () => {
+  const state = baseState(
+    creatureDefinition("volt-stormgrid-stale-host", "Stormgrid Host", "Volt"),
+  );
+  const effect = installStormgridFixture(state);
+  const event = runtimeV02CreateDeviceResolvedEvent(state, {
+    controller_seat: 1,
+    resolving_card_uid: effect.source_card.uid,
+    resolving_card_id: effect.source_card.card_id,
+    source_action_id: effect.id,
+    phase: "effect_resolution",
+  });
+  const pending = runtimeV02BeginEventListenerContinuation(state, [event]);
+  assert(pending.pending_choice, "Stormgrid optional choice required");
+  effect.source_card = instance("changed-device-uid", "volt-test-device");
+  throws(
+    () => runtimeV02ResolveEventListenerChoice(
+      state,
+      1,
+      pending.pending_choice!.id,
+      ["accept"],
+    ),
+    "tcg_v0_2_resolving_card_destination_source_stale",
+  );
+});
+

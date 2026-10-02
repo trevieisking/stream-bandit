@@ -10,6 +10,7 @@ import {
   structuredRuntimeAftermathEssenceDisposition,
   type RuntimeLifecycleInstance,
 } from "./tcg-match-surge-lifecycle-v0-2.ts";
+import { runtimeV02ExpireWithdrawalModifiersAtAftermath } from "./tcg-match-withdrawal-modifier-v0-2.ts";
 
 export type RuntimeV02AftermathCard = RuntimeLifecycleInstance & {
   uid: string;
@@ -57,6 +58,10 @@ export type RuntimeV02AftermathTransferPlan = {
   request: RuntimeV02AftermathCardZoneRequest;
 };
 
+export type RuntimeV02AftermathOptions = {
+  skip_condition_transition?: boolean;
+};
+
 export type RuntimeV02AftermathResult = {
   condition_result: RuntimeV02ConditionAftermathResult | null;
   transfer_plans: RuntimeV02AftermathTransferPlan[];
@@ -100,16 +105,18 @@ export function runtimeV02ResolveAftermath(
   seat: 1 | 2,
   randomCoin: () => RuntimeV02ConditionCoinResult,
   applyConditionDamage: RuntimeV02ConditionDamageSink,
+  options: RuntimeV02AftermathOptions = {},
 ): RuntimeV02AftermathResult {
   const owner = state.players[String(seat)];
   if (!owner) throw new Error("tcg_v0_2_aftermath_player_required");
 
   const turnSeq = Number(state.turn_seq || 0);
+  runtimeV02ExpireWithdrawalModifiersAtAftermath(state, seat);
   const logMessages: string[] = [];
   const transferPlans: RuntimeV02AftermathTransferPlan[] = [];
   let conditionResult: RuntimeV02ConditionAftermathResult | null = null;
 
-  if (owner.vanguard) {
+  if (owner.vanguard && options.skip_condition_transition !== true) {
     conditionResult = runtimeV02ResolveConditionAftermath(
       owner.vanguard,
       randomCoin,

@@ -20,6 +20,9 @@ function assertThrows(fn: () => unknown, fragment: string) {
 
 function creature() {
   return {
+    stack: [{ uid: "source-uid", card_id: "test-recoil-creature" }],
+    essence: [],
+    relic: null,
     damage: 5,
     shield: 30,
     conditions: { scorched: false, venomed: 0, control: null, modifier: null },
@@ -29,9 +32,16 @@ function creature() {
 
 function stateWith(afterDamage: unknown[], attackId = "reckless-rush") {
   const cardId = "test-recoil-creature";
+  const source = creature();
   return {
     turn_seq: 9,
+    active_seat: 1,
+    effect_events: [],
     runtime_registry_v0_2: runtimeV02SnapshotMarker(),
+    players: {
+      "1": { vanguard: source, reserve: [null, null, null, null] },
+      "2": { vanguard: null, reserve: [null, null, null, null] },
+    },
     card_index: {
       [cardId]: {
         card_id: cardId,
@@ -70,19 +80,28 @@ Deno.test("attack-owned recoil is registry-driven and preserves Shield", () => {
     damage_class: "recoil",
     source_attack_id: "reckless-rush",
   }]);
-  const source = creature();
+  const source = (state.players as any)["1"].vanguard;
   const result = structuredRuntimeAfterDamageRecoilEffects(
     state,
     { card_id: "test-recoil-creature" },
     1,
     source,
+    {
+      source_controller_seat: 1,
+      source_action_id: "attack-action",
+      source_card_uid: "source-uid",
+      source_card_id: "test-recoil-creature",
+      source_creature_uid: "source-uid",
+    },
   );
   assertEquals(result?.attack_id, "reckless-rush");
   assertEquals(result?.effects[0].damage_class, "recoil");
   assertEquals(result?.effects[0].placed, 10);
   assertEquals(result?.effects[0].shield_prevented, 0);
   assertEquals(source.damage, 15);
-  assertEquals(source.shield, 30, "recoil placement must not consume Shield in this Pass C slice");
+  assertEquals(source.shield, 30, "recoil packet placement must not consume Shield");
+  assertEquals(result?.effects[0].packet_id, "attack-action:recoil:0");
+  assertEquals((result?.effects[0].after_damage_event as any)?.damage_class, "recoil");
 });
 
 Deno.test("Meltline Charge preserves its frozen 20 recoil amount", () => {
@@ -93,12 +112,19 @@ Deno.test("Meltline Charge preserves its frozen 20 recoil amount", () => {
     damage_class: "recoil",
     source_attack_id: "meltline-charge",
   }], "meltline-charge");
-  const source = creature();
+  const source = (state.players as any)["1"].vanguard;
   const result = structuredRuntimeAfterDamageRecoilEffects(
     state,
     { card_id: "test-recoil-creature" },
     1,
     source,
+    {
+      source_controller_seat: 1,
+      source_action_id: "attack-action",
+      source_card_uid: "source-uid",
+      source_card_id: "test-recoil-creature",
+      source_creature_uid: "source-uid",
+    },
   );
   assertEquals(result?.attack_id, "meltline-charge");
   assertEquals(result?.effects[0].placed, 20);
@@ -115,7 +141,7 @@ Deno.test("non-recoil DIRECT_DAMAGE stays on later compatibility/listener author
     source_attack_id: "reckless-rush",
   }]);
   const source = creature();
-  const result = structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, source);
+  const result = structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, source, { source_controller_seat: 1, source_action_id: "attack-action", source_card_uid: "source-uid", source_card_id: "test-recoil-creature", source_creature_uid: "source-uid" });
   assertEquals(result, null);
   assertEquals(source.damage, 5);
   assertEquals(source.shield, 30);
@@ -127,7 +153,7 @@ Deno.test("mixed after_damage programs do not partially execute recoil", () => {
     { op: "HEAL", target: "$source_creature", amount: 20 },
   ]);
   const source = creature();
-  const result = structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, source);
+  const result = structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, source, { source_controller_seat: 1, source_action_id: "attack-action", source_card_uid: "source-uid", source_card_id: "test-recoil-creature", source_creature_uid: "source-uid" });
   assertEquals(result, null);
   assertEquals(source.damage, 5);
 });
@@ -141,7 +167,7 @@ Deno.test("attack-owned recoil requires the source creature target", () => {
     source_attack_id: "reckless-rush",
   }]);
   assertThrows(
-    () => structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, creature()),
+    () => structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, (state.players as any)["1"].vanguard, { source_controller_seat: 1, source_action_id: "attack-action", source_card_uid: "source-uid", source_card_id: "test-recoil-creature", source_creature_uid: "source-uid" }),
     "tcg_v0_2_attack_recoil_target_unsupported",
   );
 });
@@ -155,7 +181,7 @@ Deno.test("attack-owned recoil source_attack_id must match the structured attack
     source_attack_id: "wrong-attack",
   }]);
   assertThrows(
-    () => structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, creature()),
+    () => structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, (state.players as any)["1"].vanguard, { source_controller_seat: 1, source_action_id: "attack-action", source_card_uid: "source-uid", source_card_id: "test-recoil-creature", source_creature_uid: "source-uid" }),
     "tcg_v0_2_attack_recoil_source_attack_mismatch",
   );
 });
@@ -170,7 +196,7 @@ Deno.test("malformed owned recoil metadata fails closed", () => {
     surprise: true,
   }]);
   assertThrows(
-    () => structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, creature()),
+    () => structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, (state.players as any)["1"].vanguard, { source_controller_seat: 1, source_action_id: "attack-action", source_card_uid: "source-uid", source_card_id: "test-recoil-creature", source_creature_uid: "source-uid" }),
     "tcg_v0_2_attack_recoil_step_field_unsupported",
   );
 });
@@ -185,7 +211,7 @@ Deno.test("legacy-only matches remain on compatibility authority", () => {
   }]);
   delete state.runtime_registry_v0_2;
   const source = creature();
-  const result = structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, source);
+  const result = structuredRuntimeAfterDamageRecoilEffects(state, { card_id: "test-recoil-creature" }, 1, source, { source_controller_seat: 1, source_action_id: "attack-action", source_card_uid: "source-uid", source_card_id: "test-recoil-creature", source_creature_uid: "source-uid" });
   assertEquals(result, null);
   assertEquals(source.damage, 5);
 });

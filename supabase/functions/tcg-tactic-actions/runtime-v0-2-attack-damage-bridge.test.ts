@@ -50,6 +50,40 @@ function essence(cardId: string, continuous: Record<string, unknown>[]) {
   });
 }
 
+function relic(cardId: string, continuous: Record<string, unknown>[]) {
+  return structuredEntry(cardId, {
+    card_family: "Tactic",
+    element: "Ember",
+    tactic: {
+      subtype: "Relic",
+      play_requirements: [],
+      program: { schema: "sb-tcg-effects-v0.2", discard_after_resolve: false, steps: [] },
+      listeners: [],
+      continuous,
+    },
+  });
+}
+
+function continuousCreature(
+  cardId: string,
+  abilityId: string,
+  continuous: Record<string, unknown>[],
+) {
+  return structuredEntry(cardId, {
+    card_family: "Creature",
+    creature: {
+      withdrawal: 1,
+      ability: {
+        id: abilityId,
+        mode: "continuous",
+        timing: "passive",
+        limit: null,
+        continuous,
+      },
+    },
+  });
+}
+
 const whisper = essence("shade-whisper-essence", [{
   id: "whisper-conditioned-pressure",
   kind: "attack_damage",
@@ -86,6 +120,117 @@ const opponentVanguardConditioned: RuntimeAttackDamageContext = {
   source_controller: "opponent",
   target_has_any_condition: true,
 };
+
+const glowcub = continuousCreature("ember-glowcub", "warm-blood", [{
+  id: "warm-blood-spark-pounce",
+  kind: "attack_damage",
+  target: "$source_creature",
+  when: { predicate: "source_damaged" },
+  amount: 10,
+  filters: { attack_id: "spark-pounce" },
+}]);
+
+const murkmite = continuousCreature("shade-murkmite", "murk-sense", [{
+  id: "murk-sense-murk-nip",
+  kind: "attack_damage",
+  target: "$source_creature",
+  when: {
+    predicate: "control_condition_present",
+    target: "$current_opponent_vanguard",
+  },
+  amount: 10,
+  filters: { attack_id: "murk-nip" },
+}]);
+
+const cinderCharm = relic("ember-cinder-charm", [{
+  id: "cinder-charm-pressure",
+  kind: "attack_damage",
+  target: "$attached_creature",
+  when: { predicate: "target_element_is", target: "$attached_creature", element: "Ember" },
+  value: {
+    default: 10,
+    cases: [{
+      when: { predicate: "target_printed_hp_at_least", target: "$attached_creature", value: 200 },
+      amount: 20,
+    }],
+  },
+  filters: {},
+}]);
+
+const emberSmall = structuredEntry("ember-small", {
+  card_family: "Creature",
+  element: "Ember",
+  creature: { hp: 190, withdrawal: 1 },
+});
+const emberLarge = structuredEntry("ember-large", {
+  card_family: "Creature",
+  element: "Ember",
+  creature: { hp: 220, withdrawal: 1 },
+});
+const galeLarge = structuredEntry("gale-large", {
+  card_family: "Creature",
+  element: "Gale",
+  creature: { hp: 220, withdrawal: 1 },
+});
+
+const quartzram = continuousCreature("stone-quartzram", "prismatic-bulwark", [{
+  id: "prismatic-bulwark-prism-ram",
+  kind: "attack_damage",
+  target: "$source_creature",
+  when: { predicate: "source_has_shield_at_least", value: 1 },
+  amount: 20,
+  filters: { attack_id: "prism-ram" },
+}]);
+
+const kilnback = continuousCreature("ember-kilnback", "furnace-hide", [{
+  id: "furnace-hide-reduction",
+  kind: "incoming_attack_damage",
+  target: "$source_creature",
+  when: { predicate: "source_has_condition", condition: "Scorched" },
+  amount: -10,
+  filters: { source_controller: "opponent" },
+}]);
+
+const shalejaw = continuousCreature("stone-shalejaw", "tough-bite", [{
+  id: "tough-bite-threshold",
+  kind: "incoming_attack_damage",
+  target: "$source_creature",
+  when: { predicate: "current_attack_damage_at_least", value: 100, stage: "before_shield" },
+  amount: -20,
+  filters: { source_controller: "opponent" },
+  limit: { scope: "turn", count: 1, owner: "card_instance" },
+  consume_when: "prevention_amount_at_least_1",
+}]);
+
+const obsidianox = continuousCreature("stone-obsidianox", "glass-armour", [{
+  id: "glass-armour-threshold",
+  kind: "incoming_attack_damage",
+  target: "$source_creature",
+  when: { predicate: "current_attack_damage_at_least", value: 120, stage: "before_shield" },
+  amount: -30,
+  filters: { source_controller: "opponent" },
+  limit: { scope: "match", count: 1, owner: "card_instance" },
+  consume_when: "prevention_amount_at_least_1",
+}]);
+
+const wingclipCharm = structuredEntry("gale-wingclip-charm", {
+  card_family: "Tactic",
+  element: "Gale",
+  tactic: {
+    subtype: "Relic",
+    play_requirements: [],
+    program: { schema: "sb-tcg-effects-v0.2", discard_after_resolve: false, steps: [] },
+    listeners: [],
+    continuous: [{
+      id: "wingclip-vanguard-pressure",
+      kind: "attack_damage",
+      target: "$attached_creature",
+      when: { predicate: "target_became_vanguard_this_turn", target: "$attached_creature" },
+      amount: 20,
+      filters: { target_element: "Gale" },
+    }],
+  },
+});
 
 Deno.test("legacy-only match keeps attack-damage resolver on legacy fallback", () => {
   const state = {
@@ -158,6 +303,266 @@ Deno.test("structured outgoing and incoming layers preserve Crushed timing betwe
   assertEquals(structuredRuntimeIncomingAttackDamage(state, attacker, target, afterCrushed, opponentVanguardConditioned), 100);
 });
 
+Deno.test("Wingclip outgoing Relic damage binds Vanguard timing and target_element to the attached Creature", () => {
+  const state = {
+    ...markedState({
+      "gale-wingclip-charm": wingclipCharm,
+      "gale-large": galeLarge,
+      "ember-large": emberLarge,
+      "stone-test-target": targetEntry,
+    }),
+    turn_seq: 7,
+  } as Record<string, unknown>;
+  const target = {
+    stack: [{ uid: "target", card_id: "stone-test-target" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+    target_element: "Stone",
+  };
+  const makeAttacker = (cardId: string, becameTurn: number) => ({
+    stack: [{ uid: "attacker", card_id: cardId }],
+    essence: [],
+    relic: { uid: "wingclip", card_id: "gale-wingclip-charm" },
+    damage: 0,
+    shield: 0,
+    became_vanguard_turn: becameTurn,
+  });
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("gale-large", 7), target, 50, context),
+    70,
+    "Wingclip should add 20 to an attached Gale Creature that became Vanguard this turn",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("gale-large", 6), target, 50, context),
+    50,
+    "Wingclip must not add damage when the attached Creature became Vanguard on an earlier turn",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("ember-large", 7), target, 50, context),
+    50,
+    "Wingclip target_element filter must reject a non-Gale attached Creature even when the attacked target is unrelated",
+  );
+});
+
+Deno.test("Kilnback incoming Attack damage uses canonical source_has_condition semantics", () => {
+  const state = {
+    ...markedState({ "ember-kilnback": kilnback }),
+    turn_seq: 4,
+  } as Record<string, unknown>;
+  const attacker = { essence: [], damage: 0, shield: 0 };
+  const makeTarget = (scorched: boolean) => ({
+    stack: [{ uid: "kilnback", card_id: "ember-kilnback" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+    conditions: { scorched, venomed: 0, control: null, modifier: null },
+  });
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, makeTarget(true), 80, context),
+    70,
+    "Furnace Hide should prevent 10 while Kilnback is Scorched",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, makeTarget(false), 80, context),
+    80,
+    "Furnace Hide must not prevent damage while Kilnback is not Scorched",
+  );
+});
+
+
+Deno.test("Stone current Attack-damage thresholds use canonical pre-Shield value and card-instance limits", () => {
+  const state = {
+    ...markedState({
+      "stone-shalejaw": shalejaw,
+      "stone-obsidianox": obsidianox,
+      "stone-anchor-essence": anchor,
+    }),
+    turn_seq: 7,
+  } as Record<string, unknown>;
+  const attacker = { essence: [], damage: 0, shield: 0 };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+
+  const shaleTarget = {
+    stack: [{ uid: "shale-1", card_id: "stone-shalejaw" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 99, context),
+    99,
+    "Tough Bite must not consume below its current-damage threshold",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 100, context),
+    80,
+    "Tough Bite should prevent 20 at exactly 100 current pre-Shield damage",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 140, context),
+    140,
+    "Tough Bite should be consumed for the rest of the same turn",
+  );
+  state.turn_seq = 8;
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, shaleTarget, 100, context),
+    80,
+    "Tough Bite turn-scoped card-instance use should reset on a new turn",
+  );
+
+  const obsidianTarget = {
+    stack: [{ uid: "obsidian-1", card_id: "stone-obsidianox" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, obsidianTarget, 119, context),
+    119,
+    "Glass Armour must not consume below 120 current pre-Shield damage",
+  );
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, obsidianTarget, 120, context),
+    90,
+    "Glass Armour should prevent 30 at exactly 120 current pre-Shield damage",
+  );
+  state.turn_seq = 9;
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, obsidianTarget, 160, context),
+    160,
+    "Glass Armour match-scoped card-instance use must remain consumed on later turns",
+  );
+
+  const layeredShaleTarget = {
+    stack: [{ uid: "shale-2", card_id: "stone-shalejaw" }],
+    essence: [{ uid: "anchor-1", card_id: "stone-anchor-essence" }],
+    damage: 0,
+    shield: 0,
+  };
+  state.turn_seq = 10;
+  assertEquals(
+    structuredRuntimeIncomingAttackDamage(state, attacker, layeredShaleTarget, 100, context),
+    90,
+    "current_attack_damage_at_least must read the canonical current packet after earlier incoming modifiers and before Shield",
+  );
+});
+
+Deno.test("Stone threshold Ability grammar fails closed on unsupported stage and limit ownership", () => {
+  const wrongStage = continuousCreature("stone-wrong-stage", "wrong-stage", [{
+    id: "wrong-stage-effect",
+    kind: "incoming_attack_damage",
+    target: "$source_creature",
+    when: { predicate: "current_attack_damage_at_least", value: 100, stage: "after_shield" },
+    amount: -20,
+    filters: { source_controller: "opponent" },
+    limit: { scope: "turn", count: 1, owner: "card_instance" },
+    consume_when: "prevention_amount_at_least_1",
+  }]);
+  const wrongOwner = continuousCreature("stone-wrong-owner", "wrong-owner", [{
+    id: "wrong-owner-effect",
+    kind: "incoming_attack_damage",
+    target: "$source_creature",
+    when: { predicate: "current_attack_damage_at_least", value: 100, stage: "before_shield" },
+    amount: -20,
+    filters: { source_controller: "opponent" },
+    limit: { scope: "turn", count: 1, owner: "controller" },
+    consume_when: "prevention_amount_at_least_1",
+  }]);
+  const state = {
+    ...markedState({
+      "stone-wrong-stage": wrongStage,
+      "stone-wrong-owner": wrongOwner,
+    }),
+    turn_seq: 4,
+  } as Record<string, unknown>;
+  const attacker = { essence: [] };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+  assertThrows(
+    () => structuredRuntimeIncomingAttackDamage(
+      state,
+      attacker,
+      { stack: [{ uid: "ws", card_id: "stone-wrong-stage" }], essence: [] },
+      120,
+      context,
+    ),
+    "tcg_v0_2_attack_damage_current_threshold_stage_unsupported",
+  );
+  assertThrows(
+    () => structuredRuntimeIncomingAttackDamage(
+      state,
+      attacker,
+      { stack: [{ uid: "wo", card_id: "stone-wrong-owner" }], essence: [] },
+      120,
+      context,
+    ),
+    "tcg_v0_2_attack_damage_ability_limit_owner_unsupported",
+  );
+});
+
+Deno.test("attached Relic outgoing Attack damage resolves Cinder Charm generically", () => {
+  const target = { essence: [] };
+  const context: RuntimeAttackDamageContext = {
+    target_zone: "vanguard",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+  };
+  const makeAttacker = (cardId: string) => ({
+    stack: [{ uid: "attacker", card_id: cardId }],
+    essence: [],
+    relic: { uid: "cinder", card_id: "ember-cinder-charm" },
+    damage: 0,
+    shield: 0,
+  });
+  const state = markedState({
+    "ember-cinder-charm": cinderCharm,
+    "ember-small": emberSmall,
+    "ember-large": emberLarge,
+    "gale-large": galeLarge,
+  });
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("ember-small"), target, 50, context),
+    60,
+    "Cinder default should add 10 to an Ember Creature below 200 printed HP",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("ember-large"), target, 50, context),
+    70,
+    "Cinder 200+ printed-HP case should add 20",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(state, makeAttacker("gale-large"), target, 50, context),
+    50,
+    "Cinder target_element_is must reject a non-Ember attached Creature",
+  );
+});
+
 Deno.test("marked mixed structured and legacy card indexes fail closed instead of mixing attack engines", () => {
   const state = markedState({
     "shade-test-attacker": attackerEntry,
@@ -178,3 +583,150 @@ Deno.test("marked mixed structured and legacy card indexes fail closed instead o
     "tcg_v0_2_snapshot_definition_missing:shade-whisper-essence",
   );
 });
+
+Deno.test("Creature-owned continuous outgoing Attack damage is generic across Release 1 predicates", () => {
+  const state = markedState({
+    "ember-glowcub": glowcub,
+    "shade-murkmite": murkmite,
+    "stone-quartzram": quartzram,
+    "stone-test-target": targetEntry,
+  });
+  const target = {
+    stack: [{ uid: "target", card_id: "stone-test-target" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+
+  const baseContext: RuntimeAttackDamageContext = {
+    target_zone: "reserve",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+    current_opponent_vanguard_control_condition: null,
+  };
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "glow", card_id: "ember-glowcub" }],
+        essence: [],
+        damage: 10,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "spark-pounce" },
+    ),
+    30,
+    "Glowcub should use canonical source_damaged evaluation",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "glow", card_id: "ember-glowcub" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "spark-pounce" },
+    ),
+    20,
+    "Glowcub should not gain damage while undamaged",
+  );
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "murk", card_id: "shade-murkmite" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      {
+        ...baseContext,
+        attack_id: "murk-nip",
+        current_opponent_vanguard_control_condition: "Blinded",
+      },
+    ),
+    30,
+    "Murkmite should read current opponent Vanguard control state, not the attacked zone",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "murk", card_id: "shade-murkmite" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "murk-nip" },
+    ),
+    20,
+    "Murkmite should not gain damage without a control condition",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "murk", card_id: "shade-murkmite" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      {
+        ...baseContext,
+        attack_id: "other-attack",
+        current_opponent_vanguard_control_condition: "Blinded",
+      },
+    ),
+    20,
+    "Creature continuous filters must bind to the exact attack id",
+  );
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "quartz", card_id: "stone-quartzram" }],
+        essence: [],
+        damage: 0,
+        shield: 10,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "prism-ram" },
+    ),
+    40,
+    "Quartzram should use canonical source_has_shield_at_least evaluation",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "quartz", card_id: "stone-quartzram" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "prism-ram" },
+    ),
+    20,
+    "Quartzram should not gain damage without Shield",
+  );
+});
+

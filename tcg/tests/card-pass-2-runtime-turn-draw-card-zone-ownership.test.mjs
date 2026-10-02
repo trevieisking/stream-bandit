@@ -44,5 +44,7 @@ test('automatic turn-start draw keeps lifecycle in Match Flow while Card-Zone ow
   assert.ok(turnFlow.includes('state.active_seat = nextSeat;'));
   assert.ok(turnFlow.includes('state.turn_seq = nextTurn;'));
   assert.ok(turnFlow.includes('personalTurns[String(nextSeat)] = nextPersonalTurn;'));
+  assert.ok(turnFlow.includes('state.phase = "play";'), 'successful turn advance must leave resolution and enter play');
+  assert.equal(block.includes('s.phase="play"'), false, 'dispatcher must not own the successful turn phase transition');
   assert.ok(turnFlow.includes('state.deckout_loser = nextSeat;'));
 });

@@ -154,6 +154,8 @@ function state(deck: Inst[], damage = 30): Record<string, unknown> {
 
 function runChain(current: Record<string, unknown>, targetHasCondition: boolean) {
   const source = (current.players as any)["1"].vanguard.stack[0] as Inst;
+  const target = (current.players as any)["2"].vanguard;
+  target.conditions.scorched = targetHasCondition;
   const descriptor = structuredRuntimeAfterDamageDeckDiscard(current, source, 1);
   assert(descriptor, "structured deck-discard descriptor required");
   const discard = runtimeV02ResolveAfterDamageDeckDiscard(
@@ -161,7 +163,7 @@ function runChain(current: Record<string, unknown>, targetHasCondition: boolean)
     1,
     descriptor,
     source,
-    targetHasCondition,
+    target,
   );
   if (discard.event_name == null) {
     const heal = runtimeV02BeginAttackHealListenerContinuation(current, [], 1);

@@ -81,16 +81,25 @@ test('match owner exposes one generic use_ability boundary after the active-play
   assert.ok(match.includes('runtimeV02PendingActiveAbilityLiveChoiceView'));
   assertInOrder(match, [
     'if(s.phase!=="play"||Number(s.active_seat)!==seat)',
+    'const beginActiveAbilityRoute=',
     'if(action==="use_ability")',
-    'runtimeV02BeginActiveAbilityLiveRoute(',
+    'routed=beginActiveAbilityRoute(',
     's.pending_ability_choice=pending',
     's.phase="ability_effect_resolution"',
   ], 'active Ability activation lifecycle');
+
+  const helperStart = match.indexOf('const beginActiveAbilityRoute=');
+  const helperEnd = match.indexOf('const projectAbilitySources', helperStart);
+  assert.ok(helperStart >= 0 && helperEnd > helperStart);
+  const helper = match.slice(helperStart, helperEnd);
+  assert.ok(helper.includes('getCr(player,where,index)'));
+  assert.ok(helper.includes('cr.stack[cr.stack.length-1]'));
+  assert.ok(helper.includes('runtimeV02BeginActiveAbilityLiveRoute('));
+
   const start = match.indexOf('if(action==="use_ability")');
   const end = match.indexOf('if(action==="play_creature")', start);
   const block = match.slice(start, end);
-  assert.ok(block.includes('getCr(p,where,idx)'));
-  assert.ok(block.includes('cr.stack[cr.stack.length-1]'));
+  assert.ok(block.includes('beginActiveAbilityRoute('));
   assert.ok(block.includes('active_ability_requires_runtime_owner'));
   assert.equal(block.includes('structuredRuntimeActiveAbilityRewardInspection'), false, 'match command must not bypass the live facade for Reward recognition');
   assert.equal(block.includes('runtimeV02CreateActiveAbilityRewardChoice'), false, 'match command must not bypass the live facade for Reward choice creation');
@@ -126,9 +135,12 @@ test('resolve_ability_choice runs before the ordinary play gate and preserves Re
   ], 'active Ability private continuation');
   assert.ok(block.includes('s.phase="play"'));
   assert.ok(block.includes('commit("resolve_ability_choice"'));
-  assert.equal(block.includes('scanDefeats()'), false, 'active Ability resolution must not own attack defeat scanning');
-  assert.equal(block.includes('aftermath('), false, 'active Ability resolution must not own attack Aftermath');
-  assert.ok(block.includes('reward_inspected_count:resolved.reward_inspected_count'));
+  const rewardStart = block.indexOf('s.phase="play";return json({version:VERSION,result:await commit("resolve_ability_choice",{seat,ability_id:resolved.ability_id,kind:resolved.kind,reward_inspected_count:resolved.reward_inspected_count');
+  assert.ok(rewardStart >= 0, 'Reward return-to-play branch required');
+  const rewardBranch = block.slice(rewardStart);
+  assert.equal(rewardBranch.includes('scanDefeats()'), false, 'Reward Ability resolution must not own defeat scanning');
+  assert.equal(rewardBranch.includes('aftermath('), false, 'Reward Ability resolution must not own attack Aftermath');
+  assert.ok(rewardBranch.includes('reward_inspected_count:resolved.reward_inspected_count'));
   assert.ok(activeLive.includes('runtimeV02ResolveActiveAbilityRewardChoice('), 'Reward resolution must remain delegated to the established semantic owner');
   for (const secret of ['anchor_uid', 'anchor_card_id', 'reward_position', 'source_uid', 'source_card_id', 'resolved.options', 'resolved.prompt']) {
     assert.equal(block.includes(secret), false, `resolution public receipt leaked private Ability field: ${secret}`);

@@ -26,10 +26,19 @@ test('frozen Deep Current owns exactly one damaged-friendly selected heal progra
   assert.ok(tideSource.includes(program));
 });
 
+test('frozen Lantern Jet owns exactly one Reserve-only damaged selected-heal program', () => {
+  const program = '"after_damage":[{"op":"SELECT_CREATURE","controller":"self","zone":"reserve","count":1,"filters":{"damaged":true},"as":"reserve_heal"},{"op":"HEAL","target":"$reserve_heal","amount":10}]';
+  const files = ['tcg-card-pass-2-astral.md','tcg-card-pass-2-ember.md','tcg-card-pass-2-gale.md','tcg-card-pass-2-grove.md','tcg-card-pass-2-shade.md','tcg-card-pass-2-stone.md','tcg-card-pass-2-tide.md','tcg-card-pass-2-volt.md'];
+  const all = files.map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+  assert.equal(all.split(program).length - 1, 1);
+  assert.ok(tideSource.includes('"id":"lantern-jet","name":"Lantern Jet"'));
+  assert.ok(tideSource.includes(program));
+});
+
 test('structured selected-heal parser is narrow and heal listeners remain later', () => {
   assert.ok(effectSource.includes('structuredRuntimeAfterDamageSelectedHealChoice'));
   assert.ok(effectSource.includes('String(select.controller || "") !== "self"'));
-  assert.ok(effectSource.includes('String(select.zone || "") !== "field"'));
+  assert.ok(effectSource.includes('selectionZone !== "field" && selectionZone !== "reserve"'));
   assert.ok(effectSource.includes('filters.damaged !== true'));
   assert.ok(effectSource.includes('String(heal.target || "") !== target'));
   assert.ok(effectSource.includes('after_heal_packet listeners remain a separate later lifecycle pass'));
@@ -37,6 +46,8 @@ test('structured selected-heal parser is narrow and heal listeners remain later'
 
 test('attack-choice owner is private, anchor-bound and actual-heal authoritative', () => {
   assert.ok(choiceSource.includes('select_damaged_friendly_creature_heal'));
+  assert.ok(choiceSource.includes('descriptor.selection.zone === "reserve"'));
+  assert.ok(choiceSource.includes('entries.filter((entry) => entry.where === "reserve")'));
   assert.ok(choiceSource.includes('waiting: true'));
   assert.ok(choiceSource.includes('choice.id !== choiceId'));
   assert.ok(choiceSource.includes('candidate.anchor_uid === option.anchor_uid'));

@@ -13,6 +13,70 @@ export type RuntimeV02SourceDamagedRequirementEvaluation = {
   actual_damage: number;
 };
 
+export type RuntimeV02SourceInPlayRequirement = {
+  predicate: "source_in_play";
+};
+
+export type RuntimeV02SourceInPlayRequirementEvaluation = {
+  predicate: "source_in_play";
+  matched: boolean;
+};
+
+export type RuntimeV02SourceHasShieldAtLeastRequirement = {
+  predicate: "source_has_shield_at_least";
+  value: number;
+};
+
+export type RuntimeV02SourceHasShieldAtLeastRequirementEvaluation = {
+  predicate: "source_has_shield_at_least";
+  matched: boolean;
+  required_shield: number;
+  actual_shield: number;
+};
+
+export type RuntimeV02TargetPrintedHpAtLeastRequirement = {
+  predicate: "target_printed_hp_at_least";
+  target: string;
+  value: number;
+};
+
+export type RuntimeV02TargetPrintedHpAtLeastRequirementEvaluation = {
+  predicate: "target_printed_hp_at_least";
+  matched: boolean;
+  target: string;
+  required_hp: number;
+  actual_hp: number;
+};
+
+export type RuntimeV02LegalCardAvailableRequirement = {
+  predicate: "legal_card_available";
+  controller: string;
+  zone: string;
+  filters: Record<string, unknown>;
+};
+
+export type RuntimeV02LegalCardAvailableRequirementEvaluation = {
+  predicate: "legal_card_available";
+  matched: boolean;
+  controller: string;
+  zone: string;
+  candidate_count: number;
+};
+
+export type RuntimeV02ReserveCountAtLeastRequirement = {
+  predicate: "reserve_count_at_least";
+  controller: string;
+  count: number;
+};
+
+export type RuntimeV02ReserveCountAtLeastRequirementEvaluation = {
+  predicate: "reserve_count_at_least";
+  matched: boolean;
+  controller: string;
+  required_count: number;
+  actual_count: number;
+};
+
 export type RuntimeV02DamageHistoryCountRequirement = {
   predicate: "damage_history_count_at_least";
   target: "$source_creature";
@@ -89,6 +153,118 @@ function validatedContext(
   };
 }
 
+export function normalizeRuntimeV02LegalCardAvailableRequirement(
+  raw: unknown,
+): RuntimeV02LegalCardAvailableRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_legal_card_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "controller", "zone", "filters"],
+    "tcg_v0_2_requirement_legal_card_field_unsupported",
+  );
+  if (value.predicate !== "legal_card_available") {
+    throw new Error("tcg_v0_2_requirement_legal_card_predicate_invalid");
+  }
+  const controller = value.controller == null
+    ? "self"
+    : requiredString(
+      value.controller,
+      "tcg_v0_2_requirement_legal_card_controller_invalid",
+    );
+  const zone = requiredString(
+    value.zone,
+    "tcg_v0_2_requirement_legal_card_zone_invalid",
+  );
+  const allowedZones = new Set([
+    "field",
+    "vanguard",
+    "reserve",
+    "hand",
+    "deck",
+    "discard",
+    "rewards",
+  ]);
+  if (!allowedZones.has(zone)) {
+    throw new Error("tcg_v0_2_requirement_legal_card_zone_unsupported");
+  }
+  const filters = value.filters == null
+    ? {}
+    : objectRecord(
+      value.filters,
+      "tcg_v0_2_requirement_legal_card_filters_invalid",
+    );
+  return {
+    predicate: "legal_card_available",
+    controller,
+    zone,
+    filters: { ...filters },
+  };
+}
+
+export function evaluateRuntimeV02LegalCardAvailableRequirement(
+  candidateCount: unknown,
+  rawRequirement: RuntimeV02LegalCardAvailableRequirement,
+): RuntimeV02LegalCardAvailableRequirementEvaluation {
+  const requirement = normalizeRuntimeV02LegalCardAvailableRequirement(rawRequirement);
+  const count = Number(candidateCount);
+  if (!Number.isInteger(count) || count < 0) {
+    throw new Error("tcg_v0_2_requirement_legal_card_candidate_count_invalid");
+  }
+  return {
+    predicate: "legal_card_available",
+    matched: count > 0,
+    controller: requirement.controller,
+    zone: requirement.zone,
+    candidate_count: count,
+  };
+}
+
+export function normalizeRuntimeV02ReserveCountAtLeastRequirement(
+  raw: unknown,
+): RuntimeV02ReserveCountAtLeastRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_reserve_count_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "controller", "count"],
+    "tcg_v0_2_requirement_reserve_count_field_unsupported",
+  );
+  if (value.predicate !== "reserve_count_at_least") {
+    throw new Error("tcg_v0_2_requirement_reserve_count_predicate_invalid");
+  }
+  const controller = value.controller == null
+    ? "self"
+    : requiredString(
+      value.controller,
+      "tcg_v0_2_requirement_reserve_count_controller_invalid",
+    );
+  return {
+    predicate: "reserve_count_at_least",
+    controller,
+    count: positiveInteger(
+      value.count,
+      "tcg_v0_2_requirement_reserve_count_threshold_invalid",
+    ),
+  };
+}
+
+export function evaluateRuntimeV02ReserveCountAtLeastRequirement(
+  reserve: unknown,
+  rawRequirement: RuntimeV02ReserveCountAtLeastRequirement,
+): RuntimeV02ReserveCountAtLeastRequirementEvaluation {
+  const requirement = normalizeRuntimeV02ReserveCountAtLeastRequirement(rawRequirement);
+  if (!Array.isArray(reserve)) {
+    throw new Error("tcg_v0_2_requirement_reserve_count_zone_invalid");
+  }
+  const actual = reserve.filter(Boolean).length;
+  return {
+    predicate: "reserve_count_at_least",
+    matched: actual >= requirement.count,
+    controller: requirement.controller,
+    required_count: requirement.count,
+    actual_count: actual,
+  };
+}
+
 export function normalizeRuntimeV02SourceDamagedRequirement(
   raw: unknown,
 ): RuntimeV02SourceDamagedRequirement {
@@ -121,6 +297,123 @@ export function evaluateRuntimeV02SourceDamagedRequirement(
     predicate: "source_damaged",
     matched: damage > 0,
     actual_damage: damage,
+  };
+}
+
+export function normalizeRuntimeV02SourceInPlayRequirement(
+  raw: unknown,
+): RuntimeV02SourceInPlayRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_source_in_play_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate"],
+    "tcg_v0_2_requirement_source_in_play_field_unsupported",
+  );
+  if (value.predicate !== "source_in_play") {
+    throw new Error("tcg_v0_2_requirement_source_in_play_predicate_invalid");
+  }
+  return { predicate: "source_in_play" };
+}
+
+export function evaluateRuntimeV02SourceInPlayRequirement(
+  sourceCreature: unknown,
+  rawRequirement: RuntimeV02SourceInPlayRequirement,
+): RuntimeV02SourceInPlayRequirementEvaluation {
+  normalizeRuntimeV02SourceInPlayRequirement(rawRequirement);
+  if (sourceCreature == null) {
+    return { predicate: "source_in_play", matched: false };
+  }
+  const source = objectRecord(
+    sourceCreature,
+    "tcg_v0_2_requirement_source_in_play_source_invalid",
+  );
+  if (!Array.isArray(source.stack)) {
+    throw new Error("tcg_v0_2_requirement_source_in_play_stack_invalid");
+  }
+  return {
+    predicate: "source_in_play",
+    matched: source.stack.length > 0,
+  };
+}
+
+export function normalizeRuntimeV02SourceHasShieldAtLeastRequirement(
+  raw: unknown,
+): RuntimeV02SourceHasShieldAtLeastRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_source_shield_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "value"],
+    "tcg_v0_2_requirement_source_shield_field_unsupported",
+  );
+  if (value.predicate !== "source_has_shield_at_least") {
+    throw new Error("tcg_v0_2_requirement_source_shield_predicate_invalid");
+  }
+  const threshold = Number(value.value);
+  if (!Number.isFinite(threshold) || threshold <= 0) {
+    throw new Error("tcg_v0_2_requirement_source_shield_value_invalid");
+  }
+  return { predicate: "source_has_shield_at_least", value: threshold };
+}
+
+export function evaluateRuntimeV02SourceHasShieldAtLeastRequirement(
+  sourceCreature: unknown,
+  rawRequirement: RuntimeV02SourceHasShieldAtLeastRequirement,
+): RuntimeV02SourceHasShieldAtLeastRequirementEvaluation {
+  const requirement = normalizeRuntimeV02SourceHasShieldAtLeastRequirement(rawRequirement);
+  const source = objectRecord(
+    sourceCreature,
+    "tcg_v0_2_requirement_source_shield_source_invalid",
+  );
+  const shield = Number(source.shield ?? 0);
+  if (!Number.isFinite(shield) || shield < 0) {
+    throw new Error("tcg_v0_2_requirement_source_shield_amount_invalid");
+  }
+  return {
+    predicate: "source_has_shield_at_least",
+    matched: shield >= requirement.value,
+    required_shield: requirement.value,
+    actual_shield: shield,
+  };
+}
+
+export function normalizeRuntimeV02TargetPrintedHpAtLeastRequirement(
+  raw: unknown,
+): RuntimeV02TargetPrintedHpAtLeastRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_target_printed_hp_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "target", "value"],
+    "tcg_v0_2_requirement_target_printed_hp_field_unsupported",
+  );
+  if (value.predicate !== "target_printed_hp_at_least") {
+    throw new Error("tcg_v0_2_requirement_target_printed_hp_predicate_invalid");
+  }
+  const target = requiredString(
+    value.target,
+    "tcg_v0_2_requirement_target_printed_hp_target_required",
+  );
+  const threshold = Number(value.value);
+  if (!Number.isFinite(threshold) || threshold <= 0) {
+    throw new Error("tcg_v0_2_requirement_target_printed_hp_threshold_invalid");
+  }
+  return { predicate: "target_printed_hp_at_least", target, value: threshold };
+}
+
+export function evaluateRuntimeV02TargetPrintedHpAtLeastRequirement(
+  printedHp: unknown,
+  rawRequirement: RuntimeV02TargetPrintedHpAtLeastRequirement,
+): RuntimeV02TargetPrintedHpAtLeastRequirementEvaluation {
+  const requirement = normalizeRuntimeV02TargetPrintedHpAtLeastRequirement(rawRequirement);
+  const hp = Number(printedHp);
+  if (!Number.isFinite(hp) || hp < 0) {
+    throw new Error("tcg_v0_2_requirement_target_printed_hp_value_invalid");
+  }
+  return {
+    predicate: "target_printed_hp_at_least",
+    matched: hp >= requirement.value,
+    target: requirement.target,
+    required_hp: requirement.value,
+    actual_hp: hp,
   };
 }
 

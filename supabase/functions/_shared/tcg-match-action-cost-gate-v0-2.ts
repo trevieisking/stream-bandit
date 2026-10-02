@@ -124,6 +124,46 @@ function normalizedRequest<T extends RuntimeV02CardZoneInstance>(
   };
 }
 
+function normalizeStructuredAdditionalCostNode(
+  rawValue: unknown,
+): unknown {
+  const raw = objectRecord(rawValue);
+  if (!raw) return structuredClone(rawValue);
+  if (raw.kind != null) return structuredClone(raw);
+  if (raw.op === "CHOOSE_HAND_TO_DISCARD") {
+    const unsupported = Object.keys(raw).find((key) =>
+      !["op", "player", "count", "filters"].includes(key)
+    );
+    if (unsupported) {
+      throw new Error(
+        `tcg_v0_2_action_cost_hand_discard_field_unsupported:${unsupported}`,
+      );
+    }
+    if (raw.player !== "self") {
+      throw new Error("tcg_v0_2_action_cost_hand_discard_player_unsupported");
+    }
+    const count = Number(raw.count);
+    if (!Number.isInteger(count) || count < 1) {
+      throw new Error("tcg_v0_2_action_cost_hand_discard_count_invalid");
+    }
+    const filters = raw.filters == null ? null : objectRecord(raw.filters);
+    if (raw.filters != null && !filters) {
+      throw new Error("tcg_v0_2_action_cost_hand_discard_filters_invalid");
+    }
+    return {
+      kind: "hand_discard",
+      player: "self",
+      count,
+      ...(filters ? { filters: structuredClone(filters) } : {}),
+    };
+  }
+  return structuredClone(raw);
+}
+
+function normalizeStructuredAdditionalCosts(raw: unknown[]): unknown[] {
+  return raw.map((entry) => normalizeStructuredAdditionalCostNode(entry));
+}
+
 /**
  * Read-only structured metadata boundary for additional card costs.
  * Ability.costs is already canonical. Attack.cost remains attached-Essence
@@ -152,7 +192,7 @@ export function runtimeV02StructuredActionAdditionalCosts(
     if (!Array.isArray(ability.costs)) {
       throw new Error(`tcg_v0_2_action_cost_ability_costs_required:${id}`);
     }
-    return structuredClone(ability.costs);
+    return normalizeStructuredAdditionalCosts(ability.costs);
   }
 
   const attacks = Array.isArray(creature.attacks) ? creature.attacks : null;
@@ -165,7 +205,7 @@ export function runtimeV02StructuredActionAdditionalCosts(
   if (!Array.isArray(attack.costs)) {
     throw new Error(`tcg_v0_2_action_cost_attack_costs_invalid:${id}`);
   }
-  return structuredClone(attack.costs);
+  return normalizeStructuredAdditionalCosts(attack.costs);
 }
 
 function binding<T extends RuntimeV02CardZoneInstance>(

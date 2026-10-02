@@ -1,4 +1,6 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import { runtimeV02EvaluateAttackIf } from "./tcg-match-attack-if-v0-2.ts";
+import { type RuntimeV02ConditionCreature } from "./tcg-match-condition-engine-v0-2.ts";
 import {
   runtimeV02ApplyCardZoneTransfer,
   type RuntimeV02CardZoneInstance,
@@ -196,7 +198,7 @@ export function runtimeV02ResolveAfterDamageDeckDiscard(
   seat: 1 | 2,
   descriptor: RuntimeV02AttackDeckDiscardDescriptor,
   sourceInstance: unknown,
-  targetHasAnyCondition: boolean,
+  targetCreature: RuntimeV02ConditionCreature,
 ): RuntimeV02AttackDeckDiscardResolution {
   if (descriptor.phase !== "after_damage") {
     throw new Error("tcg_v0_2_attack_deck_discard_phase_unsupported");
@@ -230,8 +232,19 @@ export function runtimeV02ResolveAfterDamageDeckDiscard(
   const opponent = playerForSeat(state, discardedControllerSeat);
   const deck = opponent.deck as RuntimeV02CardZoneInstance[];
   const discard = opponent.discard as RuntimeV02CardZoneInstance[];
+  const sourceCreature = objectRecord(sourcePlayer.vanguard) ?? { damage: 0, shield: 0 };
+  const conditionMet = runtimeV02EvaluateAttackIf(descriptor.when, {
+    source_creature: sourceCreature,
+    attack_target: targetCreature,
+    self_reserve: Array.isArray(sourcePlayer.reserve) ? sourcePlayer.reserve : [],
+    opponent_reserve: Array.isArray(opponent.reserve) ? opponent.reserve : [],
+    variables: {},
+    current_action_events: {},
+    target_remains_in_play_after_damage: true,
+    card_matches: () => false,
+  });
 
-  if (!targetHasAnyCondition) {
+  if (!conditionMet) {
     return {
       attack_id: descriptor.attack_id,
       condition_met: false,

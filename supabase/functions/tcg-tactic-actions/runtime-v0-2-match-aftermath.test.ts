@@ -164,3 +164,32 @@ Deno.test("Aftermath foundation does not advance turns, resolve defeats, or crea
   const queue = (s as Record<string, unknown>).pending_resolutions as unknown[];
   assert(queue.length === 1, "Aftermath foundation changed the resolution queue");
 });
+
+Deno.test("TIMEFOLD aftermath skips only Condition transition and preserves cleanup", () => {
+  const s = state();
+  const vanguard = s.players["1"].vanguard!;
+  vanguard.conditions = { scorched: true, venomed: 10, control: null, modifier: "Drenched" };
+  vanguard.flags = { lifecycle_attack_bonus: { turn_seq: 4, amount: 20 }, keep_me: true };
+  vanguard.essence = [{
+    ...card("temporary"),
+    effect_flags: {
+      discard_during_target_aftermath: true,
+      runtime_v0_2_effect_attachment_state: { kind: "temporary", expires: "controller_aftermath", destination_on_expire: "discard" },
+    },
+  }];
+  let coinCalls = 0;
+  let damageCalls = 0;
+  const result = runtimeV02ResolveAftermath(
+    s,
+    1,
+    () => { coinCalls += 1; return "tails"; },
+    () => { damageCalls += 1; },
+    { skip_condition_transition: true },
+  );
+  assert(result.condition_result === null, "TIMEFOLD created Condition aftermath");
+  assert(coinCalls === 0 && damageCalls === 0, "TIMEFOLD ran skipped Condition transition");
+  assert(vanguard.conditions.scorched === true && vanguard.conditions.venomed === 10, "TIMEFOLD mutated skipped Conditions");
+  assert(vanguard.flags?.lifecycle_attack_bonus == null, "TIMEFOLD skipped ordinary lifecycle cleanup");
+  assert(vanguard.flags?.keep_me === true, "TIMEFOLD changed unrelated lifecycle state");
+  assert(result.transfer_plans.length === 1, "TIMEFOLD skipped temporary Essence disposition");
+});

@@ -1,6 +1,8 @@
 import {
   recordRuntimeV02HiddenInformationView,
   runtimeV02CurrentTurnHiddenInformationViews,
+  runtimeV02PendingHiddenInformationOccurrences,
+  runtimeV02TakeHiddenInformationOccurrences,
 } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 
 function assertEquals(actual: unknown, expected: unknown, message = "values differ") {
@@ -109,5 +111,90 @@ Deno.test("hidden-information ledger fails closed on malformed state or entries"
       runtime_hidden_information_views_v0_2: [{ turn_seq: 1, controller_seat: 1, zone: "deck", card_id: "must-not-be-stored" }],
     }, 1),
     "tcg_v0_2_hidden_information_entry_field_unsupported:0:card_id",
+  );
+});
+
+
+Deno.test("hidden-information trigger occurrences stay distinct while history remains de-duplicated", () => {
+  const state: Record<string, unknown> = { turn_seq: 13 };
+  const source = {
+    action_kind: "ability",
+    source_controller_seat: 1 as const,
+    source_action_id: "forecast",
+    source_card_uid: "source-uid",
+    source_creature_uid: "source-uid",
+    phase: "play",
+  };
+  recordRuntimeV02HiddenInformationView(state, 1, "deck_top", source);
+  recordRuntimeV02HiddenInformationView(state, 1, "deck_top", source);
+
+  assertJsonEquals(runtimeV02CurrentTurnHiddenInformationViews(state, 1), [
+    { turn_seq: 13, controller_seat: 1, zone: "deck_top" },
+  ]);
+  const pending = runtimeV02PendingHiddenInformationOccurrences(state);
+  assertEquals(pending.length, 2);
+  assertEquals(pending[0].occurrence_id, "hidden-information-viewed:13:1:1");
+  assertEquals(pending[1].occurrence_id, "hidden-information-viewed:13:2:1");
+  assertEquals(pending[0].source_creature_uid, "source-uid");
+  const serialized = JSON.stringify(pending);
+  if (
+    serialized.includes("cards") ||
+    serialized.includes("card_id") ||
+    serialized.includes("ordering") ||
+    serialized.includes("options")
+  ) {
+    throw new Error("hidden-information occurrence leaked private viewed-card payload");
+  }
+});
+
+Deno.test("taking hidden-information occurrences clears only the trigger queue", () => {
+  const state: Record<string, unknown> = { turn_seq: 14 };
+  recordRuntimeV02HiddenInformationView(state, 2, "deck", {
+    action_kind: "tactic",
+    source_controller_seat: 2,
+    source_action_id: "search-device",
+    source_card_uid: "device-uid",
+    source_creature_uid: null,
+    phase: "effect_resolution",
+  });
+  const taken = runtimeV02TakeHiddenInformationOccurrences(state);
+  assertEquals(taken.length, 1);
+  assertJsonEquals(runtimeV02PendingHiddenInformationOccurrences(state), []);
+  assertJsonEquals(runtimeV02CurrentTurnHiddenInformationViews(state, 2), [
+    { turn_seq: 14, controller_seat: 2, zone: "deck" },
+  ]);
+});
+
+Deno.test("hidden-information occurrence provenance fails closed when incomplete or stale", () => {
+  assertThrows(
+    () => recordRuntimeV02HiddenInformationView(
+      { turn_seq: 15 },
+      1,
+      "deck_top",
+      {
+        action_kind: "",
+        source_controller_seat: 1,
+        source_action_id: "a",
+        source_card_uid: "c",
+        source_creature_uid: "c",
+        phase: "play",
+      },
+    ),
+    "tcg_v0_2_hidden_information_action_kind_required",
+  );
+
+  const state: Record<string, unknown> = { turn_seq: 15 };
+  recordRuntimeV02HiddenInformationView(state, 1, "deck_top", {
+    action_kind: "attack",
+    source_controller_seat: 1,
+    source_action_id: "attack-1",
+    source_card_uid: "creature-uid",
+    source_creature_uid: "creature-uid",
+    phase: "attack_effect_resolution",
+  });
+  state.turn_seq = 16;
+  assertThrows(
+    () => runtimeV02PendingHiddenInformationOccurrences(state),
+    "tcg_v0_2_hidden_information_occurrence_queue_stale",
   );
 });

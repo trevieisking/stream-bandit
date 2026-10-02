@@ -43,6 +43,43 @@ export type RuntimeV02EssenceAttachmentTransaction = {
   lifecycle_registered: boolean | null;
 };
 
+export type RuntimeV02ManualEssenceAttachmentTarget = {
+  where: "vanguard" | "reserve";
+  index: number | null;
+  anchor_uid: string;
+};
+
+export type RuntimeV02ManualEssenceAttachmentTargetListResult =
+  | {
+      ok: true;
+      eligible: true;
+      card_uid: string;
+      legal_targets: RuntimeV02ManualEssenceAttachmentTarget[];
+    }
+  | {
+      ok: true;
+      eligible: false;
+      card_uid: string;
+      legal_targets: [];
+      reason: "manual_essence_already_used_this_turn" | "essence_card_required";
+    };
+
+export type RuntimeV02ManualEssenceAttachmentDeclarationResult =
+  | {
+      ok: true;
+      card_uid: string;
+      target_creature_uid: string;
+      where: "vanguard" | "reserve";
+      index: number | null;
+    }
+  | {
+      ok: false;
+      error:
+        | "manual_essence_already_used_this_turn"
+        | "target_creature_not_found"
+        | "essence_card_required";
+    };
+
 function objectRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
     ? value as Record<string, unknown>
@@ -187,6 +224,142 @@ function preflightReceiptAndEvent(
     sourceActionId,
     options,
   );
+}
+
+function manualEssenceTurnUsed(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+): boolean {
+  const flags = objectRecord(objectRecord(state.turn_flags)?.[String(controllerSeat)]);
+  return Number(flags?.manual_essence_turn ?? -1) === turn(state);
+}
+
+function manualEssenceSource(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  sourceCardUid: string,
+): RuntimeV02AttachmentInstance | null {
+  const owner = player(state, controllerSeat);
+  if (!Array.isArray(owner.hand)) return null;
+  const uid = typeof sourceCardUid === "string" ? sourceCardUid.trim() : "";
+  if (!uid) return null;
+  const source = (owner.hand as RuntimeV02AttachmentInstance[]).find((item) => item?.uid === uid) ?? null;
+  if (!source?.card_id) return null;
+  const definition = runtimeV02Definition(state, source);
+  if (!definition || String(definition.card_family || "") !== "Essence") return null;
+  return source;
+}
+
+function manualEssenceTargets(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+): Array<RuntimeV02ManualEssenceAttachmentTarget & { creature: RuntimeV02AttachmentCreature }> {
+  const owner = player(state, controllerSeat);
+  const candidates: Array<["vanguard" | "reserve", number | null, unknown]> = [
+    ["vanguard", null, owner.vanguard],
+    ...[0, 1, 2, 3].map((index) => [
+      "reserve",
+      index,
+      (owner.reserve as unknown[])[index],
+    ] as ["reserve", number, unknown]),
+  ];
+  const out: Array<RuntimeV02ManualEssenceAttachmentTarget & { creature: RuntimeV02AttachmentCreature }> = [];
+  for (const [where, index, raw] of candidates) {
+    if (raw == null) continue;
+    const found = creature(raw);
+    if (!found) throw new Error("tcg_v0_2_manual_essence_target_creature_invalid");
+    const top = found.stack[found.stack.length - 1];
+    if (!top?.uid) throw new Error("tcg_v0_2_manual_essence_target_anchor_required");
+    out.push({ where, index, anchor_uid: top.uid, creature: found });
+  }
+  return out;
+}
+
+/**
+ * Read-only manual Essence target projection for the current controller.
+ *
+ * This belongs to the existing Essence Attachment owner. It performs no mutation
+ * and intentionally returns only coordinates plus public anchor identity, so the
+ * browser never needs to classify Essence cards or reconstruct target legality.
+ */
+export function runtimeV02ListManualEssenceAttachmentTargets(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  sourceCardUid: string,
+): RuntimeV02ManualEssenceAttachmentTargetListResult {
+  const controller = seat(controllerSeat, "tcg_v0_2_manual_essence_controller_seat_invalid");
+  const uid = typeof sourceCardUid === "string" ? sourceCardUid.trim() : "";
+  if (manualEssenceTurnUsed(state, controller)) {
+    return {
+      ok: true,
+      eligible: false,
+      card_uid: uid,
+      legal_targets: [],
+      reason: "manual_essence_already_used_this_turn",
+    };
+  }
+  if (!manualEssenceSource(state, controller, uid)) {
+    return {
+      ok: true,
+      eligible: false,
+      card_uid: uid,
+      legal_targets: [],
+      reason: "essence_card_required",
+    };
+  }
+  return {
+    ok: true,
+    eligible: true,
+    card_uid: uid,
+    legal_targets: manualEssenceTargets(state, controller).map(({ where, index, anchor_uid }) => ({
+      where,
+      index,
+      anchor_uid,
+    })),
+  };
+}
+
+/**
+ * Final structured manual Essence declaration validation.
+ *
+ * Error precedence preserves the current public dispatcher contract:
+ * turn-use lock -> target existence -> Essence source card.
+ * The attachment transaction still performs exact-instance/lifecycle validation
+ * again before any source-zone or Creature mutation.
+ */
+export function runtimeV02ValidateManualEssenceAttachmentDeclaration(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  sourceCardUid: string,
+  whereValue: string,
+  indexValue: number | null,
+): RuntimeV02ManualEssenceAttachmentDeclarationResult {
+  const controller = seat(controllerSeat, "tcg_v0_2_manual_essence_controller_seat_invalid");
+  if (manualEssenceTurnUsed(state, controller)) {
+    return { ok: false, error: "manual_essence_already_used_this_turn" };
+  }
+
+  const where = whereValue === "vanguard" ? "vanguard" : whereValue === "reserve" ? "reserve" : null;
+  const index = indexValue == null ? null : Number(indexValue);
+  const found = where == null
+    ? null
+    : manualEssenceTargets(state, controller).find((candidate) =>
+        candidate.where === where &&
+        (where === "vanguard" ? index === null : candidate.index === index)
+      ) ?? null;
+  if (!found) return { ok: false, error: "target_creature_not_found" };
+
+  const uid = typeof sourceCardUid === "string" ? sourceCardUid.trim() : "";
+  if (!manualEssenceSource(state, controller, uid)) {
+    return { ok: false, error: "essence_card_required" };
+  }
+  return {
+    ok: true,
+    card_uid: uid,
+    target_creature_uid: found.anchor_uid,
+    where: found.where,
+    index: found.index,
+  };
 }
 
 /**

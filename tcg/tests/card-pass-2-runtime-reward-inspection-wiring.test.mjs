@@ -5,6 +5,7 @@ import fs from 'node:fs';
 const matchSource = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 const authoritySource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-authority-v0-2.ts', 'utf8');
 const rewardSource = fs.readFileSync('supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts', 'utf8');
+const inspectionSource = fs.readFileSync('supabase/functions/_shared/tcg-match-inspection-v0-2.ts', 'utf8');
 const capabilities = JSON.parse(fs.readFileSync('tcg-runtime-capabilities-v0.2.json', 'utf8'));
 
 function viewSlice() {
@@ -44,9 +45,26 @@ test('Reward Arc authority consumes only the canonical current-turn inspection l
   );
 });
 
-test('bounded Reward owner does not claim generic INSPECT_ZONE interpreter parity', () => {
+test('bounded Reward owner stays narrow while generic INSPECT_ZONE parity belongs to the inspection submodule', () => {
   assert.ok(
+    rewardSource.includes('ability.event !== "creature_evolved"'),
+    'Reward owner must remain bounded to its evolution specialist route',
+  );
+  assert.ok(
+    inspectionSource.includes('runtimeV02NormalizeInspectZoneStep'),
+    'generic INSPECT_ZONE grammar must live in the inspection submodule',
+  );
+  assert.ok(
+    inspectionSource.includes('runtimeV02ResolveRewardInspectionChoice'),
+    'generic Reward inspection must delegate back to the Reward owner',
+  );
+  assert.ok(
+    capabilities.operations.implemented.includes('INSPECT_ZONE'),
+    'all-surface INSPECT_ZONE capability must be classified implemented after V2.4.97',
+  );
+  assert.equal(
     capabilities.operations.missing.includes('INSPECT_ZONE'),
-    'narrow evolution Reward inspection must not be advertised as generic INSPECT_ZONE support',
+    false,
+    'INSPECT_ZONE must not remain missing after all 13 frozen consumers are proven',
   );
 });

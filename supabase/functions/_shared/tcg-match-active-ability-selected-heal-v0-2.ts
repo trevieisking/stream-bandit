@@ -550,3 +550,517 @@ export function runtimeV02ResolveActiveAbilitySelectedHealChoice(
     emitted_packet_ids: resolved.packet ? [resolved.packet.id] : [],
   };
 }
+
+
+export type RuntimeV02ActiveAbilitySelectedHealEachDescriptor = {
+  ability_id: string;
+  timing: "own_turn";
+  limit: { scope: "turn"; count: 1; owner: "controller" };
+  reserve_count_at_least: number;
+  target: {
+    controller: "self";
+    zone: "field";
+    min: number;
+    max: number;
+    damaged: true;
+  };
+  heal_amount: number;
+};
+
+export type RuntimeV02PendingActiveAbilitySelectedHealEachChoice = {
+  id: string;
+  seat: 1 | 2;
+  kind: "heal_each_selected_damaged_friendly_creature";
+  ability_id: string;
+  prompt: string;
+  min: number;
+  max: number;
+  declared_max: number;
+  turn_seq: number;
+  source_where: RuntimeFieldWhere;
+  source_index: number | null;
+  source_uid: string;
+  source_card_id: string;
+  reserve_count_at_least: number;
+  heal_amount: number;
+  options: RuntimeV02ActiveAbilitySelectedHealOption[];
+};
+
+export type RuntimeV02ActiveAbilitySelectedHealEachResolution = {
+  kind: "heal_each_selected_damaged_friendly_creature";
+  ability_id: string;
+  choice_id: string;
+  selected_count: number;
+  requested_heal_each: number;
+  actual_heal_total: number;
+  actual_heals: Array<{
+    target_uid: string;
+    requested_heal: number;
+    actual_heal: number;
+  }>;
+  emitted_packet_ids: string[];
+};
+
+function exactSelectionRange(
+  raw: unknown,
+  abilityId: string,
+): { min: number; max: number } {
+  const range = objectRecord(raw);
+  if (!range) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_count_required:${abilityId}`,
+    );
+  }
+  rejectUnsupportedFields(
+    range,
+    ["min", "max"],
+    `tcg_v0_2_active_ability_heal_each_count_field_unsupported:${abilityId}`,
+  );
+  const min = Number(range.min);
+  const max = Number(range.max);
+  if (
+    !Number.isInteger(min) ||
+    !Number.isInteger(max) ||
+    min < 0 ||
+    max < min ||
+    max < 1
+  ) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_count_invalid:${abilityId}`,
+    );
+  }
+  return { min, max };
+}
+
+function exactReserveCountRequirement(
+  raw: unknown,
+  abilityId: string,
+): number {
+  const requirements = objectRecord(raw);
+  if (!requirements) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_requirements_invalid:${abilityId}`,
+    );
+  }
+  rejectUnsupportedFields(
+    requirements,
+    ["all"],
+    `tcg_v0_2_active_ability_heal_each_requirements_field_unsupported:${abilityId}`,
+  );
+  if (!Array.isArray(requirements.all) || requirements.all.length !== 1) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_requirements_shape_unsupported:${abilityId}`,
+    );
+  }
+  const requirement = objectRecord(requirements.all[0]);
+  if (!requirement) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_requirement_invalid:${abilityId}`,
+    );
+  }
+  rejectUnsupportedFields(
+    requirement,
+    ["predicate", "controller", "count"],
+    `tcg_v0_2_active_ability_heal_each_requirement_field_unsupported:${abilityId}`,
+  );
+  if (
+    requirement.predicate !== "reserve_count_at_least" ||
+    requirement.controller !== "self"
+  ) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_requirement_unsupported:${abilityId}`,
+    );
+  }
+  const count = Number(requirement.count);
+  if (!Number.isInteger(count) || count < 1) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_reserve_count_invalid:${abilityId}`,
+    );
+  }
+  return count;
+}
+
+function currentFriendlyReserveCount(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+): number {
+  const player = playerForSeat(state, controllerSeat);
+  return (player.reserve as unknown[]).filter((entry) => entry != null).length;
+}
+
+function healEachTargetEntries(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+): RuntimeFieldTarget[] {
+  const player = playerForSeat(state, controllerSeat);
+  const out: RuntimeFieldTarget[] = [];
+  const inspect = (
+    raw: unknown,
+    where: RuntimeFieldWhere,
+    index: number | null,
+  ) => {
+    const creature = objectRecord(raw);
+    if (!creature) return;
+    if (!Array.isArray(creature.stack) || creature.stack.length < 1) {
+      throw new Error(
+        "tcg_v0_2_active_ability_heal_each_target_stack_invalid",
+      );
+    }
+    const damage = Number(creature.damage ?? 0);
+    if (!Number.isFinite(damage) || damage < 0) {
+      throw new Error(
+        "tcg_v0_2_active_ability_heal_each_target_damage_invalid",
+      );
+    }
+    if (damage <= 0) return;
+    const top = runtimeInst(
+      creature.stack[creature.stack.length - 1],
+      "tcg_v0_2_active_ability_heal_each_target_top_invalid",
+    );
+    out.push({
+      where,
+      index,
+      creature: creature as RuntimeCreature & { stack?: unknown[] },
+      top,
+      element: definitionElement(state, top),
+    });
+  };
+  inspect(player.vanguard, "vanguard", null);
+  for (let index = 0; index < 4; index += 1) {
+    inspect((player.reserve as unknown[])[index], "reserve", index);
+  }
+  return out;
+}
+
+/**
+ * Recognizes the bounded multi-target active-Ability heal family:
+ * SELECT_CREATURE self field 0..N damaged -> HEAL_EACH selected.
+ *
+ * It is intentionally operation-shaped and card-id-free. The existing selected
+ * heal owner remains the only active-Ability owner for the player choice,
+ * once-per-turn receipt, canonical Heal Packet mutation and emitted heal packets.
+ */
+export function structuredRuntimeActiveAbilitySelectedHealEach(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+): RuntimeV02ActiveAbilitySelectedHealEachDescriptor | null {
+  const definition = runtimeV02Definition(state, instanceOrId);
+  if (!definition) return null;
+  if (String(definition.card_family || "") !== "Creature") return null;
+  const creature = objectRecord(definition.creature);
+  const ability = creature ? objectRecord(creature.ability) : null;
+  if (!ability || String(ability.mode || "") !== "active") return null;
+  const steps = Array.isArray(ability.steps) ? ability.steps : null;
+  if (!steps || steps.length !== 2) return null;
+  const select = objectRecord(steps[0]);
+  const healEach = objectRecord(steps[1]);
+  if (
+    !select ||
+    !healEach ||
+    select.op !== "SELECT_CREATURE" ||
+    healEach.op !== "HEAL_EACH"
+  ) return null;
+
+  const abilityId = requiredString(
+    ability.id,
+    "tcg_v0_2_active_ability_heal_each_ability_id_required",
+  );
+  rejectUnsupportedFields(
+    ability,
+    ["id", "name", "mode", "event", "timing", "limit", "requirements", "costs", "steps"],
+    `tcg_v0_2_active_ability_heal_each_ability_field_unsupported:${abilityId}`,
+  );
+  if (ability.event !== null || ability.timing !== "own_turn") {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_timing_unsupported:${abilityId}`,
+    );
+  }
+  if (!Array.isArray(ability.costs) || ability.costs.length !== 0) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_costs_unsupported:${abilityId}`,
+    );
+  }
+  const limit = exactLimit(ability.limit, abilityId);
+  const reserveCountAtLeast = exactReserveCountRequirement(
+    ability.requirements,
+    abilityId,
+  );
+
+  rejectUnsupportedFields(
+    select,
+    ["op", "controller", "zone", "count", "filters", "as"],
+    `tcg_v0_2_active_ability_heal_each_select_field_unsupported:${abilityId}`,
+  );
+  if (select.controller !== "self" || select.zone !== "field") {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_select_shape_unsupported:${abilityId}`,
+    );
+  }
+  const range = exactSelectionRange(select.count, abilityId);
+  const filters = objectRecord(select.filters);
+  if (!filters) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_select_filters_invalid:${abilityId}`,
+    );
+  }
+  rejectUnsupportedFields(
+    filters,
+    ["damaged"],
+    `tcg_v0_2_active_ability_heal_each_select_filters_field_unsupported:${abilityId}`,
+  );
+  if (filters.damaged !== true) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_select_filters_unsupported:${abilityId}`,
+    );
+  }
+  const variable = requiredString(
+    select.as,
+    `tcg_v0_2_active_ability_heal_each_select_variable_required:${abilityId}`,
+  );
+
+  rejectUnsupportedFields(
+    healEach,
+    ["op", "targets", "amount"],
+    `tcg_v0_2_active_ability_heal_each_step_field_unsupported:${abilityId}`,
+  );
+  if (healEach.targets !== `$${variable}`) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_target_variable_mismatch:${abilityId}`,
+    );
+  }
+  const healAmount = Number(healEach.amount);
+  if (!Number.isFinite(healAmount) || healAmount <= 0) {
+    throw new Error(
+      `tcg_v0_2_active_ability_heal_each_amount_invalid:${abilityId}`,
+    );
+  }
+  return {
+    ability_id: abilityId,
+    timing: "own_turn",
+    limit,
+    reserve_count_at_least: reserveCountAtLeast,
+    target: {
+      controller: "self",
+      zone: "field",
+      min: range.min,
+      max: range.max,
+      damaged: true,
+    },
+    heal_amount: healAmount,
+  };
+}
+
+export function runtimeV02BuildActiveAbilitySelectedHealEachChoice(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  descriptor: RuntimeV02ActiveAbilitySelectedHealEachDescriptor,
+  source: { where: RuntimeFieldWhere; index: number | null; instance: unknown },
+  choiceId: string = crypto.randomUUID(),
+): RuntimeV02PendingActiveAbilitySelectedHealEachChoice {
+  const controller = seat(controllerSeat);
+  if (!choiceId) {
+    throw new Error("tcg_v0_2_active_ability_heal_each_choice_id_required");
+  }
+  if (state.active_seat !== controller) {
+    throw new Error("tcg_v0_2_active_ability_heal_not_active_seat");
+  }
+  if (
+    runtimeV02CurrentTurnActiveAbilityUseCount(
+      state,
+      controller,
+      descriptor.ability_id,
+    ) !== 0
+  ) {
+    throw new Error("tcg_v0_2_active_ability_heal_turn_limit_reached");
+  }
+  if (
+    currentFriendlyReserveCount(state, controller) <
+      descriptor.reserve_count_at_least
+  ) {
+    throw new Error(
+      "tcg_v0_2_active_ability_heal_each_reserve_requirement_not_met",
+    );
+  }
+  const instance = runtimeInst(
+    source.instance,
+    "tcg_v0_2_active_ability_heal_source_identity_invalid",
+  );
+  const actualSource = sourceTop(
+    state,
+    controller,
+    source.where,
+    source.index,
+  );
+  if (!sameInst(actualSource, instance)) {
+    throw new Error("tcg_v0_2_active_ability_heal_source_changed");
+  }
+  const options = targetOptions(healEachTargetEntries(state, controller));
+  if (options.length < descriptor.target.min) {
+    throw new Error("tcg_v0_2_active_ability_heal_target_unavailable");
+  }
+  return {
+    id: choiceId,
+    seat: controller,
+    kind: "heal_each_selected_damaged_friendly_creature",
+    ability_id: descriptor.ability_id,
+    prompt: `Choose up to ${descriptor.target.max} damaged friendly Creatures to heal`,
+    min: descriptor.target.min,
+    max: Math.min(descriptor.target.max, options.length),
+    declared_max: descriptor.target.max,
+    turn_seq: currentTurn(state),
+    source_where: source.where,
+    source_index: source.index,
+    source_uid: instance.uid,
+    source_card_id: instance.card_id,
+    reserve_count_at_least: descriptor.reserve_count_at_least,
+    heal_amount: descriptor.heal_amount,
+    options,
+  };
+}
+
+export function runtimeV02PendingActiveAbilitySelectedHealEachChoiceView(
+  choice: RuntimeV02PendingActiveAbilitySelectedHealEachChoice | null | undefined,
+  viewerSeat: 1 | 2,
+) {
+  if (!choice) return null;
+  if (choice.seat !== viewerSeat) {
+    return { id: choice.id, seat: choice.seat, kind: choice.kind, waiting: true };
+  }
+  return {
+    id: choice.id,
+    seat: choice.seat,
+    kind: choice.kind,
+    prompt: choice.prompt,
+    min: choice.min,
+    max: choice.max,
+    options: choice.options.map((option) => ({
+      id: option.id,
+      label: option.label,
+    })),
+  };
+}
+
+export function runtimeV02ResolveActiveAbilitySelectedHealEachChoice(
+  choice: RuntimeV02PendingActiveAbilitySelectedHealEachChoice,
+  controllerSeat: 1 | 2,
+  choiceId: string,
+  selectedIds: string[],
+  state: Record<string, unknown>,
+): RuntimeV02ActiveAbilitySelectedHealEachResolution {
+  const controller = seat(controllerSeat);
+  if (choice.seat !== controller) {
+    throw new Error("tcg_v0_2_active_ability_heal_choice_not_yours");
+  }
+  if (!choiceId || choice.id !== choiceId) {
+    throw new Error("tcg_v0_2_active_ability_heal_choice_stale_id");
+  }
+  if (currentTurn(state) !== choice.turn_seq) {
+    throw new Error("tcg_v0_2_active_ability_heal_turn_changed");
+  }
+  if (state.active_seat !== controller) {
+    throw new Error("tcg_v0_2_active_ability_heal_active_seat_changed");
+  }
+  if (
+    currentFriendlyReserveCount(state, controller) <
+      choice.reserve_count_at_least
+  ) {
+    throw new Error("tcg_v0_2_active_ability_heal_requirement_changed");
+  }
+  const source = sourceTop(
+    state,
+    controller,
+    choice.source_where,
+    choice.source_index,
+  );
+  if (
+    source.uid !== choice.source_uid ||
+    source.card_id !== choice.source_card_id
+  ) {
+    throw new Error("tcg_v0_2_active_ability_heal_source_changed");
+  }
+  if (
+    runtimeV02CurrentTurnActiveAbilityUseCount(
+      state,
+      controller,
+      choice.ability_id,
+    ) !== 1
+  ) {
+    throw new Error("tcg_v0_2_active_ability_heal_limit_receipt_missing");
+  }
+
+  if (!Array.isArray(selectedIds) || new Set(selectedIds).size !== selectedIds.length) {
+    throw new Error("tcg_v0_2_active_ability_heal_each_selection_invalid");
+  }
+  if (selectedIds.length < choice.min || selectedIds.length > choice.max) {
+    throw new Error(
+      "tcg_v0_2_active_ability_heal_each_selection_count_invalid",
+    );
+  }
+
+  const currentTargets = healEachTargetEntries(state, controller);
+  const currentOptions = targetOptions(currentTargets);
+  if (!sameOptionSet(choice.options, currentOptions)) {
+    throw new Error("tcg_v0_2_active_ability_heal_target_set_changed");
+  }
+
+  // Rebind every selected target before any heal mutation.
+  const selectedTargets = selectedIds.map((selectedId) => {
+    const option = choice.options.find((candidate) => candidate.id === selectedId);
+    if (!option) {
+      throw new Error("tcg_v0_2_active_ability_heal_each_unknown_option");
+    }
+    const target = currentTargets.find((entry) => optionId(entry) === option.id);
+    if (!target) throw new Error("tcg_v0_2_active_ability_heal_target_changed");
+    return { option, target };
+  });
+
+  const actualHeals: RuntimeV02ActiveAbilitySelectedHealEachResolution["actual_heals"] = [];
+  const emittedPacketIds: string[] = [];
+  let actualHealTotal = 0;
+  for (const { target } of selectedTargets) {
+    const packetContext: RuntimeV02HealPacketContext = {
+      source: {
+        controller_seat: controller,
+        action_kind: "ability",
+        action_id: choice.ability_id,
+        card_effect: true,
+        card_uid: source.uid,
+        card_id: source.card_id,
+        creature_uid: source.uid,
+      },
+      target: {
+        controller_seat: controller,
+        creature_uid: target.top.uid,
+        card_uid: target.top.uid,
+        card_id: target.top.card_id,
+        element: target.element,
+        where: target.where,
+        index: target.index,
+      },
+    };
+    const resolved = applyRuntimeV02HealPacket(
+      state,
+      target.creature,
+      choice.heal_amount,
+      packetContext,
+    );
+    actualHealTotal += resolved.actual_heal;
+    actualHeals.push({
+      target_uid: target.top.uid,
+      requested_heal: resolved.requested_amount,
+      actual_heal: resolved.actual_heal,
+    });
+    if (resolved.packet) emittedPacketIds.push(resolved.packet.id);
+  }
+
+  return {
+    kind: "heal_each_selected_damaged_friendly_creature",
+    ability_id: choice.ability_id,
+    choice_id: choice.id,
+    selected_count: selectedTargets.length,
+    requested_heal_each: choice.heal_amount,
+    actual_heal_total: actualHealTotal,
+    actual_heals: actualHeals,
+    emitted_packet_ids: emittedPacketIds,
+  };
+}
