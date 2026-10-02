@@ -1,6 +1,6 @@
 {
   "schema": "stream-bandit-tcg-battle-client-interaction-v1",
-  "recorded_at": "2026-09-20",
+  "recorded_at": "2026-10-02",
   "authority": {
     "reference_video": "Dar match up test deck(1).mp4",
     "purpose": "Interaction choreography reference only; Stream Bandit retains original names, art, rules, card identities and UI design.",
@@ -18,22 +18,28 @@
     "opponent_position": "top",
     "player_position": "bottom",
     "vanguard_slots_per_player": 1,
-    "reserve_slots_per_player": 4,
+    "reserve_slots_per_player": "server_authoritative_internal_indices_only",
     "reward_cards_per_player": 6,
     "show_deck_pile": true,
     "show_discard_pile": true,
     "hand_position": "bottom_edge",
     "board_remains_visible_during_choices": true,
     "normal_browser_zoom_required": true,
-    "field_card_presentation": "bounded_compact_art_status_preview",
-    "full_card_presentation": "click_or_tap_opens_shared_inspect_face_with_moves_and_abilities",
-    "hand_behavior": "bottom_edge_peek_fan_horizontal_scroll",
-    "mobile_hand_behavior": "larger_cards_partially_clipped_below_bottom_rail_swipe_left_right",
+    "field_card_presentation": "clean_printed_card_face_plus_external_tabletop_damage_shield_condition_counters",
+    "full_card_presentation": "click_or_tap_opens_clean_shared_inspect_face; server action/readiness controls live in a separate dock below the card",
+    "hand_behavior": "bottom_edge_physical_card_tray_horizontal_scroll",
+    "mobile_hand_behavior": "large_partially_offscreen_cards_swipe_left_right_only; whole page remains fixed",
     "viewport_contract": "entire_battlefield_plus_hand_visible_in_one_device_viewport_at_normal_zoom",
     "source_card_stays_in_slot_during_inspection": true,
     "field_card_scale": "bounded_by_viewport_height_not_slot_fill",
     "hand_card_visibility": "show_upper_identity_and_art_in_rail; full card only in inspector",
-    "hand_cards_may_extend_below_visible_rail": true
+    "hand_cards_may_extend_below_visible_rail": true,
+    "bench_presentation": "single_continuous_zone",
+    "bench_capacity": "server_authoritative_and_future_expandable; browser renders current reserve array plus declared reserve_capacity when supplied",
+    "bench_empty_slot_presentation": "no permanent per-index boxes; one Bench destination appears for legal placement while occupied cards remain individually targetable",
+    "reward_presentation": "six_physical_face_down_card_backs",
+    "reward_choice_presentation": "fullscreen_face_down_reward_card_overlay",
+    "dynamic_runtime_text_inside_printed_card": false
   },
   "input_modes": {
     "desktop": [
@@ -72,7 +78,7 @@
         "opening_choice",
         "opening_hand",
         "place_vanguard",
-        "place_reserves",
+        "place_optional_bench_creatures",
         "confirm_setup",
         "install_rewards"
       ]
@@ -82,10 +88,10 @@
       "steps": [
         "tap_or_click_hand_card_to_inspect",
         "close_inspector_with_selection_preserved_for_tap_fallback_or_drag_card_directly",
-        "highlight_legal_slots",
-        "choose_slot_by_drop_or_tap",
+        "highlight_single_bench_destination",
+        "server_select_internal_reserve_index",
         "server_validate",
-        "animate_card_to_board"
+        "animate_card_to_bench"
       ]
     },
     {
@@ -135,12 +141,12 @@
     {
       "id": "creature_context",
       "steps": [
-        "tap_or_click_compact_field_card",
-        "keep_source_card_anchored_in_its_board_slot",
-        "open_full_canonical_card_inspector",
-        "show_ability_or_attack_slots",
-        "show_withdraw",
-        "show_legality_reason_for_locked_actions"
+        "tap_or_click_field_card",
+        "keep_source_card_anchored_in_its_board_position",
+        "open_clean_full_canonical_card_inspector",
+        "keep_printed_card_text_free_of_runtime_debug_state",
+        "show_ability_attack_and_withdraw_controls_in_external_action_dock",
+        "show_friendly_legality_reason_outside_card"
       ]
     },
     {
@@ -175,12 +181,12 @@
         "select_vanguard",
         "choose_withdraw",
         "show_withdraw_cost",
-        "highlight_legal_reserve_replacements",
+        "highlight_legal_bench_replacements",
         "choose_replacement",
         "server_preflight",
         "animate_payment",
-        "animate_vanguard_to_reserve",
-        "animate_reserve_to_vanguard",
+        "animate_vanguard_to_bench",
+        "animate_bench_creature_to_vanguard",
         "emit_switch_context"
       ]
     },
@@ -199,7 +205,7 @@
       "id": "forced_promotion",
       "steps": [
         "defeat_animation",
-        "highlight_legal_reserve_promotions",
+        "highlight_legal_bench_promotions",
         "choose_replacement",
         "server_resolve",
         "animate_to_vanguard"
@@ -208,11 +214,12 @@
     {
       "id": "reward_take",
       "steps": [
-        "open_reward_overlay",
-        "show_face_down_reward_positions",
-        "choose_required_count",
+        "open_fullscreen_reward_overlay",
+        "show_all_six_face_down_reward_positions",
+        "choose_exact_required_count",
         "server_commit",
-        "animate_rewards_to_hand_or_destination"
+        "animate_rewards_to_hand",
+        "close_overlay_and_continue_resolution"
       ]
     },
     {
@@ -256,7 +263,6 @@
     "attached_essence_element_orb_rail",
     "attack_cost_element_orbs",
     "touch_drag_legal_destination_glow",
-    "compact_field_card_art_status_preview",
     "full_card_inspector_without_board_reflow",
     "horizontal_hand_scroll_position",
     "bottom_edge_hand_peek_fan",
@@ -267,7 +273,13 @@
     "private_search_selection_counter",
     "searched_card_assignment_to_legal_targets",
     "post_search_return_and_shuffle_effect",
-    "reduced_motion_equivalent_feedback"
+    "reduced_motion_equivalent_feedback",
+    "single_continuous_bench_zone",
+    "physical_damage_shield_condition_counters_outside_printed_text",
+    "clean_printed_card_face_without_runtime_debug_copy",
+    "external_card_action_dock_for_server_legality",
+    "fullscreen_six_card_reward_choice",
+    "mobile_horizontal_hand_swipe_without_page_scroll"
   ],
   "forbidden_client_patterns": [
     "browser_prompt_for_gameplay_targeting",
@@ -275,7 +287,10 @@
     "generic_global_attack_buttons_as_primary_attack_ui",
     "hidden_opponent_card_leak",
     "debug_form_layout_as_release_battlefield",
-    "touch_drag_with_duplicate_client_legality_engine"
+    "touch_drag_with_duplicate_client_legality_engine",
+    "four_permanent_visual_reserve_boxes",
+    "runtime_server_error_or_readiness_text_inside_printed_card_face",
+    "tiny_side_pile_as_primary_reward_choice_ui"
   ],
   "essence_visibility": {
     "source_of_truth": "authoritative_creature_attached_essence_plus_structured_provides",
@@ -451,5 +466,22 @@
       "Tide": "wave_ripple_motion",
       "Volt": "pulse_arc_electric_motion"
     }
+  },
+  "reference_rendering_v2_4_133": {
+    "recorded_at": "2026-10-02",
+    "evidence": [
+      "Trevor/Kay completed a real match and Kay won.",
+      "Both players report the core game functions are acceptable; remaining complaint is rendering/feel.",
+      "Supplied gameplay reference is used only for interaction grammar, spatial presentation and physical-card feel."
+    ],
+    "locked_direction": [
+      "one continuous Bench zone instead of four visual Reserve boxes",
+      "server reserve indices remain transport/internal state only",
+      "future reserve_capacity can expand without a new board layout",
+      "six face-down Reward backs remain visible and Reward taking uses a fullscreen focused overlay",
+      "phone hand is a horizontal left/right swipe tray with partially off-screen cards",
+      "printed cards contain only card information; damage/shield/condition/readiness/legality live outside the printed face",
+      "Stream Bandit names, rules, artwork and visual identity remain original"
+    ]
   }
 }

@@ -54,7 +54,7 @@ const sandbox={window:{},document:{baseURI:'https://example.invalid/'},URL};
 vm.runInNewContext(source,sandbox,{filename:'stream-bandit-tcg-card-renderer-v2-4-51.js'});
 const renderer=sandbox.window.StreamBanditTCGCardRendererV2451;
 assert.ok(renderer);
-assert.equal(renderer.version,'2.4.55');
+assert.equal(renderer.version,'2.4.133-clean-tabletop-card-face');
 
 const orbit=registry.records.find(x=>x.card_id==='astral-orbitortoise');
 assert.ok(orbit);
@@ -87,11 +87,17 @@ assert.equal((railOnly.match(/data-essence-element="Tide"/g)||[]).length,3,'expa
 assert.ok(orbitHtml.includes('aria-label="Attack Cost: 2 Astral"'),'Attack cost must use the same element identity system as attached Essence');
 
 const notReadyHtml=renderer.renderCard(orbit,{mode:'battle',interactiveAttacks:true,attackStates:{1:{eligible:false,reason:'attack_essence_cost_not_met'},2:{eligible:true,reason:null}}});
-assert.ok(notReadyHtml.includes('Needs more matching Essence'));
-assert.ok(notReadyHtml.includes('Ready · Attack 2 · Turn ends after full resolution'));
 assert.ok(notReadyHtml.includes('data-attack-slot="1" aria-disabled="true"'));
 assert.ok(notReadyHtml.includes('data-attack-blocked-reason="Needs more matching Essence"'));
+assert.ok(notReadyHtml.includes('data-card-attack-ready="false"'));
 assert.ok(notReadyHtml.includes('data-attack-slot="2"'));
+assert.ok(notReadyHtml.includes('data-card-attack-ready="true"'));
+assert.ok(!notReadyHtml.includes('Turn ends after full resolution'),'runtime lifecycle text must stay outside the printed card face');
+assert.ok(!notReadyHtml.includes('Ready · Attack'),'runtime readiness text must stay outside the printed card face');
+
+const technicalReasonHtml=renderer.renderCard(orbit,{mode:'battle',interactiveAttacks:true,attackStates:{1:{eligible:false,reason:'tcg_v0_2_attack_legacy_compatibility_required:orbit-bash'}}});
+assert.ok(technicalReasonHtml.includes('data-attack-blocked-reason="Attack is not currently available"'));
+assert.ok(!technicalReasonHtml.includes('Tcg V0 2'),'server/debug codes must never become visible printed-card copy');
 
 const noArt=structuredClone(orbit);
 noArt.printing.artwork_status='missing';
@@ -103,7 +109,8 @@ assert.ok(noArtHtml.includes('Gravity Shell'));
 const active=registry.records.find(x=>x.card_family==='Creature'&&x.definition.creature?.ability?.mode==='active');
 assert.ok(active,'Set One must contain an active Ability example');
 const activeHtml=renderer.renderCard(active,{mode:'battle',abilityReady:true,interactiveAbility:true,abilityWhere:'reserve',abilityIndex:0});
-assert.ok(activeHtml.includes('ABILITY READY'));
+assert.ok(activeHtml.includes('>ABILITY<'),'printed card keeps the Ability label stable');
+assert.ok(!activeHtml.includes('ABILITY READY'),'server readiness must not rewrite printed card text');
 assert.ok(activeHtml.includes('data-card-intent="ability"'));
 
 const formula=registry.records.find(x=>x.card_id==='volt-arcprowler');

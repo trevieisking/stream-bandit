@@ -160,7 +160,9 @@ test('server capability makes active Ability glow/clickable, then refreshed proj
   await h.document.fieldCards[0].click();
 
   const before=h.nodes.get('cardInspector').innerHTML;
-  assert.match(before,/ABILITY READY/);
+  assert.doesNotMatch(before,/ABILITY READY/,'printed card text remains stable when Ability is ready');
+  assert.match(before,/Ability ready/,'readiness belongs to the external action dock');
+  assert.match(before,/sb-inspector-action-dock/);
   assert.equal(h.document.abilityButtons.length,1);
 
   await h.document.abilityButtons[0].click();
@@ -171,5 +173,6 @@ test('server capability makes active Ability glow/clickable, then refreshed proj
 
   const after=h.nodes.get('cardInspector').innerHTML;
   assert.doesNotMatch(after,/ABILITY READY/);
+  assert.match(after,/Ability not currently available/);
   assert.equal(h.document.abilityButtons.length,0,'used active Ability must stop presenting as a clickable ready control');
 });

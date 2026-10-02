@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.20-server-attack-choice-route';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.21-single-bench-tabletop';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -57,6 +57,7 @@
       effect_resolution_already_pending: 'Finish the current card choice before playing another card.',
       attack_essence_cost_not_met: 'Needs more matching Essence for this Attack.',
       attack_requirements_not_met: 'This Attack\'s requirements are not met right now.',
+      attack_readiness_unavailable: 'Attack readiness is still syncing.',
       first_player_cannot_attack_on_first_personal_turn: 'The first player cannot attack on their first turn.',
       only_final_vanguard_may_attack_this_turn: 'Only the final Vanguard for this turn may attack.',
       stunned_cannot_attack: 'This Vanguard cannot attack while Stunned.',
@@ -66,7 +67,7 @@
       same_named_realm_cannot_replace_itself: 'That Realm is already active.',
       withdrawal_already_used_this_turn: 'You already withdrew this turn.',
       condition_prevents_withdrawal: 'This Vanguard cannot Withdraw while Stunned or Rooted.',
-      legal_reserve_required: 'You need an occupied Reserve Creature to Withdraw into.',
+      legal_reserve_required: 'You need an occupied Bench Creature to Withdraw into.',
       exact_withdrawal_essence_payment_required: 'You do not have enough attached Essence to pay this Withdraw cost.',
       withdrawal_payment_not_attached: 'Withdraw payment must use Essence attached to your Vanguard.',
       vanguard_required: 'A Vanguard is required for this action.',
@@ -540,12 +541,36 @@
     return instance ? String(definition.name || instance.card_id || 'Selected card') : '';
   }
 
+  function reserveList(player) {
+    return player && Array.isArray(player.reserve) ? player.reserve : [];
+  }
+
+  function reserveCapacity(player) {
+    const reserve = reserveList(player);
+    const declared = Math.max(0, Math.floor(Number(player && player.reserve_capacity || 0)));
+    return Math.max(4, reserve.length, declared);
+  }
+
+  function reserveIndexValid(player, index) {
+    return Number.isInteger(index) && index >= 0 && index < reserveCapacity(player);
+  }
+
+  function firstOpenBenchIndex(player) {
+    const reserve = reserveList(player);
+    const capacity = reserveCapacity(player);
+    for (let index = 0; index < capacity; index += 1) {
+      if (!reserve[index]) return index;
+    }
+    return null;
+  }
+
   function ownCreatureAt(where, index) {
     const view = viewState();
     if (!view || !view.you) return null;
     if (where === 'vanguard') return view.you.vanguard || null;
-    if (where === 'reserve' && Number.isInteger(index) && index >= 0 && index < 4) {
-      return Array.isArray(view.you.reserve) ? (view.you.reserve[index] || null) : null;
+    if (where === 'reserve' && reserveIndexValid(view.you, index)) {
+      const reserve = reserveList(view.you);
+      return reserve[index] || null;
     }
     return null;
   }
@@ -556,7 +581,7 @@
     const intent = selectedHandIntent();
     const projection = currentHandProjection();
     if (projection && projection.loading !== true) return projectionTargetLegal(projection, where, index);
-    if (intent === 'play_creature') return where === 'reserve' && !creature;
+    if (intent === 'play_creature') return where === 'reserve' && reserveIndexValid(view && view.you, index) && !creature;
     if (intent === 'attach_essence') return !!creature;
     if (intent === 'attach_relic') return !!creature && !creature.relic;
     if (intent === 'evolve') {
@@ -581,9 +606,8 @@
     if (where === 'vanguard') return !(view.you && view.you.vanguard);
     if (where === 'reserve') {
       if (!(view.you && view.you.vanguard)) return false;
-      if (!Number.isInteger(index) || index < 0 || index >= 4) return false;
-      const reserve = Array.isArray(view.you && view.you.reserve) ? view.you.reserve : [];
-      return !reserve[index];
+      if (!reserveIndexValid(view.you, index)) return false;
+      return !reserveList(view.you)[index];
     }
     return false;
   }
@@ -595,7 +619,7 @@
   function playInstruction(intent) {
     const touch = touchPrimaryInput();
     const lead = touch ? 'Hold then drag to, or tap,' : 'Drop or tap';
-    if (intent === 'play_creature') return lead + ' an empty Reserve slot.';
+    if (intent === 'play_creature') return lead + ' the Bench.';
     if (intent === 'evolve') return lead + ' the matching Creature to evolve it.';
     if (intent === 'attach_essence') return lead + ' one of your Creatures to attach this Essence.';
     if (intent === 'attach_relic') return lead + ' a Creature without a Relic.';
@@ -734,20 +758,27 @@
       });
   }
 
-  function liveCreatureStatus(creature, cardId, essenceUnits) {
-    const structured = structuredDefinition(topInstance(creature)) || {};
-    const maxHp = Math.max(0, Number(structured.creature && structured.creature.hp || 0));
-    const damage = Math.max(0, Number(creature && creature.damage || 0));
-    const remaining = Math.max(0, maxHp - damage);
-    const unitTotal = (Array.isArray(essenceUnits) ? essenceUnits : []).reduce((sum, row) => sum + Math.max(0, Number(row && row.count) || 0), 0);
-    const sourceCount = Array.isArray(creature && creature.essence) ? creature.essence.length : 0;
-    const essenceCount = unitTotal || sourceCount;
-    const shield = Math.max(0, Number(creature && creature.shield || 0));
-    return '<div class="sb-card-live-status" data-card-id="' + esc(cardId) + '">' +
-      '<span>HP <strong>' + esc(remaining) + '/' + esc(maxHp) + '</strong></span>' +
-      '<span>Essence <strong>' + esc(essenceCount) + '</strong></span>' +
-      '<span>Shield <strong>' + esc(shield) + '</strong></span>' +
-      '</div>';
+  function liveCreatureTokens(creature) {
+    if (!creature) return '';
+    const damage = Math.max(0, Number(creature.damage || 0));
+    const shield = Math.max(0, Number(creature.shield || 0));
+    const labels = [];
+    const single = String(creature.condition || '').trim();
+    if (single) labels.push(single);
+    const conditionMap = creature.conditions && typeof creature.conditions === 'object' && !Array.isArray(creature.conditions)
+      ? creature.conditions
+      : {};
+    for (const [name, value] of Object.entries(conditionMap)) {
+      if (!value || labels.includes(name)) continue;
+      labels.push(name);
+    }
+    const tokens = [];
+    if (damage > 0) tokens.push('<span class="sb-battle-token is-damage" aria-label="' + esc(damage) + ' damage">' + esc(damage) + '</span>');
+    if (shield > 0) tokens.push('<span class="sb-battle-token is-shield" aria-label="' + esc(shield) + ' Shield">S' + esc(shield) + '</span>');
+    for (const label of labels.slice(0, 2)) {
+      tokens.push('<span class="sb-battle-token is-condition" aria-label="' + esc(label) + ' condition">' + esc(label.slice(0, 2).toUpperCase()) + '</span>');
+    }
+    return tokens.length ? '<div class="sb-card-battle-tokens">' + tokens.join('') + '</div>' : '';
   }
 
   function syncEssenceRailCompression() {
@@ -808,7 +839,7 @@
       '<div class="sb-card-control sb-card-control-shell' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '"' +
       inspectAttrs +
       (opts.primary ? ' aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
-      face + liveCreatureStatus(creature, cardId, essenceUnits) +
+      face + liveCreatureTokens(creature) +
       '</div>' +
       (setupReturn ? '<div class="sb-card-actions">' + setupReturn + '</div>' : '') +
       '</div>';
@@ -819,8 +850,8 @@
     const player = inspected.owner === 'opponent' ? view.opponent : view.you;
     if (!player) return null;
     if (inspected.where === 'vanguard') return player.vanguard || null;
-    if (inspected.where === 'reserve' && Number.isInteger(inspected.index) && inspected.index >= 0 && inspected.index < 4) {
-      return Array.isArray(player.reserve) ? (player.reserve[inspected.index] || null) : null;
+    if (inspected.where === 'reserve' && Number.isInteger(inspected.index) && inspected.index >= 0) {
+      return reserveList(player)[inspected.index] || null;
     }
     return null;
   }
@@ -877,8 +908,11 @@
       }).join('') + '</div>';
     const targets = '<div class="sb-withdraw-targets">' + legalTargets.map((target) => {
       const index = Number(target && target.reserve_index);
+      const creature = reserveList(view && view.you)[index] || null;
+      const top = topInstance(creature);
+      const label = top ? cardNameById(String(top.card_id || '')) : 'Bench Creature';
       return '<button type="button" class="sb-withdraw-target" data-withdraw-target-index="' + esc(index) + '"' +
-        (paymentReady ? '' : ' disabled') + '>Withdraw → Reserve ' + esc(index + 1) + '</button>';
+        (paymentReady ? '' : ' disabled') + '>Withdraw → ' + esc(label) + '</button>';
     }).join('') + '</div>';
     return '<div class="sb-withdraw-panel"><div class="sb-withdraw-head"><strong>Withdraw</strong><span>Cost ' + esc(cost) +
       ' Essence</span></div>' + paymentLabel + payment + targets + '</div>';
@@ -935,6 +969,46 @@
     }
   }
 
+  function inspectorActionDock(instance, creature, isOwnVanguard, abilityReady, canAct) {
+    if (!instance || !creature || !isOwnVanguard) return '';
+    const structured = structuredDefinition(instance) || {};
+    const creatureDefinition = structured.creature && typeof structured.creature === 'object' ? structured.creature : {};
+    const ability = creatureDefinition.ability && typeof creatureDefinition.ability === 'object' ? creatureDefinition.ability : null;
+    const attackDefinitions = Array.isArray(creatureDefinition.attacks) ? creatureDefinition.attacks : [];
+    const attackStates = attackStatesFor(!!canAct);
+    const renderer = cardRenderer();
+    const costLabel = (cost) => renderer && typeof renderer.costText === 'function'
+      ? renderer.costText(cost)
+      : 'Attack cost';
+    const abilityControl = ability && String(ability.mode || '') === 'active'
+      ? (abilityReady
+        ? '<button type="button" class="sb-inspector-action is-ready" data-card-intent="ability" data-ability-where="vanguard" data-ability-index=""><strong>' +
+          esc(String(ability.name || 'Ability')) + '</strong><small>Ability ready</small></button>'
+        : '<div class="sb-inspector-action is-disabled"><strong>' + esc(String(ability.name || 'Ability')) +
+          '</strong><small>Ability not currently available</small></div>')
+      : '';
+    const attackControls = attackDefinitions.map((attack, offset) => {
+      const slot = Number(attack && attack.slot || offset + 1);
+      if (slot !== 1 && slot !== 2) return '';
+      const projected = attackStates[slot] || { eligible: false, reason: 'attack_readiness_unavailable' };
+      const ready = projected.eligible === true;
+      const reason = ready ? 'Ready' : friendlyActionMessage(projected.reason || 'attack_readiness_unavailable');
+      const damage = Number.isFinite(Number(attack && attack.damage))
+        ? Number(attack.damage)
+        : (Number.isFinite(Number(attack && attack.base_damage))
+          ? Number(attack.base_damage)
+          : (attack && attack.damage_formula && Number.isFinite(Number(attack.damage_formula.base)) ? Number(attack.damage_formula.base) : null));
+      return '<button type="button" class="sb-inspector-action' + (ready ? ' is-ready' : ' is-blocked') +
+        '" data-card-intent="attack" data-attack-slot="' + esc(slot) + '"' +
+        (ready ? '' : ' data-attack-blocked-reason="' + esc(reason) + '"') + '>' +
+        '<strong>' + esc(String(attack && attack.name || ('Attack ' + slot))) +
+        (damage == null ? '' : ' · ' + esc(damage)) + '</strong>' +
+        '<small>' + esc(costLabel(attack && attack.cost)) + ' · ' + esc(reason) + '</small></button>';
+    }).join('');
+    if (!abilityControl && !attackControls) return '';
+    return '<div class="sb-inspector-action-dock" aria-label="Card actions">' + abilityControl + attackControls + '</div>';
+  }
+
   function renderSelectedCardInspector(view, canAct) {
     const node = $('cardInspector');
     if (!node) return;
@@ -976,20 +1050,16 @@
     const essenceUnits = creature ? attachedEssenceUnits(creature) : [];
     const face = renderCardFace(cardId, {
       mode: 'inspect',
-      abilityReady,
-      interactiveAbility: !!abilityReady,
-      abilityWhere: isOwnVanguard ? 'vanguard' : '',
-      abilityIndex: null,
-      interactiveAttacks: isOwnVanguard,
-      attackStates: isOwnVanguard ? attackStatesFor(!!canAct) : null,
       attachedEssenceUnits: essenceUnits
     });
+    const actions = inspectorActionDock(instance, creature, isOwnVanguard, abilityReady, canAct);
     node.hidden = false;
     node.innerHTML =
       '<button type="button" class="sb-card-inspector-backdrop" data-card-inspector-close="1" aria-label="Close card details"></button>' +
       '<section class="sb-card-inspector-panel" role="dialog" aria-modal="true" aria-label="' + esc(cardNameById(cardId) || 'Card') + ' card details">' +
       '<button type="button" class="sb-card-inspector-close" data-card-inspector-close="1" aria-label="Close card details">×</button>' +
-      '<div class="sb-card-inspector-card">' + face + (creature ? liveCreatureStatus(creature, cardId, essenceUnits) : '') + '</div>' +
+      '<div class="sb-card-inspector-card">' + face + (creature ? liveCreatureTokens(creature) : '') + '</div>' +
+      actions +
       withdrawPanelMarkup(isOwnVanguard) +
       '</section>';
   }
@@ -1036,10 +1106,34 @@
     return yourSetup ? { where, index } : null;
   }
 
-  function renderReserve(target, reserve, ownerLabel, own) {
+  function benchOpenTargetMarkup(player, own, yourSetup, hasVanguard) {
+    if (!own || !player) return '';
+    const reserve = reserveList(player);
+    const openIndex = firstOpenBenchIndex(player);
+    if (openIndex == null) return '';
+    const view = viewState();
+    const active = activePlayTurn(view);
+    const setupAvailable = !!(yourSetup && hasVanguard);
+    const playAvailable = !!active;
+    if (!setupAvailable && !playAvailable) return '';
+    const setupLegal = !!(setupAvailable && state.selectedHandUid && setupTargetLegal('reserve', openIndex));
+    const playLegal = !!(playAvailable && state.selectedHandUid && playTargetLegal('reserve', openIndex, reserve[openIndex] || null));
+    const attrs =
+      (setupAvailable ? ' data-setup-destination="reserve" data-setup-index="' + openIndex + '"' : '') +
+      (playAvailable ? ' data-play-where="reserve" data-play-index="' + openIndex + '"' : '');
+    return '<button type="button" class="sb-bench-open-target' +
+      (setupAvailable ? ' sb-setup-destination' : '') +
+      (setupLegal ? ' is-legal' : '') +
+      (playAvailable ? ' sb-play-destination' : '') +
+      (playLegal ? ' is-play-legal' : '') +
+      '"' + attrs + '><span>Bench</span><small>Play here</small></button>';
+  }
+
+  function renderBench(target, player, ownerLabel, own) {
     const node = $(target);
     if (!node) return;
     const view = viewState();
+    const reserve = reserveList(player);
     const youSeat = Number(view && view.you && view.you.seat);
     const yourSetup = !!(own && view && view.phase === 'setup' && Number(view.setup_turn_seat) === youSeat);
     const hasVanguard = !!(view && view.you && view.you.vanguard);
@@ -1052,31 +1146,28 @@
       Number(view.pending_resolution.seat) === youSeat &&
       !hasVanguard
     );
-    node.innerHTML = [0, 1, 2, 3].map((index) => {
-      const creature = reserve && reserve[index];
-      const setupAvailable = !!(yourSetup && hasVanguard && !creature);
-      const setupDestination = setupAvailable
-        ? ' data-setup-destination="reserve" data-setup-index="' + index + '"'
-        : '';
-      const setupLegal = !!(setupAvailable && state.selectedHandUid && setupTargetLegal('reserve', index));
-      const playLegal = !!(own && playTargetLegal('reserve', index, creature));
-      const playDestination = own
-        ? ' data-play-where="reserve" data-play-index="' + index + '"'
-        : '';
+    const occupied = reserve.map((creature, index) => ({ creature, index })).filter((row) => !!row.creature);
+    const cards = occupied.map(({ creature, index }) => {
+      const playLegal = !!(own && state.selectedHandUid && playTargetLegal('reserve', index, creature));
+      const playDestination = own ? ' data-play-where="reserve" data-play-index="' + index + '"' : '';
       const promotionLegal = !!(yourPromotion && creature);
       const promotionDestination = promotionLegal ? ' data-promote-index="' + index + '"' : '';
       const legalClass =
-        (setupAvailable ? ' sb-setup-destination' : '') +
-        (setupLegal ? ' is-legal' : '') +
         (playLegal ? ' sb-play-destination is-play-legal' : '') +
         (promotionLegal ? ' sb-resolution-destination is-legal' : '');
-      return '<section class="sb-reserve-slot' + legalClass + '"' + setupDestination + playDestination + promotionDestination + '><span>' +
-        esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
-        creatureCard(creature, { own, where: 'reserve', index, setupReturn: own && creature ? setupReturnOptions('reserve', index) : null }) +
-        '</section>';
+      return '<div class="sb-bench-creature' + legalClass + '" data-bench-creature="1"' + playDestination + promotionDestination + '>' +
+        creatureCard(creature, { own, where: 'reserve', index, setupReturn: own ? setupReturnOptions('reserve', index) : null }) +
+        '</div>';
     }).join('');
+    const emptyCopy = occupied.length ? '' : '<div class="sb-bench-empty">No Bench Creatures</div>';
+    node.className = 'sb-reserve sb-bench-zone' + (own ? ' is-own' : ' is-opponent');
+    node.innerHTML =
+      '<div class="sb-bench-label">' + esc(ownerLabel) + ' Bench</div>' +
+      '<div class="sb-bench-cards">' + cards + emptyCopy + '</div>' +
+      benchOpenTargetMarkup(player, own, yourSetup, hasVanguard);
   }
 
+  
   function pendingResolutionKey(view) {
     const pending = view && view.pending_resolution;
     if (!pending) return '';
@@ -1096,30 +1187,54 @@
     state.selectedRewardPositions = [];
   }
 
-  function renderRewardStack(target, count, own) {
+  function renderRewardStack(target, count) {
     const node = $(target);
     if (!node) return;
-    const view = viewState();
     const safe = Math.max(0, Math.min(6, Number(count || 0)));
-    const youSeat = Number(view && view.you && view.you.seat);
+    node.innerHTML = Array.from({ length: 6 }, (_, index) =>
+      '<span class="sb-reward-card' + (index >= safe ? ' is-empty' : '') + '" aria-hidden="true"></span>'
+    ).join('');
+  }
+
+  function renderRewardChoiceOverlay(view) {
+    const node = $('rewardChoiceOverlay');
+    if (!node) return;
     const pending = view && view.pending_resolution;
-    const selectable = !!(
-      own &&
+    const youSeat = Number(view && view.you && view.you.seat);
+    const yours = !!(
       pending &&
       String(pending.kind || '') === 'take_reward' &&
       Number(pending.seat) === youSeat
     );
+    if (!yours) {
+      node.hidden = true;
+      node.innerHTML = '';
+      return;
+    }
+    const available = Math.max(0, Math.min(6, Number(view && view.you && view.you.rewards_count || 0)));
+    const required = Math.max(0, Number(pending.count || 0));
     const selected = new Set(state.selectedRewardPositions);
-    node.innerHTML = Array.from({ length: 6 }, (_, index) => {
-      const empty = index >= safe;
-      if (selectable && !empty) {
-        const on = selected.has(index);
-        return '<button type="button" class="sb-reward-card is-selectable' + (on ? ' is-selected' : '') +
-          '" data-reward-position="' + index + '" aria-pressed="' + (on ? 'true' : 'false') +
-          '" aria-label="Reward Card ' + (index + 1) + '"></button>';
-      }
-      return '<span class="sb-reward-card' + (empty ? ' is-empty' : '') + '" aria-hidden="true"></span>';
+    const cards = Array.from({ length: 6 }, (_, index) => {
+      const empty = index >= available;
+      const on = selected.has(index);
+      if (empty) return '<span class="sb-reward-choice-card is-empty" aria-hidden="true"></span>';
+      return '<button type="button" class="sb-reward-choice-card' + (on ? ' is-selected' : '') +
+        '" data-reward-position="' + index + '" aria-pressed="' + (on ? 'true' : 'false') +
+        '" aria-label="Face-down Reward Card ' + (index + 1) + '">' +
+        (on ? '<span class="sb-reward-choice-order">' + esc(state.selectedRewardPositions.indexOf(index) + 1) + '</span>' : '') +
+        '</button>';
     }).join('');
+    const ready = state.selectedRewardPositions.length === required;
+    node.hidden = false;
+    node.innerHTML =
+      '<div class="sb-reward-choice-backdrop" aria-hidden="true"></div>' +
+      '<section class="sb-reward-choice-panel" role="dialog" aria-modal="true" aria-label="Choose Reward Cards">' +
+      '<div class="sb-reward-choice-copy"><strong>Choose Reward Card' + (required === 1 ? '' : 's') + '</strong>' +
+      '<small>Select exactly ' + esc(required) + ' face-down Reward Card' + (required === 1 ? '' : 's') + '. Selected cards move to your hand.</small></div>' +
+      '<div class="sb-reward-choice-grid">' + cards + '</div>' +
+      '<button type="button" class="sb-reward-choice-confirm" data-take-reward-confirm="1"' + (ready ? '' : ' disabled') + '>' +
+      'Take ' + esc(required) + ' Reward' + (required === 1 ? '' : 's') + '</button>' +
+      '</section>';
   }
 
   function setText(id, value) {
@@ -1258,17 +1373,12 @@
       const kind = String(resolution.kind || '');
       if (kind === 'take_reward') {
         const required = Math.max(0, Number(resolution.count || 0));
-        const selectedCount = state.selectedRewardPositions.length;
         node.innerHTML =
           '<div class="sb-phase-card sb-choice-card">' +
-          '<div class="sb-phase-copy"><strong>' + (yours ? 'Take Reward Card' + (required === 1 ? '' : 's') : 'Opponent Reward choice') + '</strong>' +
+          '<div class="sb-phase-copy"><strong>' + (yours ? 'Choose Reward Card' + (required === 1 ? '' : 's') : 'Opponent Reward choice') + '</strong>' +
           '<small>' + (yours
-            ? 'Select exactly ' + esc(required) + ' face-down Reward Card' + (required === 1 ? '' : 's') + ' from your Reward pile. The selected card' + (required === 1 ? '' : 's') + ' move to your hand, then resolution continues.'
+            ? 'Choose from the face-down Reward Cards shown on screen.'
             : 'Waiting for the opponent to take ' + esc(required) + ' Reward Card' + (required === 1 ? '' : 's') + '.') + '</small></div>' +
-          (yours
-            ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-take-reward-confirm="1"' +
-              (selectedCount === required ? '' : ' disabled') + '>Take ' + esc(required) + ' Reward' + (required === 1 ? '' : 's') + '</button></div>'
-            : '') +
           '</div>';
         return;
       }
@@ -1277,8 +1387,8 @@
           '<div class="sb-phase-card">' +
           '<div class="sb-phase-copy"><strong>' + (yours ? 'Choose your new Vanguard' : 'Opponent promotion') + '</strong>' +
           '<small>' + (yours
-            ? 'Your Vanguard was defeated. Select one highlighted Reserve Creature to promote to Vanguard.'
-            : 'Waiting for the opponent to promote one of their Reserve Creatures to Vanguard.') + '</small></div>' +
+            ? 'Your Vanguard was defeated. Select one highlighted Bench Creature to promote to Vanguard.'
+            : 'Waiting for the opponent to promote one of their Bench Creatures to Vanguard.') + '</small></div>' +
           '</div>';
         return;
       }
@@ -1314,8 +1424,8 @@
               ? selectedName + (touchPrimaryInput() ? ' selected — hold-drag to Your Vanguard, or tap Your Vanguard.' : ' selected — tap Your Vanguard first.')
               : 'Choose an eligible Creature for Your Vanguard first.')
             : (selectedName
-              ? selectedName + (touchPrimaryInput() ? ' selected — hold-drag to an open Reserve slot, or tap it; then confirm your setup.' : ' selected — tap an open Reserve slot, or confirm your setup.')
-              : 'Vanguard ready. Add optional Reserves or confirm your setup.'))
+              ? selectedName + (touchPrimaryInput() ? ' selected — hold-drag to an Bench, or tap it; then confirm your setup.' : ' selected — tap an Bench, or confirm your setup.')
+              : 'Vanguard ready. Add optional Bench Creatures or confirm your setup.'))
           : 'Your board stays visible while the server waits for their setup.') + '</small></div>' +
         (yourSetup
           ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-setup-ready="1"' + (hasVanguard ? '' : ' disabled') + '>Confirm Setup</button></div>'
@@ -1385,16 +1495,17 @@
       canAct: canAttack,
       setupReturn: view.you && view.you.vanguard ? setupReturnOptions('vanguard', null) : null
     });
-    renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent', false);
-    renderReserve('youReserve', view.you && view.you.reserve, 'Your', true);
+    renderBench('oppReserve', view.opponent, 'Opponent', false);
+    renderBench('youReserve', view.you, 'Your', true);
     renderVanguardSetupTarget();
     renderSelectedCardInspector(view, canAttack);
 
     const hand = view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
     $('yourHand').innerHTML = hand.map(handCard).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
 
-    renderRewardStack('oppRewards', view.opponent && view.opponent.rewards_count, false);
-    renderRewardStack('yourRewards', view.you && view.you.rewards_count, true);
+    renderRewardStack('oppRewards', view.opponent && view.opponent.rewards_count);
+    renderRewardStack('yourRewards', view.you && view.you.rewards_count);
+    renderRewardChoiceOverlay(view);
     setText('oppHandCount', view.opponent && view.opponent.hand_count);
     setText('oppDeck', view.opponent && view.opponent.deck_count);
     setText('oppDiscard', view.opponent && view.opponent.discard_count);
@@ -1435,7 +1546,7 @@
         const hasVanguard = !!(view.you && view.you.vanguard);
         help.textContent = !hasVanguard
           ? (state.selectedHandUid ? 'Now tap Your Vanguard.' : 'Choose your Vanguard Creature first.')
-          : (state.selectedHandUid ? 'Now tap an open Reserve slot.' : 'Add optional Reserves or confirm setup.');
+          : (state.selectedHandUid ? 'Now tap an Bench.' : 'Add optional Bench Creatures or confirm setup.');
       }
       else if (view.phase === 'opening_choice') help.textContent = 'Opening hand dealt by the server.';
       else help.textContent = 'Select cards directly from your hand.';
@@ -1446,7 +1557,7 @@
       if (Number(view.toss_winner_seat) === youSeat) setStatus('Server toss complete. Choose whether to go first or second.', 'ready');
       else setStatus('Server toss complete. Waiting for the toss winner to choose first or second.', 'wait');
     } else if (view.phase === 'setup') {
-      if (yourSetup) setStatus('Your setup turn. Place a Vanguard, optionally place Reserves, then confirm.', 'ready');
+      if (yourSetup) setStatus('Your setup turn. Place a Vanguard, optionally place Bench Creatures, then confirm.', 'ready');
       else setStatus('Opponent setup in progress. Your board remains synced.', 'wait');
     } else if (view.phase === 'complete') {
       setStatus('Match complete.', 'ready');
@@ -1457,7 +1568,7 @@
       if (kind === 'take_reward') {
         setStatus(yours ? 'Choose the required Reward Card(s), then confirm.' : 'Waiting for the opponent to take Reward Card(s).', yours ? 'ready' : 'wait');
       } else if (kind === 'promote') {
-        setStatus(yours ? 'Choose a highlighted Reserve Creature to become your Vanguard.' : 'Waiting for the opponent to promote a Reserve Creature.', yours ? 'ready' : 'wait');
+        setStatus(yours ? 'Choose a highlighted Bench Creature to become your Vanguard.' : 'Waiting for the opponent to promote a Bench Creature.', yours ? 'ready' : 'wait');
       } else {
         setStatus('The authoritative server is resolving the pending match action.', 'wait');
       }
@@ -2244,7 +2355,7 @@
       Number(pending.seat) !== youSeat ||
       !Number.isInteger(reserveIndex) ||
       reserveIndex < 0 ||
-      reserveIndex > 3 ||
+      reserveIndex >= reserve.length ||
       !reserve[reserveIndex] ||
       state.busy
     ) return;
@@ -2252,7 +2363,7 @@
     state.busy = true;
     state.overlayKey = '';
     render();
-    setStatus('Promoting the selected Reserve Creature to Vanguard…', 'busy');
+    setStatus('Promoting the selected Bench Creature to Vanguard…', 'busy');
     let failure = '';
     try {
       await callEdge(

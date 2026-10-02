@@ -15,12 +15,12 @@ const tacticActions = fs.readFileSync(path.join(root, 'supabase', 'functions', '
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
 test('Battle keeps the tabletop zones while using bounded field geometry and inspect-drag hand-peek bindings', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-9-hand-peek"/);
-  assert.match(battle, /data-sb-tcg-play-bindings="v0-11-server-projected-actions"/);
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-12-single-bench"/);
+  assert.match(battle, /data-sb-tcg-play-bindings="v0-12-reference-tabletop"/);
   assert.match(battle, /data-sb-tcg-card-face="v1"/);
   assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-20-server-attack-choice-route/);
-  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.20-server-attack-choice-route/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-21-single-bench-tabletop/);
+  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.21-single-bench-tabletop/);
   assert.match(controller, /mode: 'compact'/);
   assert.match(controller, /data-inspect-hand-uid=/);
   assert.match(controller, /data-inspect-field-owner=/);
@@ -64,8 +64,13 @@ test('hand intents map only to existing authoritative server owners', () => {
   assert.match(controller, /runPlayCommand\(\s*API_TACTIC,\s*'play_tactic'/);
 });
 
-test('play Creature uses an empty Reserve and keeps server legality final', () => {
-  assert.match(controller, /intent === 'play_creature'\) return where === 'reserve' && !creature/);
+test('play Creature targets one continuous Bench while server reserve index remains transport-only', () => {
+  assert.match(controller, /function renderBench\(target, player, ownerLabel, own\)/);
+  assert.match(controller, /class="sb-bench-zone/);
+  assert.match(controller, /function reserveCapacity\(player\)/);
+  assert.match(controller, /reserve_capacity/);
+  assert.doesNotMatch(controller, /\[0, 1, 2, 3\]\.map/);
+  assert.match(controller, /intent === 'play_creature'\) return where === 'reserve' && reserveIndexValid/);
   assert.match(controller, /\{ card_uid: cardUid, reserve_index: Number\(index\) \}/);
   assert.match(controller, /await callEdge\(endpointName, Object\.assign\(actionBase\(action\), payload \|\| \{\}\)\)/);
   assert.match(matchActions, /empty_reserve_slot_required/);

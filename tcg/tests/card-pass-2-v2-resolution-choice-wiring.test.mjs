@@ -21,16 +21,20 @@ test('stable card inspector has an in-controller card-name resolver and cannot c
   assert.match(controller, /aria-label="' \+ esc\(cardNameById\(cardId\) \|\| 'Card'\) \+ ' card details"/);
 });
 
-test('pending take_reward is a real face-down Reward selection flow, not a generic deadlock', () => {
+test('pending take_reward is a full-screen six-card face-down Reward choice, not a tiny side-pile interaction', () => {
   assert.match(controller, /view\.pending_resolution/);
   assert.match(controller, /String\(pending\.kind \|\| ''\) === 'take_reward'/);
+  assert.match(controller, /function renderRewardChoiceOverlay\(view\)/);
+  assert.match(controller, /Array\.from\(\{ length: 6 \}/);
   assert.match(controller, /data-reward-position=/);
   assert.match(controller, /data-take-reward-confirm="1"/);
   assert.match(controller, /selectedRewardPositions/);
   assert.match(controller, /actionBase\('take_reward'\)/);
   assert.match(controller, /reward_positions: positions/);
-  assert.match(battle, /\.sb-reward-card\.is-selectable/);
-  assert.match(battle, /\.sb-reward-card\.is-selected/);
+  assert.match(battle, /id="rewardChoiceOverlay"/);
+  assert.match(battle, /\.sb-reward-choice-overlay\{/);
+  assert.match(battle, /\.sb-reward-choice-grid\{[\s\S]*?repeat\(6/);
+  assert.match(battle, /\.sb-reward-choice-card\.is-selected/);
 });
 
 test('Reward resolution keeps the authoritative server Card-Zone move and resumes the queue', () => {
@@ -70,5 +74,5 @@ test('bounded Battle cards keep the board calm while click opens the readable in
   assert.match(controller, /function renderSelectedCardInspector\(view, canAct\)/);
   assert.match(controller, /inspected\.kind === 'hand'/);
   assert.match(controller, /inspected\.kind === 'field'/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-20-server-attack-choice-route/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-21-single-bench-tabletop/);
 });

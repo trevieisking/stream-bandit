@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION='2.4.55';
+const VERSION='2.4.133-clean-tabletop-card-face';
 const REGISTRY='assets/tcg/cards/set-one/tcg-card-display-registry-v1.json';
 let readyPromise=null;
 let registry=null;
@@ -250,7 +250,7 @@ function abilityMarkup(ability,options){
     ? ' type="button" data-card-intent="ability" data-ability-where="'+esc(options.abilityWhere||'')+'" data-ability-index="'+esc(options.abilityIndex==null?'':options.abilityIndex)+'"'
     : '';
   return '<'+tag+' class="sb-card-rule sb-card-ability'+(ready?' is-ready':'')+'" data-card-ability-mode="'+esc(ability.mode||'')+'"'+attrs+'>'+
-    '<div class="sb-card-rule-head"><span class="sb-card-rule-tag">'+(ready?'ABILITY READY':'ABILITY')+'</span><strong>'+esc(ability.name||'Ability')+'</strong></div>'+
+    '<div class="sb-card-rule-head"><span class="sb-card-rule-tag">ABILITY</span><strong>'+esc(ability.name||'Ability')+'</strong></div>'+
     '<div class="sb-card-rule-meta">'+esc(trigger)+'</div>'+
     (body?'<p>'+esc(body)+'</p>':'')+
     '</'+tag+'>';
@@ -266,7 +266,7 @@ function attackReasonText(reason){
     case 'stunned_cannot_attack': return 'Stunned — cannot attack';
     case 'not_active_player': return 'Wait for your turn';
     case 'attack_readiness_unavailable': return 'Checking attack readiness';
-    default: return reason ? human(reason) : '';
+    default: return String(reason||'').startsWith('tcg_v0_2_') ? 'Attack is not currently available' : (reason ? human(reason) : '');
   }
 }
 function attackMarkup(attack,index,options){
@@ -288,10 +288,8 @@ function attackMarkup(attack,index,options){
     ? ' type="button" data-card-intent="attack" data-attack-slot="'+slot+'"'+
       (disabled?' aria-disabled="true" data-attack-blocked-reason="'+esc(reason||'Attack is not currently legal')+'"':'')
     : '';
-  const stateMeta=ready?'Ready':(reason||'');
-  return '<'+tag+' class="sb-card-rule sb-card-attack'+(ready?' is-ready':'')+(disabled?' is-disabled':'')+'" data-card-attack-slot="'+slot+'"'+attrs+'>'+
+  return '<'+tag+' class="sb-card-rule sb-card-attack'+(ready?' is-ready':'')+(disabled?' is-disabled':'')+'" data-card-attack-slot="'+slot+'" data-card-attack-ready="'+(ready?'true':'false')+'"'+attrs+'>'+
     '<div class="sb-card-rule-head"><span class="sb-card-cost">'+costOrbsMarkup(attack.cost)+'</span><strong>'+esc(attack.name||('Attack '+slot))+'</strong><span class="sb-card-damage">'+esc(damageText(attack))+'</span></div>'+
-    '<div class="sb-card-rule-meta">'+(stateMeta?esc(stateMeta)+' · ':'')+'Attack '+slot+' · Turn ends after full resolution</div>'+
     (effect?'<p>'+esc(effect)+'</p>':'')+
     '</'+tag+'>';
 }

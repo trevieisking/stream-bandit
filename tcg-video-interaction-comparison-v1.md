@@ -192,3 +192,23 @@ The acceptance gate therefore checks:
 - reduced-motion equivalence;
 - zero duplicated gameplay authority.
 
+## 2026-10-02 — V2.4.133 real-match rendering correction
+
+Trevor and Kay completed a real Stream Bandit TCG match and Kay won. Their shared verdict is that the **game core functions**, while the remaining acceptance problem is how the tabletop/cards render.
+
+The supplied gameplay reference is used for **interaction grammar and physical-card feel only**. Stream Bandit keeps its own card identities, rules, artwork, terminology and visual identity.
+
+### Direct comparison against the current screenshots/reference footage
+
+- **Bench:** the reference presents the Bench as one continuous battlefield zone containing cards. The current Stream Bandit build incorrectly exposes four large permanent Reserve boxes. V2.4.133 changes only presentation/transport mapping: one continuous Bench is shown, occupied cards remain individually targetable, and internal server reserve indices stay hidden implementation detail.
+- **Future Bench expansion:** the browser must not encode four permanent visual positions. It renders the current server reserve array and can honor a future `reserve_capacity` value without another tabletop redesign.
+- **Printed cards:** the reference keeps printed card information visually separate from game-state counters/legality UI. The current Nightmaw screenshot incorrectly injects live HP/Essence/Shield and server readiness/debug reason text into the card face. V2.4.133 keeps the printed face clean, uses physical-style damage/shield/condition counters beside it, and moves server action/readiness controls below the inspected card.
+- **Rewards:** all six Reward cards remain represented as face-down physical cards. When a Reward choice is required, V2.4.133 opens a focused fullscreen six-card face-down selection overlay while preserving the existing authoritative `take_reward` transport.
+- **Hand:** the phone hand is a bottom-edge physical card tray that scrolls/swipes left-right; cards may continue off-screen horizontally while the battlefield itself remains fixed.
+- **Vanguard/Bench scale:** Vanguard remains the visual focal card; Bench cards are smaller but no longer tiny cards floating inside oversized slot boxes.
+- **Authority:** this pass adds no browser rules engine and changes no Match/Creature/Reward legality. Existing server projections/actions remain final.
+
+### Acceptance intent
+
+The next visual retest should judge whether the Stream Bandit board now *feels* like the supplied physical-card reference: stable table, one Bench, readable card objects, swipe hand, focused Reward selection, and clean card faces. Gameplay semantics remain those of the Stream Bandit master plan.
+

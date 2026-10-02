@@ -700,7 +700,7 @@ button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:p
   background:radial-gradient(circle at center,rgba(8,18,30,.08),rgba(2,8,15,0) 55%)
 }
 </style>
-<link rel="stylesheet" href="stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-55">
+<link rel="stylesheet" href="stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-133-clean-tabletop">
 <style>
 /* V0.10 shared card-face bridge: preserve accepted board geometry while the real card face owns presentation/actions. */
 .sb-card-control-shell,.sb-hand-card-shell{
@@ -804,9 +804,249 @@ button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:p
   .sb-withdraw-chip,.sb-withdraw-target{padding:4px 5px;font-size:7px}
   .sb-withdraw-panel>small,.sb-withdraw-note{font-size:7px}
 }
+
+/* V2.4.133 reference-tabletop correction.
+   Interaction grammar follows the supplied gameplay reference while Stream Bandit keeps its own cards, rules and art. */
+.sb-reserve.sb-bench-zone{
+  position:relative;
+  height:100%;
+  min-height:0;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:14px 10px 5px;
+  border:1px solid #55e7ff20;
+  border-radius:18px;
+  background:radial-gradient(ellipse at center,#14304430 0%,#06131cb0 68%,#020b12d0 100%);
+  overflow:visible
+}
+.sb-bench-zone.is-own{border-color:#35e2ad2c;background:radial-gradient(ellipse at center,#0d46352b,#05151bbd 68%,#020b12dc)}
+.sb-bench-zone.is-opponent{border-color:#ff6f9230;background:radial-gradient(ellipse at center,#4a183022,#07131dba 68%,#020b12dc)}
+.sb-bench-label{
+  position:absolute;left:9px;top:5px;z-index:2;
+  color:#83a8bb;font-size:7px;font-weight:950;letter-spacing:.11em;text-transform:uppercase;
+  pointer-events:none
+}
+.sb-bench-cards{
+  min-width:0;max-width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  overflow:visible
+}
+.sb-bench-creature{
+  min-width:0;flex:0 1 auto;position:relative;
+  display:grid;place-items:center;
+  border-radius:12px;
+  transition:transform .15s ease,box-shadow .15s ease
+}
+.sb-bench-creature .sb-card-wrap{width:auto;height:auto;place-items:center}
+.sb-bench-creature .sb-card-control{
+  width:min(var(--card-w),12.8dvh);
+  height:auto;max-height:calc(100% - 5px);flex:0 0 auto
+}
+.sb-bench-creature.is-play-legal,.sb-bench-creature.sb-resolution-destination.is-legal{
+  box-shadow:0 0 0 2px #ffd56a2e,0 0 24px #ffd56a29;
+  background:#3b2d091f
+}
+.sb-bench-empty{
+  color:#536f80;font-size:8px;font-weight:850;letter-spacing:.04em;
+  padding:8px 14px;border-radius:999px;border:1px solid #ffffff10;background:#020a1080
+}
+.sb-bench-open-target{
+  flex:0 0 auto;
+  width:min(72px,8vw);aspect-ratio:5/7;
+  border:1px dashed #ffffff22;border-radius:10px;
+  background:#06131b70;color:#668497;
+  display:grid;place-items:center;align-content:center;gap:2px;
+  cursor:default
+}
+.sb-bench-open-target span{font-size:8px;font-weight:950;text-transform:uppercase;letter-spacing:.08em}
+.sb-bench-open-target small{font-size:6px;opacity:.7}
+.sb-bench-open-target.is-legal,.sb-bench-open-target.is-play-legal{
+  cursor:pointer;border-color:#ffd56ab8;color:#fff2be;
+  background:#4a370e65;box-shadow:0 0 0 2px #ffd56a24,0 0 28px #ffd56a2d
+}
+
+/* Cards stay printed-card clean. Live state is represented as tabletop counters beside the card. */
+.sb-card-battle-tokens{
+  position:absolute;z-index:18;right:-11px;top:36%;
+  display:grid;gap:3px;pointer-events:none
+}
+.sb-battle-token{
+  min-width:24px;height:24px;padding:0 4px;border-radius:50%;
+  display:grid;place-items:center;
+  border:2px solid #f4f7fbcc;background:#0a111b;color:#fff;
+  font-size:8px;font-weight:1000;line-height:1;
+  box-shadow:0 3px 9px #000b,inset 0 0 8px #ffffff18
+}
+.sb-battle-token.is-damage{background:radial-gradient(circle at 35% 25%,#fff5c1,#e99025 44%,#942d24 76%,#45131b);color:#170705}
+.sb-battle-token.is-shield{background:radial-gradient(circle at 35% 25%,#d9fbff,#48b9db 46%,#15547b 76%,#071f35)}
+.sb-battle-token.is-condition{background:radial-gradient(circle at 35% 25%,#f4d9ff,#9d5ad0 46%,#4a2178 78%,#180d2b);font-size:6px}
+
+/* The physical card is readable; server legality/actions live below it, not in its printed text. */
+.sb-card-inspector-panel{
+  width:min(420px,40vw,54dvh);
+  max-width:92vw;max-height:94dvh;overflow-y:auto;
+  scrollbar-width:thin
+}
+.sb-card-inspector-card>.sb-card-live-status{display:none!important}
+.sb-inspector-action-dock{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;margin-top:7px;padding:7px;
+  border:1px solid #55e7ff35;border-radius:13px;background:#031019f2;
+  box-shadow:0 10px 28px #0009
+}
+.sb-inspector-action{
+  min-height:46px;border:1px solid #ffffff24;border-radius:10px;padding:7px 8px;
+  background:#071923;color:#eaf9ff;text-align:left;
+  display:grid;align-content:center;gap:2px
+}
+button.sb-inspector-action{cursor:pointer}
+.sb-inspector-action strong{font-size:9px}.sb-inspector-action small{font-size:7px;color:#8faebe;line-height:1.25}
+.sb-inspector-action.is-ready{
+  border-color:#35e2ad8a;background:linear-gradient(145deg,#0b4e3d,#0c6d52);
+  box-shadow:0 0 18px #35e2ad23
+}
+.sb-inspector-action.is-ready small{color:#d8fff1}
+.sb-inspector-action.is-blocked{border-color:#ffffff20;background:#07131c}
+.sb-inspector-action.is-disabled{opacity:.58}
+.sb-card-rule.is-ready{animation:none!important}
+
+/* Six Rewards remain physical face-down cards at the table edge. */
+.sb-reward-stack{
+  max-width:76px;
+  display:grid;grid-template-columns:repeat(3,max-content);
+  gap:3px;justify-content:center;align-content:center
+}
+.sb-reward-card{
+  width:22px;aspect-ratio:5/7;border-radius:4px;
+  border:1px solid #68dfff66;
+  background-image:url('stream_bandit_stag_icon_32.png'),linear-gradient(145deg,#102b45,#2c195e 68%,#9d275d);
+  background-repeat:no-repeat,no-repeat;
+  background-position:center,center;
+  background-size:44%,cover;
+  box-shadow:0 3px 7px #000b,inset 0 0 0 1px #ffffff0f
+}
+.sb-reward-card.is-empty{opacity:.12}
+
+/* Reward selection becomes a focused full-screen card-back choice, like a physical prize pick. */
+.sb-reward-choice-overlay[hidden]{display:none!important}
+.sb-reward-choice-overlay{
+  position:fixed;inset:0;z-index:180;
+  display:grid;place-items:center;padding:18px
+}
+.sb-reward-choice-backdrop{
+  position:absolute;inset:0;background:#010610d8;backdrop-filter:blur(7px)
+}
+.sb-reward-choice-panel{
+  position:relative;z-index:2;
+  width:min(920px,94vw);max-height:94dvh;overflow:auto;
+  display:grid;justify-items:center;gap:18px;
+  padding:24px;border:1px solid #55e7ff58;border-radius:22px;
+  background:radial-gradient(circle at center,#0a2533f7,#031019fb 72%);
+  box-shadow:0 30px 80px #000e,0 0 45px #55e7ff16
+}
+.sb-reward-choice-copy{text-align:center;display:grid;gap:5px}
+.sb-reward-choice-copy strong{font-size:20px}.sb-reward-choice-copy small{font-size:10px;color:#9ab6c8}
+.sb-reward-choice-grid{
+  display:grid;grid-template-columns:repeat(6,minmax(70px,110px));
+  gap:12px;justify-content:center
+}
+.sb-reward-choice-card{
+  position:relative;width:100%;aspect-ratio:5/7;
+  border:2px solid #62dfff80;border-radius:12px;
+  background-image:url('stream_bandit_stag_icon_32.png'),linear-gradient(145deg,#113654,#382072 62%,#b72f70);
+  background-repeat:no-repeat,no-repeat;background-position:center,center;background-size:34%,cover;
+  box-shadow:0 12px 28px #000b,inset 0 0 0 2px #ffffff0d;
+  cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease
+}
+.sb-reward-choice-card:hover,.sb-reward-choice-card:focus-visible{
+  outline:none;transform:translateY(-8px) scale(1.025);border-color:#d9f8ff;
+  box-shadow:0 18px 38px #000d,0 0 24px #55e7ff38
+}
+.sb-reward-choice-card.is-selected{
+  transform:translateY(-10px);border-color:#ffd56a;
+  box-shadow:0 18px 38px #000d,0 0 0 3px #ffd56a35,0 0 32px #ffd56a3a
+}
+.sb-reward-choice-card.is-empty{opacity:.11;cursor:default}
+.sb-reward-choice-order{
+  position:absolute;right:-8px;top:-8px;width:25px;height:25px;border-radius:50%;
+  display:grid;place-items:center;background:#ffd56a;color:#1b1203;font-weight:1000;font-size:10px;
+  box-shadow:0 3px 10px #000a
+}
+.sb-reward-choice-confirm{
+  min-width:170px;min-height:44px;padding:9px 18px;border:1px solid #35e2ad8f;border-radius:12px;
+  background:linear-gradient(145deg,#0c5c47,#118d68);color:#fff;font-weight:1000;font-size:11px;cursor:pointer
+}
+.sb-reward-choice-confirm:disabled{opacity:.35;cursor:not-allowed}
+
+/* The hand is a physical horizontal tray. Only the hand scrolls; the board never does. */
+.sb-hand{
+  overflow-x:auto!important;overflow-y:hidden!important;
+  overscroll-behavior-x:contain;touch-action:pan-x;
+  -webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
+  scrollbar-width:none
+}
+.sb-hand::-webkit-scrollbar{display:none}
+.sb-hand-card{scroll-snap-align:center}
+
+/* Vanguard remains the focal card and is larger than Bench cards without dominating the viewport. */
+@media(min-width:641px){
+  .sb-vanguard-slot .sb-card-control{
+    width:min(var(--active-w),15.5dvh);
+    max-width:calc(100% - 8px);max-height:calc(100% - 6px)
+  }
+  .sb-bench-zone{min-height:0}
+}
+
+@media(max-width:640px), (hover:none) and (pointer:coarse){
+  .sb-reward-stack{max-width:38px;gap:1px}.sb-reward-card{width:11px;border-radius:2px}
+  .sb-reserve.sb-bench-zone{
+    padding:10px 3px 2px;border-radius:8px;gap:3px;overflow:hidden
+  }
+  .sb-bench-label{left:5px;top:2px;font-size:5px}
+  .sb-bench-cards{gap:3px;justify-content:center}
+  .sb-bench-creature .sb-card-control{
+    height:clamp(72px,12.4dvh,94px);width:auto;max-height:calc(100% - 2px);max-width:none
+  }
+  .sb-bench-open-target{
+    width:clamp(40px,10vw,58px);height:clamp(64px,11dvh,88px);aspect-ratio:auto;
+    border-radius:6px
+  }
+  .sb-bench-open-target span{font-size:6px}.sb-bench-open-target small{font-size:5px}
+  .sb-vanguard-slot .sb-card-control{
+    height:clamp(94px,16.5dvh,128px);width:auto;max-height:calc(100% - 4px);max-width:none
+  }
+  .sb-hand{
+    height:78px!important;min-height:0!important;
+    gap:0!important;padding:2px 18px 0!important;
+    scroll-padding-inline:18px
+  }
+  .sb-hand-card{
+    height:154px!important;width:auto!important;flex:0 0 auto!important;
+    margin-right:-17px!important
+  }
+  .sb-card-battle-tokens{right:-8px;top:32%;gap:2px}
+  .sb-battle-token{min-width:19px;height:19px;font-size:6px;border-width:1px}
+  .sb-card-inspector{padding:7px!important}
+  .sb-card-inspector-panel{width:min(340px,91vw);max-height:96dvh}
+  .sb-inspector-action-dock{grid-template-columns:1fr 1fr;gap:4px;padding:5px;margin-top:5px}
+  .sb-inspector-action{min-height:40px;padding:5px 6px}
+  .sb-inspector-action strong{font-size:8px}.sb-inspector-action small{font-size:6px}
+  .sb-reward-choice-panel{width:min(94vw,520px);padding:16px 12px;gap:12px;border-radius:16px}
+  .sb-reward-choice-copy strong{font-size:16px}.sb-reward-choice-copy small{font-size:8px}
+  .sb-reward-choice-grid{grid-template-columns:repeat(3,minmax(62px,92px));gap:9px}
+  .sb-reward-choice-card{border-radius:9px}
+  .sb-reward-choice-confirm{min-height:40px;font-size:10px}
+}
+@media(max-width:420px){
+  .sb-reward-choice-grid{grid-template-columns:repeat(3,minmax(58px,82px));gap:7px}
+  .sb-hand{padding-left:12px!important;padding-right:32px!important}
+}
+
 </style>
 </head>
-<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-9-hand-peek" data-sb-tcg-play-bindings="v0-11-server-projected-actions" data-sb-tcg-card-face="v1">
+<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-12-single-bench" data-sb-tcg-play-bindings="v0-12-reference-tabletop" data-sb-tcg-card-face="v1">
 <main class="sb-battle">
   <section class="sb-board" aria-label="One-screen battlefield">
     <header class="sb-player-strip" aria-label="Opponent">
@@ -881,13 +1121,14 @@ button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:p
 </main>
 
 <div class="sb-card-inspector" id="cardInspector" hidden></div>
+<div class="sb-reward-choice-overlay" id="rewardChoiceOverlay" hidden></div>
 <div class="sb-choreography-layer" id="battleChoreography" hidden aria-live="polite"></div>
 
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
-<script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-55"></script>
+<script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-133-clean-tabletop"></script>
 <script src="stream-bandit-tcg-battle-presentation-v1.js?v=1-0-choreography-foundation"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-20-server-attack-choice-route"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-21-single-bench-tabletop"></script>
 </body>
 </html>

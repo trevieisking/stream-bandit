@@ -267,10 +267,11 @@ test('rendered V2 card Attack click posts authoritative Attack payload and surfa
 });
 
 
-test('blocked Attack remains inspectable, explains insufficient Essence, and never disguises resolution timing', () => {
+test('blocked Attack remains inspectable while runtime legality stays outside the printed card face', () => {
   assert.match(cardRenderer, /data-attack-blocked-reason=/);
   assert.match(cardRenderer, /Needs more matching Essence/);
-  assert.match(cardRenderer, /Turn ends after full resolution/);
+  assert.doesNotMatch(cardRenderer, /Turn ends after full resolution/);
+  assert.match(controller, /sb-inspector-action-dock/);
   assert.match(controller, /Attack blocked —/);
   assert.match(controller, /Attach more matching Essence until the Attack cost orbs are covered/);
   assert.match(controller, /if \(blockedReason\) \{[\s\S]*?setStatus\([\s\S]*?return;[\s\S]*?\}[\s\S]*?await runAttackIntent/);
